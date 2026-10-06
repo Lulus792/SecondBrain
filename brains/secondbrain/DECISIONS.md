@@ -71,3 +71,12 @@ Die Vorschau ist eine eigene optische Nachbildung. Ein Originalmaterial von
 Apple ist damit noch nicht in die C-App integriert. Materialanbindung und
 Plattformnachweise gehören zum nächsten Implementierungsschritt.
 Beleg: [Verfeinerte Studie](../../docs/UI_GALAXIE.md).
+
+## D09: Vollständige Tastaturwege im neuen Design
+
+Am 6. Oktober hat der Nutzer die Umsetzung des neuen Designs und problemlose
+Navigation ausschließlich per Tastatur beauftragt. Tab folgt einer sichtbaren,
+stabilen Reihenfolge; F6 wechselt Gruppen. Sternfokus und Öffnen sind getrennt.
+Dialoge, Quellen, Kontext und Bearbeitung bleiben erreichbar. Ein eigener
+SDL-Tastaturdurchlauf prüft die Abläufe ohne injizierte Mausereignisse.
+Quelle: Nutzerauftrag; [Bedienvertrag](../../docs/UI_TASTATUR.md).

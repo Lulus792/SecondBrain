@@ -37,7 +37,7 @@ internen Markdown-Verweisen. Externe Quellen sind keine erfundenen Sternkanten.
 Das erste Graphmodul ist in C implementiert; Pfade, Fragmentverweise, Prozentkodierung,
 Bild-/Codeausschlüsse und doppelte Links werden geprüft.
 
-Geplant ist ein eigener C-Materialrenderer mit Lichtkanten und Brechung des
+Implementiert ist ein eigener C-Materialrenderer mit Lichtkanten und Brechung des
 Sternhintergrunds. Er verwendet SDL als UI-Bibliothek und funktioniert auch auf
 älteren Macs sowie Windows und Linux. Dies ist eine optische Nachbildung;
 Apples native macOS-26-Materialimplementierung wird damit nicht behauptet.
@@ -45,6 +45,23 @@ Die vorhandenen Modelle für Speicherung und Änderungsschutz bleiben maßgeblic
 
 ## Prüfung
 
-Am 6. Oktober bestehen lokal die sechs C-/UI-Prüfungen einschließlich Graphprüfung
-mit AddressSanitizer und UndefinedBehaviorSanitizer. Die neue räumliche Oberfläche
-und vollständige Fokusführung sind zu diesem Stand noch in Umsetzung.
+Am 6. Oktober bestehen lokal alle sieben Prüfungen in Release sowie mit
+AddressSanitizer und UndefinedBehaviorSanitizer auf Intel macOS 14.6.1.
+Der zusätzliche Tastaturdurchlauf prüft 85 Aussagen über echte SDL-Ereignisse:
+Erstellen, Bereichswahl, Bearbeiten, Speichern, Tabulator, Undo/Redo, Kamera,
+Sternwahl ohne sofortiges Öffnen, Schutzdialog, Suche, lokale Quelle, Kontext,
+Konfliktkopie ohne Überschreiben des Originals, Einstellungen, kleine Darstellung mit 150 Prozent Schrift, Hilfe, Archiv,
+Arbeitsordner, Projektwahl und Beenden. Eine Notiz mit 300 Quellenlinks prüft die Erreichbarkeit des letzten Links und
+die Fokuswiederherstellung nach der Quellenansicht. Die Prüfung kontrolliert auch
+die aktive SDL-Texteingabe in Editor und frisch geöffneten Formularen. Es werden keine Mausereignisse injiziert.
+
+Der bisherige Bedienweg besteht separat mit 87 Aussagen. Die Materialprüfung
+weist nach, dass Glas auf geänderte Sterne reagiert und reduzierte Transparenz
+seinen Inhalt von diesen Änderungen abschirmt. Der Pakettest führt beide
+Bedienwege aus dem tatsächlich entpackten und verschobenen Paket aus.
+Neue Windows-/Linux-Nachweise sind bis zur erfolgreichen CI-Abnahme noch offen.
+
+Tasten im Editor: Tab verlässt das Feld; Ctrl+I fügt einen Tabulator ein.
+Das gilt auch auf macOS, wo Ctrl ausdrücklich die Control-Taste bezeichnet.
+Die übrigen App-Kürzel verwenden Command auf macOS beziehungsweise Control
+auf Windows und Linux. Es gibt keine Tastaturfalle im Mehrzeileneditor.

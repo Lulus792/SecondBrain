@@ -28,16 +28,20 @@ Der eigene Projektkontext wird in allen sechs Desktop-Jobs geöffnet und gerende
 Die Intel-macOS-App liegt lokal unter dist/SecondBrain/secondbrain.app;
 weitere Pakete stehen im verlinkten GitHub-Lauf als Actions-Artefakte bereit.
 
-## Nächster Schritt
+## Neue Umsetzung: Version 0.2
 
-Der Nutzer hat Lumens Farbpalette mit einem stärkeren Liquid-Glass-Look für
-Karten und Bedienelemente ausgewählt. Die [Designstudie](../../docs/UI_GALAXIE.md)
-dokumentiert die verfeinerte Vorschau und ihre Prüfung. Die C-App bleibt auf
-dem geprüften Stand der ersten Version; die Galaxie-Ansicht und das neue
-Glasmaterial sind dort noch nicht integriert. Die Umsetzung samt vollständiger Tastaturbedienung ist jetzt beauftragt. Das
-C-Graphmodul erkennt geprüfte interne Markdown-Verweise; alle sechs lokalen
-C-/UI-Prüfungen bestehen mit Sanitizern. [Bedienvertrag](../../docs/UI_TASTATUR.md).
-Nächster Schritt: Sternkarte, Glasrenderer und sichtbare Fokusführung integrieren.
+Lumen-Farben, eigene C-Glasdarstellung, reale Sternkarte und Kamerabedienung sind
+in die App integriert. Die bisherigen Arbeitsabläufe verwenden weiter denselben
+C-Kern. Sichtbarer Fokus, Tab, F6, Pfeile und Bestätigung erlauben reine Tastaturwege.
+Der Editor hält seine Undo-Historie getrennt von Suche und Dialogen.
+[Bedienvertrag und Prüfumfang](../../docs/UI_TASTATUR.md).
+
+Lokal bestehen sieben Release-Prüfungen und dieselben sieben Prüfungen mit
+AddressSanitizer/UndefinedBehaviorSanitizer. Der Tastaturdurchlauf prüft 85 Aussagen,
+der bisherige Bedienweg 87. Kleine Fenster mit 150 Prozent Schriftgröße sind darin
+enthalten. Die tatsächliche Darstellung wurde in groß und klein betrachtet. Die
+entpackte Intel-macOS-App besteht beide Bedienwege aus einem anderen Ordner. Nächster Schritt: native Abnahme dieser neuen Version auf allen
+drei Plattformen; die oben verlinkte CI belegt die erste Version.
 
 ## Grenzen
 

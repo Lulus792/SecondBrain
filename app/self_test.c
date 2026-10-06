@@ -90,7 +90,7 @@ int sb_desktop_self_test(SBDesktop *d, const char *directory) {
     CHECK(click(d, "save"));
     CHECK(!sb_app_dirty(&d->model));
     CHECK(click(d, "read"));
-    CHECK(capture(d, directory, "large-light.bmp"));
+    CHECK(capture(d, directory, "large-lumen.bmp"));
     CHECK(click(d, "search")); type(d, "Messung");
     CHECK(!strcmp(d->search, "Messung") && d->hits.count == 1);
     CHECK(replace(d, "search", ""));
@@ -131,6 +131,7 @@ int sb_desktop_self_test(SBDesktop *d, const char *directory) {
     CHECK(click(d, "form-name")); type(d, "Zweites");
     CHECK(click(d, "submit"));
     CHECK(d->model.projects.count == 2 && !strcmp(d->model.project.id, "zweites"));
+    CHECK(click(d, "project-picker"));
     CHECK(click(d, "project:physim-ue"));
     CHECK(!strcmp(d->model.project.id, "physim-ue"));
     CHECK(click(d, "section:knowledge"));
@@ -141,7 +142,9 @@ int sb_desktop_self_test(SBDesktop *d, const char *directory) {
     free(text); text = NULL;
     CHECK(click(d, "settings"));
     CHECK(click(d, "theme"));
-    CHECK(d->ui.dark);
+    CHECK(!d->ui.dark);
+    CHECK(capture(d, directory, "settings-light.bmp"));
+    CHECK(click(d, "theme") && d->ui.dark);
     CHECK(click(d, "font-plus") && click(d, "font-plus"));
     CHECK(d->ui.scale == 1.5f);
     key(d, SDLK_ESCAPE, 0);

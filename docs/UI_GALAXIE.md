@@ -1,8 +1,8 @@
 # Recherche und Designrichtungen für eine Wissensgalaxie
 
 Stand: 6. Oktober 2026. Status: Lumen-Farbpalette und Liquid-Glass-Richtung
-ausgewählt; verfeinerte Vorschau erstellt. Die räumliche Ansicht ist noch keine
-Funktion der C-Desktop-App.
+ausgewählt und in Version 0.2 der C-App integriert. Die Vorschauen bleiben
+Entwurfsreferenzen; aktuelle App-Nachweise stehen unter STATUS.md.
 
 ## Auftrag und bestätigte Gestaltung
 
@@ -61,9 +61,9 @@ Reflexe. Die Lumen-Farben des Raums bleiben erhalten.
 Diese Studie ist eine eigene optische Nachbildung, kein Einsatz von Apples
 nativer Materialimplementierung. Die öffentliche macOS-Komponente
 [NSGlassEffectView](https://developer.apple.com/documentation/appkit/nsglasseffectview)
-ist laut Apples Dokumentationsdaten ab macOS 26 verfügbar. Eine konkrete native
-Anbindung und der entsprechende Materialweg unter Windows und Linux sind für
-die C-Integration gesondert zu klären.
+ist laut Apples Dokumentationsdaten ab macOS 26 verfügbar. Für die C-App ist deshalb ein eigener
+plattformübergreifender Materialrenderer umgesetzt. Eine native AppKit-Anbindung
+ist kein Bestandteil dieser Version.
 
 Bewegung soll der Handlung dienen, kurz und nachvollziehbar sein. Daraus folgen
 direkte Kamera-Reaktion auf Eingaben, abbrechbare Fokusbewegung und eine reduzierte
@@ -126,6 +126,11 @@ und Kamera-Drehung wurden in der Vorschau bedient und betrachtet; die
 angepasste Kartengröße bleibt lesbar. Dabei wurden keine JavaScript-Fehler gemeldet.
 Beispieldaten und die Abgrenzung zur C-App gelten weiterhin.
 
-Als Nächstes werden Kamerabedienung, Lesekarte, Beschriftung, Graphumfang und
-der plattformgerechte Materialweg für die C-Anwendung konkretisiert. Sichtbare
-Beziehungen sollen aus nachvollziehbaren Projektverweisen entstehen.
+Kamera, Lesekarte, Beschriftung und Material sind jetzt in C umgesetzt. Die
+Sternkarte verwendet reale Dokumente des geöffneten Projekts und vorhandene
+interne Markdown-Verweise. Die vorhandenen Arbeitsabläufe wurden integriert;
+Tab, F6, Pfeile und Bestätigung ermöglichen reine Tastaturbedienung. Lokal
+bestehen sieben Prüfungen in Release und mit AddressSanitizer/UndefinedBehaviorSanitizer,
+einschließlich vollständiger Tastaturwege bei 150 Prozent Schriftgröße.
+[Architektur](ARCHITEKTUR.md), [Bedienung](UI_TASTATUR.md) und [Prüfstand](STATUS.md)
+unterscheiden Implementierung, ausgeführte Nachweise und Grenzen.

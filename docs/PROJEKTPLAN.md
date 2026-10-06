@@ -100,11 +100,18 @@ stehen im [Umsetzungsstand](STATUS.md).
 - [x] Drei vergleichbare Entwürfe einschließlich glasartiger Karten vorbereiten.
 - [x] Lumen-Farbpalette mit Apple-orientiertem Liquid-Glass-Look auswählen.
 - [x] Die gewählte Kombination als verfeinerte Vorschau ausarbeiten und prüfen.
-- [ ] Materialweg, Graphumfang und Kamerabedienung für die C-Integration konkretisieren.
+- [x] Materialweg, Graphumfang und Kamerabedienung für die C-Integration konkretisieren.
+- [x] Lumen-Sternkarte und eigene Glasdarstellung in C implementieren.
+- [x] Vorhandene Arbeitsabläufe in schwebende Karten integrieren.
+- [x] Sichtbaren Fokus und vollständig per Tastatur bedienbare Abläufe implementieren.
+- [x] Beide Bedienwege lokal in Release prüfen, einschließlich kleinem Fenster
+  und 150 Prozent Schriftgröße.
+- [ ] Neue UI und Tastaturwege mit entpackten Paketen auf allen drei Plattformen abnehmen.
 
 Referenzen, Antworten und der Status der Vorschauen stehen in
-[UI_GALAXIE.md](UI_GALAXIE.md). Diese Phase ist zunächst eine Designauswahl;
-die neue Ansicht ist noch nicht Bestandteil der geprüften Desktop-App.
+[UI_GALAXIE.md](UI_GALAXIE.md). Die Umsetzung wurde anschließend
+ausdrücklich beauftragt. Sie steht in der C-App; den jeweils belegten Prüfstand
+nennen [STATUS.md](STATUS.md) und [UI_TASTATUR.md](UI_TASTATUR.md).
 
 ## Laufende Veröffentlichung und Nachweise
 

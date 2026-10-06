@@ -1,4 +1,4 @@
-SecondBrain 0.1
+SecondBrain 0.2
 
 Dieses Paket enthält die eigene Desktop-Anwendung. Python, ein Compiler
 und eine externe Wissensanwendung sind zum Starten nicht erforderlich.
@@ -9,19 +9,25 @@ Linux: ./secondbrain starten; assets neben der Anwendung behalten.
 Linux benötigt eine Desktop-Sitzung und die Systembibliotheken des Fenstersystems.
 
 Standardmäßig liegen deine Projektgedächtnisse im Ordner SecondBrain im
-Benutzerverzeichnis. "Arbeitsordner öffnen" wählt einen anderen Ordner.
+Benutzerverzeichnis. Die Projektwahl oder Command/Control+O öffnet einen anderen Ordner.
 Mit --workspace /pfad/zum/ordner lässt sich dieser auch beim Start angeben.
 
-1. "Neues Projekt" wählen, Namen und Ordnerkennung eingeben.
+1. "+ Projekt" wählen, Namen und Ordnerkennung eingeben.
 2. Den Projektauftrag und aktuellen Stand über "Bearbeiten" ergänzen.
-3. Mit "Neue Notiz" Wissen, Ideen oder Übergaben erfassen.
+3. Mit "+ Notiz" Wissen, Ideen oder Übergaben erfassen.
 4. Bewusst speichern. Wechsel und Beenden schützen ungespeicherte Änderungen.
 5. "Aktionen > KI-Kontext" öffnet die gespeicherten Kerninformationen zum Kopieren.
 
 Command auf macOS, Control auf Windows/Linux:
 N neue Notiz, Umschalt+N neues Projekt, S speichern, O Arbeitsordner,
 F suchen, E lesen/bearbeiten, R neu laden, Umschalt+C KI-Kontext.
-Escape schließt Dialoge und Quellenansicht. Die Tastaturhilfe steht unter Aktionen.
+Tab / Umschalt+Tab wechselt Elemente, Enter/Leertaste aktiviert.
+F6 wechselt Werkzeuge, Sternkarte und Dokument; F1 öffnet die Hilfe.
+Sterne: Pfeile wählen, Enter öffnet, Umschalt+Pfeile dreht, +/- zoomt, Pos1 setzt zurück.
+Bild auf/ab scrollt Lesebereiche; Escape geht zurück oder schließt Karten/Dialoge.
+Tab verlässt den Editor; Ctrl+I fügt dort einen Tabulator ein.
+Ziehen dreht, Umschalt+Ziehen verschiebt, Mausrad zoomt. "Liste" zeigt Dokumente.
+Die Darstellung bietet größere Schrift und reduzierte Transparenz.
 
 Die App verarbeitet UTF-8-Markdown und JSON. Lokale Textquellen sind
 schreibgeschützt; Webquellen öffnen auf ausdrücklichen Klick im Browser.

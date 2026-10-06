@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
     CHECK(sb_path_join(root, sizeof(root), argv[1], suffix).code == SB_OK);
     CHECK(sb_project_create(root, "test", "Graph", "", &project).code == SB_OK);
     CHECK(sb_note_create(&project, "knowledge", "a", "A", &note).code == SB_OK);
-    const char *text = "# A\n[Stand](../STATE.md)\n[Nochmals](../STATE.md)\n![Bild](../PROJECT.md)\n```\n[falsch](../QUESTIONS.md)\n```\n[Web](https://example.com)\n[Extern](../../other.md)\n";
+    const char *text = "# A\n[Stand](../STATE.md)\n[Nochmals](../STATE.md)\n![Bild](../PROJECT.md)\n```\n[falsch](../QUESTIONS.md)\n~~~\n[weiter falsch](../PROJECT.md)\n~~~\n```\n[Entscheidung](../DECISIONS.md)\n`[inline](../PROJECT.md)`\n\\[escaped](../QUESTIONS.md)\n[Web](https://example.com)\n[Extern](../../other.md)\n";
     char *old = NULL; SBRevision revision;
     CHECK(sb_note_load(&project, note.path, &old, &revision).code == SB_OK); sb_text_free(old);
     CHECK(sb_note_save(&project, note.path, text, revision, NULL).code == SB_OK);
@@ -29,9 +29,9 @@ int main(int argc, char **argv) {
     while (index < notes.count && strcmp(notes.items[index].path, "knowledge/a.md")) ++index;
     CHECK(index < notes.count);
     for (size_t i = 0; i < graph.edge_count; ++i) if (graph.edges[i].from == index) {
-        ++links; CHECK(!strcmp(notes.items[graph.edges[i].to].path, "STATE.md"));
+        ++links; CHECK(!strcmp(notes.items[graph.edges[i].to].path, "STATE.md") || !strcmp(notes.items[graph.edges[i].to].path, "DECISIONS.md"));
     }
-    CHECK(links == 1);
+    CHECK(links == 2);
     SBStar saved = graph.stars[index];
     CHECK(sb_graph_build(&project, &notes, &graph).code == SB_OK);
     CHECK(!memcmp(&saved, &graph.stars[index], sizeof(saved)));

@@ -10,11 +10,13 @@
 #define NK_INCLUDE_FONT_BAKING
 #define NK_INCLUDE_DEFAULT_FONT
 #define NK_INCLUDE_COMMAND_USERDATA
+#define NK_INPUT_MAX 4096
 #define NK_TEXTEDIT_UNDOCHARCOUNT 32000
 #define NK_TEXTEDIT_UNDOSTATECOUNT 256
 #include "nuklear.h"
 #include "nuklear_sdl3_renderer.h"
 #include "sb.h"
+#include "space.h"
 
 typedef struct {
     SDL_Window *window;
@@ -24,6 +26,7 @@ typedef struct {
     char font_path[SB_PATH_CAP];
     float scale, density;
     bool dark, testing;
+    SBSpace space;
 } SBUi;
 
 SBStatus sb_ui_init(SBUi *ui, const char *font_path, int width, int height, bool testing);

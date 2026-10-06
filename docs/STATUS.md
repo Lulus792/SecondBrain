@@ -110,3 +110,32 @@ bekannte Grenzen stehen unter [Distribution](DISTRIBUTION.md) und im eigenen
 Nuklear besitzt hier keine Anbindung an native
 Screenreader; vergrößerte Schrift und Tastaturbefehle ersetzen diesen fehlenden
 Zugang nicht.
+
+## Version 0.2: Lumen, Glaskarten und Tastatur
+
+Die ausgewählte Sternkarte ist in C implementiert. Reale Projektdokumente bilden
+kleine Lichtpunkte; interne Markdown-Verweise bilden Linien. Die Kamera reagiert
+auf Ziehen, Verschieben und Zoom sowie Tastatur und sichtbare Schaltflächen.
+Projektwahl, Suche, Dokumentliste und Lesekarte schweben über dem Raum.
+Erstellen, Bearbeiten, Speichern, Quellen, Kontext, Konfliktkopie, Archivierung
+und Schutzdialog verwenden die bisherigen fachlichen Modelle.
+
+Eigene C-Materialberechnung bricht den Sternhintergrund unter gewölbten Flächen
+und erzeugt Lichtkanten. Schrift wird separat dargestellt. Diese optische
+Nachbildung verwendet keine native Apple-Liquid-Glass-Komponente. Die dunkle
+Lumen-Palette ist der Standard; eine helle Variante und reduzierte Transparenz
+sind verfügbar. Kameraänderungen erfolgen direkt ohne automatische Rotation.
+
+Tab / Umschalt+Tab, sichtbare Fokusmarkierungen, Enter/Leertaste, F6, Pfeile und
+Lesescroll ermöglichen reine Tastaturwege. Dialoge begrenzen den Fokus und
+stellen ihn beim Schließen wieder her. Der Dokumenteditor hat einen dauerhaften
+Undo-Zustand, der von Such- und Dialogfeldern getrennt ist. Beim Dokumentwechsel
+wird er zurückgesetzt. [Bedienvertrag und Nachweise](UI_TASTATUR.md).
+
+Lokal bestehen am 6. Oktober alle sieben C-/UI-Prüfungen in Release sowie mit
+AddressSanitizer/UndefinedBehaviorSanitizer auf Intel macOS 14.6.1. Die tatsächlichen
+Bedienprüfungen enthalten 87 Aussagen für Maus/Tastatur und 85 für reine Tastatur,
+auch im kleinen Fenster mit 150 Prozent Schriftgröße. Die Graphprüfung umfasst
+20 Aussagen, einschließlich relativer/UTF-8-Verweise und Code-/Bildausschlüssen.
+Die neue Version benötigt ihre eigenen nativen Paket- und Plattformnachweise;
+die oben genannten GitHub-Läufe belegen weiterhin ihre jeweiligen älteren Stände.

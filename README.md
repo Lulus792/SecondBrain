@@ -10,14 +10,12 @@ Windows, macOS und Linux; externe Bibliotheken ausschließlich für die UI;
 UI-Recherche vor dem Entwurf und Gestaltung nach Apples Human Interface Guidelines.
 Die normale Nutzung erfolgt in der eigenen Anwendung.
 
-Version 0.1 liegt vor. UI-Recherche und Oberflächenentwurf sind dokumentiert;
-ein unabhängiger C17-Kern und ein natives Entwicklungswerkzeug sind implementiert.
-Die UI-Grundlage mit Schriften, Darstellung und Texteditor ist ebenfalls
-implementiert und auf allen drei Plattformen geprüft.
-Die eigene Desktop-Oberfläche ist implementiert und anhand eines vollständigen
-Bedienablaufs auf Windows, macOS und Linux geprüft. Die entpackten Pakete bestehen
-ebenfalls auf allen drei Systemen.
-Der aktuelle Nachweis steht im [Umsetzungsstand](docs/STATUS.md).
+Version 0.2 integriert die ausgewählte Lumen-Sternkarte und schwebende Glaskarten
+in die C-App. Dokumente, echte Markdown-Verweise, Kamera und sämtliche bisherigen
+Arbeitsabläufe sind verbunden. Die Oberfläche bietet durchgängige Tastaturwege
+mit sichtbarem Fokus. Aktuelle Prüfungen und ihre Plattformgrenzen stehen im
+[Umsetzungsstand](docs/STATUS.md); die vorherige Version ist bereits auf allen
+drei Systemen einschließlich entpackter Pakete geprüft.
 
 [GitHub Repository](https://github.com/Lulus792/SecondBrain) ·
 [Automatisierte Plattformprüfungen](https://github.com/Lulus792/SecondBrain/actions)
@@ -26,7 +24,7 @@ Der aktuelle Nachweis steht im [Umsetzungsstand](docs/STATUS.md).
 
 Fertige Pakete werden nach erfolgreichen Release-Prüfungen als
 `SecondBrain-Windows-X64`, `SecondBrain-macOS-ARM64` und `SecondBrain-Linux-X64`
-im [geprüften GitHub-Actions-Lauf](https://github.com/Lulus792/SecondBrain/actions/runs/37445131476)
+für Version 0.1 im [geprüften GitHub-Actions-Lauf](https://github.com/Lulus792/SecondBrain/actions/runs/37445131476)
 bereitgestellt. Den Download entpacken, dann das darin enthaltene
 Anwendungsarchiv entpacken. Die Anleitung `QUICKSTART.txt` gehört zum Paket.
 Ein GitHub-Login kann für den Download der Actions-Artefakte erforderlich sein.
@@ -46,7 +44,7 @@ Unter macOS entsteht `build/app/secondbrain.app`; unter Linux
 `build/app/secondbrain`, unter Windows bei Visual Studio
 `build/app/Release/secondbrain.exe`. Start per Doppelklick oder Terminal.
 Ohne Argumente verwendet die App den Ordner `SecondBrain` in deinem
-Benutzerverzeichnis. Über „Arbeitsordner öffnen“ kannst du einen anderen Ordner
+Benutzerverzeichnis. Über die Projektwahl oder Command/Control+O kannst du einen anderen Ordner
 mit Projektgedächtnissen auswählen. Das vorhandene Beispiel liegt in `brains`:
 
 ```sh
@@ -67,8 +65,18 @@ Lokale Textquellen und verlinkte Ordner öffnen sich schreibgeschützt in der Ap
 Vor einem Wechsel oder dem Beenden schützt ein Dialog ungespeicherte Änderungen.
 Bei externen Dateiänderungen bleibt deine eigene Fassung erhalten; sie lässt
 sich als neue Notiz sichern. Darstellung und Schriftgröße sind anpassbar.
-Tastaturhilfe findest du unter „Aktionen“. Command gilt auf macOS, Control auf
-Windows und Linux.
+Die Sternkarte zeigt Dokumente des aktuellen Projekts. Ihre Linien stehen für
+vorhandene interne Markdown-Verweise; die Farben markieren Wissensbereiche.
+„Liste“ und Suche öffnen die Dokumentauswahl. Ziehen dreht die Kamera,
+Umschalt+Ziehen verschiebt sie; das Mausrad zoomt. Die Glaseffekte sind eine eigene
+plattformübergreifende Nachbildung, keine native Apple-Materialkomponente.
+
+Tab / Umschalt+Tab erreicht die verfügbaren Elemente; Enter / Leertaste aktiviert.
+F6 wechselt Werkzeuge, Sternkarte und Dokument. In der Karte wählen Pfeile Sterne,
+Enter öffnet eine Notiz. Umschalt+Pfeile dreht die Kamera, +/- zoomt, Pos1 setzt sie
+zurück. Bild auf/ab scrollt Lesebereiche. Tab verlässt den Editor; Ctrl+I fügt einen
+Tabulator ein. F1 zeigt die vollständige Hilfe. Command gilt für die übrigen
+Kürzel auf macOS, Control auf Windows und Linux.
 
 ## Separater C-Kern und Strukturprototyp
 

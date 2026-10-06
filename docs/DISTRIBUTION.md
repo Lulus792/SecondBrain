@@ -1,6 +1,6 @@
 # Anwendungspakete
 
-SecondBrain 0.1.0 ist eine lokale Desktop-Anwendung. Zum Bauen werden ein
+SecondBrain 0.2.0 ist eine lokale Desktop-Anwendung. Zum Bauen werden ein
 C17-Compiler und CMake ab 3.20 benötigt. Zum Starten des fertigen Pakets sind
 Python, CMake und ein Compiler nicht erforderlich.
 
@@ -22,7 +22,7 @@ Systembibliotheken und eine Sitzung seines Fenstersystems.
 Der Pakettest entpackt das tatsächliche ZIP beziehungsweise tar.gz in einen
 neuen Ordner mit Leerzeichen und Umlauten. Er prüft Schriften, Lizenzen und
 Anleitung und startet anschließend die entpackte App für den vollständigen
-Bedienablauf. Schriften werden anhand des Anwendungsordners gesucht; eine
+Maus-/Tastatur-Bedienablauf und zusätzlich einen reinen Tastaturdurchlauf. Schriften werden anhand des Anwendungsordners gesucht; eine
 Referenz auf den ursprünglichen Quellordner ist nicht erforderlich.
 
 ## Inhalt
@@ -62,3 +62,11 @@ KI-Kontext wird aus den gespeicherten Kerninformationen kopiert. Weitere
 Notizen sind über die Projektdateien erreichbar. Ein KI-Chat muss das Lesen und
 die Pflege ausdrücklich übernehmen; automatische Synchronisation und eine
 integrierte Verbindung zu einem KI-Anbieter sind spätere Erweiterungen.
+
+Die Sternkarte ist auf 4096 Dokumente und 65536 interne Verweise je Projekt begrenzt.
+Bei Überschreitung bleibt die Dokumentliste verfügbar. Die Graphauswertung
+unterstützt einfache Markdown-Inline-Links; Referenzdefinitionen und Wiki-Links
+werden noch nicht ausgewertet. Die Glasdarstellung ist ein eigener C-Effekt und
+verwendet keine native macOS-26-Materialkomponente. Reduzierte Transparenz lässt
+sich in der App aktivieren. Kamerabewegungen erfolgen direkt auf Eingaben;
+es gibt keine automatische Rotation.

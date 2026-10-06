@@ -89,10 +89,39 @@ SBStatus sb_graph_build(const SBProject *project, const SBNotes *notes, SBGraph 
         if (status.code != SB_OK) goto fail;
         const char *p = text;
         bool fence = false, line_start = true;
+        unsigned inline_ticks = 0, fence_width = 0;
+        char fence_char = 0;
         while (*p) {
-            if (line_start && (!strncmp(p, "```", 3) || !strncmp(p, "~~~", 3))) fence = !fence;
+            if (line_start) {
+                const char *marker = p;
+                for (unsigned spaces = 0; spaces < 3 && *marker == ' '; ++spaces) ++marker;
+                if (*marker == '`' || *marker == '~') {
+                    unsigned width = 1;
+                    while (marker[width] == *marker) ++width;
+                    if (width >= 3) {
+                        if (!fence) { fence = true; fence_char = *marker; fence_width = width; }
+                        else if (*marker == fence_char && width >= fence_width) {
+                            const char *tail = marker + width;
+                            while (*tail == ' ' || *tail == '\t' || *tail == '\r') ++tail;
+                            if (!*tail || *tail == '\n') fence = false;
+                        }
+                        inline_ticks = 0;
+                        while (*p && *p != '\n') ++p;
+                        if (!*p) break;
+                        ++p; line_start = true; continue;
+                    }
+                }
+            }
             line_start = *p == '\n';
-            if (!fence && *p == '[' && (p == text || p[-1] != '!')) {
+            if (!fence && *p == '`') {
+                unsigned ticks = 1; while (p[ticks] == '`') ++ticks;
+                if (!inline_ticks) inline_ticks = ticks;
+                else if (inline_ticks == ticks) inline_ticks = 0;
+                p += ticks - 1;
+            }
+            unsigned escapes = 0;
+            for (const char *q = p; q > text && q[-1] == '\\'; --q) ++escapes;
+            if (!fence && !inline_ticks && !(escapes % 2) && *p == '[' && (p == text || p[-1] != '!')) {
                 const char *close = strchr(p + 1, ']');
                 if (close && close[1] == '(') {
                     const char *end = close + 2;

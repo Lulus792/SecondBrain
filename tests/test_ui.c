@@ -29,6 +29,11 @@ int main(int argc, char **argv) {
         nk_input_end(ui.ctx);
         CHECK(ui.ctx->input.keyboard.text_len == 4);
         CHECK(!memcmp(ui.ctx->input.keyboard.text, "Üß", 4));
+        nk_input_begin(ui.ctx);
+        event.text.text = "/Ein/langer/Projektpfad/mit/Leerzeichen und ü/SecondBrain";
+        sb_ui_event(&ui, &event); nk_input_end(ui.ctx);
+        CHECK((size_t)ui.ctx->input.keyboard.text_len == strlen(event.text.text));
+        CHECK(!memcmp(ui.ctx->input.keyboard.text, event.text.text, strlen(event.text.text)));
     }
     nk_textedit_init_default(&edit);
     edit.mode = NK_TEXT_EDIT_MODE_INSERT;
@@ -94,6 +99,22 @@ int main(int argc, char **argv) {
     sb_ui_draw(&ui);
     CHECK(sb_ui_capture(&ui, argv[2]).code == SB_OK);
     SDL_RenderPresent(ui.renderer);
+    ui.space.dark = true;
+    ui.space.points = calloc(1, sizeof(*ui.space.points)); CHECK(ui.space.points != NULL);
+    ui.space.count = 1;
+    ui.space.points[0] = (SBPoint){450,300,1,1,true,true,false};
+    ui.space.glass[0] = (SBGlass){{400,250,250,250},30}; ui.space.glass_count = 1;
+    sb_ui_draw(&ui);
+    CHECK(ui.space.cached && ui.space.width == 1000);
+    size_t pixel = ((size_t)300 * ui.space.width + 450) * 4;
+    CHECK(memcmp(ui.space.pixels + pixel, ui.space.base + pixel, 3));
+    uint64_t image = sb_hash((const char *)ui.space.pixels,(size_t)ui.space.width*ui.space.height*4);
+    ui.space.points[0].x += 60; sb_ui_draw(&ui);
+    CHECK(image != sb_hash((const char *)ui.space.pixels,(size_t)ui.space.width*ui.space.height*4));
+    ui.space.solid = true; sb_ui_draw(&ui);
+    unsigned char solid[3]; memcpy(solid,ui.space.pixels+pixel,3);
+    ui.space.points[0].x -= 60; sb_ui_draw(&ui);
+    CHECK(!memcmp(solid,ui.space.pixels+pixel,3));
     CHECK(sb_ui_fonts(&ui, 1.5f).code == SB_OK);
     sb_ui_theme(&ui, true);
     sb_ui_shutdown(&ui);

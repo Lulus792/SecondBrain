@@ -69,25 +69,25 @@ SBStatus sb_ui_fonts(SBUi *ui, float scale) {
 
 void sb_ui_theme(SBUi *ui, bool dark) {
     struct nk_color colors[NK_COLOR_COUNT];
-    struct nk_color bg = dark ? nk_rgb(28, 29, 33) : nk_rgb(255, 255, 255);
-    struct nk_color side = dark ? nk_rgb(37, 38, 43) : nk_rgb(243, 244, 247);
-    struct nk_color text = dark ? nk_rgb(236, 237, 241) : nk_rgb(32, 36, 44);
-    struct nk_color border = dark ? nk_rgb(65, 66, 73) : nk_rgb(221, 224, 230);
+    struct nk_color bg = dark ? nk_rgb(12, 22, 37) : nk_rgb(255, 255, 255);
+    struct nk_color side = dark ? nk_rgba(110, 144, 184, 22) : nk_rgba(255,255,255,30);
+    struct nk_color text = dark ? nk_rgb(231, 237, 246) : nk_rgb(32, 36, 44);
+    struct nk_color border = dark ? nk_rgba(162, 184, 217, 56) : nk_rgb(221, 224, 230);
     for (int i = 0; i < NK_COLOR_COUNT; ++i) colors[i] = side;
     colors[NK_COLOR_TEXT] = text; colors[NK_COLOR_WINDOW] = bg;
     colors[NK_COLOR_HEADER] = side; colors[NK_COLOR_BORDER] = border;
     colors[NK_COLOR_BUTTON] = side;
-    colors[NK_COLOR_BUTTON_HOVER] = dark ? nk_rgb(62, 65, 74) : nk_rgb(226, 233, 243);
-    colors[NK_COLOR_BUTTON_ACTIVE] = nk_rgb(27, 93, 190);
+    colors[NK_COLOR_BUTTON_HOVER] = dark ? nk_rgba(159, 189, 229, 48) : nk_rgb(226, 233, 243);
+    colors[NK_COLOR_BUTTON_ACTIVE] = nk_rgb(59, 97, 142);
     colors[NK_COLOR_TOGGLE] = border; colors[NK_COLOR_TOGGLE_HOVER] = colors[NK_COLOR_BUTTON_HOVER];
-    colors[NK_COLOR_TOGGLE_CURSOR] = nk_rgb(27, 93, 190);
-    colors[NK_COLOR_SELECT] = bg; colors[NK_COLOR_SELECT_ACTIVE] = dark ? nk_rgb(33, 73, 125) : nk_rgb(222, 236, 254);
-    colors[NK_COLOR_SLIDER] = border; colors[NK_COLOR_SLIDER_CURSOR] = nk_rgb(27, 93, 190);
+    colors[NK_COLOR_TOGGLE_CURSOR] = nk_rgb(59, 97, 142);
+    colors[NK_COLOR_SELECT] = bg; colors[NK_COLOR_SELECT_ACTIVE] = dark ? nk_rgba(113, 157, 212, 64) : nk_rgb(222, 236, 254);
+    colors[NK_COLOR_SLIDER] = border; colors[NK_COLOR_SLIDER_CURSOR] = nk_rgb(59, 97, 142);
     colors[NK_COLOR_SLIDER_CURSOR_HOVER] = nk_rgb(36, 114, 215);
-    colors[NK_COLOR_SLIDER_CURSOR_ACTIVE] = nk_rgb(27, 93, 190);
-    colors[NK_COLOR_EDIT] = bg; colors[NK_COLOR_EDIT_CURSOR] = text;
+    colors[NK_COLOR_SLIDER_CURSOR_ACTIVE] = nk_rgb(59, 97, 142);
+    colors[NK_COLOR_EDIT] = dark ? nk_rgba(10,21,36,180) : nk_rgba(249,253,255,200); colors[NK_COLOR_EDIT_CURSOR] = text;
     colors[NK_COLOR_PROPERTY] = side; colors[NK_COLOR_CHART] = bg;
-    colors[NK_COLOR_CHART_COLOR] = nk_rgb(27, 93, 190); colors[NK_COLOR_CHART_COLOR_HIGHLIGHT] = text;
+    colors[NK_COLOR_CHART_COLOR] = nk_rgb(59, 97, 142); colors[NK_COLOR_CHART_COLOR_HIGHLIGHT] = text;
     colors[NK_COLOR_SCROLLBAR] = bg; colors[NK_COLOR_SCROLLBAR_CURSOR] = border;
     colors[NK_COLOR_SCROLLBAR_CURSOR_HOVER] = colors[NK_COLOR_BUTTON_HOVER];
     colors[NK_COLOR_SCROLLBAR_CURSOR_ACTIVE] = nk_rgb(128, 133, 145);
@@ -102,14 +102,20 @@ void sb_ui_theme(SBUi *ui, bool dark) {
     ui->ctx->style.window.padding = nk_vec2(18, 14);
     ui->ctx->style.window.spacing = nk_vec2(8, 8);
     ui->ctx->style.window.border = 0;
+    ui->ctx->style.window.fixed_background = nk_style_item_color(nk_rgba(0, 0, 0, 0));
+    ui->ctx->style.window.header.normal = nk_style_item_color(nk_rgba(0, 0, 0, 0));
+    ui->ctx->style.window.header.active = ui->ctx->style.window.header.normal;
+    ui->ctx->style.window.header.hover = ui->ctx->style.window.header.normal;
+    ui->ctx->style.window.rounding = 26;
     ui->ctx->style.window.group_padding = nk_vec2(8, 10);
-    ui->ctx->style.button.rounding = 7;
-    ui->ctx->style.button.border = 0;
+    ui->ctx->style.button.rounding = 12;
+    ui->ctx->style.button.border = 0.8f;
+    ui->ctx->style.button.border_color = dark ? nk_rgba(161,193,230,48) : nk_rgba(103,139,181,64);
     ui->ctx->style.button.padding = nk_vec2(10, 6);
-    ui->ctx->style.edit.rounding = 7;
+    ui->ctx->style.edit.rounding = 16;
     ui->ctx->style.edit.padding = nk_vec2(10, 8);
     ui->ctx->style.edit.row_padding = 5;
-    ui->ctx->style.selectable.rounding = 7;
+    ui->ctx->style.selectable.rounding = 14;
     ui->ctx->style.selectable.text_normal = text;
     ui->ctx->style.selectable.text_normal_active = text;
     ui->ctx->style.selectable.text_hover_active = text;
@@ -139,7 +145,7 @@ SBStatus sb_ui_init(SBUi *ui, const char *font_path, int width, int height, bool
     ui->ctx->clip.paste = paste;
     result = sb_ui_fonts(ui, 1);
     if (result.code != SB_OK) { sb_ui_shutdown(ui); return result; }
-    sb_ui_theme(ui, false);
+    sb_ui_theme(ui, true);
     return sb_ok();
 }
 
@@ -168,6 +174,9 @@ void sb_ui_draw(SBUi *ui) {
     SDL_SetRenderLogicalPresentation(ui->renderer, width, height, SDL_LOGICAL_PRESENTATION_STRETCH);
     SDL_SetRenderDrawColor(ui->renderer, ui->dark ? 28 : 255, ui->dark ? 29 : 255, ui->dark ? 33 : 255, 255);
     SDL_RenderClear(ui->renderer);
+    if (!sb_space_draw(&ui->space, ui->renderer, width, height)) {
+        SDL_SetRenderDrawColor(ui->renderer, 7, 14, 26, 255); SDL_RenderClear(ui->renderer);
+    }
     nk_sdl_render(ui->ctx, NK_ANTI_ALIASING_ON);
 }
 void sb_ui_reset_editor(SBUi *ui) {
@@ -184,6 +193,7 @@ SBStatus sb_ui_capture(SBUi *ui, const char *path) {
     return ok ? sb_ok() : sb_error(SB_IO, "Bild konnte nicht gespeichert werden.");
 }
 void sb_ui_shutdown(SBUi *ui) {
+    sb_space_free(&ui->space);
     if (ui->ctx) nk_sdl_shutdown(ui->ctx);
     if (ui->renderer) SDL_DestroyRenderer(ui->renderer);
     if (ui->window) SDL_DestroyWindow(ui->window);

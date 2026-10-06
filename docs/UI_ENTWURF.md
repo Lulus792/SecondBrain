@@ -5,10 +5,17 @@ Die Oberfläche verbindet Projektwahl, Dokumentauswahl und die aktuelle Notiz.
 
 ## Hauptfenster
 
-Die linke Seitenleiste zeigt Projekte und Wissensbereiche. Die mittlere Spalte
-zeigt die zugehörigen Dokumente und eine Suche über Titel und Inhalte. Die große
-rechte Fläche dient dem Lesen und Bearbeiten. Das aktuelle Projekt und Dokument
-bleiben erkennbar. Bei kleinen Fenstern kann die Seitenleiste ausgeblendet werden.
+Die ausgewählte Lumen-Sternkarte bildet den Hintergrund. Die obere schwebende
+Glasleiste enthält Projektwahl, Suche, Liste und Erstellen. Kleine beschriftete
+Lichtpunkte zeigen echte Dokumente des geöffneten Projekts. Die räumlichen
+Gruppen entsprechen Wissensbereichen; Linien stehen für vorhandene interne
+Markdown-Verweise. Die Kamera lässt sich drehen, verschieben und zoomen.
+
+Eine Auswahl öffnet die schwebende Lesekarte rechts. Bearbeiten vergrößert sie;
+die Dokumentliste bleibt daneben zugänglich. Die Karte lässt sich schließen,
+während ihr Entwurf im Modell erhalten bleibt. Kleine Fenster und große Schrift
+verwenden umgebrochene Werkzeuge und scrollbare Karten. Dialoge liegen darüber.
+Die [Designrecherche](UI_GALAXIE.md) enthält Referenzen und ausgewählte Vorschau.
 
 Das Anlegen eines Projekts fragt nach einem Namen, einer portablen Kennung und
 optional dem Ordner des eigentlichen Projekts. Eine neue Notiz erhält einen
@@ -35,12 +42,17 @@ ein bestimmter KI-Anbieter wird nicht vorausgesetzt.
 
 ## Gestaltung und Bedienung
 
-Helle und dunkle Flächen, ruhige Trennlinien, klare Überschriften und ein blauer
-Akzent setzen die Apple-Gestaltungsrichtung um. Primäre Inhalte erhalten deutlich
+Die dunkle Lumen-Palette, optische Brechung des Sternhintergrunds, gewölbte
+Lichtkanten und klare Typografie setzen die ausgewählte Gestaltungsrichtung um.
+Das Material wird im eigenen C-Renderer berechnet und bei unveränderter Szene
+wiederverwendet. Es ist eine optische Nachbildung. Reduzierte Transparenz und
+eine helle Variante stehen in der Darstellungsauswahl bereit. Primäre Inhalte erhalten deutlich
 mehr Raum als Bedienelemente. Fensterrahmen und Fensterknöpfe stellt das System.
 Schriftgröße und Darstellung sind anpassbar.
 
-Beschriftete Aktionen und dokumentierte Tastenkombinationen ergänzen die Maus.
+Beschriftete Aktionen, sichtbarer Fokus und vollständige Tastaturwege ergänzen
+die Maus. Der [Bedienvertrag](UI_TASTATUR.md) beschreibt Reihenfolge, Kartenwahl,
+Texteingabe, Scrollen und Dialoge.
 Command wird unter macOS verwendet, Control unter Windows und Linux. Sichtbare
 Speicherzustände verwenden Text zusätzlich zur Farbe. Die tatsächlichen
 Barrierefreiheitsgrenzen des UI-Backends werden in der Abnahme benannt.

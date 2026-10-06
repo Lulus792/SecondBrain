@@ -37,3 +37,27 @@ SDL statisch gebaut; Vorlagen und Schriftassets gehören zum Paket.
 Die App benötigt zur Laufzeit weder Python noch Obsidian. Die vorhandenen
 Python-Prüfungen bleiben als Nachweis des älteren Strukturprototyps erhalten.
 Neue C- und App-Prüfungen belegen die tatsächliche Anwendung separat.
+
+## Räumliche Ansicht und Tastatur
+
+app/graph.c gehört zur UI-unabhängigen C-Anwendungsschicht. Es liest gespeicherte
+Markdown-Dokumente, normalisiert relative interne Verweise und erzeugt einen
+stabilen räumlichen Grundaufbau. Das Limit der Sternkarte liegt bei 4096 Dokumenten
+und 65536 Verweisen; die paginierte Dokumentliste bleibt unabhängig verfügbar.
+Unterstützt werden einfache Inline-Links, einschließlich Fragmenten und
+Prozentkodierung; Bilder, Code und externe Ziele bilden keine Sternkanten.
+
+app/space.c ist der eigene C-UI-Renderer. Er rastert Sterne und Verbindungen und
+berechnet Glasflächen mit Hintergrundbrechung und Lichtkanten. Der Materialraster
+ist auf 1600 × 1100 begrenzt; Nuklear stellt Schrift und Bedienflächen separat in
+der Fensterauflösung dar. Ein Szenenfingerabdruck vermeidet unveränderte Berechnungen.
+SDL bleibt die einzige Rendering-/Fensterbibliothek. Native Apple-Liquid-Glass-APIs
+werden nicht verwendet.
+
+app/desktop.c verwaltet stabile Fokuskennungen, die Reihenfolge der Gruppen,
+Dialogfokus und dessen Rückkehr. F6 und Tab bieten getrennte Wege für Gruppen
+und einzelne Elemente. Der Dokumenteditor verwendet einen dauerhaften
+nk_text_edit-Zustand über dem Modellpuffer; Such- und Dialogfelder teilen seine
+Undo-Historie nicht. Dokumentwechsel setzen diese Historie zurück.
+app/keyboard_test.c prüft die tatsächlichen Wege ausschließlich mit SDL-Tastatur-
+und Zwischenablageereignissen. Die Paketprüfung führt beide Bedienprüfungen aus.

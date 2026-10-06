@@ -43,9 +43,18 @@ endforeach()
 # Run the extracted app with its bundled assets from a different directory.
 execute_process(COMMAND "${SB_EXECUTABLE}" --self-test "${SB_TEST_ROOT}/Bedienprüfung ü"
     WORKING_DIRECTORY "${SB_UNPACK}" RESULT_VARIABLE SB_RESULT
-    OUTPUT_VARIABLE SB_OUTPUT ERROR_VARIABLE SB_ERROR TIMEOUT 90)
+    OUTPUT_VARIABLE SB_OUTPUT ERROR_VARIABLE SB_ERROR TIMEOUT 240)
 message(STATUS "${SB_OUTPUT}")
 if(NOT SB_RESULT EQUAL 0)
     message(FATAL_ERROR "Relocated application failed: ${SB_RESULT}\n${SB_ERROR}")
 endif()
 message(STATUS "Extracted package passed the desktop workflow: ${SB_ARCHIVE}")
+
+execute_process(COMMAND "${SB_EXECUTABLE}" --keyboard-test "${SB_TEST_ROOT}/Tastaturprüfung ü"
+    WORKING_DIRECTORY "${SB_UNPACK}" RESULT_VARIABLE SB_KEYBOARD_RESULT
+    OUTPUT_VARIABLE SB_KEYBOARD_OUTPUT ERROR_VARIABLE SB_KEYBOARD_ERROR TIMEOUT 300)
+message(STATUS "${SB_KEYBOARD_OUTPUT}")
+if(NOT SB_KEYBOARD_RESULT EQUAL 0)
+    message(FATAL_ERROR "Relocated keyboard workflow failed: ${SB_KEYBOARD_RESULT}\n${SB_KEYBOARD_ERROR}")
+endif()
+message(STATUS "Extracted package passed the keyboard-only workflow")

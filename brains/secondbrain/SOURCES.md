@@ -15,7 +15,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [UI-Recherche](../../docs/UI_RECHERCHE.md): Apple-Originalquellen und Designprinzipien.
 - [UI-Entwurf](../../docs/UI_ENTWURF.md): Ansichten, Abläufe und Gestaltung.
 - [Wissensgalaxie](../../docs/UI_GALAXIE.md): neue Referenzen, bestätigte
-  Designvorlieben und drei vorgeschlagene Ansichten; noch keine C-Implementierung.
+  Designvorlieben, drei Entwurfsreferenzen und die ausgewählte C-Integration.
 - [Tastatur und räumliche Oberfläche](../../docs/UI_TASTATUR.md): Bedienvertrag,
   Apple-Grundlagen und Graphumfang.
 - [Architektur](../../docs/ARCHITEKTUR.md): C17-Kern, Plattformschicht, UI und Build.
