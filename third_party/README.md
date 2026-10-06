@@ -9,8 +9,8 @@ SDL3 3.2.30 wird statisch gebaut oder aus einer vorhandenen passenden
 Entwicklungsinstallation eingebunden. Originalquelle:
 [Release 3.2.30](https://github.com/libsdl-org/SDL/releases/tag/release-3.2.30).
 Das Quellarchiv wird beim UI-Build bei Bedarf geladen; sein SHA-256 ist im
-CMake-Build festgelegt. Lizenz: zlib. Die Lizenz liegt im Originalarchiv und muss
-mit einem späteren Anwendungspaket ausgeliefert werden.
+CMake-Build festgelegt. Lizenz: zlib. Die Original-Lizenz ist unter
+licenses/SDL3.txt enthalten und wird mit jedem Anwendungspaket ausgeliefert.
 
 ## Nuklear
 

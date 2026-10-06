@@ -1,0 +1,37 @@
+SecondBrain 0.1
+
+Dieses Paket enthält die eigene Desktop-Anwendung. Python, ein Compiler
+und eine externe Wissensanwendung sind zum Starten nicht erforderlich.
+
+macOS: secondbrain.app öffnen.
+Windows: secondbrain.exe öffnen; assets neben der Anwendung behalten.
+Linux: ./secondbrain starten; assets neben der Anwendung behalten.
+Linux benötigt eine Desktop-Sitzung und die Systembibliotheken des Fenstersystems.
+
+Standardmäßig liegen deine Projektgedächtnisse im Ordner SecondBrain im
+Benutzerverzeichnis. "Arbeitsordner öffnen" wählt einen anderen Ordner.
+Mit --workspace /pfad/zum/ordner lässt sich dieser auch beim Start angeben.
+
+1. "Neues Projekt" wählen, Namen und Ordnerkennung eingeben.
+2. Den Projektauftrag und aktuellen Stand über "Bearbeiten" ergänzen.
+3. Mit "Neue Notiz" Wissen, Ideen oder Übergaben erfassen.
+4. Bewusst speichern. Wechsel und Beenden schützen ungespeicherte Änderungen.
+5. "Aktionen > KI-Kontext" öffnet die gespeicherten Kerninformationen zum Kopieren.
+
+Command auf macOS, Control auf Windows/Linux:
+N neue Notiz, Umschalt+N neues Projekt, S speichern, O Arbeitsordner,
+F suchen, E lesen/bearbeiten, R neu laden, Umschalt+C KI-Kontext.
+Escape schließt Dialoge und Quellenansicht. Die Tastaturhilfe steht unter Aktionen.
+
+Die App verarbeitet UTF-8-Markdown und JSON. Lokale Textquellen sind
+schreibgeschützt; Webquellen öffnen auf ausdrücklichen Klick im Browser.
+Es gibt keine automatische Synchronisation oder automatische KI-Aktualisierung.
+Der Editor unterstützt begrenztes Rückgängig/Wiederholen. Der Lesemodus
+unterstützt grundlegendes Markdown. Eine native Screenreader-Anbindung fehlt.
+
+Diese Pakete sind nicht mit einem externen Herausgeberzertifikat signiert
+oder durch Apple notarisiert. Betriebssystem-Prüfungen können den Start
+einschränken. Installiere nur aus einer Quelle, der du vertraust.
+
+Projekt, Quellen und Nachweise: https://github.com/Lulus792/SecondBrain
+Lizenzen der UI-Abhängigkeiten und Schriften stehen unter licenses.

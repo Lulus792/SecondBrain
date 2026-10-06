@@ -80,8 +80,15 @@ Lokal bestehen alle vier C-/UI-Prüfungen, auch mit AddressSanitizer und
 UndefinedBehaviorSanitizer. Tatsächlich gerenderte Ansichten wurden
 in groß/hell und klein/dunkel mit 150 Prozent Schriftgröße betrachtet.
 
-Paketierung ohne Python-Laufzeit sowie die vollständigen Desktop-Nachweise
-auf den drei Zielplattformen stehen aus. Das aktive Ziel bleibt die vollständige
-Umsetzung der Anwendung. Nuklear besitzt hier keine Anbindung an native
+Der [Desktop-Lauf zu 07ca223](https://github.com/Lulus792/SecondBrain/actions/runs/37443300206)
+besteht auf Windows, macOS und Linux. Seine drei UI-Jobs führen alle vier
+C-/UI-Prüfungen einschließlich des vollständigen Bedienablaufs aus.
+
+CPack erzeugt Pakete mit statischem SDL, Schriften und Lizenzen. Lokal besteht
+die entpackte macOS-App den Bedienablauf aus einem anderen Arbeitsordner mit
+Leerzeichen und Umlauten. `otool -L` zeigt ausschließlich Systembibliotheken.
+Die Paketprüfungen auf Windows, macOS und Linux werden nun ausgeführt.
+Das aktive Ziel bleibt bis zu deren Abschluss und dem eigenen Projektgedächtnis
+die vollständige Umsetzung. Nuklear besitzt hier keine Anbindung an native
 Screenreader; vergrößerte Schrift und Tastaturbefehle ersetzen diesen fehlenden
 Zugang nicht.

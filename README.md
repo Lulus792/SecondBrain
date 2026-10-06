@@ -14,15 +14,23 @@ Die Umsetzung läuft. UI-Recherche und Oberflächenentwurf sind dokumentiert;
 ein unabhängiger C17-Kern und ein natives Entwicklungswerkzeug sind implementiert.
 Die UI-Grundlage mit Schriften, Darstellung und Texteditor ist ebenfalls
 implementiert und auf allen drei Plattformen geprüft.
-Die eigene Desktop-Oberfläche ist implementiert und lokal anhand eines vollständigen
-Bedienablaufs geprüft. Paketierung und die vollständige App-Abnahme auf allen
-drei Plattformen folgen.
+Die eigene Desktop-Oberfläche ist implementiert und anhand eines vollständigen
+Bedienablaufs auf Windows, macOS und Linux geprüft. Die Paketerstellung und eine
+Prüfung der entpackten App sind eingerichtet; der erste lokale Paketlauf besteht.
 Der aktuelle Nachweis steht im [Umsetzungsstand](docs/STATUS.md).
 
 [GitHub Repository](https://github.com/Lulus792/SecondBrain) ·
 [Automatisierte Plattformprüfungen](https://github.com/Lulus792/SecondBrain/actions)
 
 ## Eigene Desktop-Anwendung
+
+Fertige Pakete werden nach erfolgreichen Release-Prüfungen als
+`SecondBrain-Windows-X64`, `SecondBrain-macOS-ARM64` und `SecondBrain-Linux-X64`
+im jeweiligen [GitHub-Actions-Lauf](https://github.com/Lulus792/SecondBrain/actions)
+bereitgestellt. Den Download entpacken, dann das darin enthaltene
+Anwendungsarchiv entpacken. Die Anleitung `QUICKSTART.txt` gehört zum Paket.
+Ein GitHub-Login kann für den Download der Actions-Artefakte erforderlich sein.
+Die Pakete bleiben dort 30 Tage erhalten.
 
 Voraussetzungen zum Bauen: C17-Compiler, CMake ab 3.20 und auf Linux die
 Entwicklungsdateien des Fenstersystems. SDL3 wird bei Bedarf beim Build aus der
@@ -63,6 +71,9 @@ Tastaturhilfe findest du unter „Aktionen“. Command gilt auf macOS, Control a
 Windows und Linux.
 
 ## Separater C-Kern und Strukturprototyp
+
+Paketerstellung, Voraussetzungen und Grenzen stehen in
+[Distribution](docs/DISTRIBUTION.md).
 
 Der C-Kern lässt sich bereits unabhängig von UI-Bibliotheken bauen:
 
