@@ -281,10 +281,10 @@ static void information(const Manifest *m,SBBackupInfo *info) {
 SBStatus sb_backup_inspect(const char *archive,SBBackupInfo *info,SBBackupCallback callback,void *userdata) {
     Manifest m={0}; unsigned char digest[32]; Progress p={0}; p.callback=callback; p.userdata=userdata; p.phase=SB_BACKUP_VERIFY;
     SBStatus status=archive_read(archive,&m,digest,&p,NULL);
-    if (status.code==SB_OK) information(&m,info);
+    if (status.code==SB_OK) { information(&m,info); memcpy(info->digest,digest,32); }
     dispose(&m); return status;
 }
-SBStatus sb_backup_restore(const char *archive,const char *workspace,const char *id,SBProject *out,SBBackupCallback callback,void *userdata) {
+SBStatus sb_backup_restore_checked(const char *archive,const char *workspace,const char *id,const unsigned char expected[32],SBProject *out,SBBackupCallback callback,void *userdata) {
     if (!sb_id_valid(id)) return sb_error(SB_INVALID,"Wähle einen gültigen, freien Projektordnernamen.");
     char parent[SB_PATH_CAP],destination[SB_PATH_CAP],stage[SB_PATH_CAP];
     TRY(sb_fs_absolute(workspace,parent,sizeof(parent)));
@@ -294,6 +294,7 @@ SBStatus sb_backup_restore(const char *archive,const char *workspace,const char 
     Manifest first={0},second={0}; unsigned char original[32],current[32]; Progress p={0};
     p.callback=callback; p.userdata=userdata; p.phase=SB_BACKUP_VERIFY;
     SBStatus status=archive_read(archive,&first,original,&p,NULL);
+    if (status.code==SB_OK && expected && memcmp(expected,original,32)) status=sb_error(SB_CONFLICT,"Sicherung wurde seit der Vorschau geändert. Prüfe sie erneut.");
     if (status.code!=SB_OK) { dispose(&first); return status; }
     status=temporary(parent,stage,true,NULL);
     if (status.code!=SB_OK) { dispose(&first); return status; }
@@ -317,4 +318,7 @@ SBStatus sb_backup_restore(const char *archive,const char *workspace,const char 
     if (status.code==SB_OK && out) { memset(out,0,sizeof(*out)); strcpy(out->id,id); strcpy(out->name,first.name); strcpy(out->root,destination); }
     dispose(&first); dispose(&second);
     return status.code==SB_OK ? status : cleanup(status,stage,true);
+}
+SBStatus sb_backup_restore(const char *archive,const char *workspace,const char *id,SBProject *out,SBBackupCallback callback,void *userdata) {
+    return sb_backup_restore_checked(archive,workspace,id,NULL,out,callback,userdata);
 }

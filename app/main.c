@@ -24,18 +24,19 @@ int main(int argc, char **argv) {
     char workspace[SB_PATH_CAP], font[SB_PATH_CAP], home[SB_PATH_CAP];
     const char *workspace_arg = NULL, *project_arg = NULL, *assets = NULL, *test_root = NULL, *snapshot = NULL, *settings_arg = NULL;
     SBStatus status;
-    bool keyboard_test = false;
+    bool keyboard_test = false,backup_test=false;
     for (int i = 1; i < argc; ++i) {
         if (!strcmp(argv[i], "--workspace") && i + 1 < argc) workspace_arg = argv[++i];
         else if (!strcmp(argv[i], "--project") && i + 1 < argc) project_arg = argv[++i];
         else if (!strcmp(argv[i], "--assets") && i + 1 < argc) assets = argv[++i];
         else if (!strcmp(argv[i], "--self-test") && i + 1 < argc) test_root = argv[++i];
         else if (!strcmp(argv[i], "--keyboard-test") && i + 1 < argc) { test_root = argv[++i]; keyboard_test = true; }
+        else if (!strcmp(argv[i],"--backup-test") && i+1<argc) { test_root=argv[++i]; backup_test=true; }
         else if (!strcmp(argv[i],"--settings") && i+1<argc) settings_arg=argv[++i];
         else if (!strcmp(argv[i], "--snapshot") && i + 1 < argc) snapshot = argv[++i];
         else if (!strcmp(argv[i], "--help")) {
             printf("SecondBrain\n  --workspace ORDNER\n  --project KENNUNG\n  --assets ASSETORDNER\n  --settings EINSTELLUNGSDATEI\n"
-                   "  --self-test TESTORDNER\n  --keyboard-test TESTORDNER\n  --snapshot BILD.bmp\n");
+                   "  --self-test TESTORDNER\n  --keyboard-test TESTORDNER\n  --backup-test TESTORDNER\n  --snapshot BILD.bmp\n");
             return 0;
         } else { fprintf(stderr, "Unbekannte oder unvollständige Option: %s\n", argv[i]); return 2; }
     }
@@ -49,7 +50,7 @@ int main(int argc, char **argv) {
         status = font_path(assets, font);
         if (status.code == SB_OK) status = sb_desktop_init(&desktop, workspace, font, true);
         if (status.code != SB_OK) { fprintf(stderr, "%s\n", status.message); return 1; }
-        int result = keyboard_test ? sb_desktop_keyboard_test(&desktop, directory) : sb_desktop_self_test(&desktop, directory);
+        int result = backup_test ? sb_desktop_backup_test(&desktop,directory) : keyboard_test ? sb_desktop_keyboard_test(&desktop, directory) : sb_desktop_self_test(&desktop, directory);
         sb_desktop_free(&desktop);
         return result;
     }

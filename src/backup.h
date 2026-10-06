@@ -8,8 +8,9 @@ typedef struct {
     SBBackupPhase phase; size_t entries,entries_total; uint64_t bytes,bytes_total; const char *path;
 } SBBackupProgress;
 typedef bool (*SBBackupCallback)(const SBBackupProgress *progress,void *userdata);
-typedef struct { char id[65],name[SB_NAME_CAP]; size_t files,directories; uint64_t bytes; } SBBackupInfo;
+typedef struct { char id[65],name[SB_NAME_CAP]; size_t files,directories; uint64_t bytes; unsigned char digest[32]; } SBBackupInfo;
 SBStatus sb_backup_create(const SBProject *project,const char *archive,SBBackupCallback progress,void *userdata);
 SBStatus sb_backup_inspect(const char *archive,SBBackupInfo *info,SBBackupCallback progress,void *userdata);
 SBStatus sb_backup_restore(const char *archive,const char *workspace,const char *id,SBProject *out,SBBackupCallback progress,void *userdata);
+SBStatus sb_backup_restore_checked(const char *archive,const char *workspace,const char *id,const unsigned char expected[32],SBProject *out,SBBackupCallback progress,void *userdata);
 #endif

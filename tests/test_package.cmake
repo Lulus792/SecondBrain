@@ -59,6 +59,14 @@ if(NOT SB_KEYBOARD_RESULT EQUAL 0)
 endif()
 message(STATUS "Extracted package passed the keyboard-only workflow")
 
+execute_process(COMMAND "${SB_EXECUTABLE}" --backup-test "${SB_TEST_ROOT}/Sicherungsprüfung ü"
+    WORKING_DIRECTORY "${SB_UNPACK}" RESULT_VARIABLE SB_BACKUP_RESULT
+    OUTPUT_VARIABLE SB_BACKUP_OUTPUT ERROR_VARIABLE SB_BACKUP_ERROR TIMEOUT 240)
+message(STATUS "${SB_BACKUP_OUTPUT}")
+if(NOT SB_BACKUP_RESULT EQUAL 0)
+    message(FATAL_ERROR "Relocated backup workflow failed: ${SB_BACKUP_RESULT}\n${SB_BACKUP_ERROR}")
+endif()
+
 execute_process(COMMAND "${CMAKE_COMMAND}" "-DSB_EXECUTABLE=${SB_EXECUTABLE}"
     "-DSB_TEST_ROOT=${SB_TEST_ROOT}/Einstellungen ü"
     -P "${CMAKE_CURRENT_LIST_DIR}/test_preferences_process.cmake"
@@ -67,4 +75,17 @@ execute_process(COMMAND "${CMAKE_COMMAND}" "-DSB_EXECUTABLE=${SB_EXECUTABLE}"
 message(STATUS "${SB_PREFERENCES_OUTPUT}")
 if(NOT SB_PREFERENCES_RESULT EQUAL 0)
     message(FATAL_ERROR "Relocated preferences restart failed: ${SB_PREFERENCES_ERROR}")
+endif()
+
+if(WIN32)
+    set(SB_CLI "${SB_ROOT}/secondbrain-cli.exe")
+else()
+    set(SB_CLI "${SB_ROOT}/secondbrain-cli")
+endif()
+execute_process(COMMAND "${CMAKE_COMMAND}" "-DSB_CLI=${SB_CLI}"
+    "-DSB_TEST_ROOT=${SB_TEST_ROOT}/Sicherungswerkzeug ü"
+    -P "${CMAKE_CURRENT_LIST_DIR}/test_backup_cli.cmake"
+    RESULT_VARIABLE SB_CLI_RESULT ERROR_VARIABLE SB_CLI_ERROR TIMEOUT 120)
+if(NOT SB_CLI_RESULT EQUAL 0)
+    message(FATAL_ERROR "Relocated backup CLI failed: ${SB_CLI_ERROR}")
 endif()

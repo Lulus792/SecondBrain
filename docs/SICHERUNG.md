@@ -1,8 +1,8 @@
 # Sicherung und Wiederherstellung
 
-Stand: 6. Oktober 2026. Der eigene C-Kern und das Entwicklungswerkzeug sind
-implementiert. Die Anbindung an die normale Desktop-Bedienung folgt darauf;
-sie ist mit diesem Dokument noch nicht als fertig oder abgenommen bezeichnet.
+Stand: 6. Oktober 2026. Der eigene C-Kern, das Entwicklungswerkzeug und
+die Desktop-Anbindung sind in Entwicklungsversion 0.4.0 implementiert.
+Prüfumfang und verbleibende Abnahmen stehen unten.
 
 ## Inhalt und Bestandsschutz
 
@@ -56,7 +56,8 @@ abgewiesen. ASCII-Groß-/Kleinschreibung darf keinen zweiten gleichnamigen Eintr
 erzeugen. Weitere Unicode-Normalisierungs- oder Großschreibkollisionen werden
 durch exklusives Anlegen auf dem Zielsystem abgefangen; sie werden nicht
 stillschweigend zusammengeführt. Rechte, Eigentümer, Zeitstempel und Extended
-Attributes gehören nicht zu diesem Inhaltsformat.
+Attributes gehören nicht zu diesem Inhaltsformat. Zusätzliche Pfad- und
+Namensgrenzen des Zielbetriebssystems und Dateisystems bleiben maßgeblich.
 
 Das Veröffentlichen benötigt einen exklusiven Rename innerhalb desselben
 Dateisystems. Windows verwendet MoveFileEx ohne Ersetzen, macOS RENAME_EXCL,
@@ -75,7 +76,7 @@ secondbrain-cli restore SICHERUNGSDATEI ARBEITSORDNER NEUE-KENNUNG
 Der Zielarbeitsordner muss vorhanden sein. Die normale Nutzung wird über die
 Desktop-App erfolgen; diese Befehle dienen auch deren unabhängiger Prüfung.
 
-## Desktop-Ablauf vor der Umsetzung
+## Desktop-Ablauf
 
 Die erneut gelesenen Apple-HIG-Kapitel Progress indicators und Alerts begründen
 sichtbaren, zutreffenden Fortschritt, eine sichere Abbruchmöglichkeit und knappe
@@ -86,10 +87,24 @@ Prozentwert. Normale Erfolge erhalten eine lokale Meldung; Fehler bleiben mit
 Wiederholen erreichbar. Bestehende Daten bleiben ohne zusätzlichen Warnungsdialog
 vor Ersetzen geschützt, weil Ersetzen nicht angeboten wird.
 
-Geplant: native Dateiauswahl plus Pfadfeld, Vorschau des geprüften Sicherungsinhalts,
-freier Zielordnername, Hintergrundarbeit mit Abbruch und vollständige Tastaturwege.
+Implementiert: native Dateiauswahl plus Pfadfeld, Vorschau des geprüften Sicherungsinhalts,
+freier Zielordnername und Hintergrundarbeit mit Abbruch. Ein SDL-Tastaturdurchlauf
+prüft diese Wege. Die tatsächlichen OS-Dateidialoge sind noch nicht interaktiv abgenommen.
 Eine offene Bearbeitung wird vor Sichern bewusst gespeichert; ein Speicherkonflikt
 verhindert den Beginn. Wiederherstellung lässt eine bestehende Bearbeitung erhalten.
+
+Einstieg: Aktionen → Projekt sichern; Projekte oder Aktionen → Sicherung
+wiederherstellen. Wiederherstellen verwendet den aktuellen Arbeitsordner.
+Die geprüfte Vorschau enthält eine Gesamtprüfsumme; eine seitdem veränderte
+Sicherungsdatei wird abgewiesen und muss erneut geprüft werden. Erfolgreiche
+Wiederherstellung ergänzt die Projektliste und ersetzt keinen offenen Entwurf.
+Gleichnamige Projekte werden dort über ihre Ordnerkennungen unterschieden.
+
+Escape und Abbrechen räumen den laufenden Vorgang auf. Beenden während einer
+Hintergrundarbeit wartet darauf und schützt anschließend weiterhin einen offenen
+Entwurf. War eine Veröffentlichung vor dem Abbruch bereits abgeschlossen, wird
+dies gemeldet. Fehler erscheinen oben im Formular; ihre vollständige Meldung
+lässt sich mit sichtbarer Rückmeldung kopieren.
 
 ## Gezielte Nachweise
 
@@ -107,7 +122,13 @@ Lokal bestehen die sieben betroffenen Prüfungen in Release und mit ASan/UBSan.
 Die Integritätsprüfung umfasst 482 Aussagen, die Schreibfehlerprüfung 27;
 der Produktions-CLI besteht seine getrennte Prozessprüfung.
 
-Weitere Abnahmen: echte UI-Abläufe, native Dateidialoge, große reale Daten,
+`backup-ui-workflow` verwendet dieselbe verpackte App und reine SDL-Tastaturereignisse:
+Sichern einschließlich Entwurf, Vorschau, Wiederherstellen, erhaltene Bearbeitung,
+belegte Namen, geänderte Vorschau, Save-Konflikt, Dialogantworten und Beenden.
+Die Zusatzdatei im UI-Durchlauf hat 8 MiB. Gesehene Softwarebilder belegen ihre
+genannten Fensterzustände; sie ersetzen keine interaktive native Dialogprüfung.
+
+Weitere Abnahmen: native Dateidialoge, große reale Daten,
 Speicherplatzbedingungen auf tatsächlichen Zielvolumes und Verhalten nach
 hartem Prozessabbruch. Die vollständige Release-Liste bleibt maßgeblich.
 
@@ -127,3 +148,10 @@ Am 6. Oktober 2026 gelesen:
   und [Alerts](https://developer.apple.com/design/human-interface-guidelines/alerts),
   vollständige Best-practices-Passagen über Apples öffentliche Dokumentationsdaten
   gelesen, bevor die neue Desktop-Aufgabe entworfen wird.
+
+
+UI-Prüfungen teilen die System-Zwischenablage. CTest serialisiert die betroffenen
+Tests über einen Resource Lock innerhalb desselben Laufs. Getrennte CTest-Prozesse
+auf demselben Desktop müssen ebenfalls nacheinander laufen. Ein versehentlicher
+lokaler Überlappungsversuch erzeugte falsche eingefügte Pfade; diese Prüfung ist
+kein Produktbefund und wird nach der serialisierten Nachprüfung getrennt vermerkt.

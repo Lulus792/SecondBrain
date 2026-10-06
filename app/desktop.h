@@ -4,13 +4,15 @@
 #include "model.h"
 #include "settings.h"
 #include "dialog.h"
+#include "backup_job.h"
 
-typedef enum { SB_FORM_NONE, SB_FORM_PROJECT, SB_FORM_NOTE, SB_FORM_WORKSPACE, SB_FORM_SETTINGS, SB_FORM_CONTEXT, SB_FORM_HELP, SB_FORM_ACTIONS, SB_FORM_PROJECTS, SB_FORM_FILTER } SBForm;
+typedef enum { SB_FORM_NONE, SB_FORM_PROJECT, SB_FORM_NOTE, SB_FORM_WORKSPACE, SB_FORM_SETTINGS, SB_FORM_CONTEXT, SB_FORM_HELP, SB_FORM_ACTIONS, SB_FORM_PROJECTS, SB_FORM_FILTER,SB_FORM_BACKUP,SB_FORM_RESTORE } SBForm;
 typedef enum {
     SB_CMD_NONE, SB_CMD_SAVE, SB_CMD_COPY, SB_CMD_NEW_PROJECT, SB_CMD_NEW_NOTE,
     SB_CMD_WORKSPACE, SB_CMD_SUBMIT, SB_CMD_CANCEL, SB_CMD_CONTEXT,
     SB_CMD_GUARD_SAVE, SB_CMD_GUARD_DISCARD, SB_CMD_GUARD_CANCEL,
-    SB_CMD_ARCHIVE, SB_CMD_RELOAD, SB_CMD_THEME, SB_CMD_SCALE, SB_CMD_SOURCE
+    SB_CMD_ARCHIVE, SB_CMD_RELOAD, SB_CMD_THEME, SB_CMD_SCALE, SB_CMD_SOURCE,
+    SB_CMD_BACKUP,SB_CMD_RESTORE,SB_CMD_INSPECT
 } SBCommand;
 typedef enum { SB_FOCUS_BUTTON, SB_FOCUS_TEXT, SB_FOCUS_MAP, SB_FOCUS_READER } SBFocusKind;
 typedef struct { char id[100], label[SB_NAME_CAP]; struct nk_rect bounds; SBFocusKind kind; int group; } SBTarget;
@@ -30,6 +32,11 @@ typedef struct {
     bool settings_enabled;
     SBNativeDialogs *dialogs;
     unsigned dialog_serial;
+    SBBackupJob *backup;
+    SBBackupJobState backup_state;
+    SBBackupInfo restore_info;
+    char backup_path[SB_PATH_CAP],checked_backup[SB_PATH_CAP],restore_id[65];
+    bool restore_checked,quit_after_backup,backup_feedback_reset,backup_error_copied,backup_clipboard_failed;
     char search[256], searched[256], section[32];
     char name[SB_NAME_CAP], id[65], repository[SB_PATH_CAP], folder[SB_PATH_CAP];
     char command_value[SB_PATH_CAP];
@@ -76,5 +83,6 @@ bool sb_desktop_animating(const SBDesktop *desktop);
 void sb_desktop_apply(SBDesktop *desktop);
 int sb_desktop_keyboard_test(SBDesktop *desktop, const char *directory);
 int sb_desktop_self_test(SBDesktop *desktop, const char *directory);
+int sb_desktop_backup_test(SBDesktop *desktop,const char *directory);
 
 #endif

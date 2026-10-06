@@ -34,8 +34,10 @@ Der Entwicklungs-CLI bietet backup, inspect und restore.
 Die gezielten lokalen Prüfungen umfassen komplette Rundreise, Unicode, bekannte
 SHA-256-Vektoren, beschädigte/unzulässige Archive, Abbruch, Quellenkonflikte und
 simulierten vollen Datenträger. Produktions-CLI wird separat über Prozesse geprüft.
-Die Desktop-Anbindung und ihr Plattformnachweis sind der nächste Arbeitsschritt;
-eine fertige UI-Sicherung ist damit noch nicht behauptet.
+Die Desktop-Anbindung ist in 0.4.0 umgesetzt: Aktionen/Projekte bieten Sichern
+und Wiederherstellen, Hintergrundarbeit mit Abbruch, prüfbare Vorschau und
+erhaltene Entwürfe. Der Tastaturdurchlauf umfasst 75 Aussagen und eine
+8-MiB-Datei. Der neue Plattformnachweis folgt erst nach ausgeführten Jobs.
 
 ## Auftrag und verbleibende Abnahmen
 

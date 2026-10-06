@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 struct SBNativeDialogs { SDL_Mutex *mutex; SDL_AtomicInt references; Uint32 event; bool alive; unsigned serial; };
-typedef struct { SBNativeDialogs *owner; unsigned serial; } Request;
+typedef struct { SBNativeDialogs *owner; unsigned serial; SBDialogKind kind; } Request;
 static void release(SBNativeDialogs *d) {
     if (SDL_AtomicDecRef(&d->references)) { SDL_DestroyMutex(d->mutex); SDL_free(d); }
 }
@@ -20,7 +20,7 @@ static void completed(void *userdata,const char *const *files,int filter) {
     Request *request=userdata; SBNativeDialogs *d=request->owner;
     SBDialogReply *reply=SDL_calloc(1,sizeof(*reply));
     if (reply) {
-        reply->serial=request->serial; reply->error=files==NULL;
+        reply->serial=request->serial; reply->kind=request->kind; reply->error=files==NULL;
         const char *value=files ? files[0] : SDL_GetError();
         if (value) {
             if (strlen(value)>=sizeof(reply->value) || !sb_utf8_valid(value,strlen(value))) {
@@ -35,16 +35,21 @@ static void completed(void *userdata,const char *const *files,int filter) {
     }
     SDL_free(request); release(d);
 }
-unsigned sb_dialog_folder(SBNativeDialogs *d,SDL_Window *window,const char *path) {
+static unsigned choose(SBNativeDialogs *d,SDL_Window *window,const char *path,SBDialogKind kind) {
     if (!d) return 0;
     Request *request=SDL_malloc(sizeof(*request));
     if (!request) return 0;
-    request->owner=d; request->serial=++d->serial;
+    request->owner=d; request->serial=++d->serial; request->kind=kind;
     SDL_AtomicIncRef(&d->references);
     unsigned serial=request->serial;
-    SDL_ShowOpenFolderDialog(completed,request,window,path,false);
+    static const SDL_DialogFileFilter filters[]={{"SecondBrain-Sicherung","sbbackup"},{"Alle Dateien","*"}};
+    if (kind==SB_DIALOG_FOLDER) SDL_ShowOpenFolderDialog(completed,request,window,path,false);
+    else if (kind==SB_DIALOG_SAVE_BACKUP) SDL_ShowSaveFileDialog(completed,request,window,filters,2,path);
+    else SDL_ShowOpenFileDialog(completed,request,window,filters,2,path,false);
     return serial;
 }
+unsigned sb_dialog_folder(SBNativeDialogs *d,SDL_Window *window,const char *path) { return choose(d,window,path,SB_DIALOG_FOLDER); }
+unsigned sb_dialog_backup(SBNativeDialogs *d,SDL_Window *window,const char *path,bool save) { return choose(d,window,path,save ? SB_DIALOG_SAVE_BACKUP : SB_DIALOG_OPEN_BACKUP); }
 void sb_dialogs_free(SBNativeDialogs *d) {
     if (!d) return;
     SDL_LockMutex(d->mutex); d->alive=false; SDL_UnlockMutex(d->mutex);

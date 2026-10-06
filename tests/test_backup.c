@@ -108,6 +108,11 @@ int main(int argc,char **argv) {
     Fixture valid[]={{"brain.json",meta,1},{"knowledge",NULL,2},{"knowledge/notiz.md","# Notiz\n",1}};
     OK(sb_path_join(other,sizeof(other),root,"minimal.sbbackup")); forged(other,valid,3,false,false); OK(sb_backup_inspect(other,&info,NULL,NULL));
     OK(sb_backup_restore(other,restore,"minimal",NULL,NULL,NULL));
+    SBBackupInfo approved=info;
+    OK(sb_fs_remove(other)); Fixture changed_preview[]={{"brain.json","{\"id\":\"projekt\",\"name\":\"Andere Sicherung\"}",1},{"knowledge",NULL,2},{"knowledge/notiz.md","# Verändert\n",1}};
+    forged(other,changed_preview,3,false,false);
+    CHECK(sb_backup_restore_checked(other,restore,"stale-preview",approved.digest,NULL,NULL,NULL).code==SB_CONFLICT);
+    OK(sb_path_join(path,sizeof(path),restore,"stale-preview")); CHECK(!sb_fs_kind(path));
     const char *unsafe[]={"../outside.md","/outside.md","C:/outside.md","knowledge\\outside.md","CON.txt","knowledge/trailing.","knowledge/../outside.md"};
     for (unsigned i=0;i<sizeof(unsafe)/sizeof(*unsafe);++i) {
         OK(sb_fs_remove(other)); Fixture bad[]={{"brain.json",meta,1},{unsafe[i],"x",1}}; forged(other,bad,2,false,false);

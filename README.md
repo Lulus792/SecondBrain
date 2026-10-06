@@ -21,6 +21,7 @@ Die Vorschau oben stammt aus der echten C-App.
 - Dokumente als Sterne erkunden; Linien zeigen vorhandene interne Markdown-Links.
 - Lokale Quellen und verlinkte Ordner direkt in der App lesen.
 - Gespeicherten Projektkontext für einen KI-Chat kopieren.
+- Projekte sichern, Sicherungen prüfen und unter einem freien Namen wiederherstellen.
 - Die App vollständig mit der Tastatur bedienen.
 
 Die dunkle Lumen-Oberfläche verbindet leuchtende Sterne mit schwebenden
@@ -104,6 +105,10 @@ scrollt es den Inhalt. Weitere Kürzel stehen in der eingebauten Hilfe und im
 Der letzte Arbeitsordner, das Projekt, die Notiz und deine Darstellung werden
 beim regulären Beenden gespeichert. „Arbeitsordner öffnen“ bietet eine native
 Ordnerauswahl. [Details und Grenzen](docs/EINSTELLUNGEN.md).
+
+„Projekt sichern“ liegt unter Aktionen. „Sicherung wiederherstellen“ findest du
+auch unter Projekte. Die App prüft den Inhalt vor der Wiederherstellung und
+erhält bestehende Projekte. [Ablauf und Grenzen](docs/SICHERUNG.md).
 
 „Groß lesen“ erweitert die Leseansicht auf die verfügbare Fläche. Die Bereichswahl
 bleibt auch nach dem Öffnen eines Archivdokuments erreichbar.

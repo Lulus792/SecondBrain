@@ -267,3 +267,30 @@ nach Teilfortschritt. Die Desktop-Anbindung ist noch nicht implementiert.
 Lokal bestehen die sieben betroffenen Prüfungen in Release und mit ASan/UBSan: 482
 Integritäts- und 27 Schreibfehleraussagen sowie getrennte Produktions-CLI-Prozesse.
 Neue Plattformnachweise folgen erst nach ausgeführten CI-Jobs.
+
+
+## Entwicklungsschritt 0.4.0: Sicherung in der App
+
+Aktionen bietet Projekt sichern; Projekte und Aktionen bieten Wiederherstellen.
+Native Dateiauswahl und Pfadfeld, eigener Hintergrundjob, Abbruch, geprüfte
+Vorschau und freier Zielordnername sind implementiert. Die Vorschau ist an die
+Gesamtprüfsumme gebunden; eine geänderte Datei wird vor Wiederherstellen abgewiesen.
+Ein anderer offener Entwurf bleibt erhalten. Gleichnamige Projekte lassen sich
+über die Ordnerkennung unterscheiden. Fehlermeldungen sind lokal sichtbar und
+vollständig mit Rückmeldung kopierbar. Status/Abbruch besitzen feste Positionen.
+
+Ein vollständiger lokaler 14-Test-Release-Lauf besteht; anschließend bestehen
+gezielte Nachprüfungen des neuen Bedienwegs und Kerns. Der neue Durchlauf umfasst
+75 Aussagen und eine 8-MiB-Datei. Tatsächliche normale/beschäftigte Softwarebilder
+und kleines Fenster mit 200 Prozent Schrift wurden betrachtet. Neun Python-
+Prüfungen bestehen. Ein versehentlicher paralleler UI-Testversuch störte die
+Zwischenablage; seine Fehler werden seriell nachgeprüft und als Prüfbetrieb geführt.
+Weitere Paket-/Plattformnachweise werden nach Abschluss ergänzt.
+[Vertrag und offene Abnahmen](SICHERUNG.md).
+
+
+Die seriell wiederholten Tastatur-/Sicherungsprüfungen bestehen mit ASan/UBSan
+nach dem versehentlichen Clipboard-Überlappungsversuch. Andere zwölf Prüfungen
+des vollständigen Sanitizer-Laufs bestanden bereits. Die gezielte Wiederholung
+prüft die betroffenen Pfade und letzte Layout-/Workeränderungen; ein neuer
+vollständiger ungestörter Sanitizer-Gesamtlauf wird damit nicht behauptet.

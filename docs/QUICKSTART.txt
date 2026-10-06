@@ -1,4 +1,4 @@
-SecondBrain 0.3.0
+SecondBrain 0.4.0 (in Entwicklung)
 
 Dieses Paket enthält die eigene Desktop-Anwendung. Python, ein Compiler
 und eine externe Wissensanwendung sind zum Starten nicht erforderlich.
@@ -45,3 +45,15 @@ Lizenzen der UI-Abhängigkeiten und Schriften stehen unter licenses.
 In den Einstellungen lassen sich Transparenz und Bewegung reduzieren.
 
 „Groß lesen“ erweitert die Leseansicht. Menüpfeile wählen Aktionen; Umschalt+F10 öffnet das Aktionsmenü.
+
+Projekt sichern: Aktionen > Projekt sichern. Offene Änderungen werden vorher
+mit dem vorhandenen Konfliktschutz gespeichert. Wähle einen neuen Dateinamen.
+Sicherungen enthalten Notizen, Anhänge und Unterordner des Projektgedächtnisses.
+Verknüpfte externe Projektordner werden nicht kopiert.
+
+Wiederherstellen: Projekte > Sicherung wiederherstellen, Datei auswählen und
+prüfen, freien Projektordnernamen wählen. Bestehende Projekte bleiben erhalten.
+Offene Bearbeitungen bleiben offen. Abbrechen oder Escape beendet die Aufgabe
+nach dem Aufräumen temporärer Daten. Dateidialoge besitzen auch einen Pfad-Eingabeweg.
+
+Darstellung und zuletzt geöffnetes Projekt werden beim regulären Beenden gespeichert.

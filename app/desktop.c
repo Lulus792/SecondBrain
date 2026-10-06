@@ -4,7 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <math.h>
+static void backup_poll(SBDesktop *d);
 
 static const char *sections[] = {"all", "overview", "knowledge", "inbox", "journal", "archive"};
 static const char *section_names[] = {"Alle Dokumente", "Orientierung", "Wissen", "Eingang", "Übergaben", "Archiv"};
@@ -20,6 +22,7 @@ static float approach(float current, float destination, float factor, float thre
     return fabsf(destination-value) < threshold ? destination : value;
 }
 void sb_desktop_tick(SBDesktop *d, float seconds) {
+    backup_poll(d);
     d->seconds = fmaxf(0, fminf(seconds, 0.05f));
     float factor = d->reduced_motion ? 1 : 1-expf(-d->seconds/0.085f);
     d->view_yaw = approach(d->view_yaw,d->yaw,factor,0.0001f);
@@ -35,6 +38,7 @@ void sb_desktop_tick(SBDesktop *d, float seconds) {
 
 }
 bool sb_desktop_animating(const SBDesktop *d) {
+    if (d->backup) return true;
     if (d->view_yaw != d->yaw || d->view_pitch != d->pitch || d->view_zoom != d->zoom ||
         d->view_pan_x != d->pan_x || d->view_pan_y != d->pan_y) return true;
     if (d->flight<1 || (d->map_ready && (fabsf(d->map_cx-d->map_target_cx)>0.05f || fabsf(d->map_cy-d->map_target_cy)>0.05f || fabsf(d->map_unit-d->map_target_unit)>0.0001f))) return true;
@@ -222,6 +226,45 @@ static void result(SBDesktop *d, SBStatus status, const char *success) {
     if (status.code != SB_OK) d->card = true;
     if (status.code == SB_OK && success) snprintf(d->message.message, sizeof(d->message.message), "%s", success);
 }
+static void backup_poll(SBDesktop *d) {
+    if (!d->backup) return;
+    sb_backup_job_snapshot(d->backup,&d->backup_state);
+    SBBackupJobState *state=&d->backup_state;
+    if (!state->done) return;
+    sb_backup_job_free(d->backup); d->backup=NULL;
+    d->message=state->status;
+    d->backup_error_copied=d->backup_clipboard_failed=false;
+    if (state->status.code!=SB_OK && state->status.code!=SB_CANCELLED) d->backup_feedback_reset=true;
+    if (state->status.code==SB_CANCELLED || (state->kind==SB_JOB_INSPECT && state->cancel_requested)) { result(d,sb_ok(),"Abgebrochen."); d->form=SB_FORM_NONE; }
+    else if (state->status.code==SB_OK && state->kind==SB_JOB_INSPECT) {
+        d->restore_info=state->info; d->restore_checked=true;
+        snprintf(d->checked_backup,sizeof(d->checked_backup),"%s",d->backup_path);
+        strcpy(d->restore_id,state->info.id);
+        char path[SB_PATH_CAP]; sb_path_join(path,sizeof(path),d->model.workspace,d->restore_id);
+        if (sb_fs_kind(path)!=0) {
+            size_t n=strlen(state->info.id); if (n>58) n=58;
+            while (n && state->info.id[n-1]=='-') --n;
+            snprintf(d->restore_id,sizeof(d->restore_id),"%.*s-kopie",(int)n,state->info.id);
+        }
+        snprintf(d->focus,sizeof(d->focus),"restore-id"); d->keyboard=true; d->focus_changed=true; d->focus_scroll_frames=3; d->form_focus=2;
+        result(d,sb_ok(),"Sicherung geprüft.");
+    } else if (state->status.code==SB_OK) {
+        if (state->kind==SB_JOB_RESTORE) {
+            SBProjects projects={0}; SBStatus listed=sb_projects_list(d->model.workspace,&projects);
+            if (listed.code==SB_OK) {
+                sb_projects_free(&d->model.projects); d->model.projects=projects;
+                if (!d->model.has_project) listed=sb_app_request(&d->model,SB_ACT_PROJECT,state->project.id);
+            }
+            if (listed.code!=SB_OK) d->message=sb_error(listed.code,"Projekt wiederhergestellt. Projektliste konnte nicht aktualisiert werden: %s",listed.message);
+            else result(d,sb_ok(),state->cancel_requested ? "Projekt war vor dem Abbruch bereits wiederhergestellt." : "Projekt wiederhergestellt. Es ist unter Projekte verfügbar.");
+        } else result(d,sb_ok(),state->cancel_requested ? "Sicherung war vor dem Abbruch bereits abgeschlossen." : "Sicherung gespeichert.");
+        d->form=SB_FORM_NONE;
+    } else if (state->kind==SB_JOB_RESTORE && (state->status.code==SB_CONFLICT || state->status.code==SB_INVALID)) d->restore_checked=false;
+    if (d->quit_after_backup) {
+        d->quit_after_backup=false; SBStatus status=sb_app_request(&d->model,SB_ACT_QUIT,NULL);
+        if (status.code!=SB_OK) d->message=status;
+    }
+}
 static void field(SBDesktop *d, const char *tag, const char *label, char *text, int capacity, int focus) {
     struct nk_context *ctx = d->ui.ctx;
     int length = (int)strlen(text);
@@ -312,6 +355,7 @@ SBStatus sb_desktop_store_preferences(SBDesktop *d) {
     return status;
 }
 void sb_desktop_free(SBDesktop *d) {
+    sb_backup_job_free(d->backup);
     sb_dialogs_free(d->dialogs);
     if (d->text_edit_ready) nk_textedit_free(&d->text_edit);
     free(d->targets);
@@ -363,6 +407,35 @@ void sb_desktop_apply(SBDesktop *d) {
     SBCommand cmd = d->command;
     SBStatus status = sb_ok();
     d->command = SB_CMD_NONE;
+    if (d->backup) { if (cmd==SB_CMD_CANCEL) sb_backup_job_cancel(d->backup); return; }
+    if (cmd==SB_CMD_BACKUP || cmd==SB_CMD_RESTORE) {
+        d->backup_error_copied=d->backup_clipboard_failed=false;
+        ++d->dialog_serial; d->message=sb_ok(); d->restore_checked=false; d->checked_backup[0]=0;
+        d->form=cmd==SB_CMD_BACKUP ? SB_FORM_BACKUP : SB_FORM_RESTORE; d->form_focus=1;
+        d->restore_id[0]=0; d->backup_path[0]=0;
+        if (cmd==SB_CMD_BACKUP && d->model.has_project) {
+            char name[100],date[32]; time_t now=time(NULL); struct tm *tm=localtime(&now);
+            if (tm) strftime(date,sizeof(date),"%Y%m%d-%H%M%S",tm); else strcpy(date,"sicherung");
+            snprintf(name,sizeof(name),"%s-%s.sbbackup",d->model.project.id,date);
+            d->message=sb_path_join(d->backup_path,sizeof(d->backup_path),d->model.workspace,name);
+        }
+        return;
+    }
+    if (cmd==SB_CMD_INSPECT || (cmd==SB_CMD_SUBMIT && (d->form==SB_FORM_BACKUP || d->form==SB_FORM_RESTORE))) {
+        SBBackupJobKind kind=d->form==SB_FORM_BACKUP ? SB_JOB_BACKUP : cmd==SB_CMD_INSPECT || !d->restore_checked ? SB_JOB_INSPECT : SB_JOB_RESTORE;
+        if (!d->backup_path[0]) status=sb_error(SB_INVALID,"Wähle eine Sicherungsdatei.");
+        else if (kind==SB_JOB_BACKUP && !d->model.has_project) status=sb_error(SB_INVALID,"Wähle zuerst ein Projekt.");
+        else if (kind==SB_JOB_BACKUP && sb_app_dirty(&d->model)) {
+            status=sb_app_save(&d->model); if (status.code==SB_OK) { d->graph_dirty=true; d->searched[0]=0; }
+        }
+        else if (kind==SB_JOB_RESTORE && !sb_id_valid(d->restore_id)) status=sb_error(SB_INVALID,"Wähle einen gültigen Projektordnernamen.");
+        if (status.code==SB_OK) {
+            ++d->dialog_serial;
+            d->backup=sb_backup_job_start(kind,&d->model.project,d->backup_path,d->model.workspace,d->restore_id,kind==SB_JOB_RESTORE ? d->restore_info.digest : NULL);
+            if (!d->backup) status=sb_error(SB_IO,"Sicherungsvorgang konnte nicht gestartet werden: %s",SDL_GetError());
+        }
+        d->message=status; return;
+    }
     if (cmd == SB_CMD_NEW_PROJECT || cmd == SB_CMD_NEW_NOTE) {
         d->form = cmd == SB_CMD_NEW_PROJECT ? SB_FORM_PROJECT : SB_FORM_NOTE;
         d->name[0] = 0; d->id[0] = 0; d->repository[0] = 0; d->id_manual = false;
@@ -478,16 +551,21 @@ static void star_step(SBDesktop *d, SDL_Keycode key) {
 void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
     if (d->dialogs && event->type==sb_dialogs_event(d->dialogs)) {
         SBDialogReply *reply=event->user.data1;
-        if (reply && reply->serial==d->dialog_serial && d->form==SB_FORM_WORKSPACE) {
-            if (reply->error) d->message=sb_error(SB_IO,"%s",reply->value[0] ? reply->value : "Ordnerauswahl ist nicht verfügbar.");
+        bool folder=d->form==SB_FORM_WORKSPACE && reply && reply->kind==SB_DIALOG_FOLDER;
+        bool backup=reply && ((d->form==SB_FORM_BACKUP && reply->kind==SB_DIALOG_SAVE_BACKUP) || (d->form==SB_FORM_RESTORE && reply->kind==SB_DIALOG_OPEN_BACKUP));
+        if (reply && reply->serial==d->dialog_serial && !d->backup && (folder || backup)) {
+            if (reply->error) d->message=sb_error(SB_IO,"%s",reply->value[0] ? reply->value : folder ? "Ordnerauswahl ist nicht verfügbar." : "Dateiauswahl ist nicht verfügbar.");
             else if (reply->value[0]) {
-                snprintf(d->folder,sizeof(d->folder),"%s",reply->value);
-                d->message=sb_ok(); focus_set(d,"form-folder");
+                if (folder) snprintf(d->folder,sizeof(d->folder),"%s",reply->value);
+                else { snprintf(d->backup_path,sizeof(d->backup_path),"%s",reply->value); d->restore_checked=false; }
+                d->message=sb_ok(); focus_set(d,folder ? "form-folder" : "backup-path");
+                if (backup && d->form==SB_FORM_RESTORE) command(d,SB_CMD_INSPECT);
             }
         }
         SDL_free(reply); return;
     }
     if (event->type == SDL_EVENT_QUIT || event->type == SDL_EVENT_WINDOW_CLOSE_REQUESTED) {
+        if (d->backup) { sb_backup_job_cancel(d->backup); d->quit_after_backup=true; return; }
         request(d, SB_ACT_QUIT, NULL); return;
     }
     if (event->type==SDL_EVENT_MOUSE_BUTTON_DOWN && event->button.button==SDL_BUTTON_LEFT) {
@@ -565,6 +643,10 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
         bool modifier = (event->key.mod & SDL_KMOD_CTRL) != 0;
 #endif
         bool shift = (event->key.mod & SDL_KMOD_SHIFT) != 0;
+        if (d->backup && ((modifier && key==SDLK_Q) || key==SDLK_ESCAPE)) {
+            sb_backup_job_cancel(d->backup); if (modifier && key==SDLK_Q) d->quit_after_backup=true; return;
+        }
+        if (d->backup && (key==SDLK_F1 || key==SDLK_F10 || modifier)) return;
         if (!modifier && !d->model.guard && (key==SDLK_UP || key==SDLK_DOWN) &&
             (d->form==SB_FORM_ACTIONS || d->form==SB_FORM_PROJECTS || d->form==SB_FORM_FILTER || d->form==SB_FORM_SETTINGS)) {
             focus_step(d,key==SDLK_UP ? -1 : 1);
@@ -674,7 +756,14 @@ static void project_rows(SBDesktop *d) {
         nk_bool selected = d->model.has_project && !strcmp(d->model.project.id, d->model.projects.items[i].id);
         nk_layout_row_dynamic(ctx, 36 * scale, 1);
         snprintf(tag, sizeof(tag), "project:%s", d->model.projects.items[i].id);
-        if (selectable(d, tag, d->model.projects.items[i].name, &selected))
+        bool duplicate=false;
+        for (size_t j=0;j<d->model.projects.count;++j)
+            if (i!=j && !strcmp(d->model.projects.items[i].name,d->model.projects.items[j].name)) duplicate=true;
+        char label[SB_NAME_CAP],name[181]; snprintf(name,sizeof(name),"%s",d->model.projects.items[i].name);
+        while (name[0] && !sb_utf8_valid(name,strlen(name))) name[strlen(name)-1]=0;
+        if (duplicate) snprintf(label,sizeof(label),"%s · %s",d->model.projects.items[i].id,name);
+        else snprintf(label,sizeof(label),"%s",d->model.projects.items[i].name);
+        if (selectable(d, tag, label, &selected))
             request(d, SB_ACT_PROJECT, d->model.projects.items[i].id);
     }
     if (d->model.projects.count > 6) {
@@ -1037,9 +1126,11 @@ static void popup(SBDesktop *d, int width, int height) {
     const char *title = d->form == SB_FORM_PROJECT ? "Neues Projekt" : d->form == SB_FORM_NOTE ? "Neue Notiz" :
         d->form == SB_FORM_WORKSPACE ? "Arbeitsordner öffnen" : d->form == SB_FORM_SETTINGS ? "Projekte und Darstellung" :
         d->form == SB_FORM_CONTEXT ? "KI-Kontext" : d->form == SB_FORM_ACTIONS ? "Dokumentaktionen" :
-        d->form == SB_FORM_PROJECTS ? "Projekt wählen" : d->form == SB_FORM_FILTER ? "Wissensbereich" : "Tastaturhilfe";
+        d->form == SB_FORM_PROJECTS ? "Projekt wählen" : d->form == SB_FORM_FILTER ? "Wissensbereich" :
+        d->form==SB_FORM_BACKUP ? "Projekt sichern" : d->form==SB_FORM_RESTORE ? "Sicherung wiederherstellen" : "Tastaturhilfe";
     if (d->form==SB_FORM_ACTIONS || d->form==SB_FORM_FILTER) h=fminf(height-40,(6*42+80)*s+56);
     if (d->form==SB_FORM_WORKSPACE) h=fminf(height-40,300*s+40);
+    if (d->form==SB_FORM_BACKUP || d->form==SB_FORM_RESTORE) h=fminf(height-40,(d->form==SB_FORM_RESTORE && d->restore_checked ? 520 : 340)*s+60);
     glass(d,nk_rect((width-w)/2,(height-h)/2,w,h),16);
     if (nk_begin(ctx,title,nk_rect((width-w)/2,(height-h)/2,w,h),NK_WINDOW_NO_SCROLLBAR)) {
         float available=ctx->current->layout->bounds.w;
@@ -1047,13 +1138,66 @@ static void popup(SBDesktop *d, int width, int height) {
         nk_layout_row_push(ctx,available-32*s-ctx->style.window.spacing.x); nk_label(ctx,title,NK_TEXT_LEFT);
         nk_layout_row_push(ctx,32*s); if (button(d,"cancel","Schließen")) command(d,SB_CMD_CANCEL);
         nk_layout_row_end(ctx);
-        bool form=d->form==SB_FORM_PROJECT || d->form==SB_FORM_NOTE || d->form==SB_FORM_WORKSPACE;
-        float contents=fmaxf(40,h-60-32*s-(form ? 48*s : 0));
+        bool form=!d->backup && (d->form==SB_FORM_PROJECT || d->form==SB_FORM_NOTE || d->form==SB_FORM_WORKSPACE || d->form==SB_FORM_BACKUP || d->form==SB_FORM_RESTORE);
+        float contents=fmaxf(40,h-60-32*s-((form || d->backup) ? 48*s : 0));
         nk_layout_row_dynamic(ctx,contents,1);
         bool group=nk_group_begin(ctx,"Modal contents",NK_WINDOW_NO_SCROLLBAR);
         if (group) {
+        if (d->backup_feedback_reset) { *ctx->current->layout->offset_y=0; memset(&d->scrolling[3],0,sizeof(d->scrolling[3])); d->backup_feedback_reset=false; }
         smooth_scroll(d,3,ctx->current->layout->offset_y);
-        if (d->form == SB_FORM_PROJECT || d->form == SB_FORM_NOTE) {
+        if (d->backup) {
+            static const char *phases[]={"Dateien erfassen","Sicherung schreiben","Sicherung prüfen","Projekt wiederherstellen","Abschließen","Projekt erneut prüfen"};
+            SBBackupJobState *state=&d->backup_state;
+            nk_layout_row_dynamic(ctx,42*s,1); nk_label(ctx,state->cancel_requested ? "Abbruch wird abgeschlossen …" : phases[state->phase],NK_TEXT_LEFT);
+            nk_layout_row_dynamic(ctx,20*s,1);
+            bool known=state->total && state->phase!=SB_BACKUP_SCAN;
+            if (known) {
+                nk_size amount=(nk_size)(state->bytes_total ? (double)state->bytes/(double)state->bytes_total*1000 : (double)state->entries/(double)state->total*1000);
+                nk_progress(ctx,&amount,1000,NK_FIXED);
+            } else {
+                struct nk_rect r=nk_widget_bounds(ctx); nk_spacer(ctx);
+                r.y+=r.h*0.3f; r.h*=0.4f;
+                struct nk_command_buffer *canvas=nk_window_get_canvas(ctx);
+                nk_fill_rect(canvas,r,r.h/2,d->ui.dark ? nk_rgb(40,55,76) : nk_rgb(200,213,230));
+                float amount=d->reduced_motion ? 0.5f : 0.5f+0.5f*sinf((float)(SDL_GetTicks()%10000)*0.004f);
+                r.x+=r.w*0.75f*amount; r.w*=0.25f; nk_fill_rect(canvas,r,r.h/2,nk_rgb(142,191,255));
+            }
+            char info[150];
+            if (known) snprintf(info,sizeof(info),"%zu von %zu Einträgen · %llu von %llu KiB",state->entries,state->total,(unsigned long long)(state->bytes/1024),(unsigned long long)(state->bytes_total/1024));
+            else snprintf(info,sizeof(info),"%zu Einträge erfasst",state->entries);
+            nk_layout_row_dynamic(ctx,60*s,1); nk_label_wrap(ctx,info);
+            char shown[SB_NAME_CAP]; compact_label(d,state->path,shown,sizeof(shown),w-70);
+            nk_layout_row_dynamic(ctx,32*s,1); nk_label(ctx,shown,NK_TEXT_LEFT);
+        } else if (d->form==SB_FORM_BACKUP || d->form==SB_FORM_RESTORE) {
+            bool save=d->form==SB_FORM_BACKUP;
+            if (d->message.code!=SB_OK && d->message.message[0]) {
+                const struct nk_user_font *font=ctx->style.font;
+                float measured=font->width(font->userdata,font->height,d->message.message,(int)strlen(d->message.message));
+                float rows=ceilf(measured/fmaxf(80,ctx->current->layout->bounds.w-20))+1;
+                nk_layout_row_dynamic(ctx,rows*(font->height+5),1); nk_label_wrap(ctx,d->message.message);
+                nk_layout_row_dynamic(ctx,36*s,1);
+                if (button(d,"backup-copy-error",d->backup_error_copied ? "Meldung kopiert" : "Meldung kopieren")) {
+                    d->backup_error_copied=SDL_SetClipboardText(d->message.message); d->backup_clipboard_failed=!d->backup_error_copied;
+                }
+                if (d->backup_clipboard_failed) { nk_layout_row_dynamic(ctx,36*s,1); nk_label_wrap(ctx,"Die Zwischenablage ist nicht erreichbar."); }
+            }
+            nk_layout_row_dynamic(ctx,48*s,1); nk_label_wrap(ctx,save ? "Sichere Notizen und Anhänge. Offene Änderungen werden vorher gespeichert." : "Stelle das Projekt in einem neuen Ordner wieder her.");
+            field(d,"backup-path","Sicherungsdatei",d->backup_path,sizeof(d->backup_path),1);
+            if (strcmp(d->checked_backup,d->backup_path)) d->restore_checked=false;
+            nk_layout_row_dynamic(ctx,36*s,1);
+            if (button(d,"backup-choose",save ? "Speicherort wählen" : "Sicherung auswählen")) {
+                d->dialog_serial=sb_dialog_backup(d->dialogs,d->ui.window,d->backup_path,save);
+                if (!d->dialog_serial) d->message=sb_error(SB_IO,"Dateiauswahl konnte nicht gestartet werden.");
+            }
+            if (!save && d->restore_checked) {
+                nk_layout_row_dynamic(ctx,32*s,1); nk_label(ctx,d->restore_info.name,NK_TEXT_LEFT);
+                char info[150]; snprintf(info,sizeof(info),"%zu Dateien · %zu Ordner · %llu KiB",d->restore_info.files,d->restore_info.directories,(unsigned long long)(d->restore_info.bytes/1024));
+                nk_layout_row_dynamic(ctx,36*s,1); nk_label_wrap(ctx,info);
+                field(d,"restore-id","Neuer Projektordner",d->restore_id,sizeof(d->restore_id),2);
+                nk_layout_row_dynamic(ctx,36*s,1); if (button(d,"backup-recheck","Sicherung erneut prüfen")) command(d,SB_CMD_INSPECT);
+            }
+            nk_layout_row_dynamic(ctx,32*s,1); nk_label_wrap(ctx,save ? "Vorhandene Sicherungen werden nicht ersetzt." : "Vorhandene Projektordner bleiben erhalten.");
+        } else if (d->form == SB_FORM_PROJECT || d->form == SB_FORM_NOTE) {
             char previous_id[65];
             field(d, "form-name", d->form == SB_FORM_PROJECT ? "Projektname" : "Titel", d->name, sizeof(d->name), 1);
             if (!d->id_manual) sb_app_slug(d->name, d->id, sizeof(d->id));
@@ -1090,6 +1234,7 @@ static void popup(SBDesktop *d, int width, int height) {
             nk_layout_row_dynamic(ctx, 36 * s, 1);
             if (button(d, "new-project-settings", "Neues Projekt")) command(d, SB_CMD_NEW_PROJECT);
             if (button(d, "workspace-settings", "Arbeitsordner öffnen")) command(d, SB_CMD_WORKSPACE);
+            if (button(d,"restore-project","Sicherung wiederherstellen")) command(d,SB_CMD_RESTORE);
         } else if (d->form == SB_FORM_ACTIONS) {
             nk_layout_row_dynamic(ctx, 36 * s, 1);
             if (button(d, "context", "KI-Kontext")) command(d, SB_CMD_CONTEXT);
@@ -1097,6 +1242,8 @@ static void popup(SBDesktop *d, int width, int height) {
             if (d->model.editor && strchr(d->model.path, '/') && strncmp(d->model.path, "archive/", 8))
                 if (button(d, "archive", "Archivieren")) { command(d, SB_CMD_ARCHIVE); d->form = SB_FORM_NONE; }
             if (button(d, "save-copy", "Als neue Notiz speichern")) { command(d, SB_CMD_COPY); d->form = SB_FORM_NONE; }
+            if (button(d,"backup-project","Projekt sichern")) command(d,SB_CMD_BACKUP);
+            if (button(d,"restore-project","Sicherung wiederherstellen")) command(d,SB_CMD_RESTORE);
             if (button(d, "settings-actions", "Darstellung")) d->form = SB_FORM_SETTINGS;
             if (button(d, "help-actions", "Tastaturhilfe")) d->form = SB_FORM_HELP;
         } else if (d->form == SB_FORM_SETTINGS) {
@@ -1137,14 +1284,18 @@ static void popup(SBDesktop *d, int width, int height) {
                 nk_layout_row_dynamic(ctx, 40 * s, 1); nk_label_wrap(ctx, help[i]);
             }
         }
-        if (d->message.message[0] && d->form!=SB_FORM_ACTIONS && d->form!=SB_FORM_FILTER && d->form!=SB_FORM_CONTEXT) {
+        if (d->message.message[0] && d->form!=SB_FORM_ACTIONS && d->form!=SB_FORM_FILTER && d->form!=SB_FORM_CONTEXT && d->form!=SB_FORM_BACKUP && d->form!=SB_FORM_RESTORE) {
             nk_layout_row_dynamic(ctx,52*s,1); nk_label_wrap(ctx,d->message.message);
         }
         scroll_measure(d,3); nk_group_end(ctx);
         }
-        if (form) {
+        if (d->backup) {
             nk_layout_row_dynamic(ctx,36*s,2); nk_spacer(ctx);
-            if (button(d,"submit",d->form==SB_FORM_WORKSPACE ? "Öffnen" : "Anlegen")) command(d,SB_CMD_SUBMIT);
+            if (button(d,"backup-cancel","Abbrechen")) command(d,SB_CMD_CANCEL);
+        } else if (form) {
+            nk_layout_row_dynamic(ctx,36*s,2); nk_spacer(ctx);
+            const char *submit=d->form==SB_FORM_WORKSPACE ? "Öffnen" : d->form==SB_FORM_BACKUP ? "Sichern" : d->form==SB_FORM_RESTORE ? d->restore_checked ? "Wiederherstellen" : "Prüfen" : "Anlegen";
+            if (button(d,"submit",submit)) command(d,SB_CMD_SUBMIT);
         }
     }
     nk_end(ctx);

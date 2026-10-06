@@ -16,6 +16,9 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
 - [ ] **Wiederherstellung anbieten:** Sicherung und Wiederherstellen von Projektwissen
   mit geprüften Abbruch-, Speicherplatz- und beschädigten-Datei-Szenarien.
   Atomisches Speichern ersetzt keine Sicherung oder Versionshistorie.
+  In 0.4.0 implementiert: eigene Inhaltsarchive, prüfbare Vorschau, Wiederherstellung
+  und Abbruch in der App. Noch offen: native Dialogabnahme, tatsächliche volle
+  Zielvolumes und Wiederherstellung nach hartem Prozessabbruch.
 - [ ] **Alltagskomfort vervollständigen:** Einstellungen und letzten Arbeitsordner
   dauerhaft speichern, native Ordnerauswahl, verständlicher erster Start.
   Speicherung und native Ordnerwahl sind in 0.3.1 implementiert; erster Start,
