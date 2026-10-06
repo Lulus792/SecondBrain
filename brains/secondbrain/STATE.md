@@ -23,7 +23,7 @@ Historische Arbeitsabschnitte bleiben im [Journal](journal/2026-10-06.md).
 - [0.6.1-Abnahme zu b064bd5](https://github.com/Lulus792/SecondBrain/actions/runs/37529776082):
   18 erfolgreiche Jobs, 16 Desktoptests je Debug/Release auf Windows x64,
   macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Raster- und Fokuskontrast
-  sind gezielt nachgeprüft. dist/SecondBrain ist lokal auf 0.9.0 (geprüfter Entwicklungsbuild).
+  sind gezielt nachgeprüft. dist/SecondBrain ist lokal auf 0.9.1 (geprüfter Entwicklungsbuild).
 
 ## Abgenommener erster Start
 
@@ -96,4 +96,14 @@ Neue geformte Textläufe und Noto-Ersatzschriften sind in C an die UI angebunden
 bestehen; 13 reine C-Kerntests ebenfalls. Der neue Texttest schlägt beim
 bisherigen Renderer fehl. [Vertrag und Grenzen](../../docs/TEXTDARSTELLUNG.md):
 gemischte Schreibrichtungen, graphemgenaue Eingabe, Emoji und native
-Textgeometrie bleiben eigene Arbeiten. Native 0.9.0-Abnahme folgt.
+Textgeometrie bleiben eigene Arbeiten. Die native 0.9.0-Abnahme zu 3161f08 besteht mit 20 Jobs und vier Paketen.
+
+## Dokumentstruktur 0.9.1
+
+Leseansicht veröffentlicht Überschriften, Absätze, Code und Linkaktionen
+unter dem Dokument. Alt+Bild auf/ab und native Abschnittsanfragen benutzen
+dieselben Quellpositionen. 26 lokale Release-Tests und die abschließende
+macOS-/Vertragsprüfung bestehen; diese bestätigt vollständigen Text über
+6.000 Zeichen, native Scroll-Anfragen und 2.000 stabile Absatzkennungen.
+[Umfang und offene Semantik](../../docs/DOKUMENTSTRUKTUR.md). Das Intel-Paket und gezieltes ASan/UBSan (149 Aussagen) bestehen.
+Neue native Plattformabnahme folgt; der vollständige Auftrag vor 1.0 bleibt aktiv.

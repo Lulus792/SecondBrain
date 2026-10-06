@@ -96,3 +96,13 @@ prüft 93 Aussagen einschließlich halber Mausradschritte und Richtungswechsel.
 Dieselben sieben Tests bestehen mit AddressSanitizer/UndefinedBehaviorSanitizer.
 Der [Plattformlauf zu 29b15d1](https://github.com/Lulus792/SecondBrain/actions/runs/37479319260) besteht mit allen 18 Jobs einschließlich beider Bedienwege aus den entpackten
 Windows-, macOS- und Linux-Release-Paketen.
+
+## Überschriften ab 0.9.1
+
+Bei Fokus auf der Leseansicht springt Alt+Bild ab zur nächsten, Alt+Bild auf
+zur vorherigen Überschrift. Wiederholte Eingaben wechseln sofort das Ziel;
+der Lesebereich bewegt sich über die bestehende Scrollanimation dorthin.
+Reduzierte Bewegung überspringt die Bewegung. Normales Scrollen setzt die
+Gliederungsposition zurück. Editor und Sternkarte behalten ihre eigenen Tasten.
+Native Scroll-into-view-Anfragen verwenden dieselben Bytepositionen im
+Dokument. Dokumentwechsel invalidieren ausstehende Abschnittsanfragen.

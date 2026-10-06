@@ -9,6 +9,9 @@ typedef struct {
     accesskit_role role;
     bool editable,selected;
     size_t anchor,caret;
+    const char *parent;
+    unsigned level;
+    uint64_t order;
 } SBAccessibleItem;
 typedef struct {
     char id[100]; accesskit_action action;

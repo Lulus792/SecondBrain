@@ -41,7 +41,9 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   In 0.9.0 ergänzt eine eigene SDL_ttf-Anbindung HarfBuzz, FreeType und
   Ersatzschriften; lokale Raster-/Text-/Paketprüfungen bestehen. Gemischte
   Schreibrichtungen und graphemgenaue Eingabe bleiben in
-  [TEXTDARSTELLUNG.md](TEXTDARSTELLUNG.md) offen.
+  [TEXTDARSTELLUNG.md](TEXTDARSTELLUNG.md) offen. Ab 0.9.1 veröffentlicht
+  die Leseansicht strukturierte Blöcke und bietet Abschnittssprünge;
+  [Dokumentstruktur](DOKUMENTSTRUKTUR.md) nennt Umfang und verbleibende Semantik.
   Die Cache-Signalstruktur ist in 0.5.2 korrigiert und mit echtem Linux-Clientcache
   geprüft; weitere Eventtypen bleiben gesonderte Abnahmen. Systemvorgaben bestehen
   in 0.6.0 auf allen drei CI-Systemen; reale Einstellungswechsel, Windows-Custom-

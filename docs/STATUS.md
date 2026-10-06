@@ -821,3 +821,31 @@ Standbild mit dem eigenen Projektgedächtnis bestehen. Die lokale Buildkennung
 nennt die beim Konfigurieren erfasste Revision 1ab4ab5 mit `-dirty`; der
 [neue Plattformlauf zu 3161f08](https://github.com/Lulus792/SecondBrain/actions/runs/37543159232)
 prüft den sauberen Commit gesondert.
+
+## Strukturierte Leseansicht 0.9.1, 7. Oktober 2026
+
+[Dokumentstruktur](DOKUMENTSTRUKTUR.md) beschreibt den erkannten Markdown-
+Umfang, Blöcke, natürliche Überschriftenebenen, deren nullbasierte AccessKit-
+Abbildung und Alt+Bild-auf/ab. Native Abschnittsanfragen scrollen über dieselbe
+Quellposition; Aufgabenwechsel und verborgene/bearbeitete Ansichten verwerfen
+alte Anfragen. Vollständige Absätze bleiben auch außerhalb des Viewports
+im Dokumentbaum. Ein zusätzlicher kompletter Markdown-Textlauf wird bei
+strukturierter Ausgabe vermieden.
+
+Alle 26 lokalen Release-Tests bestehen (270,90 Sekunden). Die abschließende
+native macOS-/Vertragsprüfung besteht (9,85 Sekunden): Rollen, tatsächlicher
+Textbereich über 6.000 Zeichen ohne doppelte Quelle, echter AXScrollToVisible-
+Aufruf, Tastaturziele/Sichtbarkeit, Modalabschirmung, 2.000 Absätze mit stabilen
+Kennungen und unveränderten schreibgeschützten Inhalten. Das abschließende entpackte Intel-Paket besteht mit 126 Desktop-, 112 Tastatur-
+und 75 Sicherungs-UI-Aussagen sowie Einstellungen und CLI-Sicherung.
+Neue native Windows/Linux/macOS-ARM-Abnahme folgt. Zeichen-/Graphemgeometrie,
+Listen-/Tabellensemantik und menschliche assistive Abnahme bleiben offen.
+
+Die frühere 0.9.0-Textanbindung zu 3161f08 besteht inzwischen mit 20 Jobs
+und vier Paketen; [Originalnachweis](PLATTFORMEN.md).
+
+Gezieltes ASan/UBSan für den eigenen Baumaufbau, die Kennungsverwaltung,
+Desktop-Anbindung und die Providerprüfung besteht mit 149 Aussagen. Externe
+Bibliotheken sind uninstrumentiert; LeakSanitizer ist nicht Teil dieser Prüfung.
+Das geprüfte Paket ist lokal nach dist/SecondBrain übernommen; Version und
+Standbild mit dem eigenen Projektgedächtnis bestehen.

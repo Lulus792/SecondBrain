@@ -106,6 +106,64 @@ int main(int argc,char **argv) {
 #endif
     d.form=SB_FORM_NONE; frame(&d); frame(&d);
     text=dump(&d); CHECK(!strstr(text,help_line)); accesskit_string_free(text);
+    /* Read-only document structure and complete text are exposed by the real renderer. */
+    const char *outline="# Struktur ü\n\n## Erster Abschnitt\n\nEin Absatz mit [Stand](../STATE.md).\n\n### Unterabschnitt\n\n```c\nint wert = 1;\n```\n\n####### Kein Titel\n\n";
+    char structured[16000]; snprintf(structured,sizeof(structured),"%s",outline);
+    size_t used=strlen(structured); memset(structured+used,'x',6000); used+=6000;
+    strcpy(structured+used," Ende αΩ.\n\n## Letzter Abschnitt\n\nSchluss.\n");
+    snprintf(d.model.editor,SB_TEXT_LIMIT+1,"%s",structured); OK(sb_app_save(&d.model));
+    d.editing=false; d.card=true; frame(&d); frame(&d);
+    unsigned headings=0,paragraphs=0,codes=0; char first_id[100]={0},last_id[100]={0};
+    for (size_t i=0;i<d.passive_count;++i) {
+        SBPassiveText *p=&d.passive[i]; if (strcmp(p->parent,"reader")) continue;
+        if (p->role==ACCESSKIT_ROLE_HEADING) {
+            ++headings;
+            if (!strcmp(p->text,"Erster Abschnitt")) { CHECK(p->level==2); strcpy(first_id,p->id); }
+            if (!strcmp(p->text,"Letzter Abschnitt")) strcpy(last_id,p->id);
+        }
+        if (p->role==ACCESSKIT_ROLE_PARAGRAPH) { ++paragraphs; if (strstr(p->text,"Ende αΩ")) CHECK(strlen(p->text)>6000); }
+        if (p->role==ACCESSKIT_ROLE_CODE) ++codes;
+    }
+    CHECK(headings==4 && paragraphs>=4 && codes==1 && first_id[0] && last_id[0]);
+    text=dump(&d); CHECK(strstr(text,"role: Heading") && strstr(text,"role: Paragraph") && strstr(text,"role: Code") && strstr(text,"Ende αΩ"));
+    char dump_path[SB_PATH_CAP]; OK(sb_path_join(dump_path,sizeof(dump_path),root,"document-tree.txt"));
+    FILE *tree_file=fopen(dump_path,"wb"); CHECK(tree_file); CHECK(fwrite(text,1,strlen(text),tree_file)==strlen(text)); fclose(tree_file);
+    accesskit_string_free(text);
+#ifdef __APPLE__
+    void *native_heading=native_find(view,"Erster Abschnitt",0); CHECK(native_heading);
+    CHECK(!strcmp(utf8(send(native_heading,"accessibilityRole")),heading_role ? utf8(*heading_role) : "Heading"));
+    void *native_document=native_find(view,d.model.title,0); CHECK(native_document);
+    SEL number_selector=sel_registerName("accessibilityNumberOfCharacters");
+    size_t native_count=((size_t(*)(void *,SEL))objc_msgSend)(native_document,number_selector); CHECK(native_count>6000 && native_count<7000);
+    const char *native_text=utf8(((void *(*)(void *,SEL,NativeRange))objc_msgSend)(native_document,sel_registerName("accessibilityStringForRange:"),(NativeRange){0,native_count}));
+    CHECK(native_text && strstr(native_text,"Erster Abschnitt") && strstr(native_text,"Ende αΩ") && !strstr(native_text,"## Erster"));
+    void *native_last=native_find(view,"Letzter Abschnitt",0); CHECK(native_last);
+    ((void(*)(void *,SEL,void *))objc_msgSend)(native_last,sel_registerName("accessibilityPerformAction:"),string("AXScrollToVisible"));
+    frame(&d); frame(&d); CHECK(d.scrolling[0].destination>0);
+#elif defined(_WIN32) || defined(SB_ATSPI_TEST)
+    CHECK(sb_native_probe(d.ui.window,"Erster Abschnitt",NULL,SB_NATIVE_READ_LEVEL,native_value,sizeof(native_value),pump,&d)); CHECK(!strcmp(native_value,"2"));
+    char native_document[16000];
+    CHECK(sb_native_probe(d.ui.window,d.model.title,NULL,SB_NATIVE_READ_DOCUMENT_TEXT,native_document,sizeof(native_document),pump,&d));
+    CHECK(strstr(native_document,"Erster Abschnitt") && strstr(native_document,"Ende αΩ") && strlen(native_document)<7000 && !strstr(native_document,"## Erster"));
+    CHECK(sb_native_probe(d.ui.window,"Letzter Abschnitt",NULL,SB_NATIVE_SCROLL_INTO_VIEW,NULL,0,pump,&d));
+    frame(&d); frame(&d); CHECK(d.scrolling[0].destination>0);
+#endif
+    memset(&d.scrolling[0],0,sizeof(d.scrolling[0])); d.reset_reader=true; frame(&d); frame(&d);
+    /* Keyboard heading jumps reuse the same offset and scroll path. */
+    snprintf(d.focus,sizeof(d.focus),"reader");
+    SDL_Event heading_key={0}; heading_key.type=SDL_EVENT_KEY_DOWN; heading_key.key.windowID=SDL_GetWindowID(d.ui.window);
+    heading_key.key.key=SDLK_PAGEDOWN; heading_key.key.mod=SDL_KMOD_ALT; heading_key.key.down=true;
+    sb_desktop_event(&d,&heading_key); frame(&d); CHECK(!strcmp(d.heading_cursor,first_id));
+    sb_desktop_event(&d,&heading_key); frame(&d); CHECK(strcmp(d.heading_cursor,first_id));
+    for (unsigned i=0;i<4;++i) { sb_desktop_event(&d,&heading_key); frame(&d); }
+    CHECK(!strcmp(d.heading_cursor,last_id));
+    for (unsigned i=0;i<40;++i) frame(&d);
+    bool last_visible=false;
+    for (size_t i=0;i<d.passive_count;++i) if (!strcmp(d.passive[i].id,last_id)) last_visible=d.passive[i].bounds.h>0;
+    CHECK(last_visible && d.scrolling[0].position>0 && !sb_app_dirty(&d.model));
+    snprintf(d.reveal_document,sizeof(d.reveal_document),"%s",last_id); d.reveal_document_context=d.semantic_context;
+    d.form=SB_FORM_HELP; frame(&d); CHECK(!d.reveal_document[0]); text=dump(&d); CHECK(!strstr(text,"Erster Abschnitt") && !strstr(text,"Ende αΩ")); accesskit_string_free(text);
+    d.form=SB_FORM_NONE; frame(&d);
     strcpy(d.model.editor,"Ungespeicherter Entwurf");
     OK(sb_app_request(&d.model,SB_ACT_NOTE,"STATE.md")); CHECK(d.model.guard); frame(&d);
     bool title_bounds=false; for (size_t i=0;i<d.passive_count;++i) if (!strcmp(d.passive[i].id,"modal-title")) title_bounds=d.passive[i].bounds.w>0 && d.passive[i].bounds.h>0;
@@ -146,6 +204,24 @@ int main(int argc,char **argv) {
     accesskit_string_free(text); accesskit_tree_update_free(caption_tree);
     CHECK(!sb_accessibility_submit(a,19,ACCESSKIT_ACTION_FOCUS,NULL,0,0));
     CHECK(!sb_accessibility_submit(a,19,ACCESSKIT_ACTION_CLICK,NULL,0,0));
+    while (sb_accessibility_next_action(a,&pending)) sb_accessibility_action_free(&pending);
+    /* Many immutable paragraphs retain identities across value-only updates. */
+    const size_t block_count=2000;
+    SBAccessibleItem *blocks=calloc(block_count+1,sizeof(*blocks)); char (*block_ids)[40]=calloc(block_count,sizeof(*block_ids)); CHECK(blocks && block_ids);
+    blocks[0]=(SBAccessibleItem){.id="document",.label="Langer Text",.value="",.role=ACCESSKIT_ROLE_DOCUMENT};
+    for (size_t i=0;i<block_count;++i) {
+        snprintf(block_ids[i],40,"paragraph:%zu",i);
+        blocks[i+1]=(SBAccessibleItem){.id=block_ids[i],.label="",.value="Absatz ü.",.role=ACCESSKIT_ROLE_PARAGRAPH,.parent="document"};
+    }
+    sb_accessibility_update(a,"Test","",blocks,block_count+1,"",false,4);
+    CHECK(sb_accessibility_submit(a,2020,ACCESSKIT_ACTION_SCROLL_INTO_VIEW,NULL,0,0));
+    CHECK(sb_accessibility_next_action(a,&pending)); CHECK(!strcmp(pending.id,"paragraph:1999"));
+    blocks[20].value="Geänderter Absatz"; sb_accessibility_update(a,"Test","",blocks,block_count+1,"",false,4);
+    CHECK(sb_accessibility_current(a,&pending,4)); sb_accessibility_action_free(&pending);
+    CHECK(!sb_accessibility_submit(a,2020,ACCESSKIT_ACTION_SET_VALUE,"Fremde Änderung",0,0));
+    accesskit_tree_update *large_tree=sb_accessibility_tree(a); text=accesskit_tree_update_debug(large_tree); CHECK(strstr(text,"paragraph:1999") && strstr(text,"Geänderter Absatz"));
+    accesskit_string_free(text); accesskit_tree_update_free(large_tree);
+    free(blocks); free(block_ids);
     sb_accessibility_free(a); SDL_DestroyWindow(test_window); SDL_Quit();
     printf("%u accessibility assertions passed.\n",checks); return 0;
 }

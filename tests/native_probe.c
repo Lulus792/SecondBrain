@@ -87,6 +87,26 @@ static bool query(Probe *p) {
         if (FAILED(hr) || role!=UIA_ButtonControlTypeId) goto done;
         hr=IUIAutomationElement_GetCurrentPatternAs(element,UIA_InvokePatternId,&IID_IUIAutomationInvokePattern,(void **)&invoke);
         if (SUCCEEDED(hr) && invoke) success=SUCCEEDED(IUIAutomationInvokePattern_Invoke(invoke));
+    } else if (p->operation==SB_NATIVE_SCROLL_INTO_VIEW) {
+        IUIAutomationScrollItemPattern *pattern=NULL;
+        hr=IUIAutomationElement_GetCurrentPatternAs(element,UIA_ScrollItemPatternId,&IID_IUIAutomationScrollItemPattern,(void **)&pattern);
+        if (SUCCEEDED(hr) && pattern) hr=IUIAutomationScrollItemPattern_ScrollIntoView(pattern);
+        success=SUCCEEDED(hr); if (pattern) IUIAutomationScrollItemPattern_Release(pattern);
+    } else if (p->operation==SB_NATIVE_READ_LEVEL) {
+        VARIANT level; VariantInit(&level);
+        hr=IUIAutomationElement_GetCurrentPropertyValue(element,UIA_LevelPropertyId,&level);
+        if (SUCCEEDED(hr) && level.vt==VT_I4 && p->capacity) {
+            snprintf(p->output,p->capacity,"%ld",level.lVal); success=true;
+        }
+        VariantClear(&level);
+    } else if (p->operation==SB_NATIVE_READ_DOCUMENT_TEXT) {
+        IUIAutomationTextPattern *pattern=NULL; IUIAutomationTextRange *range=NULL; BSTR value=NULL;
+        hr=IUIAutomationElement_GetCurrentPatternAs(element,UIA_TextPatternId,&IID_IUIAutomationTextPattern,(void **)&pattern);
+        if (SUCCEEDED(hr) && pattern) hr=IUIAutomationTextPattern_get_DocumentRange(pattern,&range);
+        if (SUCCEEDED(hr) && range) hr=IUIAutomationTextRange_GetText(range,-1,&value);
+        if (SUCCEEDED(hr) && value && p->capacity<=INT_MAX)
+            success=WideCharToMultiByte(CP_UTF8,WC_ERR_INVALID_CHARS,value,-1,p->output,(int)p->capacity,NULL,NULL)>0;
+        SysFreeString(value); if (range) IUIAutomationTextRange_Release(range); if (pattern) IUIAutomationTextPattern_Release(pattern);
     } else if (p->operation==SB_NATIVE_READ_NAME) {
         BSTR text=NULL; hr=IUIAutomationElement_get_CurrentName(element,&text);
         if (SUCCEEDED(hr) && text && p->capacity<=INT_MAX) success=WideCharToMultiByte(CP_UTF8,WC_ERR_INVALID_CHARS,text,-1,p->output,(int)p->capacity,NULL,NULL)>0;
@@ -161,6 +181,15 @@ static bool query(Probe *p) {
             AtspiEditableText *edit=atspi_accessible_get_editable_text_iface(element);
             if (edit) success=atspi_editable_text_set_text_contents(edit,p->value,&error);
             if (edit) g_object_unref(edit);
+        } else if (p->operation==SB_NATIVE_SCROLL_INTO_VIEW) {
+            AtspiComponent *component=atspi_accessible_get_component_iface(element);
+            if (component) success=atspi_component_scroll_to(component,ATSPI_SCROLL_ANYWHERE,&error);
+            if (component) g_object_unref(component);
+        } else if (p->operation==SB_NATIVE_READ_LEVEL) {
+            GHashTable *attributes=atspi_accessible_get_attributes(element,&error);
+            const char *level=attributes ? g_hash_table_lookup(attributes,"level") : NULL;
+            if (level && strlen(level)<p->capacity) { strcpy(p->output,level); success=true; }
+            if (attributes) g_hash_table_unref(attributes);
         } else if (p->operation==SB_NATIVE_READ_NAME) {
             char *name=atspi_accessible_get_name(element,&error);
             if (name && strlen(name)<p->capacity) { strcpy(p->output,name); success=true; }

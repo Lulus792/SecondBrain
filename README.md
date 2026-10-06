@@ -104,6 +104,7 @@ build/app/secondbrain --workspace brains --project secondbrain
 | Kamera drehen | Umschalt+Pfeile |
 | Zoomen / Kamera zurücksetzen | +, − / Pos1 |
 | Lesebereich scrollen | Bild auf / Bild ab |
+| Vorherige / nächste Überschrift in der Leseansicht | Alt+Bild auf / Bild ab |
 | Aktionen öffnen / darin wechseln | Umschalt+F10 / Pfeile auf und ab |
 | Speichern / Suche / Bearbeiten | Command/Control+S / F / E |
 | Neue Notiz / neues Projekt | Command/Control+N / Umschalt+N |

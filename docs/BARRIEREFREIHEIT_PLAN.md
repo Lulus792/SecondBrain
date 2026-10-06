@@ -273,3 +273,12 @@ bestehen 16 Release- und 16 ASan/UBSan-Tests. Reale Systemsteuerungswechsel,
 Windows-Custom-High-Contrast-Farben, Schrift-Fallback und vollständige Kontrast-
 abnahme bleiben offen. Betrachtete helle/dunkle Bilder zeigen klare Karten und
 Auswahl, aber noch zu blasse nicht ausgewählte Sternkerne und Verbindungslinien.
+
+## Strukturierte Leseansicht in 0.9.1
+
+[Dokumentstruktur](DOKUMENTSTRUKTUR.md) beschreibt Überschriftenebenen,
+Absätze, Code, vollständige Textläufe und Abschnittssprünge. Editorwerte
+bleiben Roh-Markdown. Die neue native Providerprüfung umfasst Text über
+6.000 Zeichen, Rollen und echte macOS-Scroll-Anfragen; die Plattformabnahme
+folgt gesondert. Zeichen-/Graphemgeometrie und menschliche assistive
+Benutzung sind damit weiterhin offen.

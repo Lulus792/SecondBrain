@@ -168,15 +168,15 @@ static void passive_clear(SBDesktop *d) {
     for (size_t i=0;i<d->passive_count;++i) free(d->passive[i].text);
     d->passive_count=0;
 }
-static void passive_add(SBDesktop *d,const char *id,const char *text,accesskit_role role,struct nk_rect bounds) {
-    if (!text || !*text) return;
+static void passive_span(SBDesktop *d,const char *id,const char *text,size_t length,accesskit_role role,struct nk_rect bounds) {
+    if (!text || !length) return;
     if (d->passive_count==d->passive_capacity) {
         size_t capacity=d->passive_capacity ? d->passive_capacity*2 : 32;
         SBPassiveText *next=realloc(d->passive,capacity*sizeof(*next)); if (!next) return;
         d->passive=next; d->passive_capacity=capacity;
     }
-    size_t length=strlen(text); char *copy=malloc(length+1); if (!copy) return;
-    memcpy(copy,text,length+1);
+    char *copy=malloc(length+1); if (!copy) return;
+    memcpy(copy,text,length); copy[length]=0;
     while (length && !sb_utf8_valid(copy,length)) copy[--length]=0;
     SBPassiveText *p=&d->passive[d->passive_count]; memset(p,0,sizeof(*p));
     if (id) snprintf(p->id,sizeof(p->id),"%s",id); else snprintf(p->id,sizeof(p->id),"caption:%zu",d->passive_count);
@@ -187,6 +187,39 @@ static void passive_add(SBDesktop *d,const char *id,const char *text,accesskit_r
     /* Nuklear's native window title sits outside its content clip. */
     if (id && !strcmp(id,"modal-title")) p->bounds=bounds;
     ++d->passive_count;
+}
+static void passive_add(SBDesktop *d,const char *id,const char *text,accesskit_role role,struct nk_rect bounds) {
+    passive_span(d,id,text,text ? strlen(text) : 0,role,bounds);
+}
+static void document_span(SBDesktop *d,const char *text,size_t length,size_t offset,accesskit_role role,unsigned level,struct nk_rect bounds,unsigned slot,bool title) {
+    char id[100]; snprintf(id,sizeof(id),"reader:block:%zu",offset);
+    size_t before=d->passive_count; passive_span(d,id,text,length,role,bounds);
+    if (before==d->passive_count) return;
+    SBPassiveText *p=&d->passive[before]; strcpy(p->parent,"reader"); p->level=level;
+    if (title) p->bounds=bounds;
+    p->document_y=title ? 0 : fmaxf(0,bounds.y-d->ui.ctx->current->layout->clip.y+d->scrolling[slot].applied);
+    if (d->reveal_document[0] && d->reveal_document_context!=accessible_context(d)) d->reveal_document[0]=0;
+    if (!strcmp(d->reveal_document,id)) {
+        d->scrolling[slot].destination=p->document_y; d->scrolling[slot].pending=d->scrolling[slot].elastic=0;
+        d->scrolling[slot].active=true; d->reveal_document[0]=0;
+    }
+}
+static void heading_step(SBDesktop *d,int direction) {
+    uint64_t context=accessible_context(d); size_t current=d->passive_count,chosen=d->passive_count;
+    unsigned slot=d->form==SB_FORM_CONTEXT ? 2 : 0;
+    if (d->heading_context==context)
+        for (size_t i=0;i<d->passive_count;++i) if (!strcmp(d->heading_cursor,d->passive[i].id)) { current=i; break; }
+    for (size_t i=0;i<d->passive_count;++i) {
+        SBPassiveText *p=&d->passive[i];
+        if (!p->parent[0] || p->role!=ACCESSKIT_ROLE_HEADING) continue;
+        if (direction>0 && (current<d->passive_count ? i>current : p->document_y>d->scrolling[slot].destination+1)) { chosen=i; break; }
+        if (direction<0 && (current<d->passive_count ? i<current : p->document_y<d->scrolling[slot].destination-1)) chosen=i;
+    }
+    if (chosen<d->passive_count) {
+        snprintf(d->heading_cursor,sizeof(d->heading_cursor),"%s",d->passive[chosen].id);
+        snprintf(d->reveal_document,sizeof(d->reveal_document),"%s",d->passive[chosen].id);
+        d->heading_context=d->reveal_document_context=context;
+    }
 }
 static void native_wrap(SBDesktop *d,const char *text) {
     passive_add(d,NULL,text,ACCESSKIT_ROLE_LABEL,nk_widget_bounds(d->ui.ctx));
@@ -596,7 +629,9 @@ static void accessible_actions(SBDesktop *d) {
         if (!sb_accessibility_current(d->accessibility,&action,accessible_context(d))) { sb_accessibility_action_free(&action); continue; }
         SBTarget *target=NULL;
         for (size_t i=0;i<d->target_count;++i) if (!strcmp(d->targets[i].id,action.id)) { target=&d->targets[i]; break; }
-        if (!strncmp(action.id,"star:",5) && d->form==SB_FORM_NONE && !d->model.guard) {
+        if (!strncmp(action.id,"reader:block:",13) && action.action==ACCESSKIT_ACTION_SCROLL_INTO_VIEW) {
+            snprintf(d->reveal_document,sizeof(d->reveal_document),"%s",action.id); d->reveal_document_context=accessible_context(d);
+        } else if (!strncmp(action.id,"star:",5) && d->form==SB_FORM_NONE && !d->model.guard) {
             char *end=NULL; unsigned long index=strtoul(action.id+5,&end,10);
             if (end && !*end && index<d->model.notes.count && (action.action==ACCESSKIT_ACTION_CLICK || action.action==ACCESSKIT_ACTION_FOCUS)) {
                 d->card=true; d->star=index; d->follow_star=true; focus_set(d,"galaxy"); request(d,SB_ACT_NOTE,d->model.notes.items[index].path);
@@ -634,6 +669,10 @@ static void accessible_actions(SBDesktop *d) {
         sb_accessibility_action_free(&action);
     }
 }
+static int accessible_order(const void *left,const void *right) {
+    const SBAccessibleItem *a=left,*b=right;
+    return a->order<b->order ? -1 : a->order>b->order;
+}
 static void accessible_publish(SBDesktop *d) {
     if (!d->accessibility) return;
     bool modal=d->form!=SB_FORM_NONE || d->model.guard;
@@ -641,29 +680,30 @@ static void accessible_publish(SBDesktop *d) {
     size_t controls=d->target_count+d->passive_count;
     size_t count=controls+stars;
     SBAccessibleItem *items=calloc(count,sizeof(*items)); char (*ids)[100]=stars ? calloc(stars,sizeof(*ids)) : NULL;
-    uint64_t *order=controls ? calloc(controls,sizeof(*order)) : NULL;
-    if ((count && !items) || (stars && !ids) || (controls && !order)) { free(items); free(ids); free(order); return; }
+    if ((count && !items) || (stars && !ids) ) { free(items); free(ids); return; }
     for (size_t i=0;i<d->target_count;++i) {
         SBTarget *t=&d->targets[i]; SBAccessibleItem *v=&items[i]; v->id=t->id; v->label=t->label; v->bounds=t->bounds;
         v->role=t->kind==SB_FOCUS_TEXT ? !strcmp(t->id,"editor") ? ACCESSKIT_ROLE_MULTILINE_TEXT_INPUT : !strcmp(t->id,"search") ? ACCESSKIT_ROLE_SEARCH_INPUT : ACCESSKIT_ROLE_TEXT_INPUT :
             t->kind==SB_FOCUS_READER ? ACCESSKIT_ROLE_DOCUMENT : t->kind==SB_FOCUS_MAP ? ACCESSKIT_ROLE_GROUP : !strncmp(t->id,"link:",5) ? ACCESSKIT_ROLE_LINK : ACCESSKIT_ROLE_BUTTON;
+        if (t->kind==SB_FOCUS_READER && d->form==SB_FORM_NONE && d->reader_title_bounds.w>0) {
+            struct nk_rect r=d->reader_title_bounds;
+            float bottom=fmaxf(v->bounds.y+v->bounds.h,r.y+r.h);
+            v->bounds.y=fminf(v->bounds.y,r.y); v->bounds.h=bottom-v->bounds.y;
+        }
         if (t->kind==SB_FOCUS_TEXT) {
             size_t capacity=0; v->value=!strcmp(t->id,"editor") ? d->model.editor : accessible_field(d,t->id,&capacity); v->editable=true;
             if (!strcmp(t->id,"editor") && d->text_edit_ready) { v->anchor=(size_t)d->text_edit.select_start; v->caret=(size_t)d->text_edit.select_end; }
         } else if (t->kind==SB_FOCUS_READER) v->value=d->form==SB_FORM_CONTEXT ? d->context : d->model.source ? d->model.source : d->model.editor;
         if (!strcmp(t->id,"galaxy")) v->label="Dokumente in der Sternkarte";
-        order[i]=((uint64_t)t->group<<32)|t->order;
+        v->order=((uint64_t)t->group<<32)|t->order;
+        if (!strncmp(t->id,"link:",5)) v->parent="reader";
     }
     for (size_t i=0;i<d->passive_count;++i) {
         SBPassiveText *p=&d->passive[i]; SBAccessibleItem *v=&items[d->target_count+i];
-        v->id=p->id; v->label=p->text; v->value=p->text; v->bounds=p->bounds; v->role=p->role;
-        order[d->target_count+i]=((uint64_t)p->group<<32)|p->order;
+        v->id=p->id; v->label=p->parent[0] && p->role!=ACCESSKIT_ROLE_HEADING ? "" : p->text; v->value=p->text; v->bounds=p->bounds; v->role=p->role;
+        v->parent=p->parent; v->level=p->level; v->order=((uint64_t)p->group<<32)|p->order;
     }
-    for (size_t i=1;i<controls;++i) {
-        SBAccessibleItem item=items[i]; uint64_t key=order[i]; size_t j=i;
-        while (j && order[j-1]>key) { items[j]=items[j-1]; order[j]=order[j-1]; --j; }
-        items[j]=item; order[j]=key;
-    }
+    qsort(items,controls,sizeof(*items),accessible_order);
     for (size_t i=0;i<stars;++i) {
         snprintf(ids[i],100,"star:%zu",i); SBAccessibleItem *v=&items[controls+i];
         v->id=ids[i]; v->label=d->model.notes.items[i].title; v->role=ACCESSKIT_ROLE_LIST_BOX_OPTION;
@@ -679,7 +719,7 @@ static void accessible_publish(SBDesktop *d) {
     char native_focus[100]; snprintf(native_focus,sizeof(native_focus),"%s",d->focus);
     if (!strcmp(d->focus,"galaxy") && d->star<stars) snprintf(native_focus,sizeof(native_focus),"star:%zu",d->star);
     sb_accessibility_update(d->accessibility,title,native_focus,items,count,status,modal,d->semantic_context);
-    free(items); free(ids); free(order);
+    free(items); free(ids);
 }
 static void focus_step(SBDesktop *d, int direction) {
     if (!d->target_count) return;
@@ -800,6 +840,7 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
         }
     }
     if (event->type == SDL_EVENT_MOUSE_WHEEL) {
+        d->heading_cursor[0]=0;
         float delta = event->wheel.y * (event->wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? -1 : 1);
         if (map_input(d,event->wheel.mouse_x,event->wheel.mouse_y))
             d->zoom = fmaxf(0.45f,fminf(3.5f,d->zoom*expf(delta*0.08f)));
@@ -893,8 +934,11 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
             if (key == SDLK_EQUALS || key == SDLK_PLUS || key == SDLK_KP_PLUS) { d->zoom = fminf(3.5f, d->zoom * 1.15f); return; }
             if (key == SDLK_MINUS || key == SDLK_KP_MINUS) { d->zoom = fmaxf(0.45f, d->zoom / 1.15f); return; }
         }
+        if (!modifier && !text && !d->model.guard && focused(d,"reader") && (event->key.mod&SDL_KMOD_ALT) && (key==SDLK_PAGEDOWN || key==SDLK_PAGEUP)) {
+            heading_step(d,key==SDLK_PAGEDOWN ? 1 : -1); return;
+        }
         if (!text && (key == SDLK_PAGEDOWN || key == SDLK_PAGEUP || key == SDLK_DOWN || key == SDLK_UP)) {
-            d->focus_scroll_frames = 0;
+            d->heading_cursor[0]=0; d->focus_scroll_frames = 0;
             unsigned slot=scroll_slot(d,0,0,false);
             if (slot<4) d->scrolling[slot].pending += key == SDLK_DOWN ? 50 : key == SDLK_UP ? -50 : key == SDLK_PAGEDOWN ? 220 : -220;
             return;
@@ -1172,9 +1216,14 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
         else {
             if (!code) {
                 while (heading < length && line[heading] == '#') ++heading;
-                if (heading && heading < length && line[heading] == ' ') {
+                if (heading && heading<=6 && heading < length && line[heading] == ' ') {
                     content += heading + 1; length -= heading + 1;
-                    if (first_heading && heading == 1) { first_heading = false; goto next_line; }
+                    if (first_heading && heading == 1) {
+                        char *title=plain_inline(content,length);
+                        document_span(d,title ? title : content,title ? strlen(title) : length,(size_t)(line-text),ACCESSKIT_ROLE_HEADING,1,
+                            d->form==SB_FORM_NONE ? d->reader_title_bounds : nk_rect(0,0,0,0),slot,true);
+                        free(title); first_heading = false; goto next_line;
+                    }
                 } else heading = 0;
             }
             first_heading = false;
@@ -1198,6 +1247,7 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
             float measured = font->width(font->userdata, font->height, shown, (int)shown_length);
             float lines = measured < available * 0.92f ? 1 : ceilf(measured / available) + 1;
             nk_layout_row_dynamic(ctx, lines * (font->height + 4) + (heading ? 10 : 0), 1);
+            document_span(d,shown,shown_length,(size_t)(line-text),heading ? ACCESSKIT_ROLE_HEADING : code ? ACCESSKIT_ROLE_CODE : ACCESSKIT_ROLE_PARAGRAPH,heading,nk_widget_bounds(ctx),slot,false);
             nk_text_wrap(ctx, shown, (int)shown_length);
             free(plain);
             if (!code) {
@@ -1265,6 +1315,7 @@ static void detail(SBDesktop *d, float x, float y, float width, float height, nk
         nk_layout_row_begin(ctx,NK_STATIC,(compact ? 24 : 32)*s,2);
         nk_layout_row_push(ctx,fmaxf(40,content-32*s-ctx->style.window.spacing.x));
         char short_title[SB_NAME_CAP]; compact_label(d,title,short_title,sizeof(short_title),content-44*s);
+        d->reader_title_bounds=nk_widget_bounds(ctx);
         nk_label(ctx,short_title,NK_TEXT_LEFT); if (nk_widget_is_hovered(ctx)) tooltip(d,title);
         nk_layout_row_push(ctx,32*s);
         if (button(d,"close-card","Dokument schließen")) { d->card=false; d->expanded=false; focus_set(d,"galaxy"); }
@@ -1529,7 +1580,8 @@ static void popup(SBDesktop *d, int width, int height) {
                 "Sterne: Pfeile öffnen die nächste Notiz sofort",
                 "Umschalt+Pfeile: Kamera drehen · +/-: Zoom · Pos1: zurück",
                 "Ziehen: drehen · Umschalt+Ziehen: verschieben · Mausrad: Zoom",
-                "Bild auf/ab: Lesen scrollen · Escape: zurück/schließen",
+                "Bild auf/ab: Lesen scrollen · Alt+Bild auf/ab: Abschnitt",
+                "Escape: zurück/schließen",
                 "Im Editor: A/C/V/X/Z · Y oder Umschalt+Z · Ctrl+I: Tabulator einfügen"};
             for (size_t i = 0; i < sizeof(help) / sizeof(*help); ++i) {
                 nk_layout_row_dynamic(ctx, 40 * s, 1); native_wrap(d, help[i]);
@@ -1717,6 +1769,8 @@ static void welcome(SBDesktop *d,int width,int height,nk_flags flags) {
     nk_end(ctx);
 }
 void sb_desktop_frame(SBDesktop *d) {
+    if (d->reveal_document[0] && (d->reveal_document_context!=accessible_context(d) ||
+        (d->form!=SB_FORM_CONTEXT && (!d->card || (d->editing && !d->model.source))))) d->reveal_document[0]=0;
     int width, height; SDL_GetWindowSize(d->ui.window,&width,&height);
     if (width!=d->layout_width || height!=d->layout_height || d->ui.scale!=d->layout_scale) {
         if (d->keyboard) d->focus_scroll_frames=3;

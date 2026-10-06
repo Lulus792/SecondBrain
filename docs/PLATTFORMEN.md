@@ -437,3 +437,12 @@ Desktop, Tastatur, Sicherung, Einstellungen und CLI. Die öffentliche
 enthält diese vier Archive und SHA256SUMS; die Pipeline prüft Uploadbytes erneut.
 Das belegt CI-Runner und Paketabläufe, keine vollständige reale Geräte- oder
 Screenreader-Abnahme. 0.8.0 bleibt ein späterer, gesondert zu prüfender Stand.
+
+## Textanbindung 0.9.0
+
+[Lauf37543159232](https://github.com/Lulus792/SecondBrain/actions/runs/37543159232)
+zu 3161f08 besteht mit 20 Jobs: 26 Desktoptests je Debug/Release auf Windows
+x64, Linux x64, macOS ARM64 und Intel sowie vier entpackte Pakete. Die
+Textprüfungen umfassen Verbindung, Fallbacks und Schriftgrößen im beschriebenen
+Umfang. Gemischte Schreibrichtungen und vollständige assistive Abnahme bleiben
+offen. Dieser Lauf ist kein Nachweis für die spätere Dokumentstruktur 0.9.1.
