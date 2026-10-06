@@ -23,7 +23,7 @@ Historische Arbeitsabschnitte bleiben im [Journal](journal/2026-10-06.md).
 - [0.6.1-Abnahme zu b064bd5](https://github.com/Lulus792/SecondBrain/actions/runs/37529776082):
   18 erfolgreiche Jobs, 16 Desktoptests je Debug/Release auf Windows x64,
   macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Raster- und Fokuskontrast
-  sind gezielt nachgeprüft. dist/SecondBrain ist lokal auf 0.8.0 (geprüfter Entwicklungsbuild).
+  sind gezielt nachgeprüft. dist/SecondBrain ist lokal auf 0.9.0 (geprüfter Entwicklungsbuild).
 
 ## Abgenommener erster Start
 

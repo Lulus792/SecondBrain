@@ -113,8 +113,8 @@ Submodulrevisionen dieses Tags:
   Old MIT sowie die separate Microsoft-MIT-Notiz zum USE-Anteil.
 
 Originaltexte und besondere Hinweise (FreeType BDF/PCF/zlib, HarfBuzz USE)
-liegen unter licenses/ und werden mit den Paketen ausgeliefert. FreeType-
-Fremdkompressionen und SDL_ttf-SVG-Emoji-Backend sind deaktiviert. HarfBuzz
+liegen unter licenses/ und werden mit den Paketen ausgeliefert. Optionale externe
+Kompressionsbibliotheken und das SDL_ttf-SVG-Emoji-Backend sind deaktiviert. HarfBuzz
 benötigt beim Bauen einen C++-Compiler; der eigene Code bleibt C17. Diese
 UI-Ziele sind vollständig vom separat baubaren fachlichen C-Kern getrennt.
 

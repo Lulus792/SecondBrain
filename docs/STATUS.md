@@ -815,3 +815,9 @@ Schriftgrößen). Die externen statischen Bibliotheken sind dabei nicht
 instrumentiert; LeakSanitizer ist auf diesem Mac nicht Teil der Prüfung.
 Die kleine normale Textszene läuft in 0,37 Sekunden mit maximal 89.182.208
 Bytes RSS (~85 MiB). Das ist kein Langzeit- oder Großdaten-Leistungsnachweis.
+
+Der geprüfte 0.9.0-Build ist nach dist/SecondBrain übernommen. Version und
+Standbild mit dem eigenen Projektgedächtnis bestehen. Die lokale Buildkennung
+nennt die beim Konfigurieren erfasste Revision 1ab4ab5 mit `-dirty`; der
+[neue Plattformlauf zu 3161f08](https://github.com/Lulus792/SecondBrain/actions/runs/37543159232)
+prüft den sauberen Commit gesondert.
