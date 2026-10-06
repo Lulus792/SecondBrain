@@ -16,10 +16,11 @@ int main(int argc,char **argv) {
     OK(sb_settings_load(path,&s,&revision));
     CHECK(!revision.exists && s.font_percent==100 && s.dark && s.width==1336);
     strcpy(s.workspace,"/Pfad ü/100%=Projekt\nweitere Zeile"); strcpy(s.project,"projekt-ue"); strcpy(s.note,"knowledge/überblick.md");
-    s.font_percent=200; s.dark=false; s.solid=true; s.reduced_motion=true; s.width=780; s.height=520;
+    s.font_percent=200; s.dark=false; s.solid=true; s.reduced_motion=true; s.width=780; s.height=520; s.follow_theme=true; s.contrast=true;
     OK(sb_settings_save(path,&s,revision,&saved)); OK(sb_settings_load(path,&loaded,&revision));
     CHECK(!strcmp(s.workspace,loaded.workspace) && !strcmp(s.note,loaded.note) && !strcmp(s.project,loaded.project));
     CHECK(loaded.font_percent==200 && !loaded.dark && loaded.solid && loaded.reduced_motion && loaded.width==780);
+    CHECK(loaded.follow_theme && loaded.contrast);
     CHECK(revision.hash==saved.hash && revision.length==saved.length);
     SBRevision stale=revision;
     s.font_percent=150; OK(sb_settings_save(path,&s,revision,&saved));
@@ -42,6 +43,12 @@ int main(int argc,char **argv) {
     OK(sb_fs_remove(path));
     bad="SecondBrain settings 1\nworkspace=%00\n";
     OK(sb_fs_write_new(path,bad,strlen(bad))); CHECK(sb_settings_load(path,&loaded,&revision).code==SB_INVALID);
+    OK(sb_fs_remove(path));
+    const char *legacy="SecondBrain settings 1\nworkspace=/old\nproject=\nnote=\nfont=125\nwidth=900\nheight=600\ndark=0\nsolid=1\nmotion=1\n";
+    OK(sb_fs_write_new(path,legacy,strlen(legacy))); OK(sb_settings_load(path,&loaded,&revision));
+    CHECK(!loaded.follow_theme && !loaded.contrast && loaded.solid && loaded.reduced_motion && !loaded.dark && loaded.font_percent==125);
+    OK(sb_settings_save(path,&loaded,revision,&saved)); OK(sb_fs_read(path,&text,&length)); CHECK(!strncmp(text,"SecondBrain settings 2\n",23)); free(text);
+    OK(sb_settings_load(path,&loaded,&revision)); CHECK(!strcmp(loaded.workspace,"/old") && loaded.font_percent==125);
     printf("%u settings assertions passed: persistence, UTF-8, malformed input, conflicts and preservation.\n",checks);
     return 0;
 }

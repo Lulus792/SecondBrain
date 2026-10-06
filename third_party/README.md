@@ -81,3 +81,15 @@ Noto Sans Regular und Noto Sans Mono Regular stammen aus
 Revision ffebf8c1ee449e544955a7e813c54f9b73848eac. Die Schrift und ihre SIL Open Font
 License sind unter assets/fonts enthalten. Es werden keine Apple-Schriftassets
 weiterverteilt.
+
+
+## Linux-Systemdarstellung
+
+Die UI-Anbindung von Systemvorgaben verwendet auf Linux die dynamischen
+Systembibliotheken libdbus-1 und GIO/GLib. Sie werden ausschließlich mit dem
+Desktop-Ziel verbunden und nicht in den fachlichen Kern eingebunden.
+D-Bus liest das Settings-Portal; GIO liest unter GNOME verfügbare Einstellungen.
+Sie werden nicht im Paket als eigene Bibliothekskopien ausgeliefert. Herkunft:
+[D-Bus](https://www.freedesktop.org/wiki/Software/dbus/),
+[GLib/GIO](https://gitlab.gnome.org/GNOME/glib). Voraussetzungen und Grenzen stehen
+in [Distribution](../docs/DISTRIBUTION.md) und [Einstellungen](../docs/EINSTELLUNGEN.md).

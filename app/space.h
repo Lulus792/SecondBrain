@@ -8,7 +8,7 @@ typedef struct {
     SDL_Texture *texture;
     unsigned char *base, *pixels, *sky;
     int width, height;
-    bool dark, solid, sky_dark, sky_ready, cached;
+    bool dark, solid, contrast,sky_dark,sky_contrast, sky_ready, cached;
     uint64_t fingerprint;
     SBPoint *points;
     size_t count;

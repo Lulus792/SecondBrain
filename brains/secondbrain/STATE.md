@@ -71,6 +71,12 @@ diese UI-Abhängigkeit aus festgelegter Quelle mit Cargo/Rust ab 1.87. Anwendung
 Kern bleiben C; Pakete brauchen die Toolchain nicht. dist/SecondBrain ist auf 0.5.2.
 Weitere Eventtypen und menschliche Screenreader-Abnahme bleiben offen.
 
+0.6.0 ergänzt Systemdarstellung und native Zugänglichkeitsvorgaben. Die eigene
+Auswahl wird getrennt von der wirksamen Darstellung gespeichert; alte vollständige
+Einstellungsdateien werden erhalten. Gezielte lokale Policy-/Neustart-/Altformat-
+Prüfungen bestehen; Gesamt-/Plattformabnahme läuft noch. Eigene Kontrastansichten
+wurden betrachtet und ein zu heller Hinweis korrigiert.
+
 ## Auftrag und verbleibende Abnahmen
 
 Das vollständige [Ziel vor 1.0](../../docs/RELEASE.md) bleibt aktiv: Sicherungs-UI,

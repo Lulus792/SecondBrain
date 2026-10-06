@@ -79,3 +79,46 @@ keine gespeicherte Konfiguration. Die gezielte Prüfung wartet ebenfalls auf den
 Größenwechsel; eine bloße Anfrage ist kein Beleg für eine bereits geänderte Größe.
 [SDL_SyncWindow](https://wiki.libsdl.org/SDL3/SDL_SyncWindow), Originaldokumentation
 und SDL3-3.2.30-Quellcode am 6. Oktober 2026 gelesen.
+
+
+## Systemdarstellung und Zugänglichkeit ab 0.6.0
+
+Lumen bleibt die Grundeinstellung. Systemdarstellung ist in Darstellung separat
+wählbar. Manuell reduzierte Bewegung/Transparenz und erhöhter Kontrast bleiben
+eigene gespeicherte Wünsche. Bekannte Systemvorgaben ergänzen sie: Bewegung wird
+reduziert, Transparenz vermieden und Kontrast erhöht. Die App setzt diese Vorgaben
+nicht zurück. Im Menü steht der Grund statt eines wirkungslosen Aktivierungsknopfs.
+Erhöhter Kontrast vermeidet durchscheinende Flächen und stärkt Text, Ränder und Fokus.
+
+Die native UI-Schicht liest NSWorkspace auf macOS, SystemParametersInfoW auf
+Windows und das XDG-Settings-Portal auf Linux. Unter GNOME ergänzt ein verfügbares
+GSettings-Schema enable-animations die Bewegungsvorgabe. Linux fragt mit begrenzter
+Antwortzeit im Hintergrund; der UI-Thread wartet nicht auf das Portal. Fehlende
+oder fehlerhafte Antworten ersetzen nicht den letzten gültigen Systemstand.
+Eine gültige Rückkehr zu normalen Werten hebt den Systemanteil wieder auf; eigene
+Wünsche bleiben erhalten. Portal-Schlüssel für Transparenz sind nicht standardisiert;
+unter Linux bleibt die eigene Option dafür maßgeblich, Kontrast erzwingt Deckflächen.
+
+Abfragen werden spätestens im nächsten Abfragezyklus (etwa eine Sekunde plus
+Antwortzeit) übernommen. Helle/dunkle Darstellung wird nur bei bewusst gewählter
+Systemdarstellung übernommen. Die App verändert keine OS-Einstellungen.
+
+Formatversion 2 ergänzt follow-theme und contrast als Pflichtfelder. Version 1
+wird vollständig gelesen; die zusätzlichen Werte bleiben zunächst aus. Erst
+bewusstes Speichern schreibt Version 2. Beschädigte und unbekannte Versionen,
+Doppelfelder und konkurrierende Änderungen bleiben geschützt. Automatische
+Systemwerte werden nicht als eigene Auswahl in die Datei zurückgeschrieben.
+
+Die gezielte lokale Prüfung besteht für Auflösung, Speichern, Altformat und
+Neustart; native macOS-Flags werden read-only abgefragt. Linux testet ein privates
+Settings-Portal mit tatsächlichen D-Bus-Nachrichten, Wechsel, Fehler und Erholung.
+Die native Plattform-/Gesamtabnahme folgt nach dem laufenden Schritt. Die
+vollständige Kontrastmessung, Windows-Custom-High-Contrast-Paletten und reale
+Bedienung nach Änderungen der Systemsteuerung bleiben eigene Prüfungen.
+
+Quellen, gelesen am 6. Oktober 2026:
+[NSWorkspace Reduce Motion](https://developer.apple.com/documentation/appkit/nsworkspace/accessibilitydisplayshouldreducemotion?language=objc),
+[SystemParametersInfoW](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow),
+[XDG Settings](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Settings.html),
+[SDL_GetSystemTheme](https://wiki.libsdl.org/SDL3/SDL_GetSystemTheme),
+[GNOME Schema](https://github.com/GNOME/gsettings-desktop-schemas/blob/master/schemas/org.gnome.desktop.interface.gschema.xml.in).

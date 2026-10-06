@@ -9,6 +9,18 @@
 static void backup_poll(SBDesktop *d);
 static void accessible_actions(SBDesktop *d);
 static void accessible_publish(SBDesktop *d);
+static void style_update(SBDesktop *d,bool force) {
+    d->system_style=sb_system_style_snapshot(d->style_monitor,force);
+    SBStyleChoice effective=sb_style_resolve(d->requested_style,d->system_style);
+    SBStyleChoice old=d->applied_style;
+    if (force || effective.dark!=old.dark || effective.contrast!=old.contrast) {
+        d->ui.contrast=effective.contrast; sb_ui_theme(&d->ui,effective.dark);
+    }
+    if (force || effective.solid!=old.solid) d->solid=effective.solid;
+    if (force || effective.motion!=old.motion) d->reduced_motion=effective.motion;
+    d->applied_style=effective;
+}
+void sb_desktop_set_style(SBDesktop *d,SBStyleChoice style) { d->requested_style=style; style_update(d,true); }
 static uint64_t accessible_context(const SBDesktop *d) {
     return sb_hash(d->model.project.root,strlen(d->model.project.root))^sb_hash(d->model.source_path,strlen(d->model.source_path))^
         ((uint64_t)d->model.generation<<24)^((uint64_t)d->form<<8)^(uint64_t)d->model.guard;
@@ -28,6 +40,7 @@ static float approach(float current, float destination, float factor, float thre
     return fabsf(destination-value) < threshold ? destination : value;
 }
 void sb_desktop_tick(SBDesktop *d, float seconds) {
+    style_update(d,false);
     accessible_actions(d);
     backup_poll(d);
     d->seconds = fmaxf(0, fminf(seconds, 0.05f));
@@ -208,7 +221,7 @@ static void tooltip(SBDesktop *d, const char *text) {
 static bool focused(SBDesktop *d, const char *id) { return d->keyboard && !strcmp(d->focus, id); }
 static void ring(SBDesktop *d, const char *id) {
     if (focused(d, id) && d->target_count && !strcmp(d->targets[d->target_count-1].id,id)) nk_stroke_rect(nk_window_get_canvas(d->ui.ctx),
-        d->targets[d->target_count - 1].bounds, 9, 2, nk_rgb(142,191,255));
+        d->targets[d->target_count - 1].bounds, 9, 2, d->ui.contrast ? d->ui.ctx->style.text.color : nk_rgb(142,191,255));
 }
 static bool activation(SBDesktop *d, const char *id) {
     if (strcmp(d->activate, id)) return false;
@@ -337,6 +350,8 @@ SBStatus sb_desktop_init(SBDesktop *d, const char *workspace, const char *font, 
     if (status.code != SB_OK) return status;
     d->dialogs=sb_dialogs_new();
     d->accessibility=sb_accessibility_new(d->ui.window);
+    d->style_monitor=sb_system_style_new(!testing);
+    d->requested_style.dark=true; style_update(d,true);
     status = sb_app_init(&d->model, workspace);
     if (status.code != SB_OK) {
         sb_fs_absolute(workspace, d->model.workspace, sizeof(d->model.workspace));
@@ -351,7 +366,7 @@ SBStatus sb_desktop_preferences(SBDesktop *d, const char *path, bool explicit_wo
     SBStatus status=sb_settings_load(path,&s,&revision);
     if (status.code!=SB_OK) { d->message=status; return status; }
     strcpy(d->settings_path,path); d->settings_revision=revision; d->settings_enabled=true;
-    sb_ui_theme(&d->ui,s.dark); d->solid=s.solid; d->reduced_motion=s.reduced_motion;
+    sb_desktop_set_style(d,(SBStyleChoice){.dark=s.dark,.solid=s.solid,.motion=s.reduced_motion,.contrast=s.contrast,.follow_theme=s.follow_theme});
     status=sb_ui_fonts(&d->ui,s.font_percent/100.0f);
     if (status.code!=SB_OK) { d->message=status; return status; }
     if (!SDL_SetWindowSize(d->ui.window,(int)s.width,(int)s.height) || !SDL_SyncWindow(d->ui.window)) {
@@ -389,12 +404,14 @@ SBStatus sb_desktop_store_preferences(SBDesktop *d) {
         return d->message;
     }
     s.width=(unsigned)fmaxf(780,fminf(8192,(float)width)); s.height=(unsigned)fmaxf(520,fminf(8192,(float)height));
-    s.font_percent=(unsigned)roundf(d->ui.scale*100); s.dark=d->ui.dark; s.solid=d->solid; s.reduced_motion=d->reduced_motion;
+    s.font_percent=(unsigned)roundf(d->ui.scale*100); s.dark=d->requested_style.dark; s.solid=d->requested_style.solid; s.reduced_motion=d->requested_style.motion;
+    s.follow_theme=d->requested_style.follow_theme; s.contrast=d->requested_style.contrast;
     SBStatus status=sb_settings_save(d->settings_path,&s,d->settings_revision,&d->settings_revision);
     if (status.code!=SB_OK) d->message=status;
     return status;
 }
 void sb_desktop_free(SBDesktop *d) {
+    sb_system_style_free(d->style_monitor);
     sb_accessibility_free(d->accessibility);
     sb_backup_job_free(d->backup);
     sb_dialogs_free(d->dialogs);
@@ -521,7 +538,7 @@ void sb_desktop_apply(SBDesktop *d) {
     } else if (cmd == SB_CMD_ARCHIVE || cmd == SB_CMD_RELOAD) {
         status = sb_app_request(&d->model, cmd == SB_CMD_ARCHIVE ? SB_ACT_ARCHIVE : SB_ACT_RELOAD, NULL);
         result(d, status, cmd == SB_CMD_ARCHIVE ? "Dokument archiviert." : "Dokument neu geladen.");
-    } else if (cmd == SB_CMD_THEME) sb_ui_theme(&d->ui, !d->ui.dark);
+    } else if (cmd == SB_CMD_THEME) { SBStyleChoice style=d->requested_style; style.dark=!d->ui.dark; style.follow_theme=false; sb_desktop_set_style(d,style); }
     else if (cmd == SB_CMD_SCALE) result(d, sb_ui_fonts(&d->ui, d->next_scale), NULL);
     else if (cmd == SB_CMD_SOURCE) {
         if (!d->model.source) snprintf(d->source_focus,sizeof(d->source_focus),"%s",d->focus);
@@ -871,7 +888,7 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
 static void muted(SBDesktop *d, const char *text) {
     passive_add(d,NULL,text,ACCESSKIT_ROLE_LABEL,nk_widget_bounds(d->ui.ctx));
     nk_label_colored(d->ui.ctx, text, NK_TEXT_LEFT,
-                     d->ui.dark ? nk_rgb(164, 169, 181) : nk_rgb(99, 108, 123));
+                     d->ui.contrast ? d->ui.ctx->style.text.color : d->ui.dark ? nk_rgb(164, 169, 181) : nk_rgb(99, 108, 123));
 }
 static void compact_label(SBDesktop *d, const char *text, char *out, size_t capacity, float width) {
     struct nk_user_font *font = &d->ui.normal->handle;
@@ -1238,7 +1255,7 @@ static void detail(SBDesktop *d, float x, float y, float width, float height, nk
         nk_layout_row_dynamic(ctx,(compact ? 20 : 26)*s,1);
         const char *feedback=d->message.message[0] ? d->message.message : d->model.source ? d->model.source_path : d->model.path;
         char line[SB_NAME_CAP]; compact_label(d,feedback,line,sizeof(line),content-12);
-        nk_label_colored(ctx,line,NK_TEXT_LEFT,d->message.code==SB_OK ? d->ui.dark ? nk_rgb(170,188,210) : nk_rgb(80,100,125) : nk_rgb(230,105,110));
+        nk_label_colored(ctx,line,NK_TEXT_LEFT,d->ui.contrast ? ctx->style.text.color : d->message.code==SB_OK ? d->ui.dark ? nk_rgb(170,188,210) : nk_rgb(80,100,125) : nk_rgb(230,105,110));
         if (nk_widget_is_hovered(ctx)) tooltip(d,feedback);
     }
     nk_end(ctx); ctx->style.window.spacing=spacing;
@@ -1398,13 +1415,21 @@ static void popup(SBDesktop *d, int width, int height) {
             nk_layout_row_dynamic(ctx, 32 * s, 1); native_label(d, "Darstellung", NK_TEXT_LEFT);
             nk_layout_row_dynamic(ctx, 36 * s, 1);
             if (button(d, "theme", d->ui.dark ? "Helle Darstellung" : "Dunkle Darstellung")) command(d, SB_CMD_THEME);
+            nk_layout_row_dynamic(ctx,36*s,1);
+            if (button(d,"system-theme",d->requested_style.follow_theme ? "Eigene Darstellung verwenden" : "Systemdarstellung verwenden")) { SBStyleChoice style=d->requested_style; style.follow_theme=!style.follow_theme; sb_desktop_set_style(d,style); }
             nk_layout_row_dynamic(ctx, 36 * s, 2);
             if (button(d, "font-minus", "Kleinere Schrift")) { d->next_scale = fmaxf(1, d->ui.scale - 0.25f); command(d, SB_CMD_SCALE); }
             if (button(d, "font-plus", "Größere Schrift")) { d->next_scale = fminf(2, d->ui.scale + 0.25f); command(d, SB_CMD_SCALE); }
             nk_layout_row_dynamic(ctx, 36 * s, 1);
-            if (button(d, "transparency", d->solid ? "Glasdarstellung aktivieren" : "Transparenz reduzieren")) d->solid = !d->solid;
+            if (d->system_style.solid || d->system_style.contrast) native_wrap(d,"Transparenz durch Systemeinstellung reduziert.");
+            else if (d->ui.contrast) native_wrap(d,"Transparenz bei erhöhtem Kontrast reduziert.");
+            else if (button(d, "transparency", d->requested_style.solid ? "Glasdarstellung aktivieren" : "Transparenz reduzieren")) { SBStyleChoice style=d->requested_style; style.solid=!style.solid; sb_desktop_set_style(d,style); }
             nk_layout_row_dynamic(ctx,36*s,1);
-            if (button(d,"motion",d->reduced_motion ? "Animationen aktivieren" : "Bewegung reduzieren")) d->reduced_motion=!d->reduced_motion;
+            if (d->system_style.motion) native_wrap(d,"Bewegung durch Systemeinstellung reduziert.");
+            else if (button(d,"motion",d->requested_style.motion ? "Animationen aktivieren" : "Bewegung reduzieren")) { SBStyleChoice style=d->requested_style; style.motion=!style.motion; sb_desktop_set_style(d,style); }
+            nk_layout_row_dynamic(ctx,36*s,1);
+            if (d->system_style.contrast) native_wrap(d,"Kontrast durch Systemeinstellung erhöht.");
+            else if (button(d,"contrast",d->requested_style.contrast ? "Normalen Kontrast verwenden" : "Kontrast erhöhen")) { SBStyleChoice style=d->requested_style; style.contrast=!style.contrast; sb_desktop_set_style(d,style); }
         } else if (d->form == SB_FORM_CONTEXT) {
             nk_layout_row_dynamic(ctx,24*s,1); muted(d,"Gespeicherte Kerninformationen");
             nk_layout_row_dynamic(ctx, 36 * s, 1);
@@ -1514,13 +1539,13 @@ static void galaxy(SBDesktop *d, int width, int height, struct nk_rect card, str
     if (nk_begin(ctx, "Galaxy", nk_rect(0,0,(float)width,(float)height), NK_WINDOW_NO_INPUT | NK_WINDOW_BACKGROUND | NK_WINDOW_NO_SCROLLBAR)) {
         target_add(d,"galaxy",d->map_bounds,SB_FOCUS_MAP,1);
         struct nk_command_buffer *canvas = nk_window_get_canvas(ctx);
-        if (focused(d, "galaxy")) nk_stroke_rect(canvas, d->map_bounds, 24, 1, nk_rgba(142,191,255,90));
+        if (focused(d, "galaxy")) nk_stroke_rect(canvas, d->map_bounds, 24, d->ui.contrast ? 2 : 1, d->ui.contrast ? ctx->style.text.color : nk_rgba(142,191,255,90));
         struct nk_rect labels[80]; unsigned label_count = 0;
         for (size_t i = 0; i < space->count; ++i) {
             SBPoint p = space->points[i];
             if (!p.visible || (d->card && inside(p.x,p.y,card)) || (d->browser && inside(p.x,p.y,list))) continue;
-            if (p.selected) nk_stroke_circle(canvas, nk_rect(p.x-8,p.y-8,16,16), 1, nk_rgba(142,191,255,145));
-            if (p.focused) nk_stroke_circle(canvas, nk_rect(p.x-13,p.y-13,26,26), 2.5f, nk_rgb(190,223,255));
+            if (p.selected) nk_stroke_circle(canvas, nk_rect(p.x-8,p.y-8,16,16), d->ui.contrast ? 2 : 1, d->ui.contrast ? ctx->style.text.color : nk_rgba(142,191,255,145));
+            if (p.focused) nk_stroke_circle(canvas, nk_rect(p.x-13,p.y-13,26,26), 2.5f, d->ui.contrast ? ctx->style.text.color : nk_rgb(190,223,255));
             char title[SB_NAME_CAP]; compact_label(d, d->model.notes.items[i].title, title, sizeof(title), 200);
             float tw = d->ui.normal->handle.width(d->ui.normal->handle.userdata, d->ui.normal->handle.height, title, (int)strlen(title));
             struct nk_rect r = nk_rect(p.x+12,p.y-8,tw+5,24*d->ui.scale);
@@ -1537,7 +1562,7 @@ static void galaxy(SBDesktop *d, int width, int height, struct nk_rect card, str
         }
         if (!space->count) nk_draw_text(canvas, nk_rect(60,cy-20,width-120.0f,70),
             "Dein Projektwissen wird hier zur Sternkarte.", (int)strlen("Dein Projektwissen wird hier zur Sternkarte."),
-            &d->ui.body->handle,nk_rgba(0,0,0,0),nk_rgb(166,185,211));
+            &d->ui.body->handle,nk_rgba(0,0,0,0),d->ui.contrast ? ctx->style.text.color : d->ui.dark ? nk_rgb(166,185,211) : nk_rgb(70,88,112));
     }
     nk_end(ctx);
 }
@@ -1592,7 +1617,7 @@ void sb_desktop_frame(SBDesktop *d) {
     if (d->browser && !d->expanded && card.x < list.x + list.w + 12) { card.x = list.x + list.w + 12; card.w = width-card.x-18; }
     d->map_bounds = nk_rect(18,top,width-36.0f,body-70*s);
     d->target_count = 0; d->ui.space.glass_count = 0;
-    d->ui.space.dark = d->ui.dark; d->ui.space.solid = d->solid;
+    d->ui.space.dark = d->ui.dark; d->ui.space.solid = d->solid; d->ui.space.contrast=d->ui.contrast;
     galaxy(d,width,height,card,list);
     nk_flags flags = modal ? NK_WINDOW_NO_INPUT : 0;
     tools(d,width,header,flags);
@@ -1605,7 +1630,7 @@ void sb_desktop_frame(SBDesktop *d) {
     if (d->form!=SB_FORM_NONE || d->model.guard) { d->target_count = 0; passive_clear(d); d->focus_group = 3; }
     d->semantic_context=accessible_context(d);
     struct nk_style_item old_background = d->ui.ctx->style.window.fixed_background;
-    d->ui.ctx->style.window.fixed_background = nk_style_item_color(d->ui.dark ? nk_rgba(17,29,47,245) : nk_rgba(237,245,255,245));
+    d->ui.ctx->style.window.fixed_background = nk_style_item_color(d->ui.contrast ? d->ui.dark ? nk_rgb(0,0,0) : nk_rgb(255,255,255) : d->ui.dark ? nk_rgba(17,29,47,245) : nk_rgba(237,245,255,245));
     popup(d,width,height);
     d->ui.ctx->style.window.fixed_background = old_background;
     for (size_t i = 1; i < d->target_count; ++i) {

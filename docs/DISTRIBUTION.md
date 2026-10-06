@@ -79,3 +79,8 @@ ihre AT-SPI-Cache-Signale zu korrigieren. Entwickler benötigen dafür zusätzli
 Cargo/Rust ab 1.87. Der Anwendungscode und fachliche Kern bleiben C. Ein Kernbuild
 mit SB_BUILD_UI=OFF benötigt keine Rust-Toolchain; fertige Pakete ebenfalls nicht.
 Quellen, Hashes und Umfang stehen in [third_party](../third_party/README.md).
+
+Ab 0.6.0 gehören libdbus-1 und GIO/GLib zur Linux-UI-Systemanbindung. Zum Bauen
+werden ihre Entwicklungsdateien benötigt (libdbus-1-dev, libglib2.0-dev); zur
+Laufzeit die üblichen Desktop-Systembibliotheken. Ein reiner C-Kernbuild bleibt
+unabhängig davon. Die Bibliothekskopien werden nicht im Anwendungspaket gebündelt.

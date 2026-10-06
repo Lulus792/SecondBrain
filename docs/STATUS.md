@@ -480,3 +480,21 @@ ist durch native CI und Paketprüfung belegt.
 Weitere Eventtypen und menschliche assistive Navigation bleiben eigene Abnahmen.
 Dokumentstruktur, Grapheme/Zeilen, Fortschrittsansagen, OS-Vorgaben, Schrift-Fallback
 und übrige Release-Aufgaben bleiben aktiv. 1.0 bleibt bis zur Nutzerfreigabe gesperrt.
+
+
+## 0.6.0: Systemvorgaben für Darstellung und Bewegung
+
+Eine eigene C-UI-Anbindung liest native Zugänglichkeitsvorgaben. macOS verwendet
+NSWorkspace, Windows SystemParametersInfoW, Linux das standardisierte Settings-
+Portal im Hintergrund und unter GNOME ein verfügbares Schema für enable-animations.
+Die Lumen-Auswahl bleibt Standard; Systemdarstellung ist separat wählbar.
+Systemvorgaben ergänzen die eigene Auswahl, ohne ihre gespeicherten Werte zu
+ersetzen. Erhöhter Kontrast verwendet Deckflächen, stärkere Ränder, Fokus und
+klarere Textfarben. Ein erster zu heller Hinweis in der hellen Kontrastansicht
+wurde nach tatsächlicher Bildbetrachtung korrigiert.
+
+Formatversion 2 ergänzt Systemdarstellung und Kontrast. Alte vollständige
+Version-1-Dateien werden gelesen und erst beim Speichern aktualisiert. Die
+gezielten lokalen Prüfungen für Policy, Altformat, Speichern und Neustart bestehen;
+native macOS-Vorgaben werden read-only gelesen. Vollständige Release-, Sanitizer-
+und Plattformnachweise folgen nach Abschluss. [Vertrag und Grenzen](EINSTELLUNGEN.md).

@@ -92,6 +92,17 @@ void sb_ui_theme(SBUi *ui, bool dark) {
     colors[NK_COLOR_SCROLLBAR_CURSOR_HOVER] = colors[NK_COLOR_BUTTON_HOVER];
     colors[NK_COLOR_SCROLLBAR_CURSOR_ACTIVE] = nk_rgb(128, 133, 145);
     colors[NK_COLOR_TAB_HEADER] = side;
+    if (ui->contrast) {
+        bg=dark ? nk_rgb(0,0,0) : nk_rgb(255,255,255);
+        text=dark ? nk_rgb(255,255,255) : nk_rgb(0,0,0);
+        for (int i=0;i<NK_COLOR_COUNT;++i) colors[i]=bg;
+        colors[NK_COLOR_TEXT]=text; colors[NK_COLOR_BORDER]=text;
+        colors[NK_COLOR_BUTTON_HOVER]=dark ? nk_rgb(35,35,35) : nk_rgb(230,230,230);
+        colors[NK_COLOR_BUTTON_ACTIVE]=colors[NK_COLOR_BUTTON_HOVER];
+        colors[NK_COLOR_EDIT_CURSOR]=text; colors[NK_COLOR_TOGGLE_CURSOR]=text;
+        colors[NK_COLOR_SCROLLBAR_CURSOR]=text;
+        colors[NK_COLOR_SELECT_ACTIVE]=dark ? nk_rgb(80,80,80) : nk_rgb(175,175,175);
+    }
     nk_style_from_table(ui->ctx, colors);
     ui->ctx->style.edit.cursor_text_normal = bg;
     ui->ctx->style.edit.cursor_text_hover = bg;
@@ -111,6 +122,7 @@ void sb_ui_theme(SBUi *ui, bool dark) {
     ui->ctx->style.button.rounding = 9;
     ui->ctx->style.button.border = 0.8f;
     ui->ctx->style.button.border_color = dark ? nk_rgba(161,193,230,48) : nk_rgba(103,139,181,64);
+    if (ui->contrast) { ui->ctx->style.button.border_color=text; ui->ctx->style.button.border=1.5f; }
     ui->ctx->style.button.padding = nk_vec2(10, 4);
     ui->ctx->style.edit.rounding = 10;
     ui->ctx->style.edit.padding = nk_vec2(10, 8);

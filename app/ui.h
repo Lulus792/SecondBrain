@@ -25,7 +25,7 @@ typedef struct {
     struct nk_font *normal, *body, *heading, *code;
     char font_path[SB_PATH_CAP];
     float scale, density;
-    bool dark, testing;
+    bool dark, testing,contrast;
     SBSpace space;
 } SBUi;
 

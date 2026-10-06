@@ -57,7 +57,8 @@ SBStatus sb_settings_load(const char *path, SBSettings *out, SBRevision *revisio
     if (status.code==SB_NOT_FOUND) { *out=s; return sb_ok(); }
     if (status.code!=SB_OK) return status;
     revision->exists=true; revision->length=length; revision->hash=sb_hash(text,length);
-    if (length>32768 || strlen(text)!=length || strncmp(text,"SecondBrain settings 1\n",23)) {
+    bool version2=length>=23 && !strncmp(text,"SecondBrain settings 2\n",23);
+    if (length>32768 || strlen(text)!=length || (!version2 && strncmp(text,"SecondBrain settings 1\n",23))) {
         free(text); return sb_error(SB_INVALID,"Einstellungsdatei ist beschädigt oder hat eine unbekannte Version.");
     }
     char *cursor=text+23;
@@ -77,12 +78,14 @@ SBStatus sb_settings_load(const char *path, SBSettings *out, SBRevision *revisio
             else if (!strcmp(cursor,"dark")) { bit=64; if (value>1) goto invalid; s.dark=value!=0; }
             else if (!strcmp(cursor,"solid")) { bit=128; if (value>1) goto invalid; s.solid=value!=0; }
             else if (!strcmp(cursor,"motion")) { bit=256; if (value>1) goto invalid; s.reduced_motion=value!=0; }
+            else if (version2 && !strcmp(cursor,"follow-theme")) { bit=512; if (value>1) goto invalid; s.follow_theme=value!=0; }
+            else if (version2 && !strcmp(cursor,"contrast")) { bit=1024; if (value>1) goto invalid; s.contrast=value!=0; }
             else goto invalid;
         }
         if (seen&bit) goto invalid;
         seen|=bit; cursor=end+1;
     }
-    if (seen!=511 || !valid(&s)) goto invalid;
+    if (seen!=(version2 ? 2047u : 511u) || !valid(&s)) goto invalid;
     free(text); *out=s; return sb_ok();
 invalid:
     free(text); return sb_error(SB_INVALID,"Einstellungsdatei enthält ungültige oder doppelte Werte.");
@@ -97,7 +100,7 @@ SBStatus sb_settings_save(const char *path, const SBSettings *s, SBRevision expe
     if (actual.exists!=expected.exists || actual.hash!=expected.hash || actual.length!=expected.length)
         return sb_error(SB_CONFLICT,"Einstellungen wurden von einer anderen Instanz geändert.");
     encode(s->workspace,workspace); encode(s->project,project); encode(s->note,note);
-    int length=snprintf(text,sizeof(text),"SecondBrain settings 1\nworkspace=%s\nproject=%s\nnote=%s\nfont=%u\nwidth=%u\nheight=%u\ndark=%u\nsolid=%u\nmotion=%u\n",workspace,project,note,s->font_percent,s->width,s->height,(unsigned)s->dark,(unsigned)s->solid,(unsigned)s->reduced_motion);
+    int length=snprintf(text,sizeof(text),"SecondBrain settings 2\nworkspace=%s\nproject=%s\nnote=%s\nfont=%u\nwidth=%u\nheight=%u\ndark=%u\nsolid=%u\nmotion=%u\nfollow-theme=%u\ncontrast=%u\n",workspace,project,note,s->font_percent,s->width,s->height,(unsigned)s->dark,(unsigned)s->solid,(unsigned)s->reduced_motion,(unsigned)s->follow_theme,(unsigned)s->contrast);
     if (length<0 || (size_t)length>=sizeof(text)) return sb_error(SB_LIMIT,"Einstellungen sind zu lang.");
     int count=snprintf(temporary,sizeof(temporary),"%s.tmp-%lu",path,sb_process_id());
     if (count<0 || (size_t)count>=sizeof(temporary)) return sb_error(SB_LIMIT,"Einstellungspfad ist zu lang.");

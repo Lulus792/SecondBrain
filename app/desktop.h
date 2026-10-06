@@ -6,6 +6,7 @@
 #include "dialog.h"
 #include "backup_job.h"
 #include "accessibility.h"
+#include "system_style.h"
 
 typedef enum { SB_FORM_NONE, SB_FORM_PROJECT, SB_FORM_NOTE, SB_FORM_WORKSPACE, SB_FORM_SETTINGS, SB_FORM_CONTEXT, SB_FORM_HELP, SB_FORM_ACTIONS, SB_FORM_PROJECTS, SB_FORM_FILTER,SB_FORM_BACKUP,SB_FORM_RESTORE } SBForm;
 typedef enum {
@@ -34,6 +35,9 @@ typedef struct {
     bool settings_enabled;
     SBNativeDialogs *dialogs;
     SBAccessibility *accessibility;
+    SBStyleMonitor *style_monitor;
+    SBStyleChoice requested_style,applied_style;
+    SBSystemStyle system_style;
     unsigned dialog_serial;
     SBBackupJob *backup;
     SBBackupJobState backup_state;
@@ -88,6 +92,7 @@ void sb_desktop_frame(SBDesktop *desktop);
 void sb_desktop_tick(SBDesktop *desktop, float seconds);
 bool sb_desktop_animating(const SBDesktop *desktop);
 void sb_desktop_apply(SBDesktop *desktop);
+void sb_desktop_set_style(SBDesktop *desktop,SBStyleChoice style);
 int sb_desktop_keyboard_test(SBDesktop *desktop, const char *directory);
 int sb_desktop_self_test(SBDesktop *desktop, const char *directory);
 int sb_desktop_backup_test(SBDesktop *desktop,const char *directory);
