@@ -441,6 +441,7 @@ SBStatus sb_markdown_title(const char *text, char *out, size_t capacity) {
     while (*text == '\r' || *text == '\n' || *text == ' ') ++text;
     if (*text != '#') { *out = 0; return sb_ok(); }
     while (*text == '#') ++text;
+    if (*text != ' ' && *text != '\t' && *text != '\n' && *text != '\r' && *text) { *out = 0; return sb_ok(); }
     while (*text == ' ') ++text;
     end = text;
     while (*end && *end != '\n' && *end != '\r') ++end;
@@ -485,7 +486,16 @@ static SBStatus note_visit(const char *name, int kind, void *userdata) {
     visit->list->items = items; items[visit->list->count++] = note;
     return sb_ok();
 }
-static int note_order(const void *a, const void *b) { return strcmp(((const SBNote *)a)->path, ((const SBNote *)b)->path); }
+static unsigned note_priority(const char *path) {
+    const char *core[] = {"PROJECT.md", "STATE.md", "DECISIONS.md", "QUESTIONS.md", "SOURCES.md", "START.md", "AGENTS.md"};
+    for (unsigned i = 0; i < sizeof(core) / sizeof(*core); ++i) if (!strcmp(path, core[i])) return i;
+    return !strncmp(path, "archive/", 8) ? 9 : 8;
+}
+static int note_order(const void *a, const void *b) {
+    const char *left = ((const SBNote *)a)->path, *right = ((const SBNote *)b)->path;
+    unsigned lp = note_priority(left), rp = note_priority(right);
+    return lp != rp ? lp < rp ? -1 : 1 : strcmp(left, right);
+}
 void sb_notes_free(SBNotes *notes) { free(notes->items); notes->items = NULL; notes->count = 0; }
 SBStatus sb_notes_list(const SBProject *project, SBNotes *out) {
     NoteVisit visit;

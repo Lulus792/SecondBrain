@@ -46,7 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Configure native core
-        run: cmake -S . -B build/native -DCMAKE_BUILD_TYPE=${{ matrix.config }}
+        run: cmake -S . -B build/native -DSB_BUILD_UI=OFF -DCMAKE_BUILD_TYPE=${{ matrix.config }}
       - name: Build native core and tools
         run: cmake --build build/native --config ${{ matrix.config }} --parallel
       - name: Verify native project workflow

@@ -39,7 +39,7 @@ unter macOS in die passenden Editieraktionen.
 
 ## Schriftasset
 
-Noto Sans Regular stammt aus
+Noto Sans Regular und Noto Sans Mono Regular stammen aus
 [noto-fonts](https://github.com/notofonts/noto-fonts/tree/ffebf8c1ee449e544955a7e813c54f9b73848eac),
 Revision ffebf8c1ee449e544955a7e813c54f9b73848eac. Die Schrift und ihre SIL Open Font
 License sind unter assets/fonts enthalten. Es werden keine Apple-Schriftassets

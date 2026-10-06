@@ -9,6 +9,7 @@
 
 void sb_app_source_close(SBApp *app) {
     free(app->source); app->source = NULL; app->source_path[0] = 0; app->source_title[0] = 0;
+    app->source_directory = false;
 }
 void sb_app_free(SBApp *app) {
     sb_projects_free(&app->projects); sb_notes_free(&app->notes);
@@ -213,6 +214,53 @@ static int hex_digit(char c) {
     if (c >= 'A' && c <= 'F') return c - 'A' + 10;
     return -1;
 }
+typedef struct { char *data; size_t length; const char *root; } SourceListing;
+static SBStatus listing_add(SourceListing *listing, const char *text, size_t length) {
+    if (length > SB_TEXT_LIMIT - listing->length) return sb_error(SB_LIMIT, "Quellenordner enthält zu viele Einträge.");
+    char *data = realloc(listing->data, listing->length + length + 1);
+    if (!data) return sb_error(SB_MEMORY, "Nicht genug Speicher für die Quellenliste.");
+    listing->data = data;
+    memcpy(data + listing->length, text, length); listing->length += length;
+    data[listing->length] = 0;
+    return sb_ok();
+}
+static SBStatus source_visit(const char *name, int kind, void *userdata) {
+    SourceListing *listing = userdata;
+    char path[SB_PATH_CAP];
+    SBStatus result;
+    if (name[0] == '.' || kind == 3) return sb_ok();
+    TRY(sb_path_join(path, sizeof(path), listing->root, name));
+    TRY(listing_add(listing, "- [", 3));
+    for (const char *p = name; *p; ++p) {
+        char c = *p;
+        if (c == '[') c = '(';
+        else if (c == ']') c = ')';
+        else if ((unsigned char)c < 32) c = ' ';
+        TRY(listing_add(listing, &c, 1));
+    }
+    if (kind == 2) TRY(listing_add(listing, "/", 1));
+    TRY(listing_add(listing, "](file:///", 10));
+    const unsigned char *p = (const unsigned char *)path;
+    if (*p == '/') ++p;
+    while (*p) {
+        if ((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p >= '0' && *p <= '9') ||
+            strchr("/:-._~", *p)) result = listing_add(listing, (const char *)p, 1);
+        else { char encoded[4]; snprintf(encoded, sizeof(encoded), "%%%02X", *p); result = listing_add(listing, encoded, 3); }
+        if (result.code != SB_OK) return result;
+        ++p;
+    }
+    return listing_add(listing, ")\n", 2);
+}
+static SBStatus source_listing(const char *path, char **text) {
+    SourceListing listing = {0};
+    listing.root = path;
+    SBStatus result = listing_add(&listing, "# Quellenordner\n\nWähle eine Textdatei oder einen Unterordner.\n\n",
+                                 strlen("# Quellenordner\n\nWähle eine Textdatei oder einen Unterordner.\n\n"));
+    if (result.code == SB_OK) result = sb_fs_list(path, source_visit, &listing);
+    if (result.code != SB_OK) { free(listing.data); return result; }
+    *text = listing.data;
+    return sb_ok();
+}
 SBStatus sb_app_source(SBApp *app, const char *link) {
     char decoded[SB_PATH_CAP], joined[SB_PATH_CAP], absolute[SB_PATH_CAP], base[SB_PATH_CAP];
     char *text = NULL, *slash;
@@ -244,16 +292,21 @@ SBStatus sb_app_source(SBApp *app, const char *link) {
     else {
         if (app->source) strcpy(base, app->source_path);
         else TRY(sb_path_join(base, sizeof(base), app->project.root, app->path));
-        slash = strrchr(base, '/');
-        if (!slash) return sb_error(SB_INVALID, "Quellenbasis ist ungültig.");
-        *slash = 0;
+        if (!app->source_directory) {
+            slash = strrchr(base, '/');
+            if (!slash) return sb_error(SB_INVALID, "Quellenbasis ist ungültig.");
+            *slash = 0;
+        }
         TRY(sb_path_join(joined, sizeof(joined), base, decoded));
     }
     TRY(sb_fs_absolute(joined, absolute, sizeof(absolute)));
-    result = sb_fs_read(absolute, &text, &length);
+    bool directory = sb_fs_kind(absolute) == 2;
+    result = directory ? source_listing(absolute, &text) : sb_fs_read(absolute, &text, &length);
     if (result.code != SB_OK) return result;
+    if (directory) length = strlen(text);
     if (!sb_utf8_valid(text, length)) { free(text); return sb_error(SB_INVALID, "Die Quelle ist keine UTF-8-Textdatei."); }
     free(app->source); app->source = text;
+    app->source_directory = directory;
     strcpy(app->source_path, absolute);
     sb_markdown_title(text, app->source_title, sizeof(app->source_title));
     if (!app->source_title[0]) {

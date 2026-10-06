@@ -1,0 +1,159 @@
+#include "desktop.h"
+#include "platform.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+static void frame(SBDesktop *d) {
+    SDL_Event event;
+    nk_input_begin(d->ui.ctx);
+    while (SDL_PollEvent(&event)) sb_desktop_event(d, &event);
+    nk_input_end(d->ui.ctx);
+    sb_desktop_frame(d);
+    sb_ui_draw(&d->ui);
+    SDL_RenderPresent(d->ui.renderer);
+    sb_desktop_apply(d);
+}
+static bool click(SBDesktop *d, const char *id) {
+    struct nk_rect bounds = nk_rect(0, 0, 0, 0);
+    bool found = false;
+    for (size_t i = d->target_count; i > 0; --i)
+        if (!strcmp(d->targets[i - 1].id, id)) { bounds = d->targets[i - 1].bounds; found = true; break; }
+    if (!found) { fprintf(stderr, "Control not found: %s\n", id); return false; }
+    SDL_Event event = {0};
+    event.type = SDL_EVENT_MOUSE_MOTION; event.motion.windowID = SDL_GetWindowID(d->ui.window);
+    event.motion.x = bounds.x + bounds.w / 2; event.motion.y = bounds.y + bounds.h / 2;
+    SDL_PushEvent(&event); frame(d);
+    event.type = SDL_EVENT_MOUSE_BUTTON_DOWN; event.button.windowID = SDL_GetWindowID(d->ui.window);
+    event.button.button = SDL_BUTTON_LEFT; event.button.down = true;
+    event.button.x = bounds.x + bounds.w / 2; event.button.y = bounds.y + bounds.h / 2;
+    SDL_PushEvent(&event); frame(d);
+    event.type = SDL_EVENT_MOUSE_BUTTON_UP; event.button.down = false;
+    SDL_PushEvent(&event); frame(d);
+    frame(d);
+    return true;
+}
+static void key(SBDesktop *d, SDL_Keycode key, SDL_Keymod modifiers) {
+    SDL_Event event = {0};
+    event.type = SDL_EVENT_KEY_DOWN; event.key.windowID = SDL_GetWindowID(d->ui.window);
+    event.key.key = key; event.key.mod = modifiers; event.key.down = true;
+    SDL_PushEvent(&event); frame(d);
+    event.type = SDL_EVENT_KEY_UP; event.key.down = false;
+    SDL_PushEvent(&event); frame(d);
+}
+static void type(SBDesktop *d, const char *text) {
+    SDL_Event event = {0};
+    event.type = SDL_EVENT_TEXT_INPUT; event.text.windowID = SDL_GetWindowID(d->ui.window);
+    event.text.text = text;
+    SDL_PushEvent(&event); frame(d); frame(d);
+}
+static bool replace(SBDesktop *d, const char *id, const char *text) {
+#ifdef __APPLE__
+    SDL_Keymod modifier = SDL_KMOD_GUI;
+#else
+    SDL_Keymod modifier = SDL_KMOD_CTRL;
+#endif
+    if (!click(d, id) || !SDL_SetClipboardText(text)) return false;
+    key(d, SDLK_A, modifier); key(d, *text ? SDLK_V : SDLK_BACKSPACE, *text ? modifier : 0);
+    return true;
+}
+static bool capture(SBDesktop *d, const char *directory, const char *name) {
+    char path[SB_PATH_CAP];
+    if (sb_path_join(path, sizeof(path), directory, name).code != SB_OK) return false;
+    /* ReadPixels is called before Present, using the same render path as the app. */
+    nk_input_begin(d->ui.ctx); nk_input_end(d->ui.ctx);
+    sb_desktop_frame(d); sb_ui_draw(&d->ui);
+    SBStatus result = sb_ui_capture(&d->ui, path);
+    SDL_RenderPresent(d->ui.renderer);
+    return result.code == SB_OK;
+}
+int sb_desktop_self_test(SBDesktop *d, const char *directory) {
+    unsigned checks = 0;
+    char path[SB_PATH_CAP], *text = NULL;
+    size_t length = 0;
+#define CHECK(x) do { ++checks; if (!(x)) { fprintf(stderr, "GUI FAIL line %d: %s (form=%d, path=%s, message=%s)\n", \
+    __LINE__, #x, d->form, d->model.path, d->message.message); capture(d,directory,"failure.bmp"); return 1; } } while (0)
+    frame(d); frame(d);
+    CHECK(click(d, "new-project"));
+    CHECK(d->form == SB_FORM_PROJECT);
+    CHECK(click(d, "form-name")); type(d, "Physim ü");
+    CHECK(!strcmp(d->name, "Physim ü") && !strcmp(d->id, "physim-ue"));
+    CHECK(click(d, "submit"));
+    CHECK(d->model.has_project && !strcmp(d->model.project.id, "physim-ue"));
+    CHECK(click(d, "new-note"));
+    CHECK(d->form == SB_FORM_NOTE);
+    CHECK(click(d, "form-name")); type(d, "Energie");
+    CHECK(click(d, "submit"));
+    CHECK(!strcmp(d->model.path, "knowledge/energie.md") && d->editing);
+    CHECK(replace(d, "editor", "# Energie\n\nMessung ü. Ein belegter Befund.\n"));
+    CHECK(sb_app_dirty(&d->model) && strstr(d->model.editor, "Messung ü."));
+    CHECK(click(d, "save"));
+    CHECK(!sb_app_dirty(&d->model));
+    CHECK(click(d, "read"));
+    CHECK(capture(d, directory, "large-light.bmp"));
+    CHECK(click(d, "search")); type(d, "Messung");
+    CHECK(!strcmp(d->search, "Messung") && d->hits.count == 1);
+    CHECK(replace(d, "search", ""));
+    CHECK(click(d, "edit"));
+    CHECK(replace(d, "editor", "# Energie\n\nUngespeicherte Änderung.\n"));
+    CHECK(click(d, "section:overview"));
+    CHECK(click(d, "note:STATE.md"));
+    CHECK(d->model.guard && !strcmp(d->model.path, "knowledge/energie.md"));
+    CHECK(click(d, "guard-cancel"));
+    CHECK(!d->model.guard && sb_app_dirty(&d->model));
+    CHECK(click(d, "note:STATE.md"));
+    CHECK(click(d, "guard-discard"));
+    CHECK(!strcmp(d->model.path, "STATE.md") && !sb_app_dirty(&d->model));
+#ifdef __APPLE__
+    key(d, SDLK_C, SDL_KMOD_GUI | SDL_KMOD_SHIFT);
+#else
+    key(d, SDLK_C, SDL_KMOD_CTRL | SDL_KMOD_SHIFT);
+#endif
+    CHECK(d->form == SB_FORM_CONTEXT && d->context && strstr(d->context, "PROJECT.md"));
+    CHECK(click(d, "copy-context"));
+    text = SDL_GetClipboardText();
+    CHECK(text && strstr(text, "Physim ü")); SDL_free(text); text = NULL;
+    key(d, SDLK_ESCAPE, 0);
+    CHECK(d->form == SB_FORM_NONE);
+
+    CHECK(sb_path_join(path, sizeof(path), directory, "Reference.md").code == SB_OK);
+    CHECK(sb_fs_write_new(path, "# Referenzquelle\n\nEin Originalbefund.\n", strlen("# Referenzquelle\n\nEin Originalbefund.\n")).code == SB_OK);
+    CHECK(click(d, "note:SOURCES.md"));
+    CHECK(click(d, "edit"));
+    CHECK(replace(d, "editor", "# Quellen\n\n[Referenz](../../Reference.md)\n"));
+    CHECK(click(d, "save") && click(d, "read"));
+    CHECK(click(d, "link:0"));
+    CHECK(d->model.source && strstr(d->model.source, "Originalbefund"));
+    CHECK(click(d, "source-back"));
+    CHECK(!d->model.source && !strcmp(d->model.path, "SOURCES.md"));
+
+    CHECK(click(d, "new-project"));
+    CHECK(click(d, "form-name")); type(d, "Zweites");
+    CHECK(click(d, "submit"));
+    CHECK(d->model.projects.count == 2 && !strcmp(d->model.project.id, "zweites"));
+    CHECK(click(d, "project:physim-ue"));
+    CHECK(!strcmp(d->model.project.id, "physim-ue"));
+    CHECK(click(d, "section:knowledge"));
+    CHECK(click(d, "note:knowledge/energie.md"));
+    CHECK(strstr(d->model.editor, "Messung ü.") && !sb_app_dirty(&d->model));
+    CHECK(sb_note_load(&d->model.project, d->model.path, &text, NULL).code == SB_OK);
+    CHECK(strstr(text, "Messung ü.") && !strstr(text, "Ungespeicherte Änderung"));
+    free(text); text = NULL;
+    CHECK(click(d, "settings"));
+    CHECK(click(d, "theme"));
+    CHECK(d->ui.dark);
+    CHECK(click(d, "font-plus") && click(d, "font-plus"));
+    CHECK(d->ui.scale == 1.5f);
+    key(d, SDLK_ESCAPE, 0);
+    SDL_SetWindowSize(d->ui.window, 780, 560);
+    frame(d); frame(d);
+    CHECK(capture(d, directory, "small-dark.bmp"));
+    CHECK(!sb_app_dirty(&d->model) && !strcmp(d->model.path, "knowledge/energie.md"));
+    CHECK(sb_path_join(path, sizeof(path), directory, "Reference.md").code == SB_OK);
+    CHECK(sb_fs_read(path, &text, &length).code == SB_OK);
+    CHECK(!strcmp(text, "# Referenzquelle\n\nEin Originalbefund.\n"));
+    free(text);
+    printf("%u desktop assertions passed through SDL mouse, keyboard and clipboard events.\nScreenshots: %s\n", checks, directory);
+    return 0;
+#undef CHECK
+}

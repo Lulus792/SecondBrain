@@ -58,6 +58,11 @@ int main(int argc, char **argv) {
     CHECK(!app.source && strstr(app.editor, "Ungespeicherter Zusatz"));
     CHECK(sb_app_source(&app, "%00.md").code == SB_INVALID);
     CHECK(sb_app_source(&app, "https://example.com").code == SB_INVALID);
+    OK(sb_app_source(&app, "../.."));
+    CHECK(app.source_directory && strstr(app.source, "quelle%20%C3%BC.md"));
+    OK(sb_app_source(&app, "quelle%20%C3%BC.md"));
+    CHECK(!app.source_directory && strstr(app.source, "Originalquelle") && sb_app_dirty(&app));
+    sb_app_source_close(&app);
     OK(sb_app_request(&app, SB_ACT_ARCHIVE, NULL));
     CHECK(app.guard);
     OK(sb_app_decide(&app, SB_DISCARD_CHANGES));

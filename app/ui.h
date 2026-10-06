@@ -20,7 +20,7 @@ typedef struct {
     SDL_Window *window;
     SDL_Renderer *renderer;
     struct nk_context *ctx;
-    struct nk_font *normal, *body, *heading;
+    struct nk_font *normal, *body, *heading, *code;
     char font_path[SB_PATH_CAP];
     float scale, density;
     bool dark, testing;
@@ -33,5 +33,6 @@ void sb_ui_event(SBUi *ui, const SDL_Event *event);
 void sb_ui_draw(SBUi *ui);
 SBStatus sb_ui_capture(SBUi *ui, const char *path);
 void sb_ui_shutdown(SBUi *ui);
+void sb_ui_reset_editor(SBUi *ui);
 
 #endif

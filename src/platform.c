@@ -170,6 +170,15 @@ SBStatus sb_fs_absolute(const char *path, char *out, size_t capacity) {
     return sb_ok();
 }
 unsigned long sb_process_id(void) { return GetCurrentProcessId(); }
+SBStatus sb_fs_home(char *out, size_t capacity) {
+    wchar_t home[SB_PATH_CAP];
+    DWORD length = GetEnvironmentVariableW(L"USERPROFILE", home, SB_PATH_CAP);
+    if (!length || length >= SB_PATH_CAP ||
+        !WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, home, -1, out, (int)capacity, NULL, NULL))
+        return sb_error(SB_IO, "Benutzerordner ist nicht erreichbar.");
+    for (char *p = out; *p; ++p) if (*p == '\\') *p = '/';
+    return sb_ok();
+}
 
 #else
 #include <dirent.h>
@@ -303,6 +312,12 @@ SBStatus sb_fs_absolute(const char *path, char *out, size_t capacity) {
     }
 }
 unsigned long sb_process_id(void) { return (unsigned long)getpid(); }
+SBStatus sb_fs_home(char *out, size_t capacity) {
+    const char *home = getenv("HOME");
+    if (!home || !*home || !sb_utf8_valid(home, strlen(home)))
+        return sb_error(SB_IO, "Benutzerordner ist nicht erreichbar.");
+    return sb_path_join(out, capacity, home, "");
+}
 #endif
 
 SBStatus sb_fs_mkdirs(const char *path) {

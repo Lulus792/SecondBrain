@@ -81,8 +81,6 @@ Konkrete Entwürfe werden daraus abgeleitet.
 Der Nutzer hat nach dem Festhalten des Plans die Umsetzung des Projekts
 beauftragt. Diese Reihenfolge gilt für die nun laufende Arbeit.
 
-## GitHub und Nachweise
-
 ## Eigenes Projektgedächtnis
 
 - [ ] Ein eigenes Second Brain für das SecondBrain-Projekt erstellen. Die

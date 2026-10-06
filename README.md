@@ -14,18 +14,60 @@ Die Umsetzung läuft. UI-Recherche und Oberflächenentwurf sind dokumentiert;
 ein unabhängiger C17-Kern und ein natives Entwicklungswerkzeug sind implementiert.
 Die UI-Grundlage mit Schriften, Darstellung und Texteditor ist ebenfalls
 implementiert und auf allen drei Plattformen geprüft.
-Die eigene Oberfläche und die vollständige App-Abnahme stehen noch aus.
+Die eigene Desktop-Oberfläche ist implementiert und lokal anhand eines vollständigen
+Bedienablaufs geprüft. Paketierung und die vollständige App-Abnahme auf allen
+drei Plattformen folgen.
 Der aktuelle Nachweis steht im [Umsetzungsstand](docs/STATUS.md).
 
 [GitHub Repository](https://github.com/Lulus792/SecondBrain) ·
 [Automatisierte Plattformprüfungen](https://github.com/Lulus792/SecondBrain/actions)
 
-## Vorhandener Strukturprototyp
+## Eigene Desktop-Anwendung
+
+Voraussetzungen zum Bauen: C17-Compiler, CMake ab 3.20 und auf Linux die
+Entwicklungsdateien des Fenstersystems. SDL3 wird bei Bedarf beim Build aus der
+festgelegten Originalversion geladen. Die App läuft ohne Python.
+
+```sh
+cmake -S . -B build/app -DCMAKE_BUILD_TYPE=Release
+cmake --build build/app --config Release --parallel 4
+ctest --test-dir build/app -C Release --output-on-failure
+```
+
+Unter macOS entsteht `build/app/secondbrain.app`; unter Linux
+`build/app/secondbrain`, unter Windows bei Visual Studio
+`build/app/Release/secondbrain.exe`. Start per Doppelklick oder Terminal.
+Ohne Argumente verwendet die App den Ordner `SecondBrain` in deinem
+Benutzerverzeichnis. Über „Arbeitsordner öffnen“ kannst du einen anderen Ordner
+mit Projektgedächtnissen auswählen. Das vorhandene Beispiel liegt in `brains`:
+
+```sh
+# macOS
+build/app/secondbrain.app/Contents/MacOS/secondbrain --workspace brains
+# Linux
+build/app/secondbrain --workspace brains
+```
+
+```powershell
+# Windows
+.\build\app\Release\secondbrain.exe --workspace brains
+```
+
+Die Oberfläche bietet Projekte und Wissensbereiche, Dokumentliste, Suche,
+Lesemodus, Markdown-Bearbeitung, neue Notizen, Archiv und KI-Kontext zum Kopieren.
+Lokale Textquellen und verlinkte Ordner öffnen sich schreibgeschützt in der App.
+Vor einem Wechsel oder dem Beenden schützt ein Dialog ungespeicherte Änderungen.
+Bei externen Dateiänderungen bleibt deine eigene Fassung erhalten; sie lässt
+sich als neue Notiz sichern. Darstellung und Schriftgröße sind anpassbar.
+Tastaturhilfe findest du unter „Aktionen“. Command gilt auf macOS, Control auf
+Windows und Linux.
+
+## Separater C-Kern und Strukturprototyp
 
 Der C-Kern lässt sich bereits unabhängig von UI-Bibliotheken bauen:
 
 ```sh
-cmake -S . -B build/core -DCMAKE_BUILD_TYPE=Debug
+cmake -S . -B build/core -DSB_BUILD_UI=OFF -DCMAKE_BUILD_TYPE=Debug
 cmake --build build/core --config Debug
 ctest --test-dir build/core -C Debug --output-on-failure
 ```

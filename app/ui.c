@@ -22,7 +22,7 @@ static void paste(nk_handle user, struct nk_text_edit *edit) {
 SBStatus sb_ui_fonts(SBUi *ui, float scale) {
     struct nk_font_atlas *atlas;
     struct nk_font_config config = nk_font_config(0);
-    static const nk_rune ranges[] = {32, 0x024f, 0x2000, 0x206f, 0x2190, 0x21ff, 0};
+    static const nk_rune ranges[] = {32, 0x024f, 0x0370, 0x052f, 0x2000, 0x206f, 0x2190, 0x22ff, 0};
     char *bytes = NULL;
     size_t length = 0;
     SBStatus result = sb_fs_read(ui->font_path, &bytes, &length);
@@ -34,17 +34,34 @@ SBStatus sb_ui_fonts(SBUi *ui, float scale) {
         struct nk_sdl *backend = (struct nk_sdl *)ui->ctx->userdata.ptr;
         nk_font_atlas_clear(&backend->atlas);
     }
+    ui->code = NULL;
     atlas = nk_sdl_font_stash_begin(ui->ctx);
     config.range = ranges;
     config.oversample_h = 2; config.oversample_v = 2;
     ui->normal = nk_font_atlas_add_from_memory(atlas, bytes, length, 15 * scale * ui->density, &config);
     ui->body = nk_font_atlas_add_from_memory(atlas, bytes, length, 18 * scale * ui->density, &config);
     ui->heading = nk_font_atlas_add_from_memory(atlas, bytes, length, 26 * scale * ui->density, &config);
+    {
+        char mono_path[SB_PATH_CAP], *slash;
+        char *mono = NULL;
+        size_t mono_length;
+        strcpy(mono_path, ui->font_path); slash = strrchr(mono_path, '/');
+        if (slash) {
+            *slash = 0;
+            if (sb_path_join(mono_path, sizeof(mono_path), mono_path, "NotoSansMono-Regular.ttf").code == SB_OK &&
+                sb_fs_read(mono_path, &mono, &mono_length).code == SB_OK) {
+                ui->code = nk_font_atlas_add_from_memory(atlas, mono, mono_length, 17 * scale * ui->density, &config);
+                free(mono);
+            }
+        }
+        if (!ui->code) ui->code = ui->body;
+    }
     if (!ui->normal || !ui->body || !ui->heading) { free(bytes); return sb_error(SB_IO, "Schrift konnte nicht geladen werden."); }
     nk_sdl_font_stash_end(ui->ctx);
     ui->normal->handle.height = 15 * scale;
     ui->body->handle.height = 18 * scale;
     ui->heading->handle.height = 26 * scale;
+    if (ui->code != ui->body) ui->code->handle.height = 17 * scale;
     nk_style_set_font(ui->ctx, &ui->normal->handle);
     free(bytes);
     return sb_ok();
@@ -97,6 +114,10 @@ void sb_ui_theme(SBUi *ui, bool dark) {
     ui->ctx->style.selectable.text_normal_active = text;
     ui->ctx->style.selectable.text_hover_active = text;
     ui->ctx->style.selectable.text_pressed_active = text;
+    ui->ctx->style.combo.rounding = 7;
+    ui->ctx->style.combo.border = 0;
+    ui->ctx->style.combo.content_padding = nk_vec2(10, 4);
+    ui->ctx->style.combo.button.padding = nk_vec2(2, 2);
     ui->dark = dark;
 }
 
@@ -148,6 +169,11 @@ void sb_ui_draw(SBUi *ui) {
     SDL_SetRenderDrawColor(ui->renderer, ui->dark ? 28 : 255, ui->dark ? 29 : 255, ui->dark ? 33 : 255, 255);
     SDL_RenderClear(ui->renderer);
     nk_sdl_render(ui->ctx, NK_ANTI_ALIASING_ON);
+}
+void sb_ui_reset_editor(SBUi *ui) {
+    nk_textedit_clear_state(&ui->ctx->text_edit, NK_TEXT_EDIT_MULTI_LINE, nk_filter_default);
+    ui->ctx->text_edit.active = 0;
+    if (ui->ctx->active) ui->ctx->active->edit.active = 0;
 }
 SBStatus sb_ui_capture(SBUi *ui, const char *path) {
     SDL_Surface *surface = SDL_RenderReadPixels(ui->renderer, NULL);

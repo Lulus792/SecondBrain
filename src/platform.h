@@ -16,5 +16,6 @@ SBStatus sb_fs_mkdirs(const char *path);
 SBStatus sb_fs_remove(const char *path);
 SBStatus sb_fs_absolute(const char *path, char *out, size_t capacity);
 unsigned long sb_process_id(void);
+SBStatus sb_fs_home(char *out, size_t capacity);
 
 #endif

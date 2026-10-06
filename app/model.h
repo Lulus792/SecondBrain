@@ -13,7 +13,7 @@ typedef struct {
     SBProjects projects;
     SBProject project;
     SBNotes notes;
-    bool has_project, guard, quit;
+    bool has_project, guard, quit, source_directory;
     char path[SB_PATH_CAP], title[SB_NAME_CAP];
     char *editor;
     SBRevision revision;

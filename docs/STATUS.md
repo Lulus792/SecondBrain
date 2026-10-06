@@ -72,7 +72,16 @@ ist von der noch ausstehenden vollständigen Bedienprüfung getrennt.
   Quellen und offene Aufgaben enthalten und dem Nutzer sowie der KI als
   gemeinsames Projektgedächtnis dienen.
 
-Die eigene Oberfläche mit allen geplanten Arbeitsabläufen, Darstellung und
-Bedienprüfung, Paketierung ohne Python-Laufzeit sowie die vollständigen Nachweise
+Die Desktop-Oberfläche ist implementiert: Projekte und Notizen anlegen,
+Markdown lesen und bearbeiten, speichern, suchen, archivieren, Quellen und
+Ordner schreibgeschützt betrachten sowie KI-Kontext kopieren. Die Bedienprüfung
+steuert dieselben Komponenten mit SDL-Maus-, Tastatur- und Zwischenablageereignissen.
+Lokal bestehen alle vier C-/UI-Prüfungen, auch mit AddressSanitizer und
+UndefinedBehaviorSanitizer. Tatsächlich gerenderte Ansichten wurden
+in groß/hell und klein/dunkel mit 150 Prozent Schriftgröße betrachtet.
+
+Paketierung ohne Python-Laufzeit sowie die vollständigen Desktop-Nachweise
 auf den drei Zielplattformen stehen aus. Das aktive Ziel bleibt die vollständige
-Umsetzung der Anwendung.
+Umsetzung der Anwendung. Nuklear besitzt hier keine Anbindung an native
+Screenreader; vergrößerte Schrift und Tastaturbefehle ersetzen diesen fehlenden
+Zugang nicht.
