@@ -62,6 +62,8 @@ jobs:
             build/ui/desktop-data/**/*.bmp
             build/ui/keyboard-data/**/*.bmp
             build/ui/package-check/**/*.bmp
+            build/ui/preferences-data/**/*.bmp
+            build/ui/process-preferences/**/*.bmp
           retention-days: 30
   native-core:
     name: C17 / ${{ matrix.os }} / ${{ matrix.config }}

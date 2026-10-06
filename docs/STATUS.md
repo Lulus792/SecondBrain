@@ -1,7 +1,8 @@
 # Umsetzungsstand von SecondBrain
 
-Stand: 6. Oktober 2026. Version 0.2.1 mit Lumen-Sternkarte, Glaskarten und
-Tastaturwegen liegt mit geprüften Paketen für Windows, macOS und Linux vor.
+Stand: 6. Oktober 2026. Version 0.3.0 mit Lumen-Sternkarte, Glaskarten und
+Tastaturwegen ist auf Windows, macOS und Linux geprüft. Der aktuelle
+Entwicklungsschritt 0.3.1 ergänzt Einstellungen und Ordnerwahl.
 
 ## Abgeschlossene Grundlagen
 
@@ -198,3 +199,30 @@ Dieser Entwicklungsschritt schließt das aktive Gesamtziel nicht ab. Die weitere
 Arbeiten der [Release-Liste](RELEASE.md) bleiben beauftragt; die Versionsnummer
 1.0 bleibt bis zur ausdrücklichen Nutzerfreigabe gesperrt. Die eigene MIT-Lizenz
 ist festgelegt. Herausgeberzertifikate sind noch nicht vorhanden.
+
+
+## Entwicklungsschritt 0.3.1: Einstellungen und Ordnerwahl
+
+Die App speichert beim regulären Beenden Arbeitsordner, Projekt, Notiz,
+Fenstergröße, Farbdarstellung, Schriftgröße, Transparenz- und Bewegungsschalter.
+Ein ausdrücklich übergebener Arbeitsordner hat beim Start Vorrang. Fehlende alte
+Ordner werden gemeldet; ihre gespeicherte Angabe bleibt bis zur bewussten
+Wiederherstellung erhalten. Eine unbekannte oder beschädigte Konfiguration wird
+nicht überschrieben. Der eigene C-Kern implementiert Format und Speicherung.
+[Vertrag und Bedienung](EINSTELLUNGEN.md).
+
+Das Arbeitsordnerformular bietet eine native SDL3-Ordnerauswahl. Auswahl übernimmt
+zunächst nur den Feldwert. Abbruch erhält ihn; verspätete Antworten eines
+veralteten Formulars werden ignoriert. Native Callback-Lebensdauer und UI-Thread-
+Übergabe sind abgesichert. Der tatsächliche OS-Dialog ist noch nicht interaktiv
+mit Maus, Tastatur oder Screenreader auf allen Zielsystemen abgenommen.
+
+Die neue Prüfung umfasst Format/Bestandsschutz, neu erzeugte Fenster und zwei
+getrennte App-Prozesse mit isolierter Konfiguration. Screenshots des kleinen
+780 × 560-Fensters bei 150 und 200 Prozent Schrift wurden betrachtet.
+Lokal bestehen alle zehn Release-Prüfungen, ein vollständiger Zehn-Test-Lauf mit
+AddressSanitizer/UndefinedBehaviorSanitizer sowie die gezielte Nachprüfung der
+drei Einstellungsprüfungen nach der letzten Hinweis-/Fehlerfallkorrektur.
+Die neue UI-Prüfung enthält 50 Aussagen; neun Python-Prüfungen bestehen.
+Crossplatform- und Paketnachweise für diesen Stand folgen erst nach Ausführung.
+Die vollständige Release-Liste bleibt offen.

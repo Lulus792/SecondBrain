@@ -58,3 +58,13 @@ if(NOT SB_KEYBOARD_RESULT EQUAL 0)
     message(FATAL_ERROR "Relocated keyboard workflow failed: ${SB_KEYBOARD_RESULT}\n${SB_KEYBOARD_ERROR}")
 endif()
 message(STATUS "Extracted package passed the keyboard-only workflow")
+
+execute_process(COMMAND "${CMAKE_COMMAND}" "-DSB_EXECUTABLE=${SB_EXECUTABLE}"
+    "-DSB_TEST_ROOT=${SB_TEST_ROOT}/Einstellungen ü"
+    -P "${CMAKE_CURRENT_LIST_DIR}/test_preferences_process.cmake"
+    RESULT_VARIABLE SB_PREFERENCES_RESULT OUTPUT_VARIABLE SB_PREFERENCES_OUTPUT
+    ERROR_VARIABLE SB_PREFERENCES_ERROR TIMEOUT 90)
+message(STATUS "${SB_PREFERENCES_OUTPUT}")
+if(NOT SB_PREFERENCES_RESULT EQUAL 0)
+    message(FATAL_ERROR "Relocated preferences restart failed: ${SB_PREFERENCES_ERROR}")
+endif()

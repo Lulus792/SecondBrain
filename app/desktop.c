@@ -253,6 +253,7 @@ SBStatus sb_desktop_init(SBDesktop *d, const char *workspace, const char *font, 
     strcpy(d->focus, "project-picker"); strcpy(d->section, "all");
     status = sb_ui_init(&d->ui, font, 1336, 840, testing);
     if (status.code != SB_OK) return status;
+    d->dialogs=sb_dialogs_new();
     status = sb_app_init(&d->model, workspace);
     if (status.code != SB_OK) {
         sb_fs_absolute(workspace, d->model.workspace, sizeof(d->model.workspace));
@@ -261,7 +262,49 @@ SBStatus sb_desktop_init(SBDesktop *d, const char *workspace, const char *font, 
     d->generation = d->model.generation;
     return sb_ok();
 }
+SBStatus sb_desktop_preferences(SBDesktop *d, const char *path, bool explicit_workspace) {
+    SBSettings s; SBRevision revision;
+    if (strlen(path)>=sizeof(d->settings_path)) return sb_error(SB_LIMIT,"Einstellungspfad ist zu lang.");
+    SBStatus status=sb_settings_load(path,&s,&revision);
+    if (status.code!=SB_OK) { d->message=status; return status; }
+    strcpy(d->settings_path,path); d->settings_revision=revision; d->settings_enabled=true;
+    sb_ui_theme(&d->ui,s.dark); d->solid=s.solid; d->reduced_motion=s.reduced_motion;
+    status=sb_ui_fonts(&d->ui,s.font_percent/100.0f);
+    if (status.code!=SB_OK) { d->message=status; return status; }
+    SDL_SetWindowSize(d->ui.window,(int)s.width,(int)s.height);
+    if (!explicit_workspace && s.workspace[0]) {
+        if (sb_fs_kind(s.workspace)!=2) {
+            d->settings_enabled=false;
+            d->message=sb_error(SB_NOT_FOUND,"Der letzte Arbeitsordner ist nicht erreichbar. Wähle einen Arbeitsordner.");
+            return d->message;
+        }
+        status=sb_app_request(&d->model,SB_ACT_WORKSPACE,s.workspace);
+        if (status.code!=SB_OK) { d->settings_enabled=false; d->message=status; return status; }
+        if (s.project[0]) {
+            status=sb_app_request(&d->model,SB_ACT_PROJECT,s.project);
+            if (status.code==SB_OK && s.note[0]) status=sb_app_request(&d->model,SB_ACT_NOTE,s.note);
+            if (status.code!=SB_OK) d->message=sb_error(SB_NOT_FOUND,"Das zuletzt geöffnete Dokument ist nicht mehr verfügbar.");
+        }
+    }
+    return sb_ok();
+}
+SBStatus sb_desktop_store_preferences(SBDesktop *d) {
+    if (!d->settings_enabled) return sb_ok();
+    SBSettings s; sb_settings_defaults(&s);
+    snprintf(s.workspace,sizeof(s.workspace),"%s",d->model.workspace);
+    if (d->model.has_project) {
+        snprintf(s.project,sizeof(s.project),"%s",d->model.project.id);
+        snprintf(s.note,sizeof(s.note),"%s",d->model.path);
+    }
+    int width,height; SDL_GetWindowSize(d->ui.window,&width,&height);
+    s.width=(unsigned)fmaxf(780,fminf(8192,(float)width)); s.height=(unsigned)fmaxf(520,fminf(8192,(float)height));
+    s.font_percent=(unsigned)roundf(d->ui.scale*100); s.dark=d->ui.dark; s.solid=d->solid; s.reduced_motion=d->reduced_motion;
+    SBStatus status=sb_settings_save(d->settings_path,&s,d->settings_revision,&d->settings_revision);
+    if (status.code!=SB_OK) d->message=status;
+    return status;
+}
 void sb_desktop_free(SBDesktop *d) {
+    sb_dialogs_free(d->dialogs);
     if (d->text_edit_ready) nk_textedit_free(&d->text_edit);
     free(d->targets);
     sb_graph_free(&d->graph);
@@ -317,7 +360,7 @@ void sb_desktop_apply(SBDesktop *d) {
         d->name[0] = 0; d->id[0] = 0; d->repository[0] = 0; d->id_manual = false;
         d->note_section = 0; d->form_focus = 1; d->active_form_field = 1;
     } else if (cmd == SB_CMD_WORKSPACE) {
-        d->form = SB_FORM_WORKSPACE;
+        ++d->dialog_serial; d->form = SB_FORM_WORKSPACE;
         strcpy(d->folder, d->model.workspace); d->form_focus = 1;
     } else if (cmd == SB_CMD_SUBMIT) {
         if (d->form == SB_FORM_PROJECT) {
@@ -330,10 +373,11 @@ void sb_desktop_apply(SBDesktop *d) {
             result(d, status, "Notiz angelegt.");
         } else if (d->form == SB_FORM_WORKSPACE) {
             status = sb_app_request(&d->model, SB_ACT_WORKSPACE, d->folder);
+            if (status.code == SB_OK && d->settings_path[0]) d->settings_enabled=true;
             result(d, status, "Arbeitsordner geöffnet.");
         }
         if (status.code == SB_OK) d->form = SB_FORM_NONE;
-    } else if (cmd == SB_CMD_CANCEL) d->form = SB_FORM_NONE;
+    } else if (cmd == SB_CMD_CANCEL) { ++d->dialog_serial; d->form = SB_FORM_NONE; }
     else if (cmd == SB_CMD_SAVE) {
         status = sb_app_save(&d->model); result(d, status, "Gespeichert.");
         if (status.code == SB_OK) d->graph_dirty = true;
@@ -424,6 +468,17 @@ static void star_step(SBDesktop *d, SDL_Keycode key) {
     d->star = found;
 }
 void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
+    if (d->dialogs && event->type==sb_dialogs_event(d->dialogs)) {
+        SBDialogReply *reply=event->user.data1;
+        if (reply && reply->serial==d->dialog_serial && d->form==SB_FORM_WORKSPACE) {
+            if (reply->error) d->message=sb_error(SB_IO,"%s",reply->value[0] ? reply->value : "Ordnerauswahl ist nicht verfügbar.");
+            else if (reply->value[0]) {
+                snprintf(d->folder,sizeof(d->folder),"%s",reply->value);
+                d->message=sb_ok(); focus_set(d,"form-folder");
+            }
+        }
+        SDL_free(reply); return;
+    }
     if (event->type == SDL_EVENT_QUIT || event->type == SDL_EVENT_WINDOW_CLOSE_REQUESTED) {
         request(d, SB_ACT_QUIT, NULL); return;
     }
@@ -1007,9 +1062,14 @@ static void popup(SBDesktop *d, int width, int height) {
                 if (button(d, "section-choice", new_names[d->note_section])) d->note_section = (d->note_section + 1) % 3;
             }
         } else if (d->form == SB_FORM_WORKSPACE) {
-            nk_layout_row_dynamic(ctx, 72 * s, 1);
-            nk_label_wrap(ctx, "Wähle den Ordner, der deine Projektgedächtnisse enthält. Ein neues Projekt wird darin als eigener Unterordner angelegt.");
+            nk_layout_row_dynamic(ctx, 48 * s, 1);
+            nk_label_wrap(ctx, "Wähle den Ordner mit deinen Projektgedächtnissen.");
             field(d, "form-folder", "Arbeitsordner", d->folder, sizeof(d->folder), 1);
+            nk_layout_row_dynamic(ctx,36*s,1);
+            if (button(d,"choose-folder","Ordner auswählen")) {
+                d->dialog_serial=sb_dialog_folder(d->dialogs,d->ui.window,d->folder);
+                if (!d->dialog_serial) d->message=sb_error(SB_IO,"Ordnerauswahl konnte nicht gestartet werden.");
+            }
         } else if (d->form == SB_FORM_FILTER) {
             nk_layout_row_dynamic(ctx,36*s,1);
             for (unsigned k = 0; k < 6; ++k) {

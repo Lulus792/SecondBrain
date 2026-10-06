@@ -101,6 +101,10 @@ Sternkarte, Umschalt+Ziehen verschiebt sie, das Mausrad zoomt. Über einer Karte
 scrollt es den Inhalt. Weitere Kürzel stehen in der eingebauten Hilfe und im
 [Tastaturvertrag](docs/UI_TASTATUR.md).
 
+Der letzte Arbeitsordner, das Projekt, die Notiz und deine Darstellung werden
+beim regulären Beenden gespeichert. „Arbeitsordner öffnen“ bietet eine native
+Ordnerauswahl. [Details und Grenzen](docs/EINSTELLUNGEN.md).
+
 „Groß lesen“ erweitert die Leseansicht auf die verfügbare Fläche. Die Bereichswahl
 bleibt auch nach dem Öffnen eines Archivdokuments erreichbar.
 

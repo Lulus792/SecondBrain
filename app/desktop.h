@@ -2,6 +2,8 @@
 #define SB_DESKTOP_H
 #include "ui.h"
 #include "model.h"
+#include "settings.h"
+#include "dialog.h"
 
 typedef enum { SB_FORM_NONE, SB_FORM_PROJECT, SB_FORM_NOTE, SB_FORM_WORKSPACE, SB_FORM_SETTINGS, SB_FORM_CONTEXT, SB_FORM_HELP, SB_FORM_ACTIONS, SB_FORM_PROJECTS, SB_FORM_FILTER } SBForm;
 typedef enum {
@@ -23,6 +25,11 @@ typedef struct {
     SBUi ui;
     SBApp model;
     SBNotes hits;
+    char settings_path[SB_PATH_CAP];
+    SBRevision settings_revision;
+    bool settings_enabled;
+    SBNativeDialogs *dialogs;
+    unsigned dialog_serial;
     char search[256], searched[256], section[32];
     char name[SB_NAME_CAP], id[65], repository[SB_PATH_CAP], folder[SB_PATH_CAP];
     char command_value[SB_PATH_CAP];
@@ -60,6 +67,8 @@ typedef struct {
 
 SBStatus sb_desktop_init(SBDesktop *desktop, const char *workspace, const char *font, bool testing);
 void sb_desktop_free(SBDesktop *desktop);
+SBStatus sb_desktop_preferences(SBDesktop *desktop, const char *path, bool explicit_workspace);
+SBStatus sb_desktop_store_preferences(SBDesktop *desktop);
 void sb_desktop_event(SBDesktop *desktop, const SDL_Event *event);
 void sb_desktop_frame(SBDesktop *desktop);
 void sb_desktop_tick(SBDesktop *desktop, float seconds);

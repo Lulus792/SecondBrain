@@ -22,7 +22,7 @@ static SBStatus font_path(const char *assets, char *out) {
 int main(int argc, char **argv) {
     SBDesktop desktop;
     char workspace[SB_PATH_CAP], font[SB_PATH_CAP], home[SB_PATH_CAP];
-    const char *workspace_arg = NULL, *project_arg = NULL, *assets = NULL, *test_root = NULL, *snapshot = NULL;
+    const char *workspace_arg = NULL, *project_arg = NULL, *assets = NULL, *test_root = NULL, *snapshot = NULL, *settings_arg = NULL;
     SBStatus status;
     bool keyboard_test = false;
     for (int i = 1; i < argc; ++i) {
@@ -31,9 +31,10 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i], "--assets") && i + 1 < argc) assets = argv[++i];
         else if (!strcmp(argv[i], "--self-test") && i + 1 < argc) test_root = argv[++i];
         else if (!strcmp(argv[i], "--keyboard-test") && i + 1 < argc) { test_root = argv[++i]; keyboard_test = true; }
+        else if (!strcmp(argv[i],"--settings") && i+1<argc) settings_arg=argv[++i];
         else if (!strcmp(argv[i], "--snapshot") && i + 1 < argc) snapshot = argv[++i];
         else if (!strcmp(argv[i], "--help")) {
-            printf("SecondBrain\n  --workspace ORDNER\n  --project KENNUNG\n  --assets ASSETORDNER\n"
+            printf("SecondBrain\n  --workspace ORDNER\n  --project KENNUNG\n  --assets ASSETORDNER\n  --settings EINSTELLUNGSDATEI\n"
                    "  --self-test TESTORDNER\n  --keyboard-test TESTORDNER\n  --snapshot BILD.bmp\n");
             return 0;
         } else { fprintf(stderr, "Unbekannte oder unvollständige Option: %s\n", argv[i]); return 2; }
@@ -52,6 +53,19 @@ int main(int argc, char **argv) {
         sb_desktop_free(&desktop);
         return result;
     }
+    bool explicit_workspace=workspace_arg!=NULL;
+    char preference_path[SB_PATH_CAP]={0};
+    SBStatus preferences=sb_ok();
+    SBSettings startup_settings; SBRevision startup_revision;
+    if (settings_arg || !snapshot) {
+        char *directory=settings_arg ? NULL : SDL_GetPrefPath("Lulus792","SecondBrain");
+        preferences=settings_arg ? sb_fs_absolute(settings_arg,preference_path,sizeof(preference_path)) :
+            directory ? sb_path_join(preference_path,sizeof(preference_path),directory,"settings.conf") : sb_error(SB_IO,"Einstellungsordner ist nicht erreichbar.");
+        SDL_free(directory);
+        if (preferences.code==SB_OK) preferences=sb_settings_load(preference_path,&startup_settings,&startup_revision);
+        if (!explicit_workspace && preferences.code==SB_OK && startup_settings.workspace[0] && sb_fs_kind(startup_settings.workspace)==2)
+            workspace_arg=startup_settings.workspace;
+    }
     if (workspace_arg) status = sb_fs_absolute(workspace_arg, workspace, sizeof(workspace));
     else {
         status = sb_fs_home(home, sizeof(home));
@@ -60,6 +74,10 @@ int main(int argc, char **argv) {
     if (status.code == SB_OK) status = font_path(assets, font);
     if (status.code == SB_OK) status = sb_desktop_init(&desktop, workspace, font, snapshot != NULL);
     if (status.code != SB_OK) { fprintf(stderr, "%s\n", status.message); return 1; }
+    if (settings_arg || !snapshot) {
+        if (preferences.code==SB_OK) preferences=sb_desktop_preferences(&desktop,preference_path,explicit_workspace);
+        if (preferences.code!=SB_OK) { desktop.message=preferences; fprintf(stderr,"%s\n",preferences.message); }
+    }
     if (project_arg) {
         status = sb_app_request(&desktop.model, SB_ACT_PROJECT, project_arg);
         if (status.code != SB_OK) { fprintf(stderr, "%s\n", status.message); sb_desktop_free(&desktop); return 1; }
@@ -88,6 +106,8 @@ int main(int argc, char **argv) {
             SDL_SetWindowTitle(desktop.ui.window, title);
         }
     }
+    preferences=sb_desktop_store_preferences(&desktop);
+    if (preferences.code!=SB_OK) fprintf(stderr,"%s\n",preferences.message);
     sb_desktop_free(&desktop);
     if (status.code != SB_OK) { fprintf(stderr, "%s\n", status.message); return 1; }
     return 0;

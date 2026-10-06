@@ -93,3 +93,17 @@ Keine native Screenreader-Anbindung, automatische Synchronisation oder integrier
 Chat-Anbieter. Grundlegende Markdown-Darstellung; Editor-Undo und Schriftabdeckung
 sind begrenzt. Pakete sind nicht durch Apple notarisiert.
 Details: [Distribution](../../docs/DISTRIBUTION.md).
+
+
+## Neuer Entwicklungsschritt 0.3.1
+
+Dauerhafte Darstellung und letzte Projektposition sowie native Ordnerauswahl sind
+implementiert. Konfiguration wird bei beschädigten Daten oder erkannten parallelen
+Änderungen erhalten. Ein fehlender letzter Ordner lässt sich bewusst ersetzen;
+verspätete Dialogantworten verändern kein neues Formular. [Details](../../docs/EINSTELLUNGEN.md).
+Zehn lokale Release-Prüfungen und der vollständige Sanitizer-Lauf bestehen,
+zusätzlich die drei betroffenen Prüfungen nach der letzten kleinen Korrektur.
+50 neue UI-Aussagen und zwei getrennte App-Prozesse prüfen die Einstellungen.
+Plattformnachweise für diesen Stand folgen erst nach ausgeführten CI-Jobs.
+Sicherung, native Zugänglichkeit, erster Start, OS-Vorgaben, Leistungsprüfung und
+Distribution bleiben Arbeiten des aktiven Ziels. Version 1.0 bleibt gesperrt.
