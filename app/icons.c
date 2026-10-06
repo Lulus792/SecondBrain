@@ -86,7 +86,7 @@ SBIcon sb_icon_for(const char *id) {
     if (!strcmp(id,"archive")) return SB_ICON_ARCHIVE;
     if (!strcmp(id,"save-copy") || !strcmp(id,"copy-context") || !strcmp(id,"guard-copy")) return SB_ICON_COPY;
     if (!strcmp(id,"filter") || !strcmp(id,"list-filter")) return SB_ICON_FILTER;
-    if (!strcmp(id,"reload") || !strcmp(id,"restore-project")) return SB_ICON_RELOAD;
+    if (!strcmp(id,"reload") || !strcmp(id,"restore-project") || !strcmp(id,"refresh-projects")) return SB_ICON_RELOAD;
     if (!strcmp(id,"read")) return SB_ICON_EYE;
     if (!strcmp(id,"actions")) return SB_ICON_ACTIONS;
     if (!strcmp(id,"settings") || !strcmp(id,"settings-actions")) return SB_ICON_SETTINGS;

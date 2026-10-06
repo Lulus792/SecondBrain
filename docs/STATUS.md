@@ -626,3 +626,34 @@ macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Lokal besteht das entpack
 Intel-Paket mit 126 Desktop-, 105 Tastatur- und 75 Sicherungs-UI-Aussagen sowie
 Einstellungsprozessen und CLI-Sicherung. Archiv-SHA-256: `6bd2cea886e7e6f88335b8987cd1e25839f3b0b54ff969e84afe403114d24aba`.
 Der weitere Release-Auftrag einschließlich Einzelprojekt-Fehlerzuständen bleibt aktiv.
+
+
+## 0.7.2: Einzelne Projektfehler erhalten die weitere Arbeit
+
+Die App erkennt gültige Projekte und nicht verfügbare Einträge getrennt. Die
+Projektwahl nennt Grund und Pfad, die Werkzeugleiste zeigt die Anzahl. Erneutes
+Prüfen erhält den offenen Entwurf. Korrigierte Einträge werden wieder wählbar;
+sind alle nicht verfügbar, bleiben die Wege des Einstiegs erreichbar. Ein Fehler
+beim Öffnen von Notizen blockiert nicht den nächsten gültigen Kandidaten. Aktuelle
+Metadaten werden vor dem Projektwechsel erneut gelesen. Die strikte Kernfunktion
+bleibt für bestehende Aufrufer erhalten. [Vertrag](DATENVERTRAG.md).
+
+Die Bild-/Tastaturprüfung bei 200 Prozent Schrift fand fehlendes Fokus-Reveal nach
+Größenänderung. Die App führt es jetzt auch nach Fenster-/Schriftänderungen aus.
+Fehlertexte und Pfade umbrechen; die erneute Prüfung erhält eine normale Knopfhöhe.
+Gezielte Modell-/UI- und neun reine Kerntests bestehen. Gesamtlauf, abschließende
+Sanitizer- und Plattformabnahme folgen gesondert.
+
+
+Abschließender lokaler Nachweis: alle 20 Tests des vollständigen Release-Laufs
+bestehen (190,75 Sekunden), der zusätzliche Produktions-CLI-Test besteht
+(0,77 Sekunden). Alle zehn reinen Kerntests bestehen (3,72 Sekunden). Vier gezielte
+ASan/UBSan-Wege bestehen (38,51 Sekunden): Projektfehler-UI, erster Start, native
+Zugänglichkeit und Projektmodell. Die neuen Prüfungen enthalten 39 UI- und
+46 Modell-/Erkennungsaussagen. Tatsächliche dunkle und helle Kontrastbilder mit
+200 Prozent Schrift sind betrachtet. Native Plattform- und Paketabnahme zu 0.7.2
+folgen gesondert; automatische Metadatenreparatur wurde nicht eingeführt.
+
+Das lokal abgenommene Paket 0.7.1 liegt unter dist/SecondBrain. Der tatsächliche
+Start mit dem eigenen Projektgedächtnis ist betrachtet; Version 0.7.2 folgt erst
+nach ihrer gesonderten Paketabnahme.

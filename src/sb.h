@@ -18,6 +18,7 @@ typedef struct {
     char id[65];
     char name[SB_NAME_CAP];
     char root[SB_PATH_CAP];
+    SBStatus problem;
 } SBProject;
 typedef struct {
     char path[SB_PATH_CAP];
@@ -35,6 +36,7 @@ bool sb_utf8_valid(const char *text, size_t length);
 bool sb_text_valid(const char *text,size_t length);
 bool sb_id_valid(const char *id);
 SBStatus sb_projects_list(const char *workspace, SBProjects *out);
+SBStatus sb_projects_scan(const char *workspace,SBProjects *out);
 void sb_projects_free(SBProjects *projects);
 SBStatus sb_project_create(const char *workspace, const char *id, const char *name,
                            const char *repository, SBProject *out);

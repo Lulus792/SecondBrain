@@ -183,3 +183,13 @@ zur Änderung bestehender Dateien. Längenbasierte Prüfung und Neuidentifizieru
 verwenden begrenzte Kopien. Notizen/Quellen müssen UTF-8 ohne NUL sein, um einen
 unsichtbaren Rest nicht durch C-Textverwendung zu verlieren. Fehler verändern
 die Originale nicht. [Datenvertrag](../../docs/DATENVERTRAG.md).
+
+
+## D18: Fehler je Projekt statt globaler Sperre
+
+Eine neue Scan-Funktion liefert auch nicht verfügbare Einträge. Die bisherige
+strikte Liste bleibt als Kernvertrag erhalten. Das Modell öffnet einen verwendbaren
+Kandidaten und prüft aktuelle Metadaten erneut. Die UI nennt Fehler und Adresse
+und bietet bewusstes erneutes Prüfen; dabei bleibt der Entwurf bestehen. CLI nennt
+Teilfehler getrennt und signalisiert die unvollständige Liste mit Exit 1. Dateien
+werden nicht automatisch repariert. [Datenvertrag](../../docs/DATENVERTRAG.md).

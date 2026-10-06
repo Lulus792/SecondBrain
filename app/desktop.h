@@ -76,6 +76,8 @@ typedef struct {
     float map_cx,map_cy,map_unit,map_target_cx,map_target_cy,map_target_unit;
     bool map_ready;
     size_t star, page, project_page;
+    int layout_width,layout_height;
+    float layout_scale;
     char focus[100], activate[100], saved_focus[100], source_focus[100];
     int focus_group, focus_scroll_frames;
     SBForm focus_form;

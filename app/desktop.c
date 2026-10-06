@@ -318,7 +318,7 @@ static void backup_poll(SBDesktop *d) {
         result(d,sb_ok(),"Sicherung geprüft.");
     } else if (state->status.code==SB_OK) {
         if (state->kind==SB_JOB_RESTORE) {
-            SBProjects projects={0}; SBStatus listed=sb_projects_list(d->model.workspace,&projects);
+            SBProjects projects={0}; SBStatus listed=sb_projects_scan(d->model.workspace,&projects);
             if (listed.code==SB_OK) {
                 sb_projects_free(&d->model.projects); d->model.projects=projects;
                 if (!d->model.has_project) listed=sb_app_request(&d->model,SB_ACT_PROJECT,state->project.id);
@@ -921,9 +921,39 @@ static void compact_label(SBDesktop *d, const char *text, char *out, size_t capa
             font->width(font->userdata, font->height, "…", 3) <= width) { strcat(out, "…"); return; }
     }
 }
+static void native_lines(SBDesktop *d,const char *text) {
+    struct nk_context *ctx=d->ui.ctx;
+    float width=fmaxf(40,ctx->current->layout->bounds.w-32);
+    size_t length=strlen(text),offset=0;
+    while (length && !sb_utf8_valid(text,length)) --length;
+    while (offset<length) {
+        char line[SB_PATH_CAP]; size_t end=offset,next=offset,last_break=offset;
+        while (next<length && text[next]!='\n') {
+            ++next; while (next<length && ((unsigned char)text[next]&0xc0)==0x80) ++next;
+            if (end>offset && d->ui.normal->handle.width(d->ui.normal->handle.userdata,d->ui.normal->handle.height,text+offset,(int)(next-offset))>width) break;
+            end=next;
+            if (text[end-1]==' ' || text[end-1]=='/') last_break=end;
+        }
+        if (end<length && text[end]!='\n' && last_break>offset+(end-offset)/2) end=last_break;
+        size_t count=end-offset; memcpy(line,text+offset,count); line[count]=0;
+        nk_layout_row_dynamic(ctx,22*d->ui.scale,1); native_label(d,line,NK_TEXT_LEFT);
+        offset=end; if (offset<length && text[offset]=='\n') ++offset;
+    }
+}
+static void project_problem(SBDesktop *d,const SBProject *project) {
+    native_lines(d,project->problem.message);
+    native_lines(d,project->root);
+    nk_layout_row_dynamic(d->ui.ctx,18*d->ui.scale,1); native_label(d,"Metadaten: brain.json",NK_TEXT_LEFT);
+}
 static void project_rows(SBDesktop *d) {
     struct nk_context *ctx = d->ui.ctx;
     float scale = d->ui.scale;
+    size_t unavailable=0;
+    for (size_t i=0;i<d->model.projects.count;++i) if (d->model.projects.items[i].problem.code!=SB_OK) ++unavailable;
+    if (unavailable) {
+        char summary[100]; snprintf(summary,sizeof(summary),"%zu %s nicht verfügbar. Die Dateien bleiben erhalten.",unavailable,unavailable==1 ? "Projekt ist" : "Projekte sind");
+        nk_layout_row_dynamic(ctx,48*scale,1); native_wrap(d,summary);
+    }
     size_t start = d->project_page * 6;
     if (start >= d->model.projects.count) { d->project_page = 0; start = 0; }
     for (size_t i = start; i < d->model.projects.count && i < start + 6; ++i) {
@@ -931,6 +961,12 @@ static void project_rows(SBDesktop *d) {
         nk_bool selected = d->model.has_project && !strcmp(d->model.project.id, d->model.projects.items[i].id);
         nk_layout_row_dynamic(ctx, 36 * scale, 1);
         snprintf(tag, sizeof(tag), "project:%s", d->model.projects.items[i].id);
+        if (d->model.projects.items[i].problem.code!=SB_OK) {
+            char label[100]; snprintf(label,sizeof(label),"%s · Nicht verfügbar",d->model.projects.items[i].id);
+            native_label(d,label,NK_TEXT_LEFT);
+            project_problem(d,&d->model.projects.items[i]);
+            continue;
+        }
         bool duplicate=false;
         for (size_t j=0;j<d->model.projects.count;++j)
             if (i!=j && !strcmp(d->model.projects.items[i].name,d->model.projects.items[j].name)) duplicate=true;
@@ -946,6 +982,8 @@ static void project_rows(SBDesktop *d) {
         if (button(d,"projects-prev","Vorherige Projekte")) d->project_page = d->project_page ? d->project_page-1 : (d->model.projects.count-1)/6;
         if (button(d,"projects-next","Weitere Projekte")) d->project_page = (d->project_page+1)%((d->model.projects.count-1)/6+1);
     }
+    nk_layout_row_dynamic(ctx,36*scale,1);
+    if (button(d,"refresh-projects","Liste erneut prüfen")) result(d,sb_app_refresh_projects(&d->model),"Projektliste geprüft.");
 }
 static void glass(SBDesktop *d, struct nk_rect r, float radius) {
     SBSpace *space = &d->ui.space;
@@ -988,11 +1026,17 @@ static void tools(SBDesktop *d, int width, float height, nk_flags flags) {
     bool compact=width<1180*s;
     if (nk_begin(ctx,"Lumen tools",rect,flags|NK_WINDOW_NO_SCROLLBAR)) {
         float content=ctx->current->layout->bounds.w;
+        size_t unavailable=0;
+        for (size_t i=0;i<d->model.projects.count;++i) if (d->model.projects.items[i].problem.code!=SB_OK) ++unavailable;
+        char project_label[SB_NAME_CAP];
+        if (unavailable) snprintf(project_label,sizeof(project_label),"%zu nicht verfügbar · %.180s",unavailable,d->model.project.name);
+        else snprintf(project_label,sizeof(project_label),"%s",d->model.has_project ? d->model.project.name : "Projekte");
+        while (project_label[0] && !sb_utf8_valid(project_label,strlen(project_label))) project_label[strlen(project_label)-1]=0;
         if (compact) {
             float project=fminf(230*s,content*0.30f), settings=42*s;
             nk_layout_row_begin(ctx,NK_STATIC,36*s,3);
             nk_layout_row_push(ctx,project);
-            if (button(d,"project-picker",d->model.has_project ? d->model.project.name : "Projekte")) d->form=SB_FORM_PROJECTS;
+            if (button(d,"project-picker",project_label)) d->form=SB_FORM_PROJECTS;
             nk_layout_row_push(ctx,fmaxf(80,content-project-settings-2*ctx->style.window.spacing.x)); search_box(d);
             nk_layout_row_push(ctx,settings); if (button(d,"settings","Darstellung")) d->form=SB_FORM_SETTINGS;
             nk_layout_row_end(ctx);
@@ -1002,7 +1046,7 @@ static void tools(SBDesktop *d, int width, float height, nk_flags flags) {
             float project=fminf(200*s,content*0.18f), fixed=(88+88+112+112+42)*s;
             nk_layout_row_begin(ctx,NK_STATIC,36*s,7);
             nk_layout_row_push(ctx,project);
-            if (button(d,"project-picker",d->model.has_project ? d->model.project.name : "Projekte")) d->form=SB_FORM_PROJECTS;
+            if (button(d,"project-picker",project_label)) d->form=SB_FORM_PROJECTS;
             nk_layout_row_push(ctx,fmaxf(90,content-project-fixed-6*ctx->style.window.spacing.x)); search_box(d);
             nk_layout_row_push(ctx,88*s);
         }
@@ -1630,6 +1674,7 @@ static void welcome(SBDesktop *d,int width,int height,nk_flags flags) {
             native_wrap(d,"Halte Ziele, Notizen und Quellen für jedes Projekt zusammen. Die Dateien bleiben auf deinem Rechner und sind auch für eine KI lesbar.");
             nk_layout_row_dynamic(ctx,36*s,1);
             if (button(d,"new-project","Neues Projekt")) command(d,SB_CMD_NEW_PROJECT);
+            if (d->model.projects.count && button(d,"project-settings","Projekte prüfen")) d->form=SB_FORM_PROJECTS;
             if (button(d,"workspace-detail","Arbeitsordner öffnen")) command(d,SB_CMD_WORKSPACE);
             if (button(d,"restore-project","Sicherung wiederherstellen")) command(d,SB_CMD_RESTORE);
             if (button(d,"help-actions","Tastaturhilfe")) d->form=SB_FORM_HELP;
@@ -1650,6 +1695,10 @@ static void welcome(SBDesktop *d,int width,int height,nk_flags flags) {
 }
 void sb_desktop_frame(SBDesktop *d) {
     int width, height; SDL_GetWindowSize(d->ui.window,&width,&height);
+    if (width!=d->layout_width || height!=d->layout_height || d->ui.scale!=d->layout_scale) {
+        if (d->keyboard) d->focus_scroll_frames=3;
+        d->layout_width=width; d->layout_height=height; d->layout_scale=d->ui.scale;
+    }
     synchronize(d);
     passive_clear(d); d->semantic_order=0;
     for (unsigned i=0;i<4;++i) d->scrolling[i].used=false;

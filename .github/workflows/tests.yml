@@ -63,6 +63,7 @@ jobs:
             build/ui/checked-ctest.log
             build/ui/system-style-data/**/*.bmp
             build/ui/welcome-data/**/*.bmp
+            build/ui/project-errors-data/**/*.bmp
             build/ui/ui-test.bmp
             build/ui/own-project.bmp
             build/ui/desktop-data/**/*.bmp

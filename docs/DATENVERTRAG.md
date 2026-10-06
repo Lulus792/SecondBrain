@@ -41,10 +41,22 @@ Prüfungen sind eigenes C; eine externe JSON-Bibliothek wird nicht verwendet.
 
 Projektliste, Sicherungsprüfung und Wiederherstellung verwenden dieselbe Prüfung.
 Ein nicht unterstütztes Schema erzeugt eine verständliche Meldung und wird nicht
-als aktuelles Format verarbeitet. Ein Fehler beim Auflisten weist derzeit den
-gesamten betroffenen Arbeitsordner zurück; einzelne beschädigte Projekte werden
-noch nicht separat in einer verwendbaren Projektliste dargestellt. Dateien bleiben
-unangetastet. Dieser Komfort-/Fehlerzustand ist vor 1.0 noch zu verbessern.
+als aktuelles Format verarbeitet. Ab 0.7.2 enthält die App-Projektwahl einzelne
+nicht verfügbare Einträge mit Grund und Ordnerpfad, während gültige Projekte nutzbar
+bleiben. Auch ein Ordner mit START.md und fehlendem brain.json erscheint als Fehler.
+Gewöhnliche Ordner ohne Projektmerkmale werden weiter ignoriert. Fehler beim Lesen
+des gesamten Arbeitsordners oder fehlender Speicher brechen die Erkennung ab.
+Die strikte Kernfunktion sb_projects_list bleibt erhalten; sb_projects_scan liefert
+zusätzlich Fehlerzustände je Eintrag. Keine der beiden verändert Dateien.
+
+Beim Öffnen prüft das Modell die aktuellen Metadaten erneut. Ein Fehler beim Lesen
+der Notizen wird dem betreffenden Projekt zugeordnet; der Start versucht danach
+weitere Projekte. Sind alle nicht verfügbar, bleiben Einstieg, Neuanlegen,
+Ordnerwechsel, Wiederherstellen und Prüfen erreichbar. „Liste erneut prüfen“ liest
+neu ein und erhält offene Entwürfe. Nach einer Korrektur ist das Projekt wieder
+wählbar. Die App repariert keine Metadaten automatisch. Die CLI listet gültige
+Metadateneinträge auf stdout und Gründe auf stderr; Exit 1 kennzeichnet eine
+unvollständige Liste. context/search/backup für andere Kennungen bleiben verfügbar.
 
 ## Dokumente und Quellen
 
@@ -116,3 +128,13 @@ macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Lokal besteht das entpack
 Intel-Paket mit 126 Desktop-, 105 Tastatur- und 75 Sicherungs-UI-Aussagen sowie
 Einstellungsprozessen und CLI-Sicherung. Archiv-SHA-256: `6bd2cea886e7e6f88335b8987cd1e25839f3b0b54ff969e84afe403114d24aba`.
 Der weitere Release-Auftrag einschließlich Einzelprojekt-Fehlerzuständen bleibt aktiv.
+
+
+Abschließender lokaler Nachweis: alle 20 Tests des vollständigen Release-Laufs
+bestehen (190,75 Sekunden), der zusätzliche Produktions-CLI-Test besteht
+(0,77 Sekunden). Alle zehn reinen Kerntests bestehen (3,72 Sekunden). Vier gezielte
+ASan/UBSan-Wege bestehen (38,51 Sekunden): Projektfehler-UI, erster Start, native
+Zugänglichkeit und Projektmodell. Die neuen Prüfungen enthalten 39 UI- und
+46 Modell-/Erkennungsaussagen. Tatsächliche dunkle und helle Kontrastbilder mit
+200 Prozent Schrift sind betrachtet. Native Plattform- und Paketabnahme zu 0.7.2
+folgen gesondert; automatische Metadatenreparatur wurde nicht eingeführt.

@@ -468,14 +468,14 @@ SBStatus sb_project_create(const char *workspace, const char *id, const char *na
     }
     result = sb_path_join(path, sizeof(path), root, "brain.json");
     if (result.code == SB_OK) result = sb_fs_write_new(path, metadata.data, metadata.length);
-    if (result.code == SB_OK && out) { strcpy(out->id, id); strcpy(out->name, name); strcpy(out->root, root); }
+    if (result.code == SB_OK && out) { strcpy(out->id, id); strcpy(out->name, name); strcpy(out->root, root); out->problem=sb_ok(); }
 cleanup:
     if (texts) { for (size_t i = 0; i < SB_TEMPLATE_COUNT; ++i) free(texts[i]); free(texts); }
     free(repo.data); free(hint.data); free(metadata.data);
     return result;
 }
 
-typedef struct { const char *workspace; SBProjects *list; } ProjectVisit;
+typedef struct { const char *workspace; SBProjects *list; bool tolerant; } ProjectVisit;
 static SBStatus project_visit(const char *name, int kind, void *userdata) {
     ProjectVisit *visit = userdata;
     SBProject project, *items;
@@ -486,12 +486,21 @@ static SBStatus project_visit(const char *name, int kind, void *userdata) {
     memset(&project, 0, sizeof(project));
     TRY(sb_path_join(project.root, sizeof(project.root), visit->workspace, name));
     TRY(sb_path_join(path, sizeof(path), project.root, "brain.json"));
-    if (sb_fs_kind(path) != 1) return sb_ok();
-    result = sb_fs_read(path, &json, &length);
+    int metadata_kind=sb_fs_kind(path);
+    if (!metadata_kind) {
+        char start[SB_PATH_CAP]; TRY(sb_path_join(start,sizeof(start),project.root,"START.md"));
+        if (!visit->tolerant || sb_fs_kind(start)!=1) return sb_ok();
+    }
+    result = metadata_kind==1 ? sb_fs_read(path,&json,&length) :
+        !metadata_kind ? sb_error(SB_NOT_FOUND,"brain.json fehlt.") :
+        metadata_kind<0 ? sb_error(SB_IO,"Metadatenstatus konnte nicht gelesen werden.") : sb_error(SB_INVALID,"brain.json ist keine reguläre Datei.");
     if (result.code == SB_OK && !sb_utf8_valid(json, length)) result = sb_error(SB_INVALID, "Projektmetadaten enthalten ungültiges UTF-8.");
     if (result.code == SB_OK) result = sb_metadata_validate(json,length,project.name);
     free(json);
-    if (result.code != SB_OK) return sb_error(result.code, "Projekt %s: %s", name, result.message);
+    if (result.code != SB_OK) {
+        if (!visit->tolerant || result.code==SB_MEMORY) return sb_error(result.code, "Projekt %s: %s", name, result.message);
+        project.problem=result; snprintf(project.name,sizeof(project.name),"%s",name);
+    }
     strcpy(project.id, name);
     items = realloc(visit->list->items, (visit->list->count + 1) * sizeof(*items));
     if (!items) return sb_error(SB_MEMORY, "Nicht genug Arbeitsspeicher.");
@@ -499,9 +508,13 @@ static SBStatus project_visit(const char *name, int kind, void *userdata) {
     items[visit->list->count++] = project;
     return sb_ok();
 }
-static int project_order(const void *a, const void *b) { return strcmp(((const SBProject *)a)->name, ((const SBProject *)b)->name); }
+static int project_order(const void *a, const void *b) {
+    const SBProject *x=a,*y=b;
+    if ((x->problem.code!=SB_OK)!=(y->problem.code!=SB_OK)) return x->problem.code==SB_OK ? -1 : 1;
+    int order=strcmp(x->name,y->name); return order ? order : strcmp(x->id,y->id);
+}
 void sb_projects_free(SBProjects *projects) { free(projects->items); projects->items = NULL; projects->count = 0; }
-SBStatus sb_projects_list(const char *workspace, SBProjects *out) {
+static SBStatus projects_list(const char *workspace, SBProjects *out,bool tolerant) {
     char root[SB_PATH_CAP];
     ProjectVisit visit;
     SBStatus result;
@@ -509,12 +522,14 @@ SBStatus sb_projects_list(const char *workspace, SBProjects *out) {
     TRY(sb_fs_absolute(workspace, root, sizeof(root)));
     if (sb_fs_kind(root) == 0) return sb_ok();
     if (sb_fs_kind(root) != 2) return sb_error(SB_INVALID, "Arbeitsordner ist kein regulärer Ordner.");
-    visit.workspace = root; visit.list = out;
+    visit.workspace = root; visit.list = out; visit.tolerant=tolerant;
     result = sb_fs_list(root, project_visit, &visit);
     if (result.code != SB_OK) { sb_projects_free(out); return result; }
     if (out->count > 1) qsort(out->items, out->count, sizeof(*out->items), project_order);
     return sb_ok();
 }
+SBStatus sb_projects_list(const char *workspace,SBProjects *out) { return projects_list(workspace,out,false); }
+SBStatus sb_projects_scan(const char *workspace,SBProjects *out) { return projects_list(workspace,out,true); }
 
 SBStatus sb_markdown_title(const char *text, char *out, size_t capacity) {
     const char *end;

@@ -43,16 +43,23 @@ static int run(int argc, char **argv) {
             "  secondbrain-cli restore SICHERUNGSDATEI ARBEITSORDNER NEUE-KENNUNG\n");
         return 2;
     }
-    result = sb_projects_list(argv[2], &projects);
+    result = sb_projects_scan(argv[2], &projects);
     if (result.code != SB_OK) return report(result);
     if (!strcmp(argv[1], "list")) {
-        for (size_t i = 0; i < projects.count; ++i) printf("%s\t%s\n", projects.items[i].id, projects.items[i].name);
+        bool incomplete=false;
+        for (size_t i = 0; i < projects.count; ++i) {
+            if (projects.items[i].problem.code!=SB_OK) { incomplete=true; fprintf(stderr,"%s: %s\n",projects.items[i].id,projects.items[i].problem.message); }
+            else printf("%s\t%s\n", projects.items[i].id, projects.items[i].name);
+        }
         sb_projects_free(&projects);
-        return 0;
+        return incomplete ? 1 : 0;
     }
     if (argc < 4) { sb_projects_free(&projects); return 2; }
     for (size_t i = 0; i < projects.count; ++i) {
         if (strcmp(projects.items[i].id, argv[3])) continue;
+        if (projects.items[i].problem.code!=SB_OK) {
+            result=projects.items[i].problem; sb_projects_free(&projects); return report(result);
+        }
         if (!strcmp(argv[1],"backup") && argc==5) result=sb_backup_create(&projects.items[i],argv[4],NULL,NULL);
         else if (!strcmp(argv[1], "context")) {
             char *text = NULL;

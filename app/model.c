@@ -56,6 +56,13 @@ static SBStatus open_note(SBApp *app, const char *path) {
     return sb_ok();
 }
 static SBStatus set_project(SBApp *app, const SBProject *project) {
+    if (project->problem.code!=SB_OK) return project->problem;
+    SBProject current=*project; char metadata_path[SB_PATH_CAP],*metadata=NULL; size_t metadata_length=0;
+    TRY(sb_path_join(metadata_path,sizeof(metadata_path),project->root,"brain.json"));
+    SBStatus checked=sb_fs_read(metadata_path,&metadata,&metadata_length);
+    if (checked.code==SB_OK) checked=sb_metadata_validate(metadata,metadata_length,current.name);
+    free(metadata); if (checked.code!=SB_OK) return checked;
+    project=&current;
     SBNotes notes = {0};
     SBRevision revision = {0};
     char *editor = NULL;
@@ -81,11 +88,15 @@ static SBStatus open_workspace(SBApp *app, const char *workspace) {
     SBProjects projects = {0};
     SBStatus result;
     TRY(sb_fs_absolute(workspace, absolute, sizeof(absolute)));
-    TRY(sb_projects_list(absolute, &projects));
-    if (projects.count) {
-        result = set_project(app, &projects.items[0]);
-        if (result.code != SB_OK) { sb_projects_free(&projects); return result; }
-    } else {
+    TRY(sb_projects_scan(absolute, &projects));
+    bool opened=false;
+    for (size_t i=0;i<projects.count && !opened;++i) if (projects.items[i].problem.code==SB_OK) {
+        result=set_project(app,&projects.items[i]);
+        if (result.code==SB_OK) opened=true;
+        else if (result.code==SB_MEMORY) { sb_projects_free(&projects); return result; }
+        else projects.items[i].problem=result;
+    }
+    if (!opened) {
         sb_notes_free(&app->notes); free(app->editor); app->editor = NULL;
         app->has_project = false; app->path[0] = 0; app->title[0] = 0;
         memset(&app->revision, 0, sizeof(app->revision)); sb_app_source_close(app); ++app->generation;
@@ -112,7 +123,11 @@ static SBStatus apply(SBApp *app, SBAction action) {
     if (action.kind == SB_ACT_WORKSPACE) return open_workspace(app, action.value);
     if (action.kind == SB_ACT_PROJECT) {
         for (size_t i = 0; i < app->projects.count; ++i)
-            if (!strcmp(app->projects.items[i].id, action.value)) return set_project(app, &app->projects.items[i]);
+            if (!strcmp(app->projects.items[i].id, action.value)) {
+                SBStatus status=set_project(app,&app->projects.items[i]);
+                if (status.code!=SB_OK && status.code!=SB_MEMORY) app->projects.items[i].problem=status;
+                return status;
+            }
         return sb_error(SB_NOT_FOUND, "Projekt wurde nicht gefunden.");
     }
     if (action.kind == SB_ACT_NOTE) return open_note(app, action.value);
@@ -160,9 +175,9 @@ SBStatus sb_app_decide(SBApp *app, SBDecision decision) {
     app->guard = false; memset(&app->pending, 0, sizeof(app->pending));
     return apply(app, pending);
 }
-static SBStatus refresh_projects(SBApp *app) {
+SBStatus sb_app_refresh_projects(SBApp *app) {
     SBProjects projects = {0};
-    TRY(sb_projects_list(app->workspace, &projects));
+    TRY(sb_projects_scan(app->workspace, &projects));
     sb_projects_free(&app->projects); app->projects = projects;
     return sb_ok();
 }
@@ -176,7 +191,7 @@ SBStatus sb_app_new_project(SBApp *app, const char *id, const char *name, const 
     SBProject created;
     if (!app->workspace[0]) return sb_error(SB_INVALID, "Öffne zuerst einen Arbeitsordner.");
     TRY(sb_project_create(app->workspace, id, name, repository, &created));
-    TRY(refresh_projects(app));
+    TRY(sb_app_refresh_projects(app));
     return sb_app_request(app, SB_ACT_PROJECT, created.id);
 }
 SBStatus sb_app_new_note(SBApp *app, const char *section, const char *id, const char *title) {

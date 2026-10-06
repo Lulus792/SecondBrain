@@ -24,6 +24,7 @@ typedef struct {
 } SBApp;
 
 SBStatus sb_app_init(SBApp *app, const char *workspace);
+SBStatus sb_app_refresh_projects(SBApp *app);
 void sb_app_free(SBApp *app);
 bool sb_app_dirty(const SBApp *app);
 SBStatus sb_app_request(SBApp *app, SBActionKind kind, const char *value);
