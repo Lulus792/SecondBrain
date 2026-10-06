@@ -616,3 +616,13 @@ folgen gesondert. Es fand keine automatische Migration bestehender Daten statt.
 
 Das vollständig geprüfte Paket 0.7.0 wurde lokal nach dist/SecondBrain übernommen;
 sein tatsächlicher Start mit dem eigenen Projektgedächtnis ist betrachtet.
+
+
+## Abnahme von 0.7.1
+
+[Lauf zu b3c0af5](https://github.com/Lulus792/SecondBrain/actions/runs/37532681504)
+besteht mit allen 18 Jobs: 18 Desktoptests je Debug/Release auf Windows x64,
+macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Lokal besteht das entpackte
+Intel-Paket mit 126 Desktop-, 105 Tastatur- und 75 Sicherungs-UI-Aussagen sowie
+Einstellungsprozessen und CLI-Sicherung. Archiv-SHA-256: `6bd2cea886e7e6f88335b8987cd1e25839f3b0b54ff969e84afe403114d24aba`.
+Der weitere Release-Auftrag einschließlich Einzelprojekt-Fehlerzuständen bleibt aktiv.

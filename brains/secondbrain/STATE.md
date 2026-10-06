@@ -40,7 +40,8 @@ besteht mit 18 Jobs, 17 Desktoptests je Debug/Release und drei entpackten Pakete
 0.7.1 prüft Metadatenfelder und unbekannte Schemas konsistent und verhindert
 NUL-bedingte Textverkürzung. Alle acht UI-unabhängigen Kerntests und gezielte
 ASan/UBSan-Prüfungen sowie abschließende Desktop-Nachprüfungen bestehen.
-Die Regression schlägt beim bisherigen Kern fehl; Plattform-/Paketabnahme folgt.
+Die Regression schlägt beim bisherigen Kern fehl. Die [Abnahme zu b3c0af5](https://github.com/Lulus792/SecondBrain/actions/runs/37532681504)
+besteht mit 18 Jobs, 18 Desktoptests je Debug/Release und drei entpackten Paketen.
 [Datenvertrag](../../docs/DATENVERTRAG.md).
 
 ## Weiterarbeiten und Grenzen
