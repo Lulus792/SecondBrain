@@ -43,6 +43,14 @@ besteht auf allen drei Systemen in beiden Buildprofilen.
 
 ## Implementierte UI Grundlage
 
+Die eigene Anwendungsschicht verbindet Projekt- und Dokumentwechsel mit einem
+gemeinsamen Schutz ungespeicherter Inhalte. Speichern, Verwerfen und Abbrechen
+sind für Wechsel, Archivierung und Beenden implementiert. Externe Textquellen
+können schreibgeschützt geladen werden, während die eigene Bearbeitung erhalten
+bleibt. Bei einem Speicherkonflikt kann eine eigene Fassung als neue Wissensnotiz
+gesichert werden. Diese Zustandsabläufe sind anhand tatsächlicher Dateien geprüft;
+ihre Bedienelemente werden nun in das Hauptfenster eingebunden.
+
 SDL3 und Nuklear sind ausschließlich im UI-Ziel eingebunden. Die Grundlage
 verarbeitet Texteingaben, stellt Schriften mit passender Pixeldichte dar und
 bietet helle und dunkle Farben sowie vergrößerte Schrift. UI-Quellen, Versionen
