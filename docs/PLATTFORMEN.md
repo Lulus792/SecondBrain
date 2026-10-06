@@ -169,3 +169,32 @@ Bedienwege einschließlich Ressourcen und MIT-Lizenz aus einem anderen Ordner.
 Kleine Darstellungen mit 200 Prozent Schrift sind geometrisch geprüft und betrachtet.
 Die Tests belegen die benannten Abläufe mit versteckten SDL-Softwarerenderer-Fenstern.
 Das aktive Gesamtziel und die übrigen Release-Abnahmen bleiben offen.
+
+
+## Version 0.3.1: Einstellungen und Ordnerwahl
+
+Der [Lauf zu 259fca1](https://github.com/Lulus792/SecondBrain/actions/runs/37499338633) besteht am 6. Oktober 2026
+mit 18 erfolgreichen Jobs. Die Artefaktnamen belegen Windows X64, macOS ARM64
+und Linux X64. Alle sechs Desktop-Jobs bestehen je zehn Prüfungen in Debug/Release.
+Dazu gehören Format-/Bestandsschutz für Einstellungen, neu erzeugte Fenster,
+51 UI-Aussagen und zwei getrennte App-Prozesse. Die drei entpackten Release-Pakete
+bestehen beide Bedienwege und Prozessneustart mit isolierter Konfiguration.
+
+| Plattform | Desktop Debug, 10 Tests | Desktop Release, 10 Tests | Entpacktes Paket |
+| --- | --- | --- | --- |
+| Windows x64 | bestanden | bestanden | beide Bedienwege und Neustart bestanden |
+| macOS ARM64 | bestanden | bestanden | beide Bedienwege und Neustart bestanden |
+| Ubuntu Linux x64, X11/Xvfb | bestanden | bestanden | beide Bedienwege und Neustart bestanden |
+
+Die [erste Abnahme zu 66760a3](https://github.com/Lulus792/SecondBrain/actions/runs/37498493340)
+scheiterte nur in den beiden Linux-Desktopprofilen. Neue CTest-Fehlerannotationen
+belegen den Größenvergleich beim Einstellungsneustart. SDL führt X11-Größenänderungen
+asynchron aus; der Korrekturstand wartet ausdrücklich auf deren Abschluss.
+Die erste fehlgeschlagene Prüfung bleibt als Nachweis der Korrektur erhalten.
+
+Lokal bestehen zehn Release-Prüfungen und ein vollständiger Sanitizer-Lauf;
+nach den letzten Änderungen bestehen zusätzlich die drei betroffenen Prüfungen
+in Release und ASan/UBSan. Das tatsächliche neue Intel-Paket besteht 126 Maus-,
+105 Tastaturaussagen und getrennte Prozessneustarts. Kleine Bilder bei 150/200
+Prozent Schrift wurden betrachtet. Native OS-Dialoge und Screenreader wurden
+nicht interaktiv bedient; kein solcher Plattformnachweis wird daraus abgeleitet.

@@ -115,3 +115,21 @@ zugängliche Detailprotokolle werden durch neue CI-Fehlerannotationen ergänzt.
 Zusätzlich wartet die Einstellungsanbindung nun mit SDL_SyncWindow auf asynchrone
 Fenstergrößen. Die drei betroffenen Prüfungen bestehen lokal in Release und mit
 ASan/UBSan. Der erneute Linux-Nachweis folgt erst nach tatsächlich bestandenem Lauf.
+
+
+## Abnahme 0.3.1 nach der Fensterkorrektur
+
+Der [Lauf zu 259fca1](https://github.com/Lulus792/SecondBrain/actions/runs/37499338633) besteht mit allen 18 Jobs.
+Je zehn Desktop-Prüfungen bestehen in Debug und Release auf Windows x64,
+macOS ARM64 und Linux x64. Alle drei entpackten Pakete bestehen Mausbedienung,
+reine Tastaturbedienung und zwei getrennte App-Prozesse mit gespeicherten
+Einstellungen. Die neue UI-Prüfung enthält 51 Aussagen. Der frühere Linux-Fehler
+ist durch die explizite Synchronisierung der Fenstergröße behoben; beide
+Linux-Profile bestehen im Korrekturlauf.
+
+Lokal besteht das neu gepackte und verschobene Intel-macOS-Paket ebenfalls mit
+126 Maus- und 105 Tastaturaussagen sowie dem Prozessneustart. Die installierte App
+unter dist/SecondBrain/secondbrain.app ist aktualisiert; otool -L zeigt nur
+macOS-Systembibliotheken. Die Tests verwenden versteckte native Fenster und
+SDL-Softwaredarstellung. Tatsächliche OS-Dialoge, Screenreader, reale GPU-/Display-
+Umgebungen und Langzeitsitzungen bleiben gesonderte offene Abnahmen.
