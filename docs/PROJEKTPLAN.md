@@ -98,7 +98,9 @@ stehen im [Umsetzungsstand](STATUS.md).
 - [x] Räumliche Wissensnetze und Sternkarten recherchieren.
 - [x] Den Nutzer nach Stimmung, Sternendarstellung und Bedienelementen fragen.
 - [x] Drei vergleichbare Entwürfe einschließlich glasartiger Karten vorbereiten.
-- [ ] Entwurf oder Kombination auswählen und weiter ausarbeiten.
+- [x] Lumen-Farbpalette mit Apple-orientiertem Liquid-Glass-Look auswählen.
+- [x] Die gewählte Kombination als verfeinerte Vorschau ausarbeiten und prüfen.
+- [ ] Materialweg, Graphumfang und Kamerabedienung für die C-Integration konkretisieren.
 
 Referenzen, Antworten und der Status der Vorschauen stehen in
 [UI_GALAXIE.md](UI_GALAXIE.md). Diese Phase ist zunächst eine Designauswahl;

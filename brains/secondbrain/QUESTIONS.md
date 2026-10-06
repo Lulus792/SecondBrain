@@ -11,10 +11,14 @@ Für den festgelegten ersten lokalen Arbeitsablauf ist keine Abnahmefrage offen.
 
 ## Aktuelle Designauswahl
 
-Welcher der drei Entwürfe Lumen, Glas oder Fokus trifft den gewünschten Stil?
-Eine Kombination ist ebenfalls möglich. Bestätigt sind dunkle, dezente Farben,
-kleine leuchtende Sterne und schwebende Bedienelemente. Glasartige Karten werden
-als zusätzliche Variante verglichen. Beleg: [Designrecherche](../../docs/UI_GALAXIE.md).
+Geklärt: Lumen liefert die gewünschte Farbpalette. Karten und Bedienelemente
+sollen stärker wie Apples Liquid Glass gestaltet werden. Die verfeinerte
+Vorschau ist erstellt und geprüft.
+
+Offen für die Integration: der Materialweg auf Windows, macOS und Linux sowie
+Kamerabedienung und Graphumfang. Apples native macOS-Komponente ist ab macOS 26
+dokumentiert; die Vorschau selbst ist eine optische Nachbildung.
+Beleg: [Designrecherche](../../docs/UI_GALAXIE.md).
 
 ## Weitere mögliche Erweiterungen
 

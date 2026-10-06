@@ -57,5 +57,17 @@ dezenten Farben; kleine leuchtende Sterne mit klaren Beschriftungen; wenige
 schwebende Bedienelemente und Notizen bei Auswahl. Zusätzlich soll eine Variante
 mit glasartigen Karten über der Galaxie gezeigt werden.
 
-Lumen, Glas und Fokus sind Entwürfe zur Auswahl. Die Wahl und eine entsprechende
-C-Implementierung stehen noch aus. Beleg: [Designrecherche](../../docs/UI_GALAXIE.md).
+Lumen, Glas und Fokus waren die ersten Entwürfe zur Auswahl.
+Beleg: [Designrecherche](../../docs/UI_GALAXIE.md).
+
+## D08: Lumen-Farben mit Liquid-Glass-Material
+
+Der Nutzer hat am 6. Oktober 2026 die Farbgestaltung von Lumen ausgewählt.
+Karten und weitere Bedienelemente sollen einen ausgeprägten Liquid-Glass-Look
+wie bei Apple erhalten. Die verfeinerte Designstudie zeigt diese Kombination
+mit Hintergrundbrechung und reagierenden Lichtkanten.
+
+Die Vorschau ist eine eigene optische Nachbildung. Ein Originalmaterial von
+Apple ist damit noch nicht in die C-App integriert. Materialanbindung und
+Plattformnachweise gehören zum nächsten Implementierungsschritt.
+Beleg: [Verfeinerte Studie](../../docs/UI_GALAXIE.md).

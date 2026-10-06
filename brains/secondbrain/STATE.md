@@ -30,12 +30,12 @@ weitere Pakete stehen im verlinkten GitHub-Lauf als Actions-Artefakte bereit.
 
 ## Nächster Schritt
 
-Der Nutzer möchte eine räumliche Wissensgalaxie und wählt zunächst zwischen
-Designentwürfen. Die [neue Recherche](../../docs/UI_GALAXIE.md) dokumentiert
-Referenzen, bestätigte Vorlieben und Lumen, Glas sowie Fokus. Die C-App bleibt
-auf dem geprüften Stand der ersten Version; eine Galaxie-Ansicht ist dort noch
-nicht integriert. Nächster Schritt: Entwurf oder Kombination auswählen und
-anschließend gezielt ausarbeiten.
+Der Nutzer hat Lumens Farbpalette mit einem stärkeren Liquid-Glass-Look für
+Karten und Bedienelemente ausgewählt. Die [Designstudie](../../docs/UI_GALAXIE.md)
+dokumentiert die verfeinerte Vorschau und ihre Prüfung. Die C-App bleibt auf
+dem geprüften Stand der ersten Version; die Galaxie-Ansicht und das neue
+Glasmaterial sind dort noch nicht integriert. Nächster Schritt: Kamerabedienung,
+Graphumfang und den Materialweg für alle drei Plattformen konkretisieren.
 
 ## Grenzen
 

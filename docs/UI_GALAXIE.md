@@ -1,7 +1,7 @@
 # Recherche und Designrichtungen für eine Wissensgalaxie
 
-Stand: 6. Oktober 2026. Status: Recherche und vergleichbare Designentwürfe.
-Der Nutzer möchte zuerst auswählen. Die räumliche Ansicht ist noch keine
+Stand: 6. Oktober 2026. Status: Lumen-Farbpalette und Liquid-Glass-Richtung
+ausgewählt; verfeinerte Vorschau erstellt. Die räumliche Ansicht ist noch keine
 Funktion der C-Desktop-App.
 
 ## Auftrag und bestätigte Gestaltung
@@ -17,9 +17,10 @@ Die Antworten auf die Designfragen legen fest:
 - Wenige schwebende Bedienelemente. Eine Notiz öffnet sich bei Auswahl.
 - Zusätzlich ein vergleichbarer Entwurf mit glasartigen Karten über der Galaxie.
 
-Die bisherigen Anforderungen an C, UI-Abhängigkeiten, drei Zielplattformen und
-die eigene Wissensanwendung bleiben maßgeblich. Es wurde noch kein Entwurf
-für die Umsetzung ausgewählt.
+Der Nutzer hat anschließend die Farbgestaltung von Lumen ausgewählt. Karten
+und weitere Bedienelemente sollen deutlich stärker wie Apples Liquid Glass
+wirken. Die bisherigen Anforderungen an C, UI-Abhängigkeiten, drei Zielplattformen
+und die eigene Wissensanwendung bleiben maßgeblich.
 
 ## Eingesehene Referenzen
 
@@ -44,9 +45,25 @@ eingesehen.
 
 Apple trennt funktionale Bedienelemente von der Inhaltsebene. Liquid Glass ist
 für Navigation und Bedienelemente gedacht; für Inhalte beschreibt Apple
-Standardmaterialien. Für die Notizkarten wird deshalb ein eigener zurückhaltender
-Blur-Eindruck vorgeschlagen, ohne ihn als native Liquid-Glass-Komponente auszugeben.
-Schrift, Kontrast und die Hierarchie müssen trotz sichtbarem Hintergrund erhalten bleiben.
+Standardmaterialien. Der erste Vorschlag für Notizkarten verwendete deshalb einen
+zurückhaltenden Blur-Eindruck. Der Nutzer wünscht einen ausgeprägteren
+Liquid-Glass-Look auch für die Karten. Die neue Studie überträgt die optischen
+Eigenschaften auf diese Flächen. Schrift, Kontrast und die Hierarchie bleiben
+dabei weiterhin wichtig.
+
+Apples [Meet Liquid Glass](https://developer.apple.com/videos/play/wwdc2025/219/)
+beschreibt Lichtbrechung, Reaktionen auf Interaktion und Umgebungslicht sowie
+die Anpassung des Materials an seinen Hintergrund. Die verfeinerte Vorschau
+verwendet daraus abgeleitete gewölbte Lichtkanten, eine leichte Vergrößerung und
+Verzerrung des Sternenraums unter den Glasflächen und auf den Zeiger reagierende
+Reflexe. Die Lumen-Farben des Raums bleiben erhalten.
+
+Diese Studie ist eine eigene optische Nachbildung, kein Einsatz von Apples
+nativer Materialimplementierung. Die öffentliche macOS-Komponente
+[NSGlassEffectView](https://developer.apple.com/documentation/appkit/nsglasseffectview)
+ist laut Apples Dokumentationsdaten ab macOS 26 verfügbar. Eine konkrete native
+Anbindung und der entsprechende Materialweg unter Windows und Linux sind für
+die C-Integration gesondert zu klären.
 
 Bewegung soll der Handlung dienen, kurz und nachvollziehbar sein. Daraus folgen
 direkte Kamera-Reaktion auf Eingaben, abbrechbare Fokusbewegung und eine reduzierte
@@ -96,9 +113,19 @@ Text und Verknüpfungen wechseln mit der Auswahl. Die Vorschau meldet dabei
 keine JavaScript-Fehler. Diese Prüfung ist ein Nachweis der Designvorschau,
 kein neuer Plattformnachweis für eine räumliche C-Oberfläche.
 
-## Nächste Auswahl
+## Ausgewählte Kombination und Verfeinerung
 
-Offen ist, welcher Entwurf oder welche Kombination weiter ausgearbeitet wird.
-Danach werden Kamerabedienung, Lesekarte, Beschriftung, Graphumfang und die
-Umsetzung innerhalb der eigenen C-Anwendung konkretisiert. Sichtbare Beziehungen
-sollen in der späteren App aus nachvollziehbaren Projektverweisen entstehen.
+Ausgewählt ist die Farbgestaltung von Lumen mit stärker ausgeprägtem,
+Apple-orientiertem Liquid-Glass-Look für Karten und Bedienelemente. Der
+[Quellstand der verfeinerten Vorschau](design/lumen-liquid-glass.html) ist als
+Designstudie versioniert.
+
+Die Glasflächen übernehmen die tatsächlich dahinter liegende Beispielsternkarte.
+Bei Kamerabewegung ändern sich daher auch deren Materialbilder. Notizwechsel
+und Kamera-Drehung wurden in der Vorschau bedient und betrachtet; die
+angepasste Kartengröße bleibt lesbar. Dabei wurden keine JavaScript-Fehler gemeldet.
+Beispieldaten und die Abgrenzung zur C-App gelten weiterhin.
+
+Als Nächstes werden Kamerabedienung, Lesekarte, Beschriftung, Graphumfang und
+der plattformgerechte Materialweg für die C-Anwendung konkretisiert. Sichtbare
+Beziehungen sollen aus nachvollziehbaren Projektverweisen entstehen.

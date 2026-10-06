@@ -1,0 +1,449 @@
+<div id="secondbrain-lumen-liquid" aria-label="Lumen mit Liquid-Glass-Material">
+    <div class="sb-window sb-lumen" data-design="lumen" aria-label="Lumen">
+      <header class="sb-header">
+        <div class="sb-brand"><span class="sb-mark" aria-hidden="true">✦</span><span>SecondBrain <small>Lumen · Liquid Glass</small></span></div>
+        <label class="sb-project-label">Projekt <select class="sb-project"><option value="physim">Physim</option><option value="secondbrain">SecondBrain</option><option value="research">Recherche</option></select></label>
+        <label class="sb-search-label"><span>Suchen</span><input class="sb-search" type="search" placeholder="Notiz finden" aria-label="Notiz in Lumen suchen"></label>
+      </header>
+      <div class="sb-workspace">
+        <canvas class="sb-space" role="img" aria-label="Räumliche Sternkarte mit Beispielnotizen aus Physim, SecondBrain und Recherche. Ziehen dreht die Karte, Shift und Ziehen verschiebt sie. Notizen sind auch über die beschrifteten Buttons auswählbar."></canvas>
+        <div class="sb-overline"><span>DEIN WISSENSRAUM</span><strong class="sb-world-title">Physim</strong></div>
+        <aside class="sb-reader">
+          <div class="sb-reader-top"><span class="sb-kicker">WISSENSNOTIZ · BEISPIEL</span><button class="sb-close cursor-interaction" type="button" aria-label="Notiz in Lumen schließen">×</button></div>
+          <h2 class="sb-note-title">Energieerhaltung</h2>
+          <p class="sb-note-body">Wie lässt sich die Energie einer Simulation über lange Zeit stabil halten?</p>
+          <div class="sb-note-meta">VERKNÜPFT MIT</div>
+          <div class="sb-neighbors"></div>
+          <button class="sb-focus cursor-interaction" type="button">Zu diesem Stern</button>
+        </aside>
+        <div class="sb-camera">
+          <button class="cursor-interaction" data-action="left" type="button" aria-label="Lumen nach links drehen">↶</button>
+          <button class="cursor-interaction" data-action="right" type="button" aria-label="Lumen nach rechts drehen">↷</button>
+          <button class="cursor-interaction" data-action="out" type="button" aria-label="Lumen herauszoomen">−</button>
+          <button class="cursor-interaction" data-action="in" type="button" aria-label="Lumen hineinzoomen">+</button>
+          <button class="cursor-interaction" data-action="home" type="button">Übersicht</button>
+        </div>
+      </div>
+      <footer class="sb-footer"><span>Ziehen: drehen · Shift: verschieben · Scrollen: zoomen</span><span class="sb-selection" aria-live="polite">Energieerhaltung</span></footer>
+    </div>
+
+</div>
+<style>
+#secondbrain-lumen-liquid .sb-window {
+  --sb-shell:light-dark(#f5f7fb,#0e1520); --sb-panel:light-dark(#ffffff,#172231);
+  --sb-ink:light-dark(#243247,#e7edf6); --sb-muted:light-dark(#5c6b7f,#a6b3c4);
+  --sb-line:light-dark(#dfe5ed,#2d3c50); --sb-control:light-dark(#edf1f7,#233146);
+  --sb-accent:light-dark(#397cc6,#8ebfff); --sb-space-bg:light-dark(#0a1426,#070e1a);
+  --sb-star-ink:light-dark(#dce9fb,#dce9fb); --sb-star-muted:light-dark(#8299bc,#8299bc);
+  --sb-physim:light-dark(#8bd6e6,#8bd6e6); --sb-secondbrain:light-dark(#aebaff,#aebaff);
+  --sb-research:light-dark(#e2c393,#e2c393); --sb-shadow:light-dark(#b3bfce,#050a12);
+  font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:var(--sb-ink); background:var(--sb-shell); height:640px; display:flex; flex-direction:column;
+  border:1px solid var(--sb-line); border-radius:18px; overflow:hidden; box-sizing:border-box;
+}
+#secondbrain-lumen-liquid .sb-window * {box-sizing:border-box}
+#secondbrain-lumen-liquid .sb-reader[hidden],#secondbrain-lumen-liquid .sb-related-cards[hidden] {display:none!important}
+#secondbrain-lumen-liquid .sb-header {min-height:78px;padding:14px 24px;display:flex;align-items:center;gap:24px;background:var(--sb-panel);z-index:2;border-bottom:1px solid var(--sb-line)}
+#secondbrain-lumen-liquid .sb-brand {display:flex;align-items:center;gap:10px;flex:1;min-width:150px;font-size:16px;font-weight:500}
+#secondbrain-lumen-liquid .sb-mark {font-size:27px;color:var(--sb-accent)}
+#secondbrain-lumen-liquid .sb-brand small {display:block;font-size:11px;font-weight:400;color:var(--sb-muted);letter-spacing:.035em}
+#secondbrain-lumen-liquid label {font-size:11px;color:var(--sb-muted)}
+#secondbrain-lumen-liquid select,#secondbrain-lumen-liquid input {display:block;font:inherit;font-size:13px;margin-top:3px;height:32px;border:1px solid var(--sb-line);border-radius:9px;background:var(--sb-shell);color:var(--sb-ink);padding:0 10px;max-width:100%}
+#secondbrain-lumen-liquid input {width:160px}
+#secondbrain-lumen-liquid select {width:137px}
+#secondbrain-lumen-liquid .sb-workspace {position:relative;flex:1;min-height:0;isolation:isolate}
+#secondbrain-lumen-liquid .sb-space {position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#secondbrain-lumen-liquid .sb-space:active {cursor:grabbing}
+#secondbrain-lumen-liquid .sb-overline {position:absolute;top:24px;left:28px;pointer-events:none;color:var(--sb-star-ink);z-index:1}
+#secondbrain-lumen-liquid .sb-overline span {display:block;font-size:10px;letter-spacing:.16em;color:var(--sb-star-muted);margin-bottom:6px}
+#secondbrain-lumen-liquid .sb-overline strong {font-size:25px;font-weight:500;letter-spacing:-.035em}
+#secondbrain-lumen-liquid button {font:inherit;font-size:12px;border:1px solid var(--sb-line);border-radius:9px;padding:7px 11px;background:var(--sb-control);color:var(--sb-ink)}
+#secondbrain-lumen-liquid button:hover {background:var(--sb-shell)}
+#secondbrain-lumen-liquid .sb-reader {position:absolute;right:22px;bottom:70px;width:250px;padding:20px;background:var(--sb-panel);border:1px solid var(--sb-line);border-radius:16px;box-shadow:0 20px 60px color-mix(in srgb,var(--sb-shadow) 28%,transparent);z-index:1}
+#secondbrain-lumen-liquid .sb-reader-top {display:flex;align-items:center;justify-content:space-between;gap:8px}
+#secondbrain-lumen-liquid .sb-kicker {font-size:10px;letter-spacing:.1em;color:var(--sb-muted)}
+#secondbrain-lumen-liquid .sb-close {border:0;background:transparent;padding:0 6px;font-size:22px;line-height:1}
+#secondbrain-lumen-liquid h2 {font-size:22px;line-height:1.25;letter-spacing:-.035em;font-weight:500;margin:17px 0 10px}
+#secondbrain-lumen-liquid h3 {font-size:14px;font-weight:500;margin:18px 0 8px}
+#secondbrain-lumen-liquid p {font-size:13px;line-height:1.65;margin:0 0 15px}
+#secondbrain-lumen-liquid .sb-note-meta {font-size:10px;color:var(--sb-muted);letter-spacing:.08em;margin:22px 0 8px}
+#secondbrain-lumen-liquid .sb-neighbors {display:flex;gap:6px;flex-wrap:wrap}
+#secondbrain-lumen-liquid .sb-neighbors button {background:var(--sb-shell);font-size:11px;padding:5px 8px}
+#secondbrain-lumen-liquid .sb-focus {margin-top:18px;color:var(--sb-accent);background:var(--sb-shell);width:100%}
+#secondbrain-lumen-liquid .sb-camera {position:absolute;left:28px;bottom:22px;display:flex;gap:5px;padding:6px;background:var(--sb-panel);border:1px solid var(--sb-line);border-radius:13px;z-index:2}
+#secondbrain-lumen-liquid .sb-camera button {border:0;background:transparent;min-width:29px;padding:5px 8px}
+#secondbrain-lumen-liquid .sb-camera button:hover {background:var(--sb-control)}
+#secondbrain-lumen-liquid .sb-footer {min-height:39px;display:flex;align-items:center;justify-content:space-between;gap:15px;padding:9px 24px;background:var(--sb-panel);border-top:1px solid var(--sb-line);font-size:11px;color:var(--sb-muted)}
+#secondbrain-lumen-liquid .sb-selection {color:var(--sb-ink);overflow-wrap:anywhere}
+#secondbrain-lumen-liquid .sb-orbit {--sb-shell:light-dark(#f3eff8,#16101f);--sb-panel:light-dark(#ffffff,#231b32);--sb-control:light-dark(#eee6f7,#352841);--sb-line:light-dark(#e4dce9,#493657);--sb-accent:light-dark(#8c59c5,#d2b0fb);--sb-space-bg:light-dark(#190e29,#10091c);--sb-physim:light-dark(#edb987,#edb987);--sb-secondbrain:light-dark(#b7a4f6,#b7a4f6);--sb-research:light-dark(#83d9ca,#83d9ca);--sb-star-muted:light-dark(#b4a0c9,#b4a0c9);--sb-star-ink:light-dark(#f2e8fd,#f2e8fd)}
+#secondbrain-lumen-liquid .sb-orbit .sb-workspace {display:grid;grid-template-columns:174px 1fr}
+#secondbrain-lumen-liquid .sb-orbit-nav {background:var(--sb-panel);border-right:1px solid var(--sb-line);padding:28px 15px;display:flex;flex-direction:column;gap:8px;z-index:1}
+#secondbrain-lumen-liquid .sb-orbit-nav button {text-align:left;border:0;background:transparent;font-size:12px}
+#secondbrain-lumen-liquid .sb-orbit-nav button:hover,#secondbrain-lumen-liquid .sb-orbit-nav button[aria-pressed="true"] {background:var(--sb-control)}
+#secondbrain-lumen-liquid .sb-nav-divider {margin-top:25px}
+#secondbrain-lumen-liquid .sb-orbit-scene {position:relative;min-width:0}
+#secondbrain-lumen-liquid .sb-orbit .sb-reader {right:18px;bottom:65px;width:242px;border-radius:21px}
+#secondbrain-lumen-liquid .sb-orbit .sb-overline strong {font-size:25px}
+#secondbrain-lumen-liquid .sb-atlas {--sb-shell:light-dark(#f3f4f3,#131d22);--sb-panel:light-dark(#ffffff,#19262d);--sb-control:light-dark(#edf2f1,#263940);--sb-line:light-dark(#dde6e1,#344a52);--sb-accent:light-dark(#326c72,#8cc7c7);--sb-space-bg:light-dark(#f3f5f2,#101c23);--sb-star-ink:light-dark(#294650,#c5d9df);--sb-star-muted:light-dark(#728b93,#7b9da8);--sb-physim:light-dark(#3a767d,#91c8cd);--sb-secondbrain:light-dark(#6b77a8,#a8b5e3);--sb-research:light-dark(#a78658,#ceb084)}
+#secondbrain-lumen-liquid .sb-atlas .sb-workspace {display:grid;grid-template-columns:minmax(0,1fr) 290px}
+#secondbrain-lumen-liquid .sb-atlas-scene {position:relative;min-width:0}
+#secondbrain-lumen-liquid .sb-atlas .sb-reader {position:relative;inset:auto;width:auto;border:0;border-left:1px solid var(--sb-line);border-radius:0;box-shadow:none;padding:28px 25px}
+#secondbrain-lumen-liquid .sb-atlas .sb-overline {color:var(--sb-ink)}
+#secondbrain-lumen-liquid .sb-atlas .sb-overline span {color:var(--sb-muted)}
+#secondbrain-lumen-liquid .sb-atlas .sb-camera {left:20px}
+#secondbrain-lumen-liquid .sb-atlas .sb-note-body {font-size:14px}
+#secondbrain-lumen-liquid .sb-atlas .sb-reader[hidden] {display:block}
+#secondbrain-lumen-liquid .sb-reading-extra p {color:var(--sb-muted)}
+#secondbrain-lumen-liquid .sb-window {color-scheme:dark;position:relative}
+#secondbrain-lumen-liquid .sb-header {position:absolute;top:14px;left:14px;right:14px;border:0;border-radius:14px;min-height:64px;padding:10px 18px;background:var(--sb-panel)}
+#secondbrain-lumen-liquid .sb-lumen .sb-header {background:transparent}
+#secondbrain-lumen-liquid .sb-lumen .sb-brand,#secondbrain-lumen-liquid .sb-lumen .sb-header label {color:#dce9fb}
+#secondbrain-lumen-liquid .sb-workspace {min-height:0}
+#secondbrain-lumen-liquid .sb-overline {top:108px}
+#secondbrain-lumen-liquid .sb-glass-scene,#secondbrain-lumen-liquid .sb-focus-scene {position:absolute;inset:0}
+#secondbrain-lumen-liquid .sb-glass {--sb-space-bg:#0a1120;--sb-physim:#91c8db;--sb-secondbrain:#aeb4db;--sb-research:#c5b396}
+#secondbrain-lumen-liquid .sb-glass .sb-header,#secondbrain-lumen-liquid .sb-glass .sb-reader,#secondbrain-lumen-liquid .sb-glass .sb-camera,#secondbrain-lumen-liquid .sb-glass .sb-mini-card {background:rgba(30,46,66,.7);backdrop-filter:blur(20px) saturate(125%);border:1px solid rgba(218,234,255,.16);box-shadow:0 16px 48px rgba(0,0,0,.24),inset 0 1px 0 rgba(230,244,255,.08)}
+#secondbrain-lumen-liquid .sb-glass .sb-reader {bottom:76px;right:24px;width:268px}
+#secondbrain-lumen-liquid .sb-related-cards {position:absolute;left:24px;bottom:98px;width:192px;display:flex;flex-direction:column;gap:14px;z-index:1}
+#secondbrain-lumen-liquid .sb-mini-card {display:block;text-align:left;border-radius:15px;padding:15px 17px}
+#secondbrain-lumen-liquid .sb-mini-card span,#secondbrain-lumen-liquid .sb-mini-card small {display:block;font-size:10px;color:#a6bbd4;letter-spacing:.07em}
+#secondbrain-lumen-liquid .sb-mini-card strong {display:block;font-size:13px;font-weight:500;margin:7px 0 5px}
+#secondbrain-lumen-liquid .sb-mini-card small {font-size:11px;letter-spacing:0}
+#secondbrain-lumen-liquid .sb-focus-design .sb-reader {left:26%;right:26px;bottom:77px;width:auto;padding:20px 24px;border-radius:18px}
+#secondbrain-lumen-liquid .sb-focus-design .sb-reader h2 {margin:9px 0}
+#secondbrain-lumen-liquid .sb-focus-design .sb-reading-extra {display:none}
+#secondbrain-lumen-liquid .sb-focus-design .sb-note-meta {margin:8px 0}
+#secondbrain-lumen-liquid .sb-focus-design .sb-focus {position:absolute;right:24px;bottom:20px;width:auto;margin:0}
+#secondbrain-lumen-liquid .sb-focus-design .sb-neighbors {padding-right:190px}
+#secondbrain-lumen-liquid .sb-focus-design .sb-note-body {max-width:520px}
+@media(max-width:700px) {
+  #secondbrain-lumen-liquid .sb-window {height:865px;border-radius:14px}
+  #secondbrain-lumen-liquid .sb-header {padding:12px 16px;gap:10px;flex-wrap:wrap}
+  #secondbrain-lumen-liquid .sb-brand {flex-basis:100%}
+  #secondbrain-lumen-liquid .sb-project-label,#secondbrain-lumen-liquid .sb-search-label {flex:1;min-width:110px}
+  #secondbrain-lumen-liquid select,#secondbrain-lumen-liquid input {width:100%}
+  #secondbrain-lumen-liquid .sb-reader {position:absolute;bottom:74px;left:16px;right:16px;width:auto;max-width:none;padding:18px}
+  #secondbrain-lumen-liquid .sb-reader h2 {margin:10px 0 8px;font-size:21px}
+  #secondbrain-lumen-liquid .sb-note-meta {margin:12px 0 6px}
+  #secondbrain-lumen-liquid .sb-focus {margin-top:12px}
+  #secondbrain-lumen-liquid .sb-orbit .sb-workspace {grid-template-columns:1fr}
+  #secondbrain-lumen-liquid .sb-orbit-nav {display:none}
+  #secondbrain-lumen-liquid .sb-orbit .sb-reader {left:16px;right:16px;bottom:74px;width:auto}
+  #secondbrain-lumen-liquid .sb-atlas .sb-workspace {display:flex;flex-direction:column}
+  #secondbrain-lumen-liquid .sb-atlas-scene {flex:1;min-height:300px}
+  #secondbrain-lumen-liquid .sb-atlas .sb-reader {border-left:0;border-top:1px solid var(--sb-line);padding:18px}
+  #secondbrain-lumen-liquid .sb-reading-extra {display:none}
+  #secondbrain-lumen-liquid .sb-footer {align-items:flex-start;flex-direction:column;gap:4px;padding:10px 16px}
+  #secondbrain-lumen-liquid .sb-overline {left:20px;top:20px}
+  #secondbrain-lumen-liquid .sb-camera {left:16px;bottom:16px}
+  #secondbrain-lumen-liquid .sb-header {top:9px;left:9px;right:9px;padding:10px 12px}
+  #secondbrain-lumen-liquid .sb-overline {top:150px}
+  #secondbrain-lumen-liquid .sb-glass .sb-reader,#secondbrain-lumen-liquid .sb-focus-design .sb-reader {left:16px;right:16px;bottom:74px;width:auto}
+  #secondbrain-lumen-liquid .sb-related-cards {left:auto;right:14px;top:157px;bottom:auto;width:145px}
+  #secondbrain-lumen-liquid .sb-related-cards .sb-mini-card:last-child {display:none}
+  #secondbrain-lumen-liquid .sb-mini-card {padding:11px}
+  #secondbrain-lumen-liquid .sb-focus-design .sb-neighbors {padding-right:0}
+  #secondbrain-lumen-liquid .sb-focus-design .sb-focus {position:static;width:100%;margin-top:12px}
+}
+@media(pointer:coarse) {#secondbrain-lumen-liquid button {min-height:44px}#secondbrain-lumen-liquid input,#secondbrain-lumen-liquid select {height:40px;font-size:16px}#secondbrain-lumen-liquid .sb-close {min-width:44px}}
+</style>
+<style>
+#secondbrain-lumen-liquid .sb-window {--lg-light-x:35%;--lg-light-y:5%;--lg-edge-strength:.7}
+#secondbrain-lumen-liquid .sb-lumen .sb-header {top:18px;left:18px;right:18px;min-height:74px;padding:14px 23px;border-radius:26px}
+#secondbrain-lumen-liquid .sb-lumen .sb-reader {right:26px;bottom:82px;width:294px;padding:24px;border-radius:28px}
+#secondbrain-lumen-liquid .sb-lumen .sb-camera {left:26px;bottom:45px;padding:7px;border-radius:999px}
+#secondbrain-lumen-liquid .sb-lumen .lg-surface {background:transparent;border:1px solid rgba(225,241,255,.22);box-shadow:0 18px 46px rgba(0,0,0,.32),0 3px 8px rgba(0,0,0,.18),inset 0 1px 1px rgba(250,255,255,.24),inset 0 -1px 1px rgba(178,211,245,.1);isolation:isolate;overflow:hidden}
+#secondbrain-lumen-liquid .lg-surface::before {content:"";position:absolute;inset:0;pointer-events:none;z-index:1;border-radius:inherit;background:radial-gradient(ellipse at var(--lg-light-x) var(--lg-light-y),rgba(222,241,255,.17),transparent 58%),linear-gradient(145deg,rgba(238,249,255,.12),transparent 35%,rgba(196,218,255,.015) 64%,rgba(187,217,255,.07));opacity:var(--lg-edge-strength)}
+#secondbrain-lumen-liquid .lg-surface::after {content:"";position:absolute;inset:0;padding:1.5px;pointer-events:none;z-index:3;border-radius:inherit;background:linear-gradient(145deg,rgba(252,255,255,.78),rgba(210,232,255,.13) 23%,rgba(191,211,255,.035) 46%,rgba(221,240,255,.35) 76%,rgba(253,255,255,.6));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;opacity:var(--lg-edge-strength)}
+#secondbrain-lumen-liquid .lg-surface > :not(.lg-optics) {position:relative;z-index:2}
+#secondbrain-lumen-liquid .lg-optics {position:absolute;inset:0;width:100%;height:100%;border-radius:inherit;pointer-events:none;z-index:0}
+#secondbrain-lumen-liquid .sb-reader h2 {font-size:25px;line-height:1.2;letter-spacing:-.04em;margin:21px 0 13px}
+#secondbrain-lumen-liquid .sb-reader p {font-size:14px;line-height:1.7;color:#e0e9f6;text-shadow:0 1px 4px rgba(1,6,15,.65)}
+#secondbrain-lumen-liquid .sb-reader .sb-kicker {color:#b9c9de}
+#secondbrain-lumen-liquid .sb-lumen button {background:rgba(165,203,247,.045);border:1px solid rgba(235,246,255,.13);border-radius:999px;box-shadow:inset 0 1px 0 rgba(236,247,255,.08);color:#e8f1ff;transition:background .15s ease,box-shadow .15s ease}
+#secondbrain-lumen-liquid .sb-lumen button:hover {background:rgba(203,226,255,.13);box-shadow:inset 0 1px 0 rgba(243,250,255,.21),0 0 15px rgba(165,205,255,.06)}
+#secondbrain-lumen-liquid .sb-lumen button:active {background:rgba(221,238,255,.21)}
+#secondbrain-lumen-liquid .sb-lumen .sb-close {width:31px;height:31px;min-height:31px;display:flex;align-items:center;justify-content:center;line-height:1;font-size:20px}
+#secondbrain-lumen-liquid .sb-lumen .sb-camera button {height:31px;min-width:33px;border:0;box-shadow:none}
+#secondbrain-lumen-liquid .sb-lumen .sb-focus {height:39px;color:#d4e9ff;background:linear-gradient(160deg,rgba(219,238,255,.13),rgba(150,193,246,.065));border-color:rgba(230,246,255,.18)}
+#secondbrain-lumen-liquid .sb-lumen input,#secondbrain-lumen-liquid .sb-lumen select {border-radius:999px;background:rgba(7,17,31,.17);color:#edf5ff;border:1px solid rgba(234,246,255,.15);box-shadow:inset 0 1px 3px rgba(2,8,18,.19);height:34px}
+#secondbrain-lumen-liquid .sb-lumen .sb-footer {position:absolute;bottom:0;left:0;right:0;z-index:3;background:transparent;border:0;pointer-events:none;color:#9aaac2;font-size:11px;padding:12px 26px}
+#secondbrain-lumen-liquid .sb-lumen .sb-overline {top:119px;left:28px}
+#secondbrain-lumen-liquid .sb-lumen .sb-note-meta {color:#b4c5db}
+@media(max-width:700px) {
+  #secondbrain-lumen-liquid .sb-lumen .sb-header {top:12px;left:12px;right:12px;padding:13px 16px;border-radius:23px}
+  #secondbrain-lumen-liquid .sb-lumen .sb-overline {top:159px;left:22px}
+  #secondbrain-lumen-liquid .sb-lumen .sb-reader {left:16px;right:16px;bottom:100px;width:auto;padding:22px}
+  #secondbrain-lumen-liquid .sb-lumen .sb-camera {left:17px;bottom:57px}
+  #secondbrain-lumen-liquid .sb-lumen .sb-footer {padding:10px 18px}
+}
+@media(prefers-reduced-transparency:reduce) {
+  #secondbrain-lumen-liquid .sb-lumen .lg-surface {background:#172231}
+  #secondbrain-lumen-liquid .lg-optics {opacity:.05}
+}
+@media(prefers-reduced-motion:reduce) {#secondbrain-lumen-liquid .sb-lumen button {transition:none}}
+</style>
+<script>
+(function(){
+  const root=document.getElementById('secondbrain-lumen-liquid');
+  if(!root)return;
+  const sample=[
+    {id:'physim',title:'Physim',group:'physim',hub:true,pos:[-240,-40,0],body:'Das Projekt als eigener Wissensraum. Auftrag, Erkenntnisse, Quellen und Entscheidungen bleiben verbunden.'},
+    {id:'energie',title:'Energieerhaltung',group:'physim',pos:[-340,-170,40],body:'Wie lässt sich die Energie einer Simulation über lange Zeit stabil halten? Eine Beispielnotiz für Physim.'},
+    {id:'integration',title:'Numerische Integration',short:'Integration',group:'physim',pos:[-120,-180,-70],body:'Methoden, Genauigkeit und Stabilität gemeinsam betrachten. Diese Beispielnotiz verknüpft die mathematische Idee mit einer Simulation.'},
+    {id:'experiment',title:'Experimente',group:'physim',pos:[-100,90,90],body:'Versuche und Beobachtungen sammeln. Ein Ergebnis bleibt mit der Fragestellung und den verwendeten Quellen verbunden.'},
+    {id:'sources',title:'Quellen',group:'physim',pos:[-420,75,-60],body:'Originalquellen bilden die Grundlage. Von einer Erkenntnis gelangst du direkt zu ihren Belegen.'},
+    {id:'fragen',title:'Offene Fragen',group:'physim',pos:[-270,175,70],body:'Was fehlt noch für den nächsten Schritt? Offene Fragen bleiben sichtbar und lassen sich gezielt mit anderem Wissen verbinden.'},
+    {id:'secondbrain',title:'SecondBrain',group:'secondbrain',hub:true,pos:[260,-60,-100],body:'Die eigene Anwendung als Projektwelt: Ziele, C-Kern, Oberfläche und Nachweise.'},
+    {id:'ui',title:'UI-Gestaltung',group:'secondbrain',pos:[390,-180,-30],body:'Gestaltung mit klarer Hierarchie, gut lesbarem Text und räumlicher Orientierung. Die Galaxie ist ein Zugang zum Wissen.'},
+    {id:'core',title:'C-Kern',group:'secondbrain',pos:[120,-220,-80],body:'Projektverwaltung und Speicherung gehören zum eigenen Kern. Die Oberfläche zeigt dieselben lesbaren Projektdateien.'},
+    {id:'platform',title:'Plattformtests',group:'secondbrain',pos:[410,70,90],body:'Windows, macOS und Linux haben eigene Nachweise. Ein geplantes Merkmal und ein bestandener Test werden getrennt dokumentiert.'},
+    {id:'decisions',title:'Entscheidungen',group:'secondbrain',pos:[200,110,-100],body:'Wesentliche Entscheidungen erklären, warum ein Weg gewählt wurde. Ihre Gründe und Quellen bleiben zugänglich.'},
+    {id:'research',title:'Recherche',group:'research',hub:true,pos:[50,210,-280],body:'Eine weitere Beispielwelt für Themen, Quellen und neue Gedanken. Kein zusätzliches Projekt wurde dafür angelegt.'},
+    {id:'ideen',title:'Neue Ideen',group:'research',pos:[-90,265,-250],body:'Noch ungeordnete Gedanken können im Eingang gesammelt und später mit einem passenden Projekt verbunden werden.'},
+    {id:'papers',title:'Fachliteratur',group:'research',pos:[120,345,-320],body:'Quellen und Erkenntnisse zusammenhalten. Eine sichtbare Verbindung soll einen nachvollziehbaren Zusammenhang darstellen.'}
+  ];
+  const edges=[['physim','energie'],['physim','integration'],['physim','experiment'],['physim','sources'],['physim','fragen'],['energie','integration'],['energie','experiment'],['integration','sources'],['secondbrain','ui'],['secondbrain','core'],['secondbrain','platform'],['secondbrain','decisions'],['ui','decisions'],['core','platform'],['research','ideen'],['research','papers'],['sources','papers'],['ui','ideen']];
+  const byId=new Map(sample.map(n=>[n.id,n]));
+  const renders=[];
+  const saved=window.openai&&window.openai.widgetState;
+  function remember(kind,state){
+    if(window.openai&&window.openai.setWidgetState)
+      window.openai.setWidgetState({modelContent:{preview:{design:kind,note:state.selected}},privateContent:{design:kind,yaw:state.yaw,pitch:state.pitch,zoom:state.zoom}}).catch(function(){});
+  }
+  root.querySelectorAll('.sb-window').forEach(function(app){
+    const kind=app.dataset.design,canvas=app.querySelector('canvas'),ctx=canvas.getContext('2d',{willReadFrequently:true});
+    if(!ctx)return;
+    const reader=app.querySelector('.sb-reader'),select=app.querySelector('select'),search=app.querySelector('input');
+    const state={selected:'energie',project:'physim',yaw:.12,pitch:.22,zoom:1,panX:0,panY:0,stars:390,glow:.65,links:true,appearance:'Dunkel',thickness:9,frost:.18,highlight:.78};
+    if(saved&&saved.modelContent&&saved.modelContent.preview&&saved.modelContent.preview.design===kind&&byId.has(saved.modelContent.preview.note))
+      state.selected=saved.modelContent.preview.note;
+    let width=1,height=1,palette={},hits=[],drag=null,scheduled=false,animation=0;
+    const probe=document.createElement('span');probe.style.display='none';app.appendChild(probe);
+    const materials=[];
+    app.querySelectorAll('.sb-header,.sb-reader,.sb-camera').forEach(function(surface){
+      surface.classList.add('lg-surface');
+      const layer=document.createElement('canvas');layer.className='lg-optics';layer.setAttribute('aria-hidden','true');surface.prepend(layer);
+      materials.push({surface:surface,layer:layer,paint:layer.getContext('2d')});
+      surface.addEventListener('pointermove',function(e){
+        const r=surface.getBoundingClientRect();
+        surface.style.setProperty('--lg-light-x',((e.clientX-r.left)/r.width*100)+'%');
+        surface.style.setProperty('--lg-light-y',((e.clientY-r.top)/r.height*100)+'%');
+      });
+      surface.addEventListener('pointerleave',function(){surface.style.removeProperty('--lg-light-x');surface.style.removeProperty('--lg-light-y');});
+    });
+    function renderMaterials(){
+      const cr=canvas.getBoundingClientRect(),source=ctx.getImageData(0,0,canvas.width,canvas.height),pixels=source.data;
+      const scaleX=canvas.width/cr.width,scaleY=canvas.height/cr.height;
+      for(const material of materials){
+        const surface=material.surface;
+        if(surface.hidden||!surface.getClientRects().length)continue;
+        const rect=surface.getBoundingClientRect(),scale=Math.min(1.25,window.devicePixelRatio||1);
+        const w=Math.max(1,Math.round(rect.width*scale)),h=Math.max(1,Math.round(rect.height*scale));
+        if(material.layer.width!==w||material.layer.height!==h){material.layer.width=w;material.layer.height=h;}
+        const image=material.paint.createImageData(w,h),out=image.data;
+        const hw=rect.width/2,hh=rect.height/2,radius=Math.min(parseFloat(getComputedStyle(surface).borderRadius)||24,hw,hh);
+        for(let py=0;py<h;py++){
+          for(let px=0;px<w;px++){
+            const lx=(px+.5)/scale,ly=(py+.5)/scale,qx=Math.abs(lx-hw)-(hw-radius),qy=Math.abs(ly-hh)-(hh-radius);
+            const ox=Math.max(qx,0),oy=Math.max(qy,0),len=Math.sqrt(ox*ox+oy*oy);
+            const distance=len+Math.min(Math.max(qx,qy),0)-radius;
+            let nx=0,ny=0;
+            if(len>.001){nx=ox/len*Math.sign(lx-hw);ny=oy/len*Math.sign(ly-hh);}
+            else if(qx>qy)nx=Math.sign(lx-hw);else ny=Math.sign(ly-hh);
+            const edge=Math.max(0,1-Math.max(0,-distance)/18),bend=state.thickness*edge*edge;
+            const sourceX=rect.left-cr.left+hw+(lx-hw)*.982+nx*bend;
+            const sourceY=rect.top-cr.top+hh+(ly-hh)*.982+ny*bend;
+            const sx=Math.max(0,Math.min(source.width-1,Math.round(sourceX*scaleX))),sy=Math.max(0,Math.min(source.height-1,Math.round(sourceY*scaleY)));
+            const input=(sy*source.width+sx)*4,output=(py*w+px)*4;
+            const frost=state.frost,shine=(Math.max(0,-nx*.65-ny*.75)*edge*edge*.055)*state.highlight;
+            out[output]=pixels[input]*(1-frost)+65*frost+255*shine;
+            out[output+1]=pixels[input+1]*(1-frost)+86*frost+255*shine;
+            out[output+2]=pixels[input+2]*(1-frost)+115*frost+255*shine;
+            out[output+3]=255;
+          }
+        }
+        material.paint.putImageData(image,0,0);
+        material.paint.globalAlpha=.13;
+        material.paint.fillStyle='#a0badc';material.paint.fillRect(0,0,w,h);material.paint.globalAlpha=1;
+      }
+    }
+    function color(variable){probe.style.color='var('+variable+')';return getComputedStyle(probe).color;}
+    function colors(){
+      palette={bg:color('--sb-space-bg'),ink:color('--sb-star-ink'),muted:color('--sb-star-muted'),physim:color('--sb-physim'),secondbrain:color('--sb-secondbrain'),research:color('--sb-research'),accent:color('--sb-accent')};
+    }
+    function point(pos){
+      let x=pos[0],y=pos[1],z=pos[2];
+      if(kind==='atlas')return {x:width*.5+(x+state.panX)*width/900*state.zoom,y:height*.5+(y+state.panY)*height/710*state.zoom,k:1,z:z};
+      const a=x*Math.cos(state.yaw)-z*Math.sin(state.yaw),b=x*Math.sin(state.yaw)+z*Math.cos(state.yaw);
+      const c=y*Math.cos(state.pitch)-b*Math.sin(state.pitch),d=y*Math.sin(state.pitch)+b*Math.cos(state.pitch);
+      const k=1000/Math.max(450,1200+d),usable=width>700?width-190:width;
+      const scale=Math.min(usable/1080,height/910)*state.zoom;
+      return {x:(width>700?usable*.5+20:width*.5)+(a+state.panX)*k*scale,y:height*(width<=700?.36:kind==='focus'?.39:.48)+(c+state.panY)*k*scale,k:k*scale,z:d};
+    }
+    function positions(){
+      if(kind!=='orbit')return sample.map(n=>({node:n,p:point(n.pos)}));
+      const group=sample.filter(n=>n.group===state.project),count=group.length-1;
+      return group.map(function(n,i){
+        if(n.hub)return {node:n,p:point([0,0,0])};
+        const angle=(i-1)/Math.max(count,1)*Math.PI*2-.9,r=145+(i%3)*39;
+        return {node:n,p:point([Math.cos(angle)*r,Math.sin(angle)*r*.58,Math.sin(angle)*r*.72])};
+      });
+    }
+    function draw(){
+      scheduled=false;
+      if(!width||!height)return;
+      ctx.clearRect(0,0,width,height);ctx.fillStyle=palette.bg;ctx.fillRect(0,0,width,height);
+      if(kind!=='atlas'){
+        [['physim',.3,.35],['secondbrain',.74,.3],['research',.52,.8]].forEach(function(a){
+          const glow=ctx.createRadialGradient(width*a[1],height*a[2],0,width*a[1],height*a[2],width*.5);
+          glow.addColorStop(0,palette[a[0]]);glow.addColorStop(1,'rgba(0,0,0,0)');
+          ctx.globalAlpha=.075*state.glow;ctx.fillStyle=glow;ctx.fillRect(0,0,width,height);ctx.globalAlpha=1;
+        });
+      }
+      for(let i=0;i<state.stars;i++){
+        const fx=(Math.sin(i*127.1+41)*43758.5453)%1,fy=(Math.sin(i*311.7+29)*12658.147)%1;
+        const x=(Math.abs(fx)*width+state.yaw*19*(i%3+1)+width)%width,y=(Math.abs(fy)*height+state.pitch*17+height)%height;
+        ctx.globalAlpha=kind==='atlas'?.13:.14+(i%7)*.055;ctx.fillStyle=palette.ink;
+        ctx.beginPath();ctx.arc(x,y,i%23===0?1.4:.6,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+      }
+      const projected=positions(),points=new Map(projected.map(v=>[v.node.id,v.p]));
+      if(kind==='orbit'){
+        ctx.strokeStyle=palette.muted;ctx.lineWidth=1;ctx.globalAlpha=.2;
+        [145,184,223].forEach(function(r){
+          ctx.beginPath();
+          for(let a=0;a<=100;a++){const theta=a/100*Math.PI*2,p=point([Math.cos(theta)*r,Math.sin(theta)*r*.58,Math.sin(theta)*r*.72]);if(!a)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);}
+          ctx.stroke();
+        });ctx.globalAlpha=1;
+      }
+      if(state.links){
+        edges.forEach(function(edge){
+          const a=points.get(edge[0]),b=points.get(edge[1]);if(!a||!b)return;
+          const active=edge.includes(state.selected);
+          ctx.strokeStyle=active?palette[byId.get(state.selected).group]:palette.muted;ctx.globalAlpha=active?.58:kind==='focus'?.055:.18;ctx.lineWidth=active?1.4:1;
+          ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.globalAlpha=1;
+        });
+      }
+      hits=[];const query=search.value.trim().toLocaleLowerCase();
+      projected.sort((a,b)=>b.p.z-a.p.z).forEach(function(v){
+        const n=v.node,p=v.p,active=n.id===state.selected,neighbor=active||edges.some(e=>e.includes(state.selected)&&e.includes(n.id)),match=(!query||n.title.toLocaleLowerCase().includes(query))&&(kind!=='focus'||neighbor);
+        if(p.x<0||p.x>width||p.y<0||p.y>height)return;
+        const r=kind==='orbit'?(n.hub?24:8+(sample.indexOf(n)%3)*3)*Math.max(.5,p.k):n.hub?7:active?5:3.3;
+        ctx.globalAlpha=match?1:.15;ctx.shadowColor=palette[n.group];ctx.shadowBlur=(kind==='atlas'?3:active?26:n.hub?20:10)*state.glow;
+        if(kind==='orbit'){
+          const gradient=ctx.createRadialGradient(p.x-r*.3,p.y-r*.35,0,p.x,p.y,r);
+          gradient.addColorStop(0,palette.ink);gradient.addColorStop(.35,palette[n.group]);gradient.addColorStop(1,palette.bg);ctx.fillStyle=gradient;
+        }else ctx.fillStyle=active?palette.ink:palette[n.group];
+        ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+        if(active){ctx.strokeStyle=palette[n.group];ctx.globalAlpha=.65;ctx.lineWidth=1;ctx.beginPath();ctx.arc(p.x,p.y,r+7,0,Math.PI*2);ctx.stroke();}
+        ctx.globalAlpha=1;hits.push({id:n.id,x:p.x,y:p.y,r:Math.max(18,r+8),node:n});
+      });
+      const occupied=[];
+      projected.sort((a,b)=>(b.node.id===state.selected?10:b.node.hub?5:0)-(a.node.id===state.selected?10:a.node.hub?5:0)).forEach(function(v){
+        const n=v.node,p=v.p,active=n.id===state.selected;
+        if(query&&!n.title.toLocaleLowerCase().includes(query))return;
+        if(kind==='focus'&&n.id!==state.selected&&!edges.some(e=>e.includes(state.selected)&&e.includes(n.id)))return;
+        if(width<400&&!active&&!n.hub)return;
+        const label=n.short||n.title;ctx.font=(n.hub?'500 ':'400 ')+(n.hub?'14':'12')+'px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+        const w=ctx.measureText(label).width,x=Math.max(12,Math.min(width-w-12,p.x+13)),y=p.y-10;
+        const box={x:x,y:y-14,w:w+12,h:20};
+        if(y<110||y>height-70||occupied.some(b=>box.x<b.x+b.w&&box.x+box.w>b.x&&box.y<b.y+b.h&&box.y+box.h>b.y))return;
+        if(kind!=='atlas'&&reader&&!reader.hidden){
+          const cr=canvas.getBoundingClientRect(),rr=reader.getBoundingClientRect();
+          if(x+w>rr.left-cr.left&&x<rr.right-cr.left&&y>rr.top-cr.top&&y<rr.bottom-cr.top)return;
+        }
+        ctx.globalAlpha=active||n.hub?1:.78;ctx.fillStyle=palette.ink;ctx.fillText(label,x,y);ctx.globalAlpha=1;occupied.push(box);
+      });
+      renderMaterials();
+    }
+    function schedule(){if(!scheduled){scheduled=true;requestAnimationFrame(draw);}}
+    function resize(){
+      const rect=canvas.getBoundingClientRect();if(rect.width<1||rect.height<1)return;
+      width=rect.width;height=rect.height;const ratio=Math.min(2,window.devicePixelRatio||1);
+      canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);ctx.setTransform(ratio,0,0,ratio,0,0);colors();schedule();
+    }
+    function content(){
+      const n=byId.get(state.selected);app.querySelector('.sb-note-title').textContent=n.title;
+      app.querySelector('.sb-note-body').textContent=n.body;
+      app.querySelector('.sb-selection').textContent=n.title;
+      app.querySelector('.sb-world-title').textContent=byId.get(state.project).title;
+      const neighbors=app.querySelector('.sb-neighbors');neighbors.replaceChildren();
+      edges.filter(e=>e.includes(n.id)).slice(0,3).forEach(function(e){
+        const id=e[0]===n.id?e[1]:e[0],b=document.createElement('button');
+        b.type='button';b.className='cursor-interaction';b.textContent=byId.get(id).short||byId.get(id).title;b.addEventListener('click',()=>choose(id,false));neighbors.appendChild(b);
+      });
+      const related=edges.filter(e=>e.includes(n.id)).map(e=>e[0]===n.id?e[1]:e[0]);
+      app.querySelectorAll('.sb-mini-card').forEach(function(card,i){
+        const other=byId.get(related[i]);card.hidden=!other;if(!other)return;
+        card.dataset.node=other.id;card.querySelector('span').textContent='VERBINDUNG';
+        card.querySelector('strong').textContent=other.title;
+        card.querySelector('small').textContent=byId.get(other.group).title+(other.hub?' · Projekt':' · Notiz');
+      });
+    }
+    function choose(id,focus){
+      if(!byId.has(id))return;state.selected=id;state.project=byId.get(id).group;select.value=state.project;
+      if(kind==='orbit'){state.project=byId.get(id).group;select.value=state.project;}
+      reader.hidden=false;const cards=app.querySelector('.sb-related-cards');if(cards)cards.hidden=false;
+      content();if(focus)focusNode();schedule();remember(kind,state);
+    }
+    function focusNode(){
+      cancelAnimationFrame(animation);
+      const n=byId.get(state.selected),pos=kind==='orbit'?[0,0,0]:n.pos;
+      const endX=kind==='atlas'?-pos[0]:-(pos[0]*Math.cos(state.yaw)-pos[2]*Math.sin(state.yaw));
+      const endY=kind==='atlas'?-pos[1]:-(pos[1]*Math.cos(state.pitch));
+      const startX=state.panX,startY=state.panY,startZ=state.zoom,targetZoom=kind==='orbit'?1.22:1.6,start=performance.now();
+      const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function move(now){const t=reduced?1:Math.min(1,(now-start)/380),ease=1-Math.pow(1-t,3);
+        state.panX=startX+(endX-startX)*ease;state.panY=startY+(endY-startY)*ease;state.zoom=startZ+(targetZoom-startZ)*ease;schedule();
+        if(t<1)animation=requestAnimationFrame(move);else remember(kind,state);
+      }animation=requestAnimationFrame(move);
+    }
+    canvas.addEventListener('pointerdown',function(e){cancelAnimationFrame(animation);drag={x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,shift:e.shiftKey,moved:false};canvas.setPointerCapture(e.pointerId);});
+    canvas.addEventListener('pointermove',function(e){
+      if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;
+      if(Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>4)drag.moved=true;
+      if(kind==='atlas'||drag.shift){state.panX+=dx*900/width/state.zoom;state.panY+=dy*710/height/state.zoom;}
+      else{state.yaw+=dx*.006;state.pitch=Math.max(-1.1,Math.min(1.1,state.pitch+dy*.004));}schedule();
+    });
+    canvas.addEventListener('pointerup',function(e){
+      if(!drag)return;
+      if(!drag.moved){const rect=canvas.getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top;
+        const nearest=hits.filter(h=>Math.hypot(h.x-x,h.y-y)<h.r).sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y))[0];
+        if(nearest)choose(nearest.id,false);
+      }drag=null;remember(kind,state);
+    });
+    canvas.addEventListener('pointercancel',()=>{drag=null;});
+    canvas.addEventListener('wheel',function(e){e.preventDefault();cancelAnimationFrame(animation);state.zoom=Math.max(.45,Math.min(3.5,state.zoom*Math.exp(-e.deltaY*.0015)));schedule();},{passive:false});
+    app.querySelectorAll('[data-action]').forEach(function(b){b.addEventListener('click',function(){
+      const a=b.dataset.action;cancelAnimationFrame(animation);
+      if(a==='in')state.zoom=Math.min(3.5,state.zoom*1.2);if(a==='out')state.zoom=Math.max(.45,state.zoom/1.2);
+      if(a==='left'){if(kind==='atlas')state.panX+=80;else state.yaw-=.3;}
+      if(a==='right'){if(kind==='atlas')state.panX-=80;else state.yaw+=.3;}
+      if(a==='home'){state.zoom=1;state.panX=0;state.panY=0;state.yaw=kind==='orbit'?-.24:.12;state.pitch=kind==='orbit'?.5:.22;}
+      schedule();remember(kind,state);
+    });});
+    app.querySelector('.sb-focus').addEventListener('click',focusNode);
+    app.querySelector('.sb-close').addEventListener('click',function(){reader.hidden=true;const cards=app.querySelector('.sb-related-cards');if(cards)cards.hidden=true;app.querySelector('.sb-selection').textContent='Wähle einen Stern';schedule();});
+    app.querySelectorAll('[data-node]').forEach(b=>b.addEventListener('click',()=>choose(b.dataset.node,false)));
+    select.addEventListener('change',function(){state.project=select.value;choose(select.value,kind!=='orbit');});
+    search.addEventListener('input',schedule);
+    function redesign(){
+      if(state.appearance==='System')app.style.removeProperty('color-scheme');else app.style.colorScheme=state.appearance==='Hell'?'light':'dark';
+      app.style.setProperty('--lg-edge-strength',state.highlight);
+      colors();schedule();
+    }
+    content();if(reader.hidden)app.querySelector('.sb-selection').textContent='Wähle einen Stern';
+    new ResizeObserver(resize).observe(canvas);resize();renders.push(redesign);
+    if(globalThis.Tweak){
+      const tweak=new Tweak({container:app,onChange:redesign});
+      tweak.addSlider(state,'stars',{label:'Sternendichte',min:40,max:850,step:10});
+      tweak.addSlider(state,'glow',{label:'Leuchten',min:.15,max:1.6,step:.05});
+      tweak.addToggle(state,'links',{label:'Verbindungen anzeigen'});
+      tweak.addSlider(state,'thickness',{label:'Linsenwirkung',min:2,max:15,step:1});
+      tweak.addSlider(state,'frost',{label:'Trübung',min:.05,max:.4,step:.025});
+      tweak.addSlider(state,'highlight',{label:'Lichtkanten',min:.25,max:1,step:.05});
+    }
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>renders.forEach(f=>f()));
+})();
+</script>
