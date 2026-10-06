@@ -83,6 +83,15 @@ beauftragt. Diese Reihenfolge gilt für die nun laufende Arbeit.
 
 ## GitHub und Nachweise
 
+## Eigenes Projektgedächtnis
+
+- [ ] Ein eigenes Second Brain für das SecondBrain-Projekt erstellen. Die
+  Anwendung soll damit auch für ihre eigene Entwicklung verwendet werden.
+  Ziele, Stand, Entscheidungen, Quellen und offene Aufgaben werden darin
+  nachvollziehbar gepflegt.
+
+## Veröffentlichung und Nachweise
+
 Jeder abgeschlossene, geprüfte Arbeitsschritt wird committet und nach
 `origin` unter `Lulus792/SecondBrain` gepusht. Die Historie bleibt erhalten.
 Die Regel gilt für Planung, Recherche, Design und Implementierung.

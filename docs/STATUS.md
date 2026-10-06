@@ -67,6 +67,11 @@ ist von der noch ausstehenden vollständigen Bedienprüfung getrennt.
 
 ## Weiter ausstehend
 
+- [ ] Ein eigenes Second Brain für dieses SecondBrain-Projekt erstellen und in
+  der Anwendung verwenden. Es soll Projektziele, aktuellen Stand, Entscheidungen,
+  Quellen und offene Aufgaben enthalten und dem Nutzer sowie der KI als
+  gemeinsames Projektgedächtnis dienen.
+
 Die eigene Oberfläche mit allen geplanten Arbeitsabläufen, Darstellung und
 Bedienprüfung, Paketierung ohne Python-Laufzeit sowie die vollständigen Nachweise
 auf den drei Zielplattformen stehen aus. Das aktive Ziel bleibt die vollständige
