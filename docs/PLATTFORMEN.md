@@ -4,9 +4,9 @@ Windows, macOS und Linux sind verbindliche Zielplattformen. Der vorhandene
 Strukturprototyp benötigt Python ab 3.10 und verwendet ausschließlich dessen Standardbibliothek.
 Markdown und JSON werden in UTF-8 geschrieben; generierte Dateien verwenden LF.
 
-Die [geplante eigene Anwendung](PROJEKTPLAN.md) wird in C umgesetzt. Die folgenden
-Nachweise gelten ausschließlich für den Python-Prototyp. Plattformprüfungen der
-C-Anwendung und ihrer zukünftigen Oberfläche stehen noch aus.
+Die [eigene Anwendung](PROJEKTPLAN.md) wird in C umgesetzt. Die folgenden
+Prototypnachweise betreffen Python; die native C-Prüfung steht im eigenen Abschnitt
+weiter unten. Die vollständige Prüfung der Projektoberfläche steht noch aus.
 
 ## Prüfungsumfang
 
@@ -46,6 +46,22 @@ Die Runner-Bezeichnungen bezeichnen die tatsächlich verwendete CI-Matrix.
 Sie sind keine Zusage für jede historische Windows-, macOS- oder Linux-Version.
 
 ## Grenzen
+
+## Native C Prüfung
+
+Der [Lauf zu 4c99bb3](https://github.com/Lulus792/SecondBrain/actions/runs/37435200479)
+besteht am 6. Oktober 2026 mit sechs erfolgreichen C17-Jobs: Windows, macOS und
+Ubuntu, jeweils Debug und Release. Dabei werden die C-Bibliothek und das native
+Kommandozeilenwerkzeug gebaut. Der Dateiablauf prüft Erstellung, Wiederöffnung,
+UTF-8, Suche, Speicherkonflikte, Archivierung, KI-Kontext und Metadaten.
+
+Lokal bestehen außerdem Kern- und UI-Grundlagenprüfung mit AppleClang 16 auf
+Intel macOS 14.6.1 sowie zusätzliche Läufe mit AddressSanitizer und
+UndefinedBehaviorSanitizer. Die UI-Prüfung rendert mit dem nativen Cocoa-Fenster
+und SDL-Softwarerenderer. Sie belegt Renderer und Editorbausteine; die vollständige
+Projektoberfläche wird daraus noch aufgebaut.
+
+## Grenzen der Nachweise
 
 Die Prüfungen belegen das getestete Verhalten des Generators. Sie bewerten
 keine KI-Integration oder Drittprogramme wie Obsidian. Die lokale Physim-Instanz

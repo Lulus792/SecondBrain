@@ -37,8 +37,23 @@ liefert Treffer aus Projektauftrag, Entscheidungen und Wissensnotiz.
 Die Tests prüfen echte Dateien: Erstellung, Wiederöffnung, UTF-8, Suchtreffer,
 Speicherkonflikte, Archivierung, Kontext und gültige beziehungsweise fehlerhafte
 JSON-Metadaten. Die C17-CI-Matrix ergänzt die bisherigen Python-Prüfungen um
-Windows, macOS und Linux in Debug und Release. Ergebnisse dieser Matrix werden
-nach den jeweiligen GitHub-Läufen dokumentiert.
+Windows, macOS und Linux in Debug und Release.
+Der [C17-Lauf zu 4c99bb3](https://github.com/Lulus792/SecondBrain/actions/runs/37435200479)
+besteht auf allen drei Systemen in beiden Buildprofilen.
+
+## Implementierte UI Grundlage
+
+SDL3 und Nuklear sind ausschließlich im UI-Ziel eingebunden. Die Grundlage
+verarbeitet Texteingaben, stellt Schriften mit passender Pixeldichte dar und
+bietet helle und dunkle Farben sowie vergrößerte Schrift. UI-Quellen, Versionen
+und Lizenzen sind unter third_party dokumentiert.
+
+Lokal bestehen Renderer- und Editorprüfungen, auch mit AddressSanitizer und
+UndefinedBehaviorSanitizer. Sie prüfen Unicode-Paste, Auswahlersetzung,
+Rückgängig/Wiederholen, lange Cursorpositionen, Kapazitätsfehler und mehrteilige
+Texteingaben. Die tatsächliche Testdarstellung wurde betrachtet. Die UI-CI
+prüft diese Grundlage zusätzlich mit nativen Fenstersystemen der drei Plattformen.
+Ergebnisse werden nach dem jeweiligen Lauf ergänzt.
 
 ## Weiter ausstehend
 
