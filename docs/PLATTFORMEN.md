@@ -223,3 +223,40 @@ Clipboard-Tests gestörte Wege bestehen seriell wiederholt mit ASan/UBSan.
 Kleine Darstellungen bei 200 Prozent Schrift und echte Hintergrundarbeit wurden
 als Softwarebilder betrachtet. Fehler-Injektion ist ausdrücklich kein physisch
 volles Volume. Native Screenreader, reale GPU-/Display- und Langzeitnachweise fehlen.
+
+
+## 0.5.0: native Zugänglichkeitsadapter
+
+Der [Lauf zu 0c9fc8b](https://github.com/Lulus792/SecondBrain/actions/runs/37512645717) ist erfolgreich abgeschlossen: 18 Jobs.
+Je 15 Desktoptests bestehen in Debug/Release auf Windows x64, macOS ARM64 und
+Linux x64. Die drei tatsächlich entpackten Release-Pakete bestehen die bisherigen
+Maus-/Tastatur-/Sicherungswege, Einstellungsneustart und Produktions-CLI-Sicherung.
+Damit wird unter Windows auch das Laden der ausgelieferten AccessKit-DLL geprüft.
+
+Der Test native-accessibility benutzt auf macOS tatsächlich NSAccessibility:
+Rollen, Namen, Textwerte, Press-Aktionen, Auswahl und Lesewerte. Auf Windows/Linux
+prüft er in dieser Fassung den gemeinsamen Snapshot-/Aktionsvertrag; eine native
+UIA-/AT-SPI-Clientabfrage wird damit nicht behauptet. Menschliche VoiceOver/NVDA/
+Orca-Abnahme bleibt auf allen Systemen offen.
+
+Lokal auf Intel macOS 14.6.1 bestehen alle 15 Release-Tests in 168,90 Sekunden;
+die Zugänglichkeitsprüfung umfasst 107 Aussagen. CPack erzeugt das Intel-Paket
+mit der korrekten Bundle-Version und allen vier unveränderten AccessKit-Hinweisen.
+Der folgende Sanitizer-/Paketprüfstand wird nach seinem Abschluss ergänzt.
+
+
+### Lokale Abschlussprüfung 0.5.0
+
+Alle 15 Tests bestehen auch im seriellen ASan/UBSan-Lauf (318,88 Sekunden),
+einschließlich 107 Zugänglichkeitsaussagen. Der Anwendungscode ist instrumentiert;
+die vorgebaute AccessKit-Bibliothek ist es intern nicht. Der entpackte Intel-Mac-
+Build startet aus einem verschobenen Unicode-Pfad und rendert das eigene Projekt;
+das tatsächliche Bild wurde betrachtet. Die entpackte Produktions-CLI besteht
+den Sicherungs-/Prüf-/Wiederherstellungsablauf. Die lokale App unter
+`dist/SecondBrain/secondbrain.app` ist auf 0.5.0 aktualisiert.
+
+Paket SHA-256 (SecondBrain-0.5.0-Darwin-x86_64.tar.gz):
+`3261e6420d9d49caf825318cf435f6e990fd0dd76f720299a04f3d6ce9203bed`.
+Dies ist keine neue vollständige lokale Paket-Bedienabnahme: alle vollständigen
+entpackten Paketwege sind im oben genannten Crossplatform-Lauf belegt. Der
+komplette Release-Auftrag bleibt aktiv; die Versionsnummer 1.0 bleibt gesperrt.

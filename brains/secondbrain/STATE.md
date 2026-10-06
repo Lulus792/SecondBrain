@@ -48,8 +48,10 @@ Sanitizer-Nachprüfung nach dem korrigierten Clipboard-Prüfbetrieb.
 0.5.0 bindet AccessKit ausschließlich in der UI an alle drei Plattformadapter an.
 Der native macOS-Provider wird tatsächlich über NSAccessibility abgefragt und
 bedient: Schaltflächen, Texteingaben, Notizerstellung, Speichern, Auswahl und Lesen.
-Alte Aktionen nach Dokumentwechsel werden verworfen. Die Gesamt-/Plattformprüfung
-läuft noch; UIA-/AT-SPI-Clientabfragen und menschliche Screenreader-Abnahme bleiben
+Alte Aktionen nach Dokumentwechsel werden verworfen. Die [Plattformprüfung zu 0c9fc8b](https://github.com/Lulus792/SecondBrain/actions/runs/37512645717) besteht mit 18 Jobs,
+15 Desktoptests je Debug/Release und drei entpackten Paketen. Lokal bestehen
+alle 15 Release- und ASan/UBSan-Tests. Das entpackte Intel-Paket startet
+aus einem Unicode-Pfad; dist/SecondBrain ist auf 0.5.0 aktualisiert. UIA-/AT-SPI-Clientabfragen und menschliche Screenreader-Abnahme bleiben
 offen. [Umfang und Grenzen](../../docs/BARRIEREFREIHEIT_PLAN.md).
 
 ## Auftrag und verbleibende Abnahmen
