@@ -118,7 +118,10 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
     if (!strcmp(opened,d->model.path)) key(d,SDLK_RIGHT,0);
     if (!strcmp(opened,d->model.path)) key(d,SDLK_DOWN,0);
     CHECK(strcmp(opened,d->model.path) && !d->model.guard && d->card);
-    CHECK(d->view_pan_x != d->pan_x || d->view_pan_y != d->pan_y);
+    CHECK(d->flight<1);
+    float flight_x=d->focus_x, flight_z=d->focus_z;
+    for (unsigned i=0;i<15;++i) frame(d);
+    CHECK(d->focus_x!=flight_x || d->focus_z!=flight_z);
     key(d,SDLK_F,MOD); type(d,"Vor dem Wechsel");
     CHECK(d->hits.count == 1 && d->browser && !strcmp(d->focus,"search"));
     CHECK(activate(d,"note:inbox/erkenntnis.md")); CHECK(!strcmp(d->model.path,saved));
@@ -134,6 +137,12 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
         strcat(many,row);
     }
     key(d,SDLK_E,MOD); replace(d,many); key(d,SDLK_S,MOD); key(d,SDLK_E,MOD);
+    key(d,SDLK_F10,SDL_KMOD_SHIFT);
+    CHECK(d->form==SB_FORM_ACTIONS && !strcmp(d->focus,"context"));
+    key(d,SDLK_DOWN,0); CHECK(!strcmp(d->focus,"reload"));
+    key(d,SDLK_UP,0); CHECK(!strcmp(d->focus,"context"));
+    key(d,SDLK_UP,0); CHECK(!strcmp(d->focus,"help-actions"));
+    key(d,SDLK_ESCAPE,0); CHECK(d->form==SB_FORM_NONE);
     CHECK(d->target_count > 300);
     CHECK(reach(d,"reader"));
     key(d,SDLK_PAGEDOWN,0);

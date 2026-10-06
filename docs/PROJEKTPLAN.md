@@ -136,3 +136,19 @@ Kern-, UI-, Desktop- und Paketprüfungen.
 
 Die offene Release-Liste unterscheidet notwendige Abnahmen und mögliche spätere
 Erweiterungen. Entwicklungsnachweise bleiben während der Arbeit erhalten.
+
+## Auftrag vor 1.0
+
+- [x] Archiv-Navigation und Rückkehr jederzeit zugänglich halten.
+- [x] Scrollgrenzen mit begrenzter elastischer Rückmeldung ohne Hochspringen prüfen.
+- [x] Aktionen und vergleichbare Menüs mit Auf-/Ab-Pfeilen bedienen.
+- [x] Layout, Innenabstände, Rundungen und feste Schließen-Knöpfe in allen Ansichten prüfen.
+- [x] Große Leseansicht neben Bearbeiten anbieten.
+- [x] Löschen in das Suchfeld integrieren und eigene Icons verwenden.
+- [x] Räumliche Kamerafahrt und Parallaxe implementieren und prüfen.
+- [ ] Alle offenen Arbeiten der [Release-Liste](RELEASE.md) umsetzen und abnehmen.
+- [ ] Die Versionsnummer 1.0 erst nach ausdrücklicher Nutzerfreigabe setzen.
+
+Die eigene Lizenz ist auf Nutzerentscheidung MIT. Herausgeberzertifikate sind
+noch nicht vorhanden. Die [erneute UI-Recherche](UI_POLITUR.md) dokumentiert
+Grundlagen, konkrete Änderungen und Abnahmekriterien.

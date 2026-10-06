@@ -11,11 +11,13 @@ typedef enum {
     SB_CMD_ARCHIVE, SB_CMD_RELOAD, SB_CMD_THEME, SB_CMD_SCALE, SB_CMD_SOURCE
 } SBCommand;
 typedef enum { SB_FOCUS_BUTTON, SB_FOCUS_TEXT, SB_FOCUS_MAP, SB_FOCUS_READER } SBFocusKind;
-typedef struct { char id[100]; struct nk_rect bounds; SBFocusKind kind; int group; } SBTarget;
+typedef struct { char id[100], label[SB_NAME_CAP]; struct nk_rect bounds; SBFocusKind kind; int group; } SBTarget;
 typedef struct {
-    float position, destination, pending;
+    float position, destination, pending, maximum, elastic;
     nk_uint applied;
-    bool active, ready, used;
+    bool active, ready, used, measured, dragging;
+    float width,height,grab;
+    struct nk_rect track,thumb;
 } SBScroll;
 typedef struct {
     SBUi ui;
@@ -44,7 +46,10 @@ typedef struct {
     float yaw, pitch, zoom, pan_x, pan_y, drag_x, drag_y;
     float view_yaw, view_pitch, view_zoom, view_pan_x, view_pan_y, seconds;
     SBScroll scrolling[4];
-    bool follow_star;
+    bool follow_star, expanded;
+    float focus_x,focus_y,focus_z,flight_from[3],flight_to[3],flight;
+    float map_cx,map_cy,map_unit,map_target_cx,map_target_cy,map_target_unit;
+    bool map_ready;
     size_t star, page, project_page;
     char focus[100], activate[100], saved_focus[100], source_focus[100];
     int focus_group, focus_scroll_frames;

@@ -90,6 +90,7 @@ build/app/secondbrain --workspace brains --project secondbrain
 | Kamera drehen | Umschalt+Pfeile |
 | Zoomen / Kamera zurücksetzen | +, − / Pos1 |
 | Lesebereich scrollen | Bild auf / Bild ab |
+| Aktionen öffnen / darin wechseln | Umschalt+F10 / Pfeile auf und ab |
 | Speichern / Suche / Bearbeiten | Command/Control+S / F / E |
 | Neue Notiz / neues Projekt | Command/Control+N / Umschalt+N |
 | Zurück oder abbrechen / Hilfe | Escape / F1 |
@@ -99,6 +100,9 @@ Editor; Ctrl+I fügt dort einen Tabulator ein. Mit der Maus: Ziehen dreht die
 Sternkarte, Umschalt+Ziehen verschiebt sie, das Mausrad zoomt. Über einer Karte
 scrollt es den Inhalt. Weitere Kürzel stehen in der eingebauten Hilfe und im
 [Tastaturvertrag](docs/UI_TASTATUR.md).
+
+„Groß lesen“ erweitert die Leseansicht auf die verfügbare Fläche. Die Bereichswahl
+bleibt auch nach dem Öffnen eines Archivdokuments erreichbar.
 
 Vor einem Dokumentwechsel oder dem Beenden fragt die App nach ungespeicherten
 Änderungen. Bei einer extern geänderten Datei kannst du deine Fassung als neue
@@ -121,8 +125,8 @@ im Einsatz. [Konzept und Arbeitsweise](docs/KONZEPT.md).
 Der fachliche Kern verwendet C und Betriebssystem-APIs. SDL3 und Nuklear werden
 für die UI eingesetzt. Die Herkunft und Lizenzen der Abhängigkeiten stehen unter
 [third_party](third_party/README.md); die Architektur in [docs/ARCHITEKTUR.md](docs/ARCHITEKTUR.md).
-Eine Projektlizenz für den eigenen Code muss vor dem öffentlichen 1.0-Release
-noch festgelegt werden.
+Der eigene Code steht unter der [MIT-Lizenz](LICENSE). Für die UI-Abhängigkeiten
+und Schriften gelten ihre jeweiligen mitgelieferten Lizenzen.
 
 Den Kern kannst du separat bauen:
 

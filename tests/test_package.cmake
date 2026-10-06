@@ -35,7 +35,7 @@ else()
 endif()
 foreach(SB_RESOURCE IN ITEMS "${SB_EXECUTABLE}" "${SB_ASSETS}/fonts/NotoSans-Regular.ttf"
     "${SB_ASSETS}/fonts/NotoSansMono-Regular.ttf" "${SB_ROOT}/licenses/SDL3.txt"
-    "${SB_ROOT}/licenses/Nuklear.txt" "${SB_ROOT}/licenses/Noto.txt" "${SB_ROOT}/QUICKSTART.txt")
+    "${SB_ROOT}/licenses/Nuklear.txt" "${SB_ROOT}/licenses/Noto.txt" "${SB_ROOT}/QUICKSTART.txt" "${SB_ROOT}/LICENSE")
     if(NOT EXISTS "${SB_RESOURCE}")
         message(FATAL_ERROR "Missing package resource: ${SB_RESOURCE}")
     endif()

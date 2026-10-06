@@ -1,8 +1,9 @@
 # Auf dem Weg zu 1.0
 
 Stand: 6. Oktober 2026. Diese Liste bewertet den vorhandenen Code und die
-[Distribution](DISTRIBUTION.md). Sie ist ein Vorschlag für die Release-Abnahme;
-der verbindliche Funktionsumfang von 1.0 muss noch festgelegt werden.
+[Distribution](DISTRIBUTION.md). Der Nutzer hat die offenen Arbeiten als Umsetzungsauftrag bestätigt. Die
+Versionsnummer 1.0 darf erst nach seiner ausdrücklichen Freigabe gesetzt werden.
+Die unterstützten Umgebungen und konkreten Abnahmen werden dabei festgelegt.
 Die heutige Desktop-App deckt bereits Anlegen, Lesen, Bearbeiten, Suche, Quellen,
 Archiv, Kontext und Tastaturbedienung ab. Ein vollständiger Release braucht darüber
 hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
@@ -31,7 +32,7 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   verfallen nach 30 Tagen. Signierung, macOS-Notarisierung und einfache Installation
   müssen für die gewählten Vertriebswege geklärt werden. Ein automatischer Updater
   ist optional, ein dokumentierter Updateweg notwendig.
-- [ ] **Lizenz und Support klären:** Lizenz des eigenen Codes festlegen, alle
+- [ ] **Lizenz und Support klären:** Die eigene MIT-Lizenz ist auf Nutzerentscheidung festgelegt. Noch offen: alle
   Abhängigkeiten und übernommenen Anpassungen vollständig zuordnen, Fehler- und
   Sicherheitsmeldungen sowie Wartung der UI-Abhängigkeiten organisieren.
 - [ ] **Endprodukt redaktionell prüfen:** kurze, natürliche Texte in App, Hilfe,
@@ -55,3 +56,11 @@ sichert und stellt es wieder her und aktualisiert die App ohne Verlust seines
 Projektgedächtnisses. Derselbe zugesagte Ablauf funktioniert mit Tastatur und
 unter den vereinbarten Anforderungen an Barrierefreiheit. Die Nachweise nennen
 Version, System, Testumfang und verbleibende Grenzen.
+
+## Entscheidungen des Nutzers
+
+Am 6. Oktober ist MIT als Lizenz des eigenen Codes gewählt. Ein Apple-Developer-
+Konto und ein Windows-Code-Signing-Zertifikat sind noch nicht vorhanden. Der
+Signierungsweg wird vorbereitet; tatsächliche Herausgeber-Signierung und macOS-
+Notarisierung können erst mit den entsprechenden Konten und Zertifikaten geprüft
+werden. Entwicklungspakete werden bis dahin eindeutig als solche gekennzeichnet.

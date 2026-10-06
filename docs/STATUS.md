@@ -172,3 +172,25 @@ sieben Prüfungen und beide Bedienwege aus entpackten Release-Paketen bestehen a
 Windows x64, macOS ARM64 und Linux x64. Die CI prüft versteckte native Fenster
 mit SDL-Softwarerenderer; manuelle Freigaben aller Geräte und GPU-Treiber sind
 damit weiterhin nicht behauptet. Die lokale App unter dist/SecondBrain ist aktualisiert.
+
+## Entwicklungsschritt 0.3.0: Navigation und Karten
+
+Archivdokumente schalten den Bereich nicht mehr ungefragt um. Eine globale
+Bereichswahl bleibt erreichbar. Raumfahrt verwendet Weltpositionen und Parallaxe;
+Kartenwechsel passen den Bildausschnitt weich an. Die große Leseansicht, integrierte
+Suchfeld-Löschung, eigene Vektor-Icons und feste Schließen-Knöpfe sind implementiert.
+Menüs unterstützen Auf/Ab und Umschalt+F10 öffnet Dokumentaktionen. Scrollbereiche
+verwenden eigene Begrenzung, elastische Rückmeldung und ziehbare Indikatoren.
+Projektkontext und Hintergrundnotiz halten getrennte Scrollpositionen.
+
+Lokal bestehen alle sieben Release-Prüfungen: 126 Aussagen im Maus-Bedienweg und
+105 im reinen Tastaturweg. Wiederholtes Scrollen am Ende, Archiv-Rückkehr,
+Menüpfeile und große Leseansicht sind enthalten. Leisten wurden bei kleinem Fenster
+mit 200 Prozent Schrift anhand ihrer tatsächlichen Geometrie geprüft und betrachtet.
+Neun Python-Prüfungen bestehen. Weitere Sanitizer-, Paket- und Plattformnachweise
+werden erst nach ihrem Abschluss ergänzt.
+
+Dieser Entwicklungsschritt schließt das aktive Gesamtziel nicht ab. Die weiteren
+Arbeiten der [Release-Liste](RELEASE.md) bleiben beauftragt; die Versionsnummer
+1.0 bleibt bis zur ausdrücklichen Nutzerfreigabe gesperrt. Die eigene MIT-Lizenz
+ist festgelegt. Herausgeberzertifikate sind noch nicht vorhanden.

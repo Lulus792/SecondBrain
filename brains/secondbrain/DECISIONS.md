@@ -95,3 +95,16 @@ Die README orientiert sich nach Recherche an üblichen Desktop-Projekten. Eine
 abschließende sprachliche Prüfung des Endprodukts folgt erst vor 1.0; die
 Entwicklungsdokumentation bleibt erhalten. [Release-Aufgaben](../../docs/RELEASE.md)
 und [README-Recherche](../../docs/README_RECHERCHE.md).
+
+## D11: Vollständige Vorbereitung vor 1.0
+
+Der Nutzer hat Archiv-Rückkehr, stärkere Raumfahrt, stabile Scrollgrenzen,
+Menüpfeile, überarbeitete Layouts, große Leseansicht, integrierte Suchfeld-Löschung
+und eigene Icons beauftragt. Die übrigen offenen Release-Arbeiten gehören zum
+selben Auftrag. Die Versionsnummer 1.0 bleibt ausdrücklich bis zu seiner Freigabe
+gesperrt. Recherche und Abnahme stehen in [UI_POLITUR.md](../../docs/UI_POLITUR.md).
+
+Die eigene Lizenz ist auf direkte Nutzerentscheidung MIT. Apple-Developer-Konto
+und Windows-Code-Signing-Zertifikat sind noch nicht vorhanden. Signierungswege
+werden vorbereitet; tatsächliche Herausgeber-Signierung wird erst mit den nötigen
+Konten und Zertifikaten belegt. [Release-Liste](../../docs/RELEASE.md).

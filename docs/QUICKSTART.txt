@@ -1,4 +1,4 @@
-SecondBrain 0.2.1
+SecondBrain 0.3.0
 
 Dieses Paket enthält die eigene Desktop-Anwendung. Python, ein Compiler
 und eine externe Wissensanwendung sind zum Starten nicht erforderlich.
@@ -12,9 +12,9 @@ Standardmäßig liegen deine Projektgedächtnisse im Ordner SecondBrain im
 Benutzerverzeichnis. Die Projektwahl oder Command/Control+O öffnet einen anderen Ordner.
 Mit --workspace /pfad/zum/ordner lässt sich dieser auch beim Start angeben.
 
-1. "+ Projekt" wählen, Namen und Ordnerkennung eingeben.
+1. Den Projekt-Knopf mit dem Plus-Icon wählen, Namen und Ordnerkennung eingeben.
 2. Den Projektauftrag und aktuellen Stand über "Bearbeiten" ergänzen.
-3. Mit "+ Notiz" Wissen, Ideen oder Übergaben erfassen.
+3. Mit "Notiz" und dem Plus-Icon Wissen, Ideen oder Übergaben erfassen.
 4. Bewusst speichern. Wechsel und Beenden schützen ungespeicherte Änderungen.
 5. "Aktionen > KI-Kontext" öffnet die gespeicherten Kerninformationen zum Kopieren.
 
@@ -43,3 +43,5 @@ Projekt, Quellen und Nachweise: https://github.com/Lulus792/SecondBrain
 Lizenzen der UI-Abhängigkeiten und Schriften stehen unter licenses.
 
 In den Einstellungen lassen sich Transparenz und Bewegung reduzieren.
+
+„Groß lesen“ erweitert die Leseansicht. Menüpfeile wählen Aktionen; Umschalt+F10 öffnet das Aktionsmenü.

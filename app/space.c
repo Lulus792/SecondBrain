@@ -49,6 +49,7 @@ bool sb_space_draw(SBSpace *s, SDL_Renderer *renderer, int width, int height) {
     fingerprint ^= sb_hash((const char *)s->glass, s->glass_count * sizeof(*s->glass));
     fingerprint ^= sb_hash((const char *)&s->mouse_x, sizeof(s->mouse_x)) << 1;
     fingerprint ^= sb_hash((const char *)&s->mouse_y, sizeof(s->mouse_y)) << 2;
+    fingerprint ^= sb_hash((const char *)s->camera,sizeof(s->camera));
     fingerprint ^= (uint64_t)s->dark << 3; fingerprint ^= (uint64_t)s->solid << 4;
     if (s->graph) fingerprint ^= sb_hash((const char *)s->graph->edges, s->graph->edge_count * sizeof(*s->graph->edges));
     SDL_FRect rect = {0, 0, (float)width, (float)height};
@@ -73,6 +74,25 @@ bool sb_space_draw(SBSpace *s, SDL_Renderer *renderer, int width, int height) {
     memcpy(s->sky, s->pixels, (size_t)w * h * 4);
     s->sky_ready = true; s->sky_dark = s->dark;
     } else memcpy(s->pixels, s->sky, (size_t)w * h * 4);
+    /* Decorative particles share world coordinates with the knowledge stars. */
+    if (s->camera[7]>0) for (unsigned i=0;i<280;++i) {
+        unsigned hash=i*2654435761u+29;
+        float x=((hash%10000)/10000.0f-0.5f)*2200-s->camera[0];
+        hash=hash*1664525u+1013904223u;
+        float y=((hash%10000)/10000.0f-0.5f)*1400-s->camera[1];
+        hash=hash*1664525u+1013904223u;
+        float z=(hash%10000)/10000.0f*850-180-s->camera[2];
+        float xx=x*cosf(s->camera[3])+z*sinf(s->camera[3]);
+        z=-x*sinf(s->camera[3])+z*cosf(s->camera[3]);
+        float yy=y*cosf(s->camera[4])-z*sinf(s->camera[4]);
+        z=y*sinf(s->camera[4])+z*cosf(s->camera[4]);
+        if (z<-500) continue;
+        float depth=700/(700+z);
+        float px=(s->camera[5]+xx*depth*s->camera[7])*scale;
+        float py=(s->camera[6]+yy*depth*s->camera[7])*scale;
+        const unsigned char color[]={159,184,220};
+        glow(s,px,py,clamp(depth*1.2f,0.7f,2.2f)*scale,color,clamp(depth*0.28f,0.12f,0.55f));
+    }
     if (s->graph) for (size_t i = 0; i < s->graph->edge_count; ++i) {
         SBEdge edge = s->graph->edges[i];
         if (edge.from < s->count && edge.to < s->count && s->points[edge.from].visible && s->points[edge.to].visible) {
@@ -83,7 +103,7 @@ bool sb_space_draw(SBSpace *s, SDL_Renderer *renderer, int width, int height) {
     for (size_t i = 0; i < s->count; ++i) if (s->points[i].visible) {
         SBPoint p = s->points[i];
         const unsigned char *c = colors[p.group % 5];
-        float x = p.x * scale, y = p.y * scale, radius = (p.selected ? 4.5f : 2.8f) * scale;
+        float x = p.x * scale, y = p.y * scale, radius = (p.selected ? 4.5f : 2.8f) * scale * clamp(p.depth,0.65f,1.6f);
         glow(s, x, y, (p.selected ? 24 : 15) * scale, c, 0.17f);
         glow(s, x, y, radius, c, 1);
         { const unsigned char white[] = {232,247,255}; blend(s, (int)x, (int)y, white, 1); }
@@ -121,7 +141,8 @@ bool sb_space_draw(SBSpace *s, SDL_Renderer *renderer, int width, int height) {
             float light = (0.22f - nx * 0.22f - ny * 0.29f + pointer * 0.4f) * rim;
             const float tint[] = {s->dark ? 49.0f : 235.0f, s->dark ? 67.0f : 243.0f, s->dark ? 93.0f : 252.0f};
             for (int k = 0; k < 3; ++k) {
-                float color = s->solid ? tint[k] * (s->dark ? 0.48f : 1) : sample[k] * 0.73f + tint[k] * 0.27f;
+                float substrate=s->dark ? fminf(sample[k],74) : sample[k];
+                float color = s->solid ? tint[k] * (s->dark ? 0.48f : 1) : substrate * 0.73f + tint[k] * 0.27f;
                 p[k] = byte(color + light * 130 + edge * edge * 3);
             }
         }

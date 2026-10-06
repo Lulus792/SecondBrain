@@ -67,6 +67,22 @@ beschreibt Umfang und Grenzen. Die [Release-Liste](../../docs/RELEASE.md)
 ordnet die Lücken vor 1.0; die Endprodukt-Texte werden abschließend erst vor dem
 vollständigen Release geprüft.
 
+## Aktives Ziel vor 1.0
+
+Der Nutzer hat UI-Fehler, Raumfahrt, Menünavigation und die übrigen Release-Arbeiten
+beauftragt. Die Version 1.0 ist bis zu seiner ausdrücklichen Freigabe gesperrt.
+Der erste Entwicklungsschritt 0.3.0 implementiert Archiv-Rückkehr, eigene Scrollgrenzen,
+Weltpositions-Fahrten, große Leseansicht, feste Schließen-Knöpfe und eigene Icons.
+Sieben lokale Release-Prüfungen bestehen mit 126 Maus- und 105 Tastaturaussagen;
+kleine Ansichten mit 200 Prozent Schrift wurden betrachtet. Die eigene MIT-Lizenz
+ist gewählt. Weitere Nachweise werden im [Umsetzungsstand](../../docs/STATUS.md) ergänzt.
+
+Das Gesamtziel bleibt aktiv. Nächste Arbeiten sind Sicherung/Wiederherstellung,
+dauerhafte Einstellungen, native Ordnerwahl, Screenreader-Anbindung, weitere
+Daten- und Leistungsabnahme sowie Distribution. Die vollständige [Release-Liste](../../docs/RELEASE.md)
+bleibt maßgeblich. Apple-Developer-Konto und Windows-Zertifikat fehlen noch;
+Signierungswege werden vorbereitet, tatsächliche Signierung bleibt eine externe Abnahme.
+
 ## Grenzen
 
 Keine native Screenreader-Anbindung, automatische Synchronisation oder integrierte

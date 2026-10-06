@@ -90,13 +90,16 @@ int sb_desktop_self_test(SBDesktop *d, const char *directory) {
     CHECK(sb_app_dirty(&d->model) && strstr(d->model.editor, "Messung ü."));
     CHECK(click(d, "save"));
     CHECK(!sb_app_dirty(&d->model));
-    CHECK(click(d, "read"));
+    CHECK(click(d,"read"));
+    CHECK(d->expanded && !d->editing && !sb_app_dirty(&d->model));
+    CHECK(click(d,"expand") && !d->expanded);
     CHECK(capture(d, directory, "large-lumen.bmp"));
     CHECK(click(d, "search")); type(d, "Messung");
     CHECK(!strcmp(d->search, "Messung") && d->hits.count == 1);
     CHECK(replace(d, "search", ""));
     CHECK(click(d, "edit"));
     CHECK(replace(d, "editor", "# Energie\n\nUngespeicherte Änderung.\n"));
+    CHECK(click(d,"list"));
     CHECK(click(d, "section:overview"));
     CHECK(click(d, "note:STATE.md"));
     CHECK(d->model.guard && !strcmp(d->model.path, "knowledge/energie.md"));
@@ -142,6 +145,19 @@ int sb_desktop_self_test(SBDesktop *d, const char *directory) {
     for (unsigned i=0;i<35;++i) frame(d);
     CHECK(d->scrolling[0].applied == 0 && !d->scrolling[0].active);
     CHECK(d->model.source && !strcmp(d->model.source,reference));
+    /* Repeated wheel input at the lower edge must not move the stored position up. */
+    wheel.wheel.y=-1000; SDL_PushEvent(&wheel); frame(d);
+    for (unsigned i=0;i<45;++i) frame(d);
+    nk_uint bottom=d->scrolling[0].applied;
+    CHECK(bottom>0 && bottom==(nk_uint)d->scrolling[0].maximum);
+    for (unsigned i=0;i<8;++i) {
+        wheel.wheel.y=-1; SDL_PushEvent(&wheel); frame(d);
+        CHECK(d->scrolling[0].applied==bottom && d->scrolling[0].destination==(float)bottom);
+    }
+    for (unsigned i=0;i<45;++i) frame(d);
+    CHECK(d->scrolling[0].applied==bottom && d->scrolling[0].elastic==0);
+    CHECK(!strcmp(d->model.source,reference));
+
 
     CHECK(click(d, "source-back"));
     CHECK(!d->model.source && !strcmp(d->model.path, "SOURCES.md"));
@@ -170,6 +186,21 @@ int sb_desktop_self_test(SBDesktop *d, const char *directory) {
     SDL_SetWindowSize(d->ui.window, 780, 560);
     frame(d); frame(d);
     CHECK(capture(d, directory, "small-dark.bmp"));
+    CHECK(sb_ui_fonts(&d->ui,2).code==SB_OK); frame(d); frame(d);
+    struct nk_window *bar=nk_window_find(d->ui.ctx,"Lumen tools");
+    CHECK(bar!=NULL);
+    const char *toolbar[]={"project-picker","search","clear-search","list","filter","new-note","new-project","settings","help"};
+    for (size_t k=0;k<sizeof(toolbar)/sizeof(*toolbar);++k) {
+        bool found=false;
+        for (size_t i=0;i<d->target_count;++i) if (!strcmp(d->targets[i].id,toolbar[k])) {
+            struct nk_rect r=d->targets[i].bounds;
+            found=r.x>=bar->bounds.x && r.y>=bar->bounds.y && r.x+r.w<=bar->bounds.x+bar->bounds.w+0.5f && r.y+r.h<=bar->bounds.y+bar->bounds.h+0.5f;
+        }
+        CHECK(found);
+    }
+    CHECK(capture(d,directory,"small-200.bmp"));
+    CHECK(sb_ui_fonts(&d->ui,1.5f).code==SB_OK); frame(d); frame(d);
+
     CHECK(!sb_app_dirty(&d->model) && !strcmp(d->model.path, "knowledge/energie.md"));
     CHECK(sb_path_join(path, sizeof(path), directory, "Reference.md").code == SB_OK);
     CHECK(sb_fs_read(path, &text, &length).code == SB_OK);
@@ -188,7 +219,11 @@ int sb_desktop_self_test(SBDesktop *d, const char *directory) {
     CHECK(sb_note_load(&d->model.project, "knowledge/energie.md", &text, NULL).code == SB_OK);
     CHECK(!strcmp(text, "# Extern\n")); free(text); text = NULL;
     CHECK(click(d, "actions") && click(d, "archive"));
-    CHECK(!strncmp(d->model.path, "archive/kopie-", 14) && !strcmp(d->section, "archive"));
+    CHECK(!strncmp(d->model.path,"archive/kopie-",14) && !strcmp(d->section,"all"));
+    CHECK(click(d,"filter")); CHECK(click(d,"section:archive"));
+    CHECK(!strcmp(d->section,"archive"));
+    CHECK(click(d,"filter")); CHECK(click(d,"section:all"));
+    CHECK(!strcmp(d->section,"all"));
     CHECK(click(d, "edit"));
     CHECK(replace(d, "editor", "# Übergabe\n\nBeim Beenden gespeichert.\n"));
     SDL_Event quit = {0}; quit.type = SDL_EVENT_QUIT;
