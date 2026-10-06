@@ -15,8 +15,8 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   Bestandsschutz und Konflikterkennung sind implementiert. Der
   [Datenvertrag](DATENVERTRAG.md) beschreibt ab 0.7.1 Metadatenversionen, Altformat,
   Textgrenzen und NUL-Abweisung mit erhaltenen Originalbytes. In 0.7.2 erhält die
-  Projektwahl einzelne Fehler mit Grund und erneutem Prüfen; die Plattformabnahme
-  dieses Schritts, OS-Mindestversionen und zukünftige Migrationen bleiben offen.
+  Projektwahl einzelne Fehler mit Grund und erneutem Prüfen; ihre native Plattform-
+  und Paketabnahme besteht. OS-Mindestversionen und zukünftige Migrationen bleiben offen.
 - [ ] **Wiederherstellung anbieten:** Sicherung und Wiederherstellen von Projektwissen
   mit geprüften Abbruch-, Speicherplatz- und beschädigten-Datei-Szenarien.
   Atomisches Speichern ersetzt keine Sicherung oder Versionshistorie.
