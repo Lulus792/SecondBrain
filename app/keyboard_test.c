@@ -42,6 +42,16 @@ static bool activate(SBDesktop *d, const char *id) {
     if (!reach(d,id)) return false;
     key(d,SDLK_RETURN,0); return true;
 }
+static bool same_clipboard_text(const char *actual, const char *expected) {
+    if (!actual) return false;
+    while (*expected) {
+        /* Windows' CF_UNICODETEXT uses CRLF even when SDL is given LF. */
+        if (*expected=='\n' && actual[0]=='\r' && actual[1]=='\n') ++actual;
+        if (*actual!=*expected) return false;
+        ++actual; ++expected;
+    }
+    return !*actual;
+}
 int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
     unsigned checks = 0; char path[SB_PATH_CAP], saved[SB_PATH_CAP]; char *text = NULL;
 #define CHECK(x) do { ++checks; if (!(x)) { fprintf(stderr,"KEYBOARD FAIL %d: %s (focus=%s form=%d path=%s: %s)\n",__LINE__,#x,d->focus,d->form,d->model.path,d->message.message); return 1; } } while (0)
@@ -174,7 +184,7 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
     CHECK(activate(d,"transparency") && d->solid);
     CHECK(activate(d,"about") && d->form == SB_FORM_ABOUT);
     CHECK(activate(d,"copy-version"));
-    text=SDL_GetClipboardText(); CHECK(text && !strcmp(text,sb_build_info()) && !strstr(text,d->model.project.root)); SDL_free(text); text=NULL;
+    text=SDL_GetClipboardText(); CHECK(text && same_clipboard_text(text,sb_build_info()) && !strstr(text,d->model.project.root)); SDL_free(text); text=NULL;
     CHECK(sb_path_join(path,sizeof(path),directory,"about-small.bmp").code == SB_OK);
     CHECK(sb_ui_capture(&d->ui,path).code == SB_OK);
     CHECK(activate(d,"about-back") && d->form == SB_FORM_SETTINGS);

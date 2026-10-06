@@ -765,3 +765,14 @@ ist geprüft. Das ersetzt keine erneute lokale Geräteabnahme aller Systeme.
 Versionsausgabe und tatsächlicher Start mit dem eigenen Projektgedächtnis
 bestehen. Der lokale Entwicklungsbuild meldet seine damalige Quellrevision
 mit `-dirty`; die späteren CI-Pakete erfassen ihren eigenen sauberen Commit.
+
+## Windows-Zwischenablage, 7. Oktober 2026
+
+Der erste 0.8.0-Lauf37539685660 zu ae9ee97 findet unter Windows im neuen
+Kopiertest den CF_UNICODETEXT-Zeilenwechsel: SDL3 ergänzt CR vor LF. Beide
+Versionsprozesstests bestehen; der Bytevergleich der Zwischenablage schlägt fehl.
+Original: src/video/windows/SDL_windowsclipboard.c der geladenen SDL3 3.2.30.
+Der Vergleich akzeptiert nun LF oder CRLF, erhält aber die vollständige Prüfung
+aller übrigen Zeichen. Sechs C-Prüffälle bestehen lokal: beide korrekten Formen,
+ein falscher Buchstabe, zusätzliches Zeichen, alleinstehendes CR und NULL.
+Native Wiederholungsabnahme folgt; kein erfolgreicher 0.8.0-Gesamtlauf behauptet.
