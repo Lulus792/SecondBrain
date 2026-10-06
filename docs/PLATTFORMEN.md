@@ -20,9 +20,26 @@ Begründung ausgelassen.
 ## Nachweise
 
 Am 6. Oktober 2026 bestehen lokal 9/9 Tests mit Python 3.14.0 auf macOS 14.6.1;
-der Symlink-Test wurde ausgeführt. Der GitHub-Workflow wird nach dem Push ausgewertet.
-Die CI-Matrix enthält Windows, macOS und Ubuntu, jeweils mit Python 3.10 und 3.14.
-Eine vorhandene Workflow-Datei ist allein kein Nachweis bestandener Prüfungen.
+der Symlink-Test wurde ausgeführt.
+
+Der [GitHub-Lauf für `58aac00`](https://github.com/Lulus792/SecondBrain/actions/runs/37431461978)
+besteht am selben Tag mit sechs erfolgreichen Jobs:
+
+| Runner | Python 3.10 | Python 3.14 |
+| --- | --- | --- |
+| windows-latest | bestanden | bestanden |
+| macos-latest | bestanden | bestanden |
+| ubuntu-latest | bestanden | bestanden |
+
+Im [ersten Lauf](https://github.com/Lulus792/SecondBrain/actions/runs/37431163324)
+scheitern beide Windows-Jobs. Das Lesen der UTF-8-Metadaten ohne angegebene
+Kodierung lässt sich lokal mit einem simulierten CP1252-Standard als Fehler
+reproduzieren. Die Tests lesen und schreiben ihre Textdateien jetzt ausdrücklich
+als UTF-8; der Generator verwendet bereits UTF-8. Nach der Korrektur bestehen
+die lokale Simulation und alle sechs CI-Jobs.
+
+Die Runner-Bezeichnungen bezeichnen die tatsächlich verwendete CI-Matrix.
+Sie sind keine Zusage für jede historische Windows-, macOS- oder Linux-Version.
 
 ## Grenzen
 
