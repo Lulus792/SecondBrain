@@ -284,3 +284,33 @@ VoiceOver/NVDA/Orca-Abnahme. Passive Dialog-/Hilfetexte, graphemgenaue Textläuf
 Zeilengeometrie, zurückhaltende Fortschrittsansagen und große animierte Dokumente
 bleiben offen. Ebenso OS-Vorgaben, Schrift-Fallback und übrige Release-Aufgaben.
 Die Produktversion bleibt 0.5.0; 1.0 bleibt bis zur Nutzerfreigabe gesperrt.
+
+
+## 0.5.1: abgeschlossene native Nachprüfung
+
+Der [korrigierte Lauf zu 9eeb402](https://github.com/Lulus792/SecondBrain/actions/runs/37518758088) ist mit 18 Jobs erfolgreich abgeschlossen:
+15 Desktoptests je Debug/Release auf Windows x64, macOS ARM64 und Linux x64,
+einschließlich der tatsächlichen Provider-/Clientabfragen von Titel und Hilfezeile.
+Alle drei entpackten Pakete bestehen die bisherigen Maus-, Tastatur-, Sicherungs-,
+Neustart- und Produktions-CLI-Wege. Die früheren Fehlerläufe bleiben erhalten.
+
+Lokal bestehen alle 15 Release-Prüfungen (232,23 Sekunden) vor der letzten nativen
+Korrektur und die gezielte abschließende Providerprüfung (121 Aussagen).
+Alle 15 ASan/UBSan-Prüfungen bestehen für den Zwischenstand mit Titelgeometrie
+(363,94 Sekunden). Nach lesbarem Textwert und Rollen-Anpassung bestehen zusätzlich
+native-accessibility, keyboard-workflow und backup-ui-workflow mit ASan/UBSan
+(267,30 Sekunden). Die vorgebaute UI-Bibliothek ist intern nicht instrumentiert.
+
+Das endgültige Intel-Mac-Paket startet aus einem verschobenen Unicode-Pfad,
+rendert das eigene Projekt und besteht den Produktions-CLI-Sicherungsablauf.
+Das tatsächliche Bild wurde betrachtet. Die App unter dist/SecondBrain ist auf
+0.5.1 aktualisiert. Paket-SHA-256:
+`c22d00036a8d450711357a270a3d7f11a06ab4079487cc3708857910240f498a`.
+Dies behauptet keine zusätzliche vollständige lokale Paket-Bedienabnahme;
+die vollständigen Paketwege sind im genannten Crossplatform-Lauf belegt.
+
+Offen: vollständige Dokumentstruktur, Grapheme/Zeilen, Fortschrittsansagen,
+Schrift-Fallback/OS-Vorgaben und menschliche assistive Bedienung. Der Linux-
+Clientlauf zeigt trotz erfolgreicher Abfragen AT-SPI-Cache-Signaturwarnungen.
+Die Cache-/Signal-Kompatibilität muss getrennt untersucht werden; direkte
+Abfragen beweisen sie nicht. Die gesamte Release-Liste bleibt aktiv; 1.0 bleibt gesperrt.

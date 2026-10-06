@@ -29,8 +29,9 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   eigene Schalter für Transparenz und Bewegung; OS-Einstellungen werden noch nicht übernommen.
   In 0.5.0 sind native Adapter integriert und macOS-Provideraktionen gezielt geprüft.
   UIA-/AT-SPI-Clientabfragen bestehen inzwischen auf den nativen CI-Systemen.
-  Vollständige Text-/Dialogsemantik und tatsächliche VoiceOver/NVDA/Orca-Abnahme
-  bleiben offen.
+  In 0.5.1 bestehen native Dialog-/Hilfetexte auf allen drei Systemen. Dokumentstruktur,
+  Unicode-Textgeometrie, AT-SPI-Cache-/Signal-Kompatibilität und tatsächliche
+  VoiceOver/NVDA/Orca-Abnahme bleiben offen.
 - [ ] **Leistung und Stabilität im Alltag prüfen:** große reale Wissensbasen,
   schnelle Eingabefolgen, lange Sitzungen, mehrere Displays, Skalierung und
   GPU-Treiber auf allen Zielsystemen. Die bisherigen Tests verwenden versteckte
