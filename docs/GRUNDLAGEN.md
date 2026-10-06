@@ -20,14 +20,14 @@ in konkrete Arbeit münden. [CODE bei Forte Labs](https://www.buildingasecondbra
 
 So setzen wir die Schritte im Projekt um:
 
-| Schritt | Im Alltag | Beispiel für Physim |
+| Schritt | Im Alltag | Beispiel aus einem Forschungsprojekt |
 | --- | --- | --- |
 | Erfassen | Idee, Befund oder Quelle mit Kontext notieren | Beobachtung zur Energieabweichung eines Experiments |
 | Ordnen | Einer aktuellen Aufgabe oder einem Wissensgebiet zuweisen | Untersuchung numerischer Integratoren |
 | Verdichten | Aussage, Bedingungen und Beleg herausarbeiten | Fehlerverhalten bei zwei Schrittweiten vergleichen |
 | Anwenden | Entscheidung, Umsetzung oder nachvollziehbares Ergebnis erzeugen | Verfahren anhand dokumentierter Anforderungen auswählen |
 
-Das Physim-Beispiel ist ein möglicher Arbeitsablauf, kein bereits ausgeführter
+Das Forschungsbeispiel ist ein möglicher Arbeitsablauf, kein bereits ausgeführter
 Versuch. Ein Eintrag ist besonders hilfreich, wenn er beantwortet: Was bedeutet
 das, warum interessiert es uns und wo können wir es überprüfen?
 
@@ -38,7 +38,7 @@ fortlaufende Verantwortungsbereiche, Resources für möglicherweise nützliche
 Themen und Archives für abgeschlossene oder inaktive Inhalte. Die Einteilung
 richtet sich nach der aktuellen Verwendung. [Die PARA Methode](https://www.buildingasecondbrain.com/para)
 
-In deinem übergreifenden System könnte Physim ein Projekt sein, während
+In deinem übergreifenden System könnte ein Forschungsauftrag ein Projekt sein, während
 Softwarequalität einen dauerhaften Verantwortungsbereich und numerische Methoden
 ein Wissensgebiet bilden. Eine abgeschlossene Untersuchung wandert ins Archiv;
 ihre verwertbaren Erkenntnisse bleiben von aktiven Dokumenten aus erreichbar.
@@ -58,7 +58,7 @@ später richtig zu verstehen.
 [Progressive Summarization](https://fortelabs.com/blog/progressive-summarization-a-practical-technique-for-designing-discoverable-notes/)
 
 Unsere Wissensnotiz erhält dafür eine kurze Kernaussage, ihre Bedingungen,
-eine Quelle und den Bezug zur Aufgabe. Bei einer Physim-Notiz über einen Integrator
+eine Quelle und den Bezug zur Aufgabe. Bei einer Forschungsnotiz über einen Integrator
 gehören etwa untersuchtes Modell, Zeitschritt, Messgröße und Vergleichsverfahren
 zum Kontext. Ein pauschales „Verfahren A ist besser“ wäre nicht ausreichend.
 
@@ -97,7 +97,7 @@ Jede wesentliche Aussage erhält einen nachvollziehbaren Status:
 
 Ein Dokumentationsbeleg über einen Testlauf beweist den dort beschriebenen Lauf.
 Er beweist nicht automatisch, dass der aktuelle Checkout auf allen Plattformen
-funktioniert. Gerade Physim benötigt diese Unterscheidung zwischen Roadmap,
+funktioniert. Forschungsprojekte benötigen diese Unterscheidung zwischen Roadmap,
 Implementierung und tatsächlicher Plattformprüfung.
 
 ## Was das System dauerhaft nützlich hält
@@ -121,5 +121,4 @@ Wenn das gelingt, erfüllt das Second Brain seinen Zweck.
 
 Die verlinkten Originalquellen wurden am 6. Oktober 2026 eingesehen. Sie
 beschreiben die Methode ihres Urhebers; Werbeversprechen werden hier nicht als
-Wirksamkeitsnachweis verwendet. Das lokale Physim-Beispiel stützt sich zusätzlich
-auf die unter brains/physim/SOURCES.md genannten Projektdateien.
+Wirksamkeitsnachweis verwendet.

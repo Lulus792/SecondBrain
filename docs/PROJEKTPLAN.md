@@ -10,7 +10,7 @@ Nachweis nennt [STATUS.md](STATUS.md).
 ## Produktziel
 
 Der Nutzer soll seine Second Brains vollständig innerhalb dieser Anwendung
-betrachten und bearbeiten können. Für jedes Projekt, etwa Physim, lässt sich
+betrachten und bearbeiten können. Für jedes Projekt lässt sich
 ein eigenes Projektgedächtnis mit derselben Grundstruktur anlegen.
 
 Zur eigenen Oberfläche gehören der Zugang zu Zielen, aktuellem Stand,
@@ -44,7 +44,7 @@ Arbeitsablauf muss auf allen drei Systemen verfügbar sein. Plattformabhängige
 Funktionen benötigen eine klar abgegrenzte Anbindung.
 
 Vorhandenes Projektwissen soll bei der Weiterentwicklung erhalten bleiben.
-Die vorhandenen Markdown-Vorlagen und das Physim-Beispiel dienen als Grundlage
+Die vorhandenen Markdown-Vorlagen dienen als Grundlage
 für das Wissensmodell. Die C-Anwendung verwendet UTF-8-Markdown und kleine
 JSON-Metadaten und kann die vorhandenen Instanzen direkt öffnen.
 
@@ -124,3 +124,15 @@ Plattformunterstützung wird anhand ausgeführter Prüfungen dokumentiert.
 Die bisherigen Python-Prüfungen belegen den Strukturprototyp; sie sind kein
 Nachweis für die C-Anwendung oder deren Oberfläche. Dafür bestehen eigene
 Kern-, UI-, Desktop- und Paketprüfungen.
+
+## Verfeinerung und vollständiger Release
+
+- [x] Zentrierung, weiches Scrollen und kurze Kamerabewegungen in der C-App prüfen.
+- [x] Pfeiltasten zum sofortigen Öffnen der nächsten Notiz umstellen; Entwürfe schützen.
+- [x] Aktuelle Arbeitsfassung auf ein eigenes Projektgedächtnis und neutrale Beispiele beschränken.
+- [x] README anhand mehrerer GitHub-Projekte neu strukturieren und echte App-Vorschau ergänzen.
+- [x] Fehlende Schritte für 1.0 in [RELEASE.md](RELEASE.md) bewerten und festhalten.
+- [ ] Abschließende sprachliche Bereinigung des Endprodukts erst vor dem vollständigen Release durchführen.
+
+Die offene Release-Liste unterscheidet notwendige Abnahmen und mögliche spätere
+Erweiterungen. Entwicklungsnachweise bleiben während der Arbeit erhalten.

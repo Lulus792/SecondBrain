@@ -27708,7 +27708,7 @@ nk_textedit_cut(struct nk_text_edit *state)
 NK_API nk_bool
 nk_textedit_paste(struct nk_text_edit *state, char const *ctext, int len)
 {
-    /* Physim patch: len is bytes; cursor and undo records count Unicode scalars.
+    /* UTF-8 paste patch: len is bytes; cursor and undo records count Unicode scalars.
      * Validate and reserve before deleting a selection, including allocation failure. */
     int glyphs = 0, offset = 0, first, last, unused;
     nk_rune rune;

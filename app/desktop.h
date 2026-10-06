@@ -13,6 +13,11 @@ typedef enum {
 typedef enum { SB_FOCUS_BUTTON, SB_FOCUS_TEXT, SB_FOCUS_MAP, SB_FOCUS_READER } SBFocusKind;
 typedef struct { char id[100]; struct nk_rect bounds; SBFocusKind kind; int group; } SBTarget;
 typedef struct {
+    float position, destination, pending;
+    nk_uint applied;
+    bool active, ready, used;
+} SBScroll;
+typedef struct {
     SBUi ui;
     SBApp model;
     SBNotes hits;
@@ -35,11 +40,14 @@ typedef struct {
     struct nk_text_edit text_edit;
     bool text_edit_ready;
     char graph_project[SB_PATH_CAP];
-    bool graph_dirty, card, browser, solid, focus_changed, keyboard, dragging, moved;
+    bool graph_dirty, card, browser, solid, reduced_motion, focus_changed, keyboard, dragging, moved;
     float yaw, pitch, zoom, pan_x, pan_y, drag_x, drag_y;
+    float view_yaw, view_pitch, view_zoom, view_pan_x, view_pan_y, seconds;
+    SBScroll scrolling[4];
+    bool follow_star;
     size_t star, page, project_page;
     char focus[100], activate[100], saved_focus[100], source_focus[100];
-    int focus_group, scroll, focus_scroll_frames;
+    int focus_group, focus_scroll_frames;
     SBForm focus_form;
     bool focus_guard;
     struct nk_rect map_bounds;
@@ -49,6 +57,8 @@ SBStatus sb_desktop_init(SBDesktop *desktop, const char *workspace, const char *
 void sb_desktop_free(SBDesktop *desktop);
 void sb_desktop_event(SBDesktop *desktop, const SDL_Event *event);
 void sb_desktop_frame(SBDesktop *desktop);
+void sb_desktop_tick(SBDesktop *desktop, float seconds);
+bool sb_desktop_animating(const SBDesktop *desktop);
 void sb_desktop_apply(SBDesktop *desktop);
 int sb_desktop_keyboard_test(SBDesktop *desktop, const char *directory);
 int sb_desktop_self_test(SBDesktop *desktop, const char *directory);

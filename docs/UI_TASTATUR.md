@@ -18,7 +18,8 @@ keine native Full-Keyboard-Access-Brücke bietet, setzt sie die Wege selbst um.
   Reihenfolge. Dialoge begrenzen den Fokus auf ihren Inhalt; Schließen stellt ihn
   wieder her. Enter / Leertaste aktiviert fokussierte Schaltflächen.
 - F6 wechselt zwischen Werkzeugen, Sternkarte und Dokument. Pfeile wechseln
-  Sterne, ohne dabei eine Notiz zu öffnen; Enter öffnet den fokussierten Stern.
+  sofort zur nächsten Notiz in der Karte. Ein offener Entwurf bleibt durch den
+  Schutzdialog gesichert. Enter kann den aktuellen Stern erneut öffnen.
 - Die Kamera ist über Tastatur und sichtbare Schaltflächen bedienbar. Eine
   Listenansicht und die Suche bieten direkten Zugriff bei großen Wissensbasen.
 - Texteingabe behält Cursor-, Auswahl-, Zwischenablage- und Undo-Funktionen.
@@ -53,7 +54,7 @@ Sternwahl ohne sofortiges Öffnen, Schutzdialog, Suche, lokale Quelle, Kontext,
 Konfliktkopie ohne Überschreiben des Originals, Einstellungen, kleine Darstellung mit 150 Prozent Schrift, Hilfe, Archiv,
 Arbeitsordner, Projektwahl und Beenden. Eine Notiz mit 300 Quellenlinks prüft die Erreichbarkeit des letzten Links und
 die Fokuswiederherstellung nach der Quellenansicht. Die Prüfung kontrolliert auch
-die aktive SDL-Texteingabe in Editor und frisch geöffneten Formularen. Es werden keine Mausereignisse injiziert.
+die aktive SDL-Texteingabe in Editor und frisch geöffneten Formularen. Der damalige Durchlauf injizierte keine Mausereignisse.
 
 Der bisherige Bedienweg besteht separat mit 87 Aussagen. Die Materialprüfung
 weist nach, dass Glas auf geänderte Sterne reagiert und reduzierte Transparenz
@@ -68,3 +69,26 @@ Tasten im Editor: Tab verlässt das Feld; Ctrl+I fügt einen Tabulator ein.
 Das gilt auch auf macOS, wo Ctrl ausdrücklich die Control-Taste bezeichnet.
 Die übrigen App-Kürzel verwenden Command auf macOS beziehungsweise Control
 auf Windows und Linux. Es gibt keine Tastaturfalle im Mehrzeileneditor.
+
+## Verfeinerung: direkte Navigation und Bewegung
+
+Der neue Nutzerauftrag ersetzt die frühere Trennung zwischen Sternwahl und Öffnen.
+Pfeile öffnen direkt, ohne zusätzliche Bestätigung. Bei einem Entwurf entscheidet
+weiterhin der Schutzdialog über Speichern, Verwerfen oder Abbrechen.
+
+Apples [Motion](https://developer.apple.com/design/human-interface-guidelines/motion)
+wurde am 6. Oktober erneut gelesen: Bewegung gezielt einsetzen, abbrechbar und
+optional machen. Kamera und Scrollposition nähern sich ihrem Ziel anhand verstrichener
+Zeit. Neue Eingaben ändern das Ziel während des Übergangs; Ziehen folgt der Hand direkt.
+Die Kamera folgt der gewählten Notiz mit einer kleinen Verschiebung. „Bewegung
+reduzieren“ in den Einstellungen schaltet die Übergänge ab. Die sichtbare Auswahl
+und der Dokumentinhalt wechseln unabhängig davon sofort. Die Betriebssystem-
+Einstellung für reduzierte Bewegung wird bisher nicht automatisch übernommen.
+
+Suchhinweise werden vertikal an der Schrift ausgerichtet. Kompakte Schaltflächen
+bekommen genug Raum oberhalb und unterhalb ihrer Beschriftung. Die vorhandenen
+Materialien und die Lumen-Farbpalette bleiben erhalten.
+
+Die lokale Release-Prüfung von 0.2.1 besteht mit allen sieben Tests. Der reine
+Tastaturweg prüft 99 Aussagen ohne injizierte Mausereignisse; der Maus-Bedienweg
+prüft 93 Aussagen einschließlich halber Mausradschritte und Richtungswechsel.

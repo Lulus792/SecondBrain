@@ -13,6 +13,7 @@ static void frame(SBDesktop *d) {
     SDL_Event event;
     nk_input_begin(d->ui.ctx);
     while (SDL_PollEvent(&event)) sb_desktop_event(d, &event);
+    sb_desktop_tick(d,1.0f/60);
     nk_input_end(d->ui.ctx);
     sb_desktop_frame(d); sb_ui_draw(&d->ui); SDL_RenderPresent(d->ui.renderer); sb_desktop_apply(d);
 }
@@ -84,16 +85,23 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
     key(d,SDLK_F6,0); CHECK(!strcmp(d->focus,"galaxy") && !d->card);
     size_t before = d->star;
     key(d,SDLK_LEFT,SDL_KMOD_SHIFT); CHECK(d->yaw < 0 && d->star == before);
+    CHECK(d->view_yaw < 0 && d->view_yaw > d->yaw);
+    float animated=d->view_yaw;
+    frame(d); CHECK(d->view_yaw < animated && d->view_yaw > d->yaw);
     key(d,SDLK_PLUS,0); CHECK(d->zoom > 1);
     key(d,SDLK_HOME,0); CHECK(d->yaw == 0 && d->zoom == 1);
+    for (unsigned i=0;i<45;++i) frame(d);
+    CHECK(d->view_yaw == 0 && d->view_zoom == 1);
+    d->reduced_motion=true; key(d,SDLK_LEFT,SDL_KMOD_SHIFT);
+    CHECK(d->view_yaw == d->yaw); key(d,SDLK_HOME,0); d->reduced_motion=false;
     key(d,SDLK_F6,0); CHECK(!strcmp(d->focus,"editor") && d->card);
     replace(d,"# Erkenntnis\n\nVor dem Wechsel speichern.\n");
     key(d,SDLK_TAB,0); key(d,SDLK_F6,0);
-    /* Navigate without opening a file until confirmation. */
+    /* Arrow navigation opens immediately, while a draft still requires a decision. */
     strcpy(saved,d->model.path); before = d->star;
-    key(d,SDLK_UP,0); key(d,SDLK_RIGHT,0);
+    key(d,SDLK_UP,0);
+    if (!d->model.guard) key(d,SDLK_RIGHT,0);
     CHECK(d->star != before && !strcmp(d->model.path,saved));
-    key(d,SDLK_RETURN,0);
     CHECK(d->model.guard && sb_app_dirty(&d->model));
     CHECK(!strcmp(d->focus,"guard-save"));
     key(d,SDLK_TAB,SDL_KMOD_SHIFT); CHECK(!strcmp(d->focus,"guard-cancel"));
@@ -103,6 +111,14 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
     CHECK(!d->model.guard && !sb_app_dirty(&d->model) && strcmp(d->model.path,saved));
     CHECK(sb_note_load(&d->model.project,saved,&text,NULL).code == SB_OK && strstr(text,"Vor dem Wechsel speichern"));
     free(text); text = NULL;
+    for (unsigned i=0;i<3 && strcmp(d->focus,"galaxy");++i) key(d,SDLK_F6,0);
+    CHECK(!strcmp(d->focus,"galaxy"));
+    char opened[SB_PATH_CAP]; strcpy(opened,d->model.path);
+    key(d,SDLK_LEFT,0);
+    if (!strcmp(opened,d->model.path)) key(d,SDLK_RIGHT,0);
+    if (!strcmp(opened,d->model.path)) key(d,SDLK_DOWN,0);
+    CHECK(strcmp(opened,d->model.path) && !d->model.guard && d->card);
+    CHECK(d->view_pan_x != d->pan_x || d->view_pan_y != d->pan_y);
     key(d,SDLK_F,MOD); type(d,"Vor dem Wechsel");
     CHECK(d->hits.count == 1 && d->browser && !strcmp(d->focus,"search"));
     CHECK(activate(d,"note:inbox/erkenntnis.md")); CHECK(!strcmp(d->model.path,saved));
@@ -119,6 +135,20 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
     }
     key(d,SDLK_E,MOD); replace(d,many); key(d,SDLK_S,MOD); key(d,SDLK_E,MOD);
     CHECK(d->target_count > 300);
+    CHECK(reach(d,"reader"));
+    key(d,SDLK_PAGEDOWN,0);
+    float first_scroll=d->scrolling[0].position;
+    CHECK(first_scroll > 0 && first_scroll < 220);
+    frame(d); CHECK(d->scrolling[0].position > first_scroll && d->scrolling[0].position < 220);
+    for (unsigned i=0;i<35;++i) frame(d);
+    CHECK(d->scrolling[0].applied == 220);
+    d->reduced_motion=true; key(d,SDLK_PAGEDOWN,0);
+    CHECK(d->scrolling[0].applied == 440 && !d->scrolling[0].active);
+    d->reduced_motion=false; key(d,SDLK_PAGEUP,0);
+    float reversed=d->scrolling[0].position;
+    CHECK(reversed > 220 && reversed < 440);
+    frame(d); CHECK(d->scrolling[0].position < reversed);
+
     key(d,SDLK_F6,0); CHECK(!strcmp(d->focus,"project-picker"));
     key(d,SDLK_TAB,SDL_KMOD_SHIFT); CHECK(!strcmp(d->focus,"link:299"));
     key(d,SDLK_RETURN,0); CHECK(d->model.source && strstr(d->model.source,"Quelle ü"));

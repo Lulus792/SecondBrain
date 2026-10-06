@@ -90,7 +90,7 @@ int main(int argc, char **argv) {
         nk_label(ui.ctx, "Dein Wissen. Deine Projekte.", NK_TEXT_LEFT);
         nk_style_set_font(ui.ctx, &ui.body->handle);
         nk_layout_row_dynamic(ui.ctx, 40, 1);
-        nk_label(ui.ctx, "Physim · Ziele, Entscheidungen und Erkenntnisse", NK_TEXT_LEFT);
+        nk_label(ui.ctx, "Beispielprojekt · Ziele, Entscheidungen und Erkenntnisse", NK_TEXT_LEFT);
         nk_style_set_font(ui.ctx, &ui.normal->handle);
         nk_layout_row_dynamic(ui.ctx, 36, 3);
         nk_button_label(ui.ctx, "Lesen"); nk_button_label(ui.ctx, "Bearbeiten"); nk_button_label(ui.ctx, "Speichern");

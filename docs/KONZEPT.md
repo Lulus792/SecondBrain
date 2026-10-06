@@ -34,10 +34,10 @@ erzeugen.
 
 ## Quellen und Zusammenfassungen
 
-SOURCES.md legt fest, welches Original welche Frage beantwortet. Bei Physim
-liefert der Projektplan die Produktziele, docs/status.md den beschriebenen
-Umsetzungsstand und docs/platform-validation.md die dokumentierten
-Plattformnachweise. Die Anleitung steht in README.md und docs/guide.md.
+SOURCES.md legt fest, welches Original welche Frage beantwortet. Der Projektplan
+liefert die Produktziele, der Umsetzungsstand beschreibt die Implementierung und
+der Plattformbericht dokumentiert tatsächlich ausgeführte Prüfungen. Die Anleitung
+steht in README.md und den zugehörigen Handbüchern.
 
 Diese Rollen sind verschieden: Ein geplantes Merkmal ist keine bestätigte
 Implementierung. Ein historischer Testbericht ist kein aktueller Gesamttest.
@@ -67,14 +67,14 @@ Wissenssammlung stehen. Die Projekte verlinken dann auf dieselbe Notiz.
 Projektbezogene Entscheidungen und Zustände bleiben in ihrer eigenen Instanz.
 
 Beispiel: Allgemeine Grundlagen numerischer Fehler könnten gemeinsam genutzt
-werden. Welche Genauigkeit Physim für ein bestimmtes Experiment fordert, gehört
-weiterhin in den Physim-Kontext. So bleiben allgemeines Wissen und konkrete
+werden. Welche Genauigkeit ein bestimmtes Experiment fordert, gehört
+weiterhin in den zugehörigen Projektkontext. So bleiben allgemeines Wissen und konkrete
 Anforderungen unterscheidbar.
 
 ## Strukturprototyp und eigene Anwendung
 
 Der vorhandene Strukturprototyp umfasst die lokale Vorlage, einen Generator und ein
-vorbereitetes Physim-Beispiel. Das Anlegen erfordert einen Befehl. Suche kann
+eigenes Projektgedächtnis. Das Anlegen erfordert einen Befehl. Suche kann
 im Prototyp über lokale Textsuche erfolgen.
 
 Die C-Anwendung übernimmt Projektverwaltung, Anzeige, Bearbeitung, Erfassung

@@ -7,7 +7,7 @@ Stand: 6. Oktober 2026. Grundlage: [verbindlicher Projektplan](../../docs/PROJEK
 Eine eigene Desktop-Anwendung in C, die für jedes Projekt ein wiederverwendbares
 Second Brain anlegt und verwaltet. Mensch und KI verwenden dieselben lesbaren
 Projektziele, Entscheidungen, Quellen, Wissensnotizen und Arbeitsübergaben.
-Physim ist die erste Beispielinstanz. Diese Instanz dokumentiert SecondBrain selbst.
+Diese Instanz dokumentiert SecondBrain selbst.
 
 ## Verbindliche Anforderungen
 

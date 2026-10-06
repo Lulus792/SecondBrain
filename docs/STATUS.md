@@ -31,8 +31,8 @@ an KI-Werkzeuge. Die normale Nutzung erfolgt über die eigene Oberfläche.
 
 Auf dem lokalen Intel-Mac mit macOS 14.6.1 und AppleClang 16 bestehen Build und
 Kernablauf. Ein zusätzlicher Lauf mit AddressSanitizer und UndefinedBehaviorSanitizer
-besteht ebenfalls. Der native Kern liest das vorhandene Physim-Beispiel und
-liefert Treffer aus Projektauftrag, Entscheidungen und Wissensnotiz.
+besteht ebenfalls. Die Kernprüfung verwendet Projektauftrag, Entscheidungen und
+Wissensnotizen aus einem neutralen Testprojekt.
 
 Die Tests prüfen echte Dateien: Erstellung, Wiederöffnung, UTF-8, Suchtreffer,
 Speicherkonflikte, Archivierung, Kontext und gültige beziehungsweise fehlerhafte
@@ -144,3 +144,24 @@ Paketen auf Windows x64, macOS ARM64 und Linux x64. Lokal besteht außerdem das
 entpackte Intel-macOS-Paket aus einem neuen Ordner mit Leerzeichen und Umlauten.
 `otool -L` zeigt ausschließlich macOS-Systembibliotheken. Die älteren verlinkten
 Läufe belegen weiterhin ihre jeweils benannten Stände.
+
+## Version 0.2.1: flüssige Navigation und UI-Verfeinerung
+
+Die App öffnet mit Pfeilen in der Sternkarte direkt die nächste Notiz. Ein offener
+Entwurf bleibt durch den Schutzdialog gesichert. Kamera, Zoom und Scrollbereiche
+verwenden kurze Übergänge anhand verstrichener Zeit; neue Eingaben ändern das Ziel
+während der Bewegung. „Bewegung reduzieren“ schaltet sie in der App aus. Suchhinweis
+und Bedienelemente der Kopf- und Kameraleiste sind vertikal ausgerichtet.
+
+Das frühere fremde Projektbeispiel und alle Namensverweise wurden aus der aktuellen
+Arbeitsfassung entfernt. Tests und HTML-Studien verwenden neutrale Beispieldaten.
+Die README wurde nach Recherche von neun GitHub-Projekten neu aufgebaut und zeigt
+eine echte App-Aufnahme. Die [Release-Liste](RELEASE.md) beschreibt offene Aufgaben
+vor 1.0; die abschließende sprachliche Prüfung ist dafür vorgesehen.
+
+Auf Intel macOS 14.6.1 bestehen alle sieben Release-Prüfungen und neun Python-Prüfungen.
+Der Maus-Bedienweg prüft 93 Aussagen, der reine Tastaturweg 99. Neue Prüfungen erfassen
+sofortiges Öffnen mit und ohne Entwurf, Zwischenstände der Kamerabewegung, weiches
+Scrollen, halbe Mausradschritte, Richtungswechsel und reduzierte Bewegung. Große und
+kleine tatsächliche Darstellungen wurden betrachtet. Der neue Plattformlauf und die
+Paket-/Sanitizer-Abnahme werden nach ihrem Abschluss gesondert dokumentiert.

@@ -8,6 +8,7 @@ static void frame(SBDesktop *d) {
     SDL_Event event;
     nk_input_begin(d->ui.ctx);
     while (SDL_PollEvent(&event)) sb_desktop_event(d, &event);
+    sb_desktop_tick(d,1.0f/60);
     nk_input_end(d->ui.ctx);
     sb_desktop_frame(d);
     sb_ui_draw(&d->ui);
@@ -76,16 +77,16 @@ int sb_desktop_self_test(SBDesktop *d, const char *directory) {
     frame(d); frame(d);
     CHECK(click(d, "new-project"));
     CHECK(d->form == SB_FORM_PROJECT);
-    CHECK(click(d, "form-name")); type(d, "Physim ü");
-    CHECK(!strcmp(d->name, "Physim ü") && !strcmp(d->id, "physim-ue"));
+    CHECK(click(d, "form-name")); type(d, "Beispielprojekt ü");
+    CHECK(!strcmp(d->name, "Beispielprojekt ü") && !strcmp(d->id, "beispielprojekt-ue"));
     CHECK(click(d, "submit"));
-    CHECK(d->model.has_project && !strcmp(d->model.project.id, "physim-ue"));
+    CHECK(d->model.has_project && !strcmp(d->model.project.id, "beispielprojekt-ue"));
     CHECK(click(d, "new-note"));
     CHECK(d->form == SB_FORM_NOTE);
     CHECK(click(d, "form-name")); type(d, "Energie");
     CHECK(click(d, "submit"));
     CHECK(!strcmp(d->model.path, "knowledge/energie.md") && d->editing);
-    CHECK(replace(d, "editor", "# Energie und ihre Bedeutung für die Simulation in Physim\n\nMessung ü. Ein belegter Befund.\n"));
+    CHECK(replace(d, "editor", "# Energie und ihre Bedeutung für die Simulation in Beispielprojekt\n\nMessung ü. Ein belegter Befund.\n"));
     CHECK(sb_app_dirty(&d->model) && strstr(d->model.editor, "Messung ü."));
     CHECK(click(d, "save"));
     CHECK(!sb_app_dirty(&d->model));
@@ -112,18 +113,36 @@ int sb_desktop_self_test(SBDesktop *d, const char *directory) {
     CHECK(d->form == SB_FORM_CONTEXT && d->context && strstr(d->context, "PROJECT.md"));
     CHECK(click(d, "copy-context"));
     text = SDL_GetClipboardText();
-    CHECK(text && strstr(text, "Physim ü")); SDL_free(text); text = NULL;
+    CHECK(text && strstr(text, "Beispielprojekt ü")); SDL_free(text); text = NULL;
     key(d, SDLK_ESCAPE, 0);
     CHECK(d->form == SB_FORM_NONE);
 
     CHECK(sb_path_join(path, sizeof(path), directory, "Reference.md").code == SB_OK);
-    CHECK(sb_fs_write_new(path, "# Referenzquelle\n\nEin Originalbefund.\n", strlen("# Referenzquelle\n\nEin Originalbefund.\n")).code == SB_OK);
+    char reference[4096]="# Referenzquelle\n\nEin Originalbefund.\n";
+    for (unsigned i=0;i<40;++i) strcat(reference,"\nWeitere Beobachtung aus der Originalquelle.\n");
+    CHECK(sb_fs_write_new(path,reference,strlen(reference)).code == SB_OK);
     CHECK(click(d, "note:SOURCES.md"));
     CHECK(click(d, "edit"));
     CHECK(replace(d, "editor", "# Quellen\n\n[Referenz](../../Reference.md)\n"));
     CHECK(click(d, "save") && click(d, "read"));
     CHECK(click(d, "link:0"));
     CHECK(d->model.source && strstr(d->model.source, "Originalbefund"));
+    SDL_Event wheel={0}; wheel.type=SDL_EVENT_MOUSE_WHEEL; wheel.wheel.y=-0.5f;
+    for (size_t i=0;i<d->target_count;++i) if (!strcmp(d->targets[i].id,"reader")) {
+        wheel.wheel.mouse_x=d->targets[i].bounds.x+30; wheel.wheel.mouse_y=d->targets[i].bounds.y+30;
+    }
+    SDL_PushEvent(&wheel); frame(d);
+    CHECK(d->scrolling[0].position > 0 && d->scrolling[0].position < 25);
+    float first_scroll=d->scrolling[0].position;
+    frame(d); CHECK(d->scrolling[0].position > first_scroll);
+    for (unsigned i=0;i<35;++i) frame(d);
+    CHECK(d->scrolling[0].applied == 25);
+    wheel.wheel.y=1; SDL_PushEvent(&wheel); frame(d);
+    CHECK(d->scrolling[0].position < 25);
+    for (unsigned i=0;i<35;++i) frame(d);
+    CHECK(d->scrolling[0].applied == 0 && !d->scrolling[0].active);
+    CHECK(d->model.source && !strcmp(d->model.source,reference));
+
     CHECK(click(d, "source-back"));
     CHECK(!d->model.source && !strcmp(d->model.path, "SOURCES.md"));
 
@@ -132,8 +151,8 @@ int sb_desktop_self_test(SBDesktop *d, const char *directory) {
     CHECK(click(d, "submit"));
     CHECK(d->model.projects.count == 2 && !strcmp(d->model.project.id, "zweites"));
     CHECK(click(d, "project-picker"));
-    CHECK(click(d, "project:physim-ue"));
-    CHECK(!strcmp(d->model.project.id, "physim-ue"));
+    CHECK(click(d, "project:beispielprojekt-ue"));
+    CHECK(!strcmp(d->model.project.id, "beispielprojekt-ue"));
     CHECK(click(d, "section:knowledge"));
     CHECK(click(d, "note:knowledge/energie.md"));
     CHECK(strstr(d->model.editor, "Messung ü.") && !sb_app_dirty(&d->model));
@@ -154,7 +173,7 @@ int sb_desktop_self_test(SBDesktop *d, const char *directory) {
     CHECK(!sb_app_dirty(&d->model) && !strcmp(d->model.path, "knowledge/energie.md"));
     CHECK(sb_path_join(path, sizeof(path), directory, "Reference.md").code == SB_OK);
     CHECK(sb_fs_read(path, &text, &length).code == SB_OK);
-    CHECK(!strcmp(text, "# Referenzquelle\n\nEin Originalbefund.\n"));
+    CHECK(!strcmp(text,reference));
     free(text); text = NULL;
     SDL_SetWindowSize(d->ui.window, 1336, 840);
     CHECK(sb_ui_fonts(&d->ui, 1).code == SB_OK);

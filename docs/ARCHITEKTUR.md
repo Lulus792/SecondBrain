@@ -8,7 +8,7 @@ Bibliotheken und keine Abhängigkeit von der Oberfläche.
 Der Kern verwaltet Arbeitsordner, Projekte und Markdown-Dokumente. Er erzeugt
 die vorhandene Grundstruktur, liest und schreibt Dateien, durchsucht Inhalte
 und stellt KI-Kontext zusammen. Dateiverweise und Metadaten bleiben lesbar.
-Die bisherigen Vorlagen und das Physim-Beispiel können weiterverwendet werden.
+Die vorhandenen Vorlagen und Projektgedächtnisse können weiterverwendet werden.
 
 Eine eigene kleine Plattformschicht verbindet Dateizugriff und Verzeichnislisten
 mit Windows beziehungsweise POSIX auf macOS und Linux. Pfade werden in der

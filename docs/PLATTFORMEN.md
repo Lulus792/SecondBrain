@@ -134,8 +134,7 @@ keine manuelle Abnahme aller GPU-Treiber oder Desktop-Umgebungen.
 ## Grenzen der Nachweise
 
 Die Prüfungen belegen die jeweils benannten Abläufe. Der KI-Kontext wird erzeugt
-und kopiert; ein externer KI-Anbieter wurde dabei nicht integriert. Die Physim-Instanz
-enthält Quellenverweise und dokumentierte Aussagen, keine neue Physim-Abnahme.
+und kopiert; ein externer KI-Anbieter wurde dabei nicht integriert.
 
 Wissensbasen bleiben bei einem Betriebssystemwechsel lesbar. Lokale Projektpfade
 müssen am Zielrechner erreichbar sein. Absolute Laufwerksverweise sind an den

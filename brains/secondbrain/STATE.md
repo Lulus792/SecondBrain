@@ -51,6 +51,19 @@ Die aktuelle Intel-App liegt unter dist/SecondBrain/secondbrain.app; die weitere
 Pakete stehen im neuen GitHub-Lauf. Neue Erweiterungen werden anhand der
 offenen Fragen geplant.
 
+## Verfeinerung in Version 0.2.1
+
+Direkte Pfeilnavigation, kurze Kamera- und Scrollübergänge und verbesserte
+Ausrichtung sind implementiert. Die README hat nach Recherche von neun GitHub-
+Projekten einen neuen Einstieg mit tatsächlicher App-Vorschau. Die Arbeitsfassung
+enthält nur das eigene Projektgedächtnis und neutrale Beispiele.
+
+Lokal bestehen sieben Release-Prüfungen (93 Maus- und 99 Tastaturaussagen) und neun
+Python-Prüfungen. Weitere Paket-, Sanitizer- und Plattformnachweise werden nach
+Abschluss im [Umsetzungsstand](../../docs/STATUS.md) ergänzt. Die [Release-Liste](../../docs/RELEASE.md)
+ordnet die Lücken vor 1.0; die Endprodukt-Texte werden abschließend erst vor dem
+vollständigen Release geprüft.
+
 ## Grenzen
 
 Keine native Screenreader-Anbindung, automatische Synchronisation oder integrierte

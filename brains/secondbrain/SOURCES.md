@@ -35,9 +35,10 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 ## Anwendung verwenden
 
 - [Anleitung](../../README.md): Build, Start und Arbeitsweise.
+- [README-Recherche](../../docs/README_RECHERCHE.md): neun GitHub-Originale und die abgeleitete Struktur.
+- [Release-Aufgaben](../../docs/RELEASE.md): bewertete Lücken vor 1.0 und optionale Erweiterungen.
 - [Distribution](../../docs/DISTRIBUTION.md): Pakete, Voraussetzungen und Einschränkungen.
 - [Kernquellen](../../src) und [App-Quellen](../../app): konkrete Implementierung.
-- [Physim-Instanz](../physim/START.md): erste Beispielwissensbasis; kein neuer Physim-Test.
 
 ## Verdichtetes Wissen
 

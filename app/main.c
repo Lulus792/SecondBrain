@@ -65,11 +65,14 @@ int main(int argc, char **argv) {
         if (status.code != SB_OK) { fprintf(stderr, "%s\n", status.message); sb_desktop_free(&desktop); return 1; }
     }
     unsigned frames = 0;
+    Uint64 last_tick=SDL_GetTicksNS();
     while (!desktop.model.quit) {
         SDL_Event event;
         nk_input_begin(desktop.ui.ctx);
-        if (!snapshot && SDL_WaitEventTimeout(&event, 100)) sb_desktop_event(&desktop, &event);
+        if (!snapshot && SDL_WaitEventTimeout(&event, sb_desktop_animating(&desktop) ? 16 : 100)) sb_desktop_event(&desktop, &event);
         while (SDL_PollEvent(&event)) sb_desktop_event(&desktop, &event);
+        Uint64 now=SDL_GetTicksNS();
+        sb_desktop_tick(&desktop,(float)((double)(now-last_tick)/1e9)); last_tick=now;
         nk_input_end(desktop.ui.ctx);
         sb_desktop_frame(&desktop);
         sb_ui_draw(&desktop.ui);

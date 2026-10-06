@@ -24,7 +24,7 @@ Lokale Anpassungen des Nuklear-Headers:
 - UTF-8-Einfügen arbeitet mit Byte-Längen und Unicode-Zeichenpositionen.
 - Vor einer Auswahlersetzung wird Speicher reserviert; bei ungültigem Text oder
   fehlender Kapazität bleibt die bisherige Auswahl erhalten. Diese Korrektur
-  stammt aus der vorhandenen, MIT-lizenzierten UI-Anpassung im Physim-Projekt.
+  wurde aus einer vorhandenen MIT-lizenzierten UI-Anpassung übernommen.
 - Rückgängig und Wiederholen stellen eine zusammengefallene Auswahl am Cursor her.
 - Positionen und Einfügelängen jenseits des 16-Bit-Bereichs werden erhalten.
 

@@ -96,7 +96,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Ein Second Brain pro Projekt anlegen.")
     commands = parser.add_subparsers(dest="command", required=True)
     new = commands.add_parser("new", help="Neue Wissensbasis aus der Vorlage erstellen.")
-    new.add_argument("id", help="Projektkennung, zum Beispiel physim.")
+    new.add_argument("id", help="Projektkennung, zum Beispiel beispielprojekt.")
     new.add_argument("--name", help="Anzeigename; standardmäßig die Kennung.")
     new.add_argument("--repo", type=Path, help="Vorhandenen Projektordner verknüpfen.")
     new.add_argument("--output", type=Path, help="Zielordner; standardmäßig brains/KENNUNG.")

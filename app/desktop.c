@@ -13,6 +13,74 @@ static const char *new_names[] = {"Wissen", "Eingang", "Übergaben"};
 static void compact_label(SBDesktop *d, const char *text, char *out, size_t capacity, float width);
 static void glass(SBDesktop *d, struct nk_rect r, float radius);
 
+/* Motion uses elapsed time, so trackpads and keyboard repeats can retarget it. */
+static float approach(float current, float destination, float factor, float threshold) {
+    float value = current + (destination-current)*factor;
+    return fabsf(destination-value) < threshold ? destination : value;
+}
+void sb_desktop_tick(SBDesktop *d, float seconds) {
+    d->seconds = fmaxf(0, fminf(seconds, 0.05f));
+    float factor = d->reduced_motion ? 1 : 1-expf(-d->seconds/0.085f);
+    d->view_yaw = approach(d->view_yaw,d->yaw,factor,0.0001f);
+    d->view_pitch = approach(d->view_pitch,d->pitch,factor,0.0001f);
+    d->view_zoom = approach(d->view_zoom,d->zoom,factor,0.0001f);
+    d->view_pan_x = approach(d->view_pan_x,d->pan_x,factor,0.05f);
+    d->view_pan_y = approach(d->view_pan_y,d->pan_y,factor,0.05f);
+}
+bool sb_desktop_animating(const SBDesktop *d) {
+    if (d->view_yaw != d->yaw || d->view_pitch != d->pitch || d->view_zoom != d->zoom ||
+        d->view_pan_x != d->pan_x || d->view_pan_y != d->pan_y) return true;
+    for (unsigned i=0;i<4;++i) if (d->scrolling[i].active || d->scrolling[i].pending) return true;
+    return false;
+}
+static void smooth_scroll(SBDesktop *d, unsigned slot, nk_uint *offset) {
+    SBScroll *s = &d->scrolling[slot]; s->used=true;
+    /* Scrollbar dragging, focus reveal and Nuklear's boundary clamp take priority. */
+    if (!s->ready || *offset != s->applied) {
+        s->position = s->destination = (float)*offset; s->active = false; s->ready = true;
+    }
+    if (s->pending) {
+        if ((s->destination-s->position)*s->pending < 0) s->destination = s->position;
+        s->destination = fmaxf(0,s->destination+s->pending); s->pending = 0; s->active = true;
+    }
+    float factor = d->reduced_motion ? 1 : 1-expf(-d->seconds/0.065f);
+    s->position = approach(s->position,s->destination,factor,0.25f);
+    *offset = s->applied = (nk_uint)roundf(s->position);
+    s->active = s->position != s->destination;
+}
+static unsigned scroll_slot(SBDesktop *d, float x, float y, bool pointer) {
+    if (d->model.guard) return 4;
+    if (d->form != SB_FORM_NONE) {
+        if (pointer) {
+            int w,h; SDL_GetWindowSize(d->ui.window,&w,&h);
+            float pw=fminf(w-40,580*d->ui.scale), ph=fminf(h-40,680*d->ui.scale);
+            if (x < (w-pw)/2 || x >= (w+pw)/2 || y < (h-ph)/2 || y >= (h+ph)/2) return 4;
+        }
+        return d->form == SB_FORM_CONTEXT ? 0 : 3;
+    }
+    if (pointer) {
+        for (size_t i=0;i<d->target_count;++i) {
+            SBTarget *item = &d->targets[i];
+            if (x >= item->bounds.x && y >= item->bounds.y && x < item->bounds.x+item->bounds.w && y < item->bounds.y+item->bounds.h) {
+                if (!strcmp(item->id,"reader")) return 0;
+                if (!strcmp(item->id,"editor")) return 1;
+            }
+        }
+    } else {
+        if (!strcmp(d->focus,"reader") || !strncmp(d->focus,"link:",5)) return 0;
+    }
+    if (pointer) {
+        struct nk_window *window=nk_window_find(d->ui.ctx,"Detail");
+        if (!d->card || !window || x < window->bounds.x || y < window->bounds.y ||
+            x >= window->bounds.x+window->bounds.w || y >= window->bounds.y+window->bounds.h) return 4;
+    } else {
+        bool document=false;
+        for (size_t i=0;i<d->target_count;++i) if (!strcmp(d->focus,d->targets[i].id)) document=d->targets[i].group==2;
+        if (!document) return 4;
+    }
+    return 2;
+}
+
 static SBTarget *target_add(SBDesktop *d, const char *id, struct nk_rect rect, SBFocusKind kind, int group) {
     if (d->target_count == d->target_capacity) {
         size_t capacity = d->target_capacity ? d->target_capacity * 2 : 64;
@@ -105,13 +173,14 @@ static void request(SBDesktop *d, SBActionKind kind, const char *value) {
         d->message = sb_error(SB_LIMIT, "Zielpfad zu lang."); return;
     }
     d->navigation.kind = kind;
+    if (kind == SB_ACT_NOTE && value && strcmp(value,d->model.path)) d->follow_star=true;
     if (value) strcpy(d->navigation.value, value);
     else d->navigation.value[0] = 0;
 }
 SBStatus sb_desktop_init(SBDesktop *d, const char *workspace, const char *font, bool testing) {
     SBStatus status;
     memset(d, 0, sizeof(*d));
-    d->sidebar = true; d->test = testing; d->card = true; d->zoom = 1; d->graph_dirty = true;
+    d->sidebar = true; d->test = testing; d->card = true; d->zoom = d->view_zoom = 1; d->seconds = 1.0f/60; d->graph_dirty = true;
     strcpy(d->focus, "project-picker"); strcpy(d->section, "all");
     status = sb_ui_init(&d->ui, font, 1336, 840, testing);
     if (status.code != SB_OK) return status;
@@ -158,6 +227,7 @@ static void synchronize(SBDesktop *d) {
         d->editing = d->next_edit; d->next_edit = false;
         d->focus_editor = d->editing;
         d->reset_reader = true; d->card = true; d->graph_dirty = true; d->page = 0;
+        memset(d->scrolling,0,sizeof(d->scrolling));
         sb_ui_reset_editor(&d->ui); editor_reset(d);
         d->search[0] = 0; d->searched[0] = 0; sb_notes_free(&d->hits);
         if (!strncmp(d->model.path, "archive/", 8)) strcpy(d->section, "archive");
@@ -206,7 +276,7 @@ void sb_desktop_apply(SBDesktop *d) {
     } else if (cmd == SB_CMD_GUARD_SAVE || cmd == SB_CMD_GUARD_DISCARD || cmd == SB_CMD_GUARD_CANCEL) {
         status = sb_app_decide(&d->model, cmd == SB_CMD_GUARD_SAVE ? SB_SAVE_CHANGES :
                               cmd == SB_CMD_GUARD_DISCARD ? SB_DISCARD_CHANGES : SB_KEEP_EDITING);
-        if (cmd == SB_CMD_GUARD_CANCEL) d->next_edit = false;
+        if (cmd == SB_CMD_GUARD_CANCEL) { d->next_edit = false; d->follow_star=false; }
         result(d, status, NULL);
     } else if (cmd == SB_CMD_ARCHIVE || cmd == SB_CMD_RELOAD) {
         status = sb_app_request(&d->model, cmd == SB_CMD_ARCHIVE ? SB_ACT_ARCHIVE : SB_ACT_RELOAD, NULL);
@@ -234,6 +304,7 @@ static SBTarget *focus_target(SBDesktop *d) {
 static void focus_set(SBDesktop *d, const char *id) {
     snprintf(d->focus, sizeof(d->focus), "%s", id);
     d->focus_changed = true; d->keyboard = true; d->focus_scroll_frames = 3;
+    for (unsigned i=0;i<4;++i) { d->scrolling[i].pending=0; d->scrolling[i].ready=false; d->scrolling[i].active=false; }
     d->ui.ctx->text_edit.active = 0;
     for (struct nk_window *w = d->ui.ctx->begin; w; w = w->next) w->edit.active = 0;
 }
@@ -286,6 +357,7 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
             if (SDL_GetModState() & SDL_KMOD_SHIFT) { d->pan_x += dx; d->pan_y += dy; }
             else { d->yaw += dx * 0.007f; d->pitch = fmaxf(-1.2f, fminf(1.2f, d->pitch + dy * 0.007f)); }
             d->drag_x = event->motion.x; d->drag_y = event->motion.y;
+            d->view_yaw=d->yaw; d->view_pitch=d->pitch; d->view_pan_x=d->pan_x; d->view_pan_y=d->pan_y;
         }
     }
     if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
@@ -309,8 +381,16 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
             if (found < d->model.notes.count) { d->star = found; d->card = true; request(d, SB_ACT_NOTE, d->model.notes.items[found].path); }
         }
     }
-    if (event->type == SDL_EVENT_MOUSE_WHEEL && map_input(d, event->wheel.mouse_x, event->wheel.mouse_y)) {
-        d->zoom = fmaxf(0.45f, fminf(3.5f, d->zoom * (1 + event->wheel.y * 0.08f))); return;
+    if (event->type == SDL_EVENT_MOUSE_WHEEL) {
+        float delta = event->wheel.y * (event->wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? -1 : 1);
+        if (map_input(d,event->wheel.mouse_x,event->wheel.mouse_y))
+            d->zoom = fmaxf(0.45f,fminf(3.5f,d->zoom*expf(delta*0.08f)));
+        else {
+            d->focus_scroll_frames=0;
+            unsigned slot=scroll_slot(d,event->wheel.mouse_x,event->wheel.mouse_y,true);
+            if (slot<4) d->scrolling[slot].pending -= delta*50;
+        }
+        return;
     }
     if (event->type == SDL_EVENT_KEY_DOWN) {
         SDL_Keycode key = event->key.key;
@@ -370,7 +450,13 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
                     if (key == SDLK_RIGHT) d->yaw += 0.1f;
                     if (key == SDLK_UP) d->pitch = fmaxf(-1.2f, d->pitch - 0.1f);
                     if (key == SDLK_DOWN) d->pitch = fminf(1.2f, d->pitch + 0.1f);
-                } else star_step(d, key);
+                } else {
+                    size_t previous = d->star; star_step(d,key);
+                    if (d->star != previous && d->star < d->model.notes.count) {
+                        d->follow_star = true; d->card = true;
+                        request(d,SB_ACT_NOTE,d->model.notes.items[d->star].path);
+                    }
+                }
                 d->keyboard = true; return;
             }
             if (key == SDLK_HOME) { camera_reset(d); return; }
@@ -379,7 +465,8 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
         }
         if (!text && (key == SDLK_PAGEDOWN || key == SDLK_PAGEUP || key == SDLK_DOWN || key == SDLK_UP)) {
             d->focus_scroll_frames = 0;
-            d->scroll += key == SDLK_DOWN ? 50 : key == SDLK_UP ? -50 : key == SDLK_PAGEDOWN ? 220 : -220;
+            unsigned slot=scroll_slot(d,0,0,false);
+            if (slot<4) d->scrolling[slot].pending += key == SDLK_DOWN ? 50 : key == SDLK_UP ? -50 : key == SDLK_PAGEDOWN ? 220 : -220;
             return;
         }
     }
@@ -431,8 +518,10 @@ static void tools(SBDesktop *d, int width, float height, nk_flags flags) {
     struct nk_context *ctx = d->ui.ctx; float s = d->ui.scale;
     struct nk_rect rect = nk_rect(18, 16, width - 36.0f, height);
     glass(d, rect, 27); d->focus_group = 0;
+    struct nk_vec2 padding=ctx->style.window.padding;
+    bool compact = width < 1100 || s > 1.25f;
+    ctx->style.window.padding.y=fmaxf(0,(height-(compact ? 70*s+ctx->style.window.spacing.y : 36*s))/2);
     if (nk_begin(ctx, "Lumen tools", rect, flags | NK_WINDOW_NO_SCROLLBAR)) {
-        bool compact = width < 1100 || s > 1.25f;
         nk_layout_row_begin(ctx, NK_DYNAMIC, 36 * s, compact ? 4 : 8);
         if (!compact) { nk_layout_row_push(ctx, 0.13f); nk_label(ctx, "SecondBrain", NK_TEXT_LEFT); }
         nk_layout_row_push(ctx, compact ? 0.30f : 0.18f);
@@ -444,6 +533,7 @@ static void tools(SBDesktop *d, int width, float height, nk_flags flags) {
         if (!length && !focused(d, "search")) {
             struct nk_rect hint = d->targets[d->target_count-1].bounds;
             hint.x += 12; hint.w -= 24;
+            hint.y += (hint.h-d->ui.normal->handle.height)/2; hint.h=d->ui.normal->handle.height;
             nk_draw_text(nk_window_get_canvas(ctx), hint, "Suche im Projekt", 16, &d->ui.normal->handle,
                 nk_rgba(0,0,0,0), nk_rgb(154,176,204));
         }
@@ -466,7 +556,7 @@ static void tools(SBDesktop *d, int width, float height, nk_flags flags) {
             if (button(d, "help", "Tastaturhilfe")) d->form = SB_FORM_HELP;
         }
     }
-    nk_end(ctx);
+    nk_end(ctx); ctx->style.window.padding=padding;
 }
 static void document_list(SBDesktop *d, struct nk_rect rect, nk_flags flags) {
     struct nk_context *ctx = d->ui.ctx; float s = d->ui.scale;
@@ -559,11 +649,8 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
     target(d, "reader");
     if (d->target_count) d->targets[d->target_count - 1].kind = SB_FOCUS_READER;
     ring(d, "reader");
-    if (d->scroll && (!strcmp(d->focus, "reader") || !strncmp(d->focus,"link:",5) || d->form == SB_FORM_CONTEXT)) {
-        nk_uint x = 0, y = 0; nk_group_get_scroll(ctx, "Reader", &x, &y);
-        nk_group_set_scroll(ctx, "Reader", x, (nk_uint)fmaxf(0, (float)y + d->scroll)); d->scroll = 0;
-    }
     if (!nk_group_begin(ctx, "Reader", 0)) return;
+    smooth_scroll(d,0,ctx->current->layout->offset_y);
     while (*line) {
         const char *end = strchr(line, '\n');
         size_t length = end ? (size_t)(end - line) : strlen(line);
@@ -660,10 +747,7 @@ static void detail(SBDesktop *d, float x, float y, float width, float height, nk
     struct nk_context *ctx = d->ui.ctx;
     float s = d->ui.scale;
     if (nk_begin(ctx, "Detail", nk_rect(x, y, width, height), flags)) {
-        if (d->scroll && strcmp(d->focus,"reader") && strncmp(d->focus,"link:",5)) {
-            nk_uint sx, sy; nk_window_get_scroll(ctx,&sx,&sy);
-            nk_window_set_scroll(ctx,sx,(nk_uint)fmaxf(0,(float)sy+d->scroll)); d->scroll = 0;
-        }
+        smooth_scroll(d,2,ctx->current->layout->offset_y);
         if (d->reset_reader) { nk_group_set_scroll(ctx, "Reader", 0, 0); d->reset_reader = false; }
         nk_layout_row_dynamic(ctx, 28 * s, 1);
         if (button(d, "close-card", "Zur Sternkarte")) { d->card = false; focus_set(d, "galaxy"); }
@@ -702,6 +786,8 @@ static void detail(SBDesktop *d, float x, float y, float width, float height, nk
             nk_style_set_font(ctx, &d->ui.body->handle);
             nk_layout_row_dynamic(ctx, body_height, 1); text_target(d, "editor");
             if (d->focus_editor) { nk_edit_focus(ctx, NK_EDIT_ALWAYS_INSERT_MODE); d->focus_editor = false; }
+            nk_uint editor_scroll=(nk_uint)d->text_edit.scrollbar.y;
+            smooth_scroll(d,1,&editor_scroll); d->text_edit.scrollbar.y=(float)editor_scroll;
             nk_edit_buffer(ctx, NK_EDIT_BOX, &d->text_edit, nk_filter_default);
             size_t length = d->text_edit.string.buffer.allocated;
             d->model.editor[length] = 0; ring(d, "editor");
@@ -753,10 +839,7 @@ static void popup(SBDesktop *d, int width, int height) {
     glass(d, nk_rect((width-w)/2, (height-h)/2, w, h), 28);
     if (nk_begin(ctx, title, nk_rect((width - w) / 2, (height - h) / 2, w, h),
                  NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
-        if (d->scroll && d->form != SB_FORM_CONTEXT) {
-            nk_uint x, y; nk_window_get_scroll(ctx, &x, &y);
-            nk_window_set_scroll(ctx, x, (nk_uint)fmaxf(0, (float)y + d->scroll)); d->scroll = 0;
-        }
+        smooth_scroll(d,3,ctx->current->layout->offset_y);
         if (d->form == SB_FORM_PROJECT || d->form == SB_FORM_NOTE) {
             char previous_id[65];
             field(d, "form-name", d->form == SB_FORM_PROJECT ? "Projektname" : "Titel", d->name, sizeof(d->name), 1);
@@ -813,6 +896,8 @@ static void popup(SBDesktop *d, int width, int height) {
             if (button(d, "font-plus", "Größere Schrift")) { d->next_scale = fminf(2, d->ui.scale + 0.25f); command(d, SB_CMD_SCALE); }
             nk_layout_row_dynamic(ctx, 36 * s, 1);
             if (button(d, "transparency", d->solid ? "Glasdarstellung aktivieren" : "Transparenz reduzieren")) d->solid = !d->solid;
+            nk_layout_row_dynamic(ctx,36*s,1);
+            if (button(d,"motion",d->reduced_motion ? "Animationen aktivieren" : "Bewegung reduzieren")) d->reduced_motion=!d->reduced_motion;
         } else if (d->form == SB_FORM_CONTEXT) {
             nk_layout_row_dynamic(ctx, 64 * s, 1);
             nk_label_wrap(ctx, "Dieser Kontext enthält die gespeicherten Kerninformationen. Die Originaldateien bleiben über den Projektordner zugänglich.");
@@ -826,7 +911,7 @@ static void popup(SBDesktop *d, int width, int height) {
                 "F: Suche · E: Lesen/Bearbeiten", "R: Neu laden · Umschalt+C: KI-Kontext",
                 "Tab / Umschalt+Tab: Fokus · Enter/Leertaste: aktivieren",
                 "F6: Werkzeuge, Sterne, Dokument · F1: Hilfe",
-                "Sterne: Pfeile wählen · Enter öffnet die Notiz",
+                "Sterne: Pfeile öffnen die nächste Notiz sofort",
                 "Umschalt+Pfeile: Kamera drehen · +/-: Zoom · Pos1: zurück",
                 "Ziehen: drehen · Umschalt+Ziehen: verschieben · Mausrad: Zoom",
                 "Bild auf/ab: Lesen scrollen · Escape: zurück/schließen",
@@ -848,6 +933,7 @@ static void graph_refresh(SBDesktop *d) {
     d->graph_dirty = false;
     if (strcmp(d->graph_project, d->model.project.root)) {
         snprintf(d->graph_project, sizeof(d->graph_project), "%s", d->model.project.root); camera_reset(d);
+        d->view_yaw=d->view_pitch=d->view_pan_x=d->view_pan_y=0; d->view_zoom=1;
     }
     if (d->model.has_project) {
         SBStatus status = sb_graph_build(&d->model.project, &d->model.notes, &d->graph);
@@ -869,17 +955,28 @@ static void galaxy(SBDesktop *d, int width, int height, struct nk_rect card, str
     float right = d->card ? card.x - 12 : width - 24.0f;
     if (right - left < 180) { left = 24; right = width - 24.0f; }
     float cx = (left + right) / 2;
-    float unit = fminf((right - left) / 760, d->map_bounds.h / 460) * d->zoom;
+    if (d->follow_star && d->navigation.kind == SB_ACT_NONE && !d->model.guard && d->star < d->graph.count) {
+        SBStar v=d->graph.stars[d->star];
+        float unit_target=fminf((right-left)/760,d->map_bounds.h/460)*d->zoom;
+        float x=v.x*cosf(d->yaw)+v.z*sinf(d->yaw);
+        float z=-v.x*sinf(d->yaw)+v.z*cosf(d->yaw);
+        float y=v.y*cosf(d->pitch)-z*sinf(d->pitch);
+        z=v.y*sinf(d->pitch)+z*cosf(d->pitch);
+        d->pan_x=fmaxf(-120,fminf(120,-x*700/(700+z)*unit_target*0.35f));
+        d->pan_y=fmaxf(-90,fminf(90,-y*700/(700+z)*unit_target*0.35f));
+        d->follow_star=false;
+    }
+    float unit = fminf((right - left) / 760, d->map_bounds.h / 460) * d->view_zoom;
     for (size_t i = 0; i < space->count; ++i) {
         SBStar v = d->graph.stars[i];
-        float x = v.x * cosf(d->yaw) + v.z * sinf(d->yaw);
-        float z = -v.x * sinf(d->yaw) + v.z * cosf(d->yaw);
-        float y = v.y * cosf(d->pitch) - z * sinf(d->pitch);
-        z = v.y * sinf(d->pitch) + z * cosf(d->pitch);
+        float x = v.x * cosf(d->view_yaw) + v.z * sinf(d->view_yaw);
+        float z = -v.x * sinf(d->view_yaw) + v.z * cosf(d->view_yaw);
+        float y = v.y * cosf(d->view_pitch) - z * sinf(d->view_pitch);
+        z = v.y * sinf(d->view_pitch) + z * cosf(d->view_pitch);
         float perspective = 700 / (700 + z);
         SBPoint *p = &space->points[i];
-        p->x = cx + x * perspective * unit + d->pan_x;
-        p->y = cy + y * perspective * unit + d->pan_y;
+        p->x = cx + x * perspective * unit + d->view_pan_x;
+        p->y = cy + y * perspective * unit + d->view_pan_y;
         p->depth = perspective; p->group = v.group;
         p->selected = !strcmp(d->model.path, d->model.notes.items[i].path);
         p->focused = focused(d, "galaxy") && i == d->star;
@@ -928,6 +1025,8 @@ static void camera_tools(SBDesktop *d, int width, int height, float available, n
     if (w < 220) return;
     struct nk_rect rect = nk_rect(18,height-80*s,w,64*s);
     glass(d,rect,26); d->focus_group = 1;
+    struct nk_vec2 padding=ctx->style.window.padding;
+    ctx->style.window.padding.y=(rect.h-28*s)/2;
     if (nk_begin(ctx,"Camera",rect, flags | NK_WINDOW_NO_SCROLLBAR)) {
         nk_layout_row_begin(ctx,NK_DYNAMIC,28*s,5);
         nk_layout_row_push(ctx,0.15f);
@@ -942,16 +1041,18 @@ static void camera_tools(SBDesktop *d, int width, int height, float available, n
         if (button(d,"camera-home","Home")) camera_reset(d);
         nk_layout_row_end(ctx);
     }
-    nk_end(ctx);
+    nk_end(ctx); ctx->style.window.padding=padding;
 }
 void sb_desktop_frame(SBDesktop *d) {
     int width, height; SDL_GetWindowSize(d->ui.window,&width,&height);
     synchronize(d);
+    for (unsigned i=0;i<4;++i) d->scrolling[i].used=false;
     if (d->search[0] && strcmp(d->search,d->searched)) d->browser = true;
     search_refresh(d); graph_refresh(d);
     bool modal = d->form != SB_FORM_NONE || d->model.guard;
     bool before = d->focus_form != SB_FORM_NONE || d->focus_guard;
     bool enter = modal && (!before || d->form != d->focus_form || d->model.guard != d->focus_guard);
+    if (enter) memset(d->scrolling,0,sizeof(d->scrolling));
     if (modal && !before) snprintf(d->saved_focus,sizeof(d->saved_focus),"%s",d->focus);
     if (!modal && before) focus_set(d,d->saved_focus[0] ? d->saved_focus : "project-picker");
     if (!modal && d->focus_editor && d->editing) focus_set(d,"editor");
@@ -996,6 +1097,9 @@ void sb_desktop_frame(SBDesktop *d) {
     }
     if (!focus_target(d) && d->target_count) focus_set(d,d->targets[0].id);
     d->activate[0] = 0;
+    for (unsigned i=0;i<4;++i) if (!d->scrolling[i].used) {
+        d->scrolling[i].active=false; d->scrolling[i].pending=0; d->scrolling[i].ready=false;
+    }
     if (d->focus_scroll_frames) --d->focus_scroll_frames;
     nk_style_set_font(d->ui.ctx,&d->ui.normal->handle);
     nk_sdl_update_TextInput(d->ui.ctx);

@@ -68,5 +68,5 @@ Bei Überschreitung bleibt die Dokumentliste verfügbar. Die Graphauswertung
 unterstützt einfache Markdown-Inline-Links; Referenzdefinitionen und Wiki-Links
 werden noch nicht ausgewertet. Die Glasdarstellung ist ein eigener C-Effekt und
 verwendet keine native macOS-26-Materialkomponente. Reduzierte Transparenz lässt
-sich in der App aktivieren. Kamerabewegungen erfolgen direkt auf Eingaben;
-es gibt keine automatische Rotation.
+sich in der App aktivieren. Kamera und Scrollen verwenden kurze Übergänge;
+„Bewegung reduzieren“ schaltet sie ab. Es gibt keine automatische Rotation.

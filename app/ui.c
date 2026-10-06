@@ -111,7 +111,7 @@ void sb_ui_theme(SBUi *ui, bool dark) {
     ui->ctx->style.button.rounding = 12;
     ui->ctx->style.button.border = 0.8f;
     ui->ctx->style.button.border_color = dark ? nk_rgba(161,193,230,48) : nk_rgba(103,139,181,64);
-    ui->ctx->style.button.padding = nk_vec2(10, 6);
+    ui->ctx->style.button.padding = nk_vec2(10, 4);
     ui->ctx->style.edit.rounding = 16;
     ui->ctx->style.edit.padding = nk_vec2(10, 8);
     ui->ctx->style.edit.row_padding = 5;

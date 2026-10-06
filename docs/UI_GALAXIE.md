@@ -73,7 +73,7 @@ vorgestellten Arbeitsablauf.
 ## Drei Entwürfe zur Auswahl
 
 Die Vorschauen zeigen ausdrücklich Beispieldaten. Positionen und Beziehungen
-sind illustrative Entwurfsdaten, keine neue Analyse des Physim-Repositories.
+sind illustrative Entwurfsdaten, keine neue Analyse des Beispielprojekt-Repositories.
 
 ### Lumen
 

@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
     SBNotes notes = {0};
     SBNote note;
     SBRevision first = {0}, saved = {0};
-    const char *name = "Physim ü \"Wissen\" @DATE@";
+    const char *name = "Beispielprojekt ü \"Wissen\" @DATE@";
     if (argc != 2) return 2;
     snprintf(suffix, sizeof(suffix), "run-%lu-%lu/Wissensbasis ü", sb_process_id(), (unsigned long)time(NULL));
     OK(sb_path_join(workspace, sizeof(workspace), argv[1], suffix));
@@ -34,11 +34,11 @@ int main(int argc, char **argv) {
     CHECK(sb_project_create(workspace, "test", "Zeile\nBefehl", NULL, NULL).code == SB_INVALID);
     CHECK(sb_project_create(workspace, "test", "Test", "/missing-secondbrain-repository", NULL).code == SB_INVALID);
 
-    OK(sb_project_create(workspace, "physim", name, NULL, &project));
+    OK(sb_project_create(workspace, "beispielprojekt", name, NULL, &project));
     OK(sb_note_load(&project, "PROJECT.md", &text, &first));
     CHECK(strstr(text, name) != NULL);
     free(text); text = NULL;
-    CHECK(sb_project_create(workspace, "physim", "Ersetzen", NULL, NULL).code == SB_EXISTS);
+    CHECK(sb_project_create(workspace, "beispielprojekt", "Ersetzen", NULL, NULL).code == SB_EXISTS);
     OK(sb_note_load(&project, "PROJECT.md", &text, &saved));
     CHECK(first.hash == saved.hash && first.length == saved.length);
     CHECK(sb_note_archive(&project, "PROJECT.md", saved, archived, sizeof(archived)).code == SB_INVALID);
@@ -101,11 +101,11 @@ int main(int argc, char **argv) {
     OK(sb_path_join(path, sizeof(path), project.root, "brain.json"));
     OK(sb_path_join(temporary, sizeof(temporary), project.root, "metadata.tmp"));
     {
-        const char *json = "{\"name\":\"Physim \\u00fc \\ud83d\\ude80\",\"other\":[true,null,{\"a\":12.5e2}]}";
+        const char *json = "{\"name\":\"Beispielprojekt \\u00fc \\ud83d\\ude80\",\"other\":[true,null,{\"a\":12.5e2}]}";
         OK(sb_fs_write_new(temporary, json, strlen(json)));
         OK(sb_fs_replace(temporary, path));
         OK(sb_projects_list(workspace, &projects));
-        CHECK(projects.count == 1 && !strcmp(projects.items[0].name, "Physim ü 🚀"));
+        CHECK(projects.count == 1 && !strcmp(projects.items[0].name, "Beispielprojekt ü 🚀"));
         sb_projects_free(&projects);
     }
     {

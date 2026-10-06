@@ -76,7 +76,22 @@ Beleg: [Verfeinerte Studie](../../docs/UI_GALAXIE.md).
 
 Am 6. Oktober hat der Nutzer die Umsetzung des neuen Designs und problemlose
 Navigation ausschließlich per Tastatur beauftragt. Tab folgt einer sichtbaren,
-stabilen Reihenfolge; F6 wechselt Gruppen. Sternfokus und Öffnen sind getrennt.
+stabilen Reihenfolge; F6 wechselt Gruppen. Die ursprüngliche getrennte Sternwahl
+wurde durch den Folgeauftrag zur direkten Navigation ersetzt (D10).
 Dialoge, Quellen, Kontext und Bearbeitung bleiben erreichbar. Ein eigener
 SDL-Tastaturdurchlauf prüft die Abläufe ohne injizierte Mausereignisse.
 Quelle: Nutzerauftrag; [Bedienvertrag](../../docs/UI_TASTATUR.md).
+
+## D10: Direkte Navigation und kurze Übergänge
+
+Der Folgeauftrag vom 6. Oktober verlangt sofortiges Öffnen der nächsten Notiz mit
+Pfeiltasten und flüssigere Bewegungen. Kamera und Scrollposition verwenden kurze,
+unterbrechbare Übergänge; reduzierte Bewegung ist in der App wählbar. Der Schutz
+ungespeicherter Änderungen bleibt maßgeblich. Ein fremdes Projektbeispiel wurde
+auf Nutzerwunsch vollständig aus der aktuellen Arbeitsfassung entfernt; neutrale
+Testdaten ersetzen es. Die Git-Historie bleibt erhalten.
+
+Die README orientiert sich nach Recherche an üblichen Desktop-Projekten. Eine
+abschließende sprachliche Prüfung des Endprodukts folgt erst vor 1.0; die
+Entwicklungsdokumentation bleibt erhalten. [Release-Aufgaben](../../docs/RELEASE.md)
+und [README-Recherche](../../docs/README_RECHERCHE.md).

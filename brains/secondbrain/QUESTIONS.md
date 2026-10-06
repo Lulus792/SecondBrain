@@ -15,10 +15,18 @@ Geklärt: Lumen liefert die gewünschte Farbpalette. Karten und Bedienelemente
 sollen stärker wie Apples Liquid Glass gestaltet werden. Die verfeinerte
 Vorschau ist erstellt und geprüft.
 
-Offen für die Integration: der Materialweg auf Windows, macOS und Linux sowie
-Kamerabedienung und Graphumfang. Apples native macOS-Komponente ist ab macOS 26
-dokumentiert; die Vorschau selbst ist eine optische Nachbildung.
-Beleg: [Designrecherche](../../docs/UI_GALAXIE.md).
+Geklärt in Version 0.2: Die C-App verwendet einen eigenen Materialrenderer auf
+allen drei Plattformen. Kamerabedienung und Graphumfang sind implementiert und
+abgenommen. Apples native Komponente ist weiterhin kein Bestandteil der App.
+Beleg: [Designrecherche](../../docs/UI_GALAXIE.md) und [Umsetzung](../../docs/UI_TASTATUR.md).
+
+## Vollständiger Release
+
+Welche Betriebssystemversionen und Funktionen werden für 1.0 zugesagt? Welche
+Lizenz soll der eigene Code erhalten? Welche Vertriebswege sollen signierte
+Pakete und Notarisierung verwenden? Die [Release-Liste](../../docs/RELEASE.md)
+hält die erforderlichen Arbeiten und ihre Abnahme fest. Die abschließende
+sprachliche Bereinigung bleibt ein Schritt vor dem fertigen Endprodukt.
 
 ## Weitere mögliche Erweiterungen
 

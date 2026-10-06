@@ -1,4 +1,4 @@
-SecondBrain 0.2
+SecondBrain 0.2.1
 
 Dieses Paket enthält die eigene Desktop-Anwendung. Python, ein Compiler
 und eine externe Wissensanwendung sind zum Starten nicht erforderlich.
@@ -23,7 +23,7 @@ N neue Notiz, Umschalt+N neues Projekt, S speichern, O Arbeitsordner,
 F suchen, E lesen/bearbeiten, R neu laden, Umschalt+C KI-Kontext.
 Tab / Umschalt+Tab wechselt Elemente, Enter/Leertaste aktiviert.
 F6 wechselt Werkzeuge, Sternkarte und Dokument; F1 öffnet die Hilfe.
-Sterne: Pfeile wählen, Enter öffnet, Umschalt+Pfeile dreht, +/- zoomt, Pos1 setzt zurück.
+Sterne: Pfeile öffnen sofort die nächste Notiz, Umschalt+Pfeile dreht, +/- zoomt, Pos1 setzt zurück.
 Bild auf/ab scrollt Lesebereiche; Escape geht zurück oder schließt Karten/Dialoge.
 Tab verlässt den Editor; Ctrl+I fügt dort einen Tabulator ein.
 Ziehen dreht, Umschalt+Ziehen verschiebt, Mausrad zoomt. "Liste" zeigt Dokumente.
@@ -41,3 +41,5 @@ einschränken. Installiere nur aus einer Quelle, der du vertraust.
 
 Projekt, Quellen und Nachweise: https://github.com/Lulus792/SecondBrain
 Lizenzen der UI-Abhängigkeiten und Schriften stehen unter licenses.
+
+In den Einstellungen lassen sich Transparenz und Bewegung reduzieren.
