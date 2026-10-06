@@ -350,6 +350,33 @@ SBStatus sb_metadata_validate(const char *json,size_t length,char name[SB_NAME_C
     if (status.code==SB_OK) strcpy(name,candidate);
     free(copy); return status;
 }
+SBStatus sb_project_metadata(const SBProject *project,char name[SB_NAME_CAP],SBRevision *revision) {
+    char path[SB_PATH_CAP],candidate[SB_NAME_CAP],chunk[8192]; Buffer json={0}; SBFile *file=NULL;
+    if (sb_fs_kind(project->root)!=2) return sb_error(SB_INVALID,"Projektordner ist kein regulärer Ordner.");
+    TRY(sb_path_join(path,sizeof(path),project->root,"brain.json"));
+    int kind=sb_fs_kind(path);
+    if (kind!=1) return sb_error(!kind ? SB_NOT_FOUND : kind<0 ? SB_IO : SB_INVALID,"Projektmetadaten fehlen oder sind keine reguläre Datei.");
+    SBStatus status=sb_file_open(path,false,&file);
+    while (status.code==SB_OK) {
+        size_t count=0; status=sb_file_read(file,chunk,sizeof(chunk),&count);
+        if (status.code!=SB_OK || !count) break;
+        status=add(&json,chunk,count);
+    }
+    SBStatus closed=sb_file_close(file,false); if (status.code==SB_OK) status=closed;
+    if (status.code==SB_OK) status=append(&json,"");
+    if (status.code==SB_OK) status=sb_metadata_validate(json.data,json.length,candidate);
+    if (status.code==SB_OK) {
+        if (name) strcpy(name,candidate);
+        if (revision) *revision=(SBRevision){sb_hash(json.data,json.length),json.length,true};
+    }
+    free(json.data); return status;
+}
+static SBStatus check_project_revision(const SBProject *project,SBRevision expected) {
+    SBRevision current={0}; TRY(sb_project_metadata(project,NULL,&current));
+    if (current.hash!=expected.hash || current.length!=expected.length)
+        return sb_error(SB_CONFLICT,"Projektmetadaten wurden während der Aktion geändert. Die Datei bleibt unverändert.");
+    return sb_ok();
+}
 SBStatus sb_metadata_reidentify(const char *json,size_t length,const char *id,char **out,size_t *out_length) {
     char name[SB_NAME_CAP],*copy=NULL; const char *cursor,*begin=NULL,*end=NULL;
     Buffer buffer={0}; bool found=false;
@@ -637,10 +664,15 @@ SBStatus sb_note_save(const SBProject *project, const char *relative, const char
     size_t length = strlen(text);
     static unsigned counter = 0;
     SBStatus result;
+    SBRevision metadata={0};
     if (length > SB_TEXT_LIMIT || !sb_utf8_valid(text, length)) return sb_error(SB_INVALID, "Text ist zu groß oder enthält ungültiges UTF-8.");
+    TRY(sb_project_metadata(project,NULL,&metadata));
     TRY(note_path(project, relative, path));
     TRY(check_revision(project, relative, expected));
-    if (!expected.exists) result = sb_fs_write_new(path, text, length);
+    if (!expected.exists) {
+        TRY(check_project_revision(project,metadata));
+        result = sb_fs_write_new(path, text, length);
+    }
     else {
         snprintf(suffix, sizeof(suffix), ".sbtmp-%lu-%u", sb_process_id(), ++counter);
         if (strlen(path) + strlen(suffix) >= sizeof(temporary)) return sb_error(SB_LIMIT, "Pfad zu lang.");
@@ -648,6 +680,7 @@ SBStatus sb_note_save(const SBProject *project, const char *relative, const char
         result = sb_fs_write_new(temporary, text, length);
         if (result.code != SB_OK) return result;
         result = check_revision(project, relative, expected);
+        if (result.code==SB_OK) result=check_project_revision(project,metadata);
         if (result.code == SB_OK) result = sb_fs_replace(temporary, path);
         if (result.code != SB_OK) sb_fs_remove(temporary);
     }
@@ -668,6 +701,7 @@ SBStatus sb_note_create(const SBProject *project, const char *section,
     SBStatus result;
     if (!section_valid(section) || !sb_id_valid(id) || !name_valid(title))
         return sb_error(SB_INVALID, "Bereich, Kennung oder Titel ist ungültig.");
+    TRY(sb_project_metadata(project,NULL,NULL));
     snprintf(note.path, sizeof(note.path), "%s/%s.md", section, id);
     strcpy(note.title, title); strcpy(note.section, section);
     TRY(sb_path_join(directory, sizeof(directory), project->root, section));
@@ -687,8 +721,10 @@ SBStatus sb_note_archive(const SBProject *project, const char *relative, SBRevis
     const char *base = strrchr(relative, '/');
     unsigned index = 0;
     SBStatus result;
+    SBRevision metadata={0};
     if (!strchr(relative, '/')) return sb_error(SB_INVALID, "Kerndokumente bleiben in der Projektübersicht.");
     if (!strncmp(relative, "archive/", 8)) return sb_error(SB_INVALID, "Dokument liegt bereits im Archiv.");
+    TRY(sb_project_metadata(project,NULL,&metadata));
     TRY(note_path(project, relative, from));
     TRY(check_revision(project, relative, expected));
     if (!expected.exists) return sb_error(SB_NOT_FOUND, "Dokument fehlt.");
@@ -703,6 +739,7 @@ SBStatus sb_note_archive(const SBProject *project, const char *relative, SBRevis
         if (snprintf(archived, capacity, "archive/%s", name) < 0 ||
             strlen(name) + 9 > capacity) return sb_error(SB_LIMIT, "Archivpfad zu lang.");
         TRY(sb_path_join(to, sizeof(to), project->root, archived));
+        TRY(check_project_revision(project,metadata));
         result = sb_fs_move_new(from, to);
         if (++index > 10000) return sb_error(SB_LIMIT, "Zu viele gleichnamige Archive.");
     } while (result.code == SB_EXISTS);

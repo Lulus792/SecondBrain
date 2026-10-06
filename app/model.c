@@ -57,11 +57,7 @@ static SBStatus open_note(SBApp *app, const char *path) {
 }
 static SBStatus set_project(SBApp *app, const SBProject *project) {
     if (project->problem.code!=SB_OK) return project->problem;
-    SBProject current=*project; char metadata_path[SB_PATH_CAP],*metadata=NULL; size_t metadata_length=0;
-    TRY(sb_path_join(metadata_path,sizeof(metadata_path),project->root,"brain.json"));
-    SBStatus checked=sb_fs_read(metadata_path,&metadata,&metadata_length);
-    if (checked.code==SB_OK) checked=sb_metadata_validate(metadata,metadata_length,current.name);
-    free(metadata); if (checked.code!=SB_OK) return checked;
+    SBProject current=*project; TRY(sb_project_metadata(project,current.name,NULL));
     project=&current;
     SBNotes notes = {0};
     SBRevision revision = {0};

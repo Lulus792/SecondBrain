@@ -657,3 +657,40 @@ folgen gesondert; automatische Metadatenreparatur wurde nicht eingeführt.
 Das lokal abgenommene Paket 0.7.1 liegt unter dist/SecondBrain. Der tatsächliche
 Start mit dem eigenen Projektgedächtnis ist betrachtet; Version 0.7.2 folgt erst
 nach ihrer gesonderten Paketabnahme.
+
+
+## 0.7.3: Aktuelle Metadaten vor Schreibaktionen prüfen
+
+Auch ein bereits geöffnetes Projekt kann extern nicht unterstützte Metadaten
+bekommen. Die Schreibwege prüfen nun den aktuellen Stand: Speichern, neue Notizen,
+Kopien und Archivieren. Kurz vor Ersetzen/Verschieben wird die Metadatenrevision
+zusätzlich abgeglichen. Erkanntes Schemaproblem/Entfernen schützt Datei und Entwurf;
+fehlgeschlagenes Save im Wechsel-Dialog erhält die Entscheidung. Gültige spätere
+Metadaten ermöglichen die Aktion wieder. [Vertrag und Grenzen](DATENVERTRAG.md).
+
+Alle elf reinen Kerntests bestehen. Gezielte Sanitizer-, Desktop- und native
+Plattformnachweise folgen gesondert. Die Regression verwendet private Testdaten.
+
+
+## Abnahme von 0.7.2
+
+[Lauf zu f2e2725](https://github.com/Lulus792/SecondBrain/actions/runs/37534667024)
+besteht mit allen 18 Jobs: 21 Desktoptests je Debug/Release auf Windows x64,
+macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Die Teilfehlerbehandlung
+besteht auch im Produktions-CLI-Prozesstest auf den nativen CI-Systemen. Lokal
+besteht das entpackte Intel-Paket mit 126 Desktop-, 105 Tastatur- und 75 Sicherungs-
+UI-Aussagen sowie Einstellungsprozessen und CLI-Sicherung. Archiv-SHA-256:
+`9989fc424de596e021504e0ac71132231d20347d4e923cc68ab82e81f38a8c1d`. Menschliche assistive Bedienung und übrige Release-Abnahmen bleiben offen.
+
+
+Abschließender lokaler Nachweis: 22 Release-Tests bestehen (302,43 Sekunden),
+zusätzlich die ergänzte UI-Nachprüfung (14,47 Sekunden). Elf reine Kerntests
+bestehen (2,41 Sekunden). Fünf gezielte ASan/UBSan-Wege bestehen (8,45 Sekunden),
+die ergänzte UI-/Guard-Nachprüfung ebenfalls (22,27 Sekunden). Die Regression
+enthält 75 Guard-Aussagen; die UI prüft Save-Verweigerung und Wiederkehr gültiger
+Metadaten innerhalb ihrer 47 Aussagen. Das tatsächliche Fehlerbild wurde betrachtet.
+Mit dem bisherigen Kern schlägt die Guard-Regression beim Speichern fehl (Exit 1).
+Native Plattform- und entpackte Paketabnahme zu 0.7.3 folgen gesondert.
+
+Das abgenommene Intel-Paket 0.7.2 ist nach dist/SecondBrain übernommen. Sein
+tatsächlicher Start mit dem eigenen Projektgedächtnis ist betrachtet.

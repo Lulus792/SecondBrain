@@ -11,7 +11,8 @@ static void frame(SBDesktop *d) {
     nk_input_begin(d->ui.ctx); SDL_Event e; while (SDL_PollEvent(&e)) sb_desktop_event(d,&e); nk_input_end(d->ui.ctx);
     sb_desktop_tick(d,1.0f/60); sb_desktop_frame(d); sb_ui_draw(&d->ui); SDL_RenderPresent(d->ui.renderer); sb_desktop_apply(d);
 }
-static void key(SBDesktop *d,SDL_Keycode code) { SDL_Event e={0};e.type=SDL_EVENT_KEY_DOWN;e.key.key=code;nk_input_begin(d->ui.ctx);sb_desktop_event(d,&e);nk_input_end(d->ui.ctx);frame(d);frame(d);frame(d); }
+static void key_mod(SBDesktop *d,SDL_Keycode code,SDL_Keymod mod) { SDL_Event e={0};e.type=SDL_EVENT_KEY_DOWN;e.key.key=code;e.key.mod=mod;nk_input_begin(d->ui.ctx);sb_desktop_event(d,&e);nk_input_end(d->ui.ctx);frame(d);frame(d);frame(d); }
+static void key(SBDesktop *d,SDL_Keycode code) { key_mod(d,code,0); }
 static SBTarget *target(SBDesktop *d,const char *id) { for (size_t i=0;i<d->target_count;++i) if (!strcmp(d->targets[i].id,id)) return &d->targets[i];return NULL; }
 static bool activate(SBDesktop *d,const char *id) { for (unsigned i=0;i<25 && strcmp(d->focus,id);++i) key(d,SDLK_TAB);if (strcmp(d->focus,id))return false;key(d,SDLK_RETURN);return true; }
 static SBStatus replace(const char *path,const char *text) { char temporary[SB_PATH_CAP];snprintf(temporary,sizeof(temporary),"%s.tmp",path);SBStatus s=sb_fs_write_new(temporary,text,strlen(text));return s.code==SB_OK ? sb_fs_replace(temporary,path) : s; }
@@ -22,6 +23,17 @@ int main(int argc,char **argv) {
     SBProject good,bad;OK(sb_project_create(workspace,"good","Gültiges Projekt",NULL,&good));OK(sb_project_create(workspace,"bad","Defekt",NULL,&bad));
     OK(sb_path_join(path,sizeof(path),bad.root,"brain.json"));const char *invalid="{\"name\":\"Defekt\",\"schema_version\":2}";OK(replace(path,invalid));
     SBDesktop d;OK(sb_desktop_init(&d,workspace,argv[1],true));frame(&d);CHECK(d.model.has_project && !strcmp(d.model.project.id,"good"));
+    OK(sb_path_join(good_path,sizeof(good_path),good.root,"brain.json"));
+    char *metadata=NULL;size_t metadata_length=0;OK(sb_fs_read(good_path,&metadata,&metadata_length));
+    strcat(d.model.editor,"Entwurf nach Schemawechsel.\n");OK(replace(good_path,invalid));
+#ifdef __APPLE__
+    SDL_Keymod save_mod=SDL_KMOD_GUI;
+#else
+    SDL_Keymod save_mod=SDL_KMOD_CTRL;
+#endif
+    key_mod(&d,SDLK_S,save_mod);CHECK(d.message.code==SB_INVALID && sb_app_dirty(&d.model));
+    CHECK(strstr(d.model.editor,"Entwurf nach Schemawechsel"));OK(capture(&d,root,"metadata-save-error.bmp"));
+    OK(replace(good_path,metadata));free(metadata);key_mod(&d,SDLK_S,save_mod);CHECK(!sb_app_dirty(&d.model) && d.message.code==SB_OK);
     CHECK(activate(&d,"project-picker") && d.form==SB_FORM_PROJECTS);CHECK(target(&d,"project:good") && !target(&d,"project:bad"));
     bool reason=false;for(size_t i=0;i<d.passive_count;++i) if(strstr(d.passive[i].text,"Projektschema 2"))reason=true;CHECK(reason);OK(capture(&d,root,"partial-projects.bmp"));
     strcat(d.model.editor,"Entwurf bleibt.\n");OK(replace(path,"{\"name\":\"Repariert\"}"));CHECK(activate(&d,"refresh-projects"));CHECK(sb_app_dirty(&d.model) && target(&d,"project:bad"));

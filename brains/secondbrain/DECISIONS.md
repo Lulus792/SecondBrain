@@ -193,3 +193,12 @@ Kandidaten und prüft aktuelle Metadaten erneut. Die UI nennt Fehler und Adresse
 und bietet bewusstes erneutes Prüfen; dabei bleibt der Entwurf bestehen. CLI nennt
 Teilfehler getrennt und signalisiert die unvollständige Liste mit Exit 1. Dateien
 werden nicht automatisch repariert. [Datenvertrag](../../docs/DATENVERTRAG.md).
+
+
+## D19: Metadaten nicht allein beim Öffnen vertrauen
+
+Eigene C-Schreibwege prüfen das aktuelle Projektformat vor der Aktion und die
+Metadatenrevision vor Ersetzen/Verschieben. Der Metadatenleser öffnet nur reguläre
+Dateien über die vorhandene geprüfte Dateihandle-Schicht. Erkanntes unbekanntes
+Schema, defekte/entfernte Metadaten erhalten Datei, Entwurf und Save-Guard. Dies
+ist keine globale Transaktionssperre. [Datenvertrag](../../docs/DATENVERTRAG.md).

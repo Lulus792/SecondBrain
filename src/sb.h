@@ -56,6 +56,7 @@ SBStatus sb_markdown_title(const char *text, char *out, size_t capacity);
 uint64_t sb_hash(const char *data, size_t length);
 void sb_text_free(char *text);
 SBStatus sb_metadata_validate(const char *json,size_t length,char name[SB_NAME_CAP]);
+SBStatus sb_project_metadata(const SBProject *project,char name[SB_NAME_CAP],SBRevision *revision);
 SBStatus sb_metadata_reidentify(const char *json,size_t length,const char *id,char **out,size_t *out_length);
 
 #endif

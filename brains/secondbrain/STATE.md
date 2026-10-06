@@ -23,7 +23,7 @@ Historische Arbeitsabschnitte bleiben im [Journal](journal/2026-10-06.md).
 - [0.6.1-Abnahme zu b064bd5](https://github.com/Lulus792/SecondBrain/actions/runs/37529776082):
   18 erfolgreiche Jobs, 16 Desktoptests je Debug/Release auf Windows x64,
   macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Raster- und Fokuskontrast
-  sind gezielt nachgeprüft. dist/SecondBrain ist lokal auf 0.7.1.
+  sind gezielt nachgeprüft. dist/SecondBrain ist lokal auf 0.7.2.
 
 ## Abgenommener erster Start
 
@@ -47,7 +47,14 @@ besteht mit 18 Jobs, 18 Desktoptests je Debug/Release und drei entpackten Pakete
 0.7.2 erhält einzelne Projektfehler als sichtbare Einträge und lässt andere
 Projekte nutzbar. Alle 20 Release-Tests und der zusätzliche CLI-Prozesstest
 bestehen, ebenso zehn reine Kerntests und vier ASan/UBSan-Wege. Erneutes Prüfen
-und Fokus-Reveal nach Größenänderung sind betrachtet; Plattform-/Paketabnahme folgt.
+und Fokus-Reveal nach Größenänderung sind betrachtet. Die [Abnahme zu f2e2725](https://github.com/Lulus792/SecondBrain/actions/runs/37534667024)
+besteht mit 18 Jobs, 21 Desktoptests je Debug/Release und drei entpackten Paketen.
+
+0.7.3 prüft aktuelle Metadaten zusätzlich vor Schreibaktionen, auch bei bereits
+geöffnetem Projekt. Elf reine Kerntests bestehen; Save-Guard, Entwurf und
+Originaldatei bleiben bei erkannten Metadatenfehlern erhalten. 22 Release-Tests,
+elf Kerntests und gezielte ASan/UBSan-/UI-Nachprüfungen bestehen; native Plattform-
+und Paketabnahme folgen.
 
 ## Weiterarbeiten und Grenzen
 

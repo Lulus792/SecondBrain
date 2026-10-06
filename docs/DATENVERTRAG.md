@@ -138,3 +138,36 @@ Zugänglichkeit und Projektmodell. Die neuen Prüfungen enthalten 39 UI- und
 46 Modell-/Erkennungsaussagen. Tatsächliche dunkle und helle Kontrastbilder mit
 200 Prozent Schrift sind betrachtet. Native Plattform- und Paketabnahme zu 0.7.2
 folgen gesondert; automatische Metadatenreparatur wurde nicht eingeführt.
+
+
+## Prüfung laufender Schreibaktionen ab 0.7.3
+
+Speichern, Notizkopien, Neuanlegen und Archivieren prüfen die aktuellen Metadaten
+vor der Aktion. Unbekannte/beschädigte oder inzwischen entfernte Metadaten dürfen
+auch über einen bereits geöffneten Projektzustand keine Schreibaktion ermöglichen.
+Speichern und Verschieben prüfen zusätzlich die Metadatenrevision kurz vor dem
+Veröffentlichen. Eine erkannte Änderung führt zu Abbruch und Aufräumen temporärer
+Schreibdateien. Originaldatei und offener Entwurf bleiben erhalten; ein fehlgeschlagenes
+Speichern im Wechsel-Dialog erhält auch die ausstehende Entscheidung.
+
+Die Prüfung ist keine prozessübergreifende Transaktion. Andere Prozesse können
+nach der letzten Prüfung erneut schreiben; Dateien und Metadaten sind nicht
+zusammen gesperrt. Eine während einer begonnenen Erstellung angelegte leere
+Unterstruktur kann bei Fehler bestehen bleiben. Vorhandene Dateien werden dadurch
+nicht ersetzt. Der Unterschied zwischen erkanntem Konflikt und einer globalen
+Transaktionsgarantie gehört zum Vertrag, nicht in eine Erfolgsaussage der UI.
+
+`live-metadata-guard` prüft unbekanntes Schema, defekte und fehlende Metadaten mit
+bereits geöffnetem Projekt, Kopieren, Erstellen, Archivieren, Save-Guard und
+Wiederkehr gültiger Daten. Die neue Regression schlägt mit dem bisherigen Kern
+beim ersten Speicherversuch fehl. Der Parser und alle Prüfungen bleiben eigenes C.
+
+
+Abschließender lokaler Nachweis: 22 Release-Tests bestehen (302,43 Sekunden),
+zusätzlich die ergänzte UI-Nachprüfung (14,47 Sekunden). Elf reine Kerntests
+bestehen (2,41 Sekunden). Fünf gezielte ASan/UBSan-Wege bestehen (8,45 Sekunden),
+die ergänzte UI-/Guard-Nachprüfung ebenfalls (22,27 Sekunden). Die Regression
+enthält 75 Guard-Aussagen; die UI prüft Save-Verweigerung und Wiederkehr gültiger
+Metadaten innerhalb ihrer 47 Aussagen. Das tatsächliche Fehlerbild wurde betrachtet.
+Mit dem bisherigen Kern schlägt die Guard-Regression beim Speichern fehl (Exit 1).
+Native Plattform- und entpackte Paketabnahme zu 0.7.3 folgen gesondert.
