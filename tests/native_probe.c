@@ -135,9 +135,10 @@ static bool query(Probe *p) {
     AtspiAccessible *element=NULL;
     Uint64 deadline=SDL_GetTicks()+15000;
     while (!element && SDL_GetTicks()<deadline) {
+        /* Let the real client consume cache/property events; do not bypass its cache. */
+        for (unsigned i=0;i<256 && g_main_context_pending(NULL);++i) g_main_context_iteration(NULL,FALSE);
         AtspiAccessible *desktop=atspi_get_desktop(0);
         if (desktop) {
-            atspi_accessible_clear_cache(desktop);
             int count=atspi_accessible_get_child_count(desktop,NULL);
             for (int i=0;i<count && !element;++i) {
                 AtspiAccessible *app=atspi_accessible_get_child_at_index(desktop,i,NULL);
