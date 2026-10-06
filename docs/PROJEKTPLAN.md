@@ -106,7 +106,8 @@ stehen im [Umsetzungsstand](STATUS.md).
 - [x] Sichtbaren Fokus und vollständig per Tastatur bedienbare Abläufe implementieren.
 - [x] Beide Bedienwege lokal in Release prüfen, einschließlich kleinem Fenster
   und 150 Prozent Schriftgröße.
-- [ ] Neue UI und Tastaturwege mit entpackten Paketen auf allen drei Plattformen abnehmen.
+- [x] Neue UI und Tastaturwege mit entpackten Paketen auf allen drei Plattformen abnehmen.
+  [Abnahme zu 5534ff0](https://github.com/Lulus792/SecondBrain/actions/runs/37466622105): 18 erfolgreiche Jobs.
 
 Referenzen, Antworten und der Status der Vorschauen stehen in
 [UI_GALAXIE.md](UI_GALAXIE.md). Die Umsetzung wurde anschließend

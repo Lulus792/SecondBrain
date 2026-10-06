@@ -59,7 +59,10 @@ Der bisherige Bedienweg besteht separat mit 87 Aussagen. Die Materialprüfung
 weist nach, dass Glas auf geänderte Sterne reagiert und reduzierte Transparenz
 seinen Inhalt von diesen Änderungen abschirmt. Der Pakettest führt beide
 Bedienwege aus dem tatsächlich entpackten und verschobenen Paket aus.
-Neue Windows-/Linux-Nachweise sind bis zur erfolgreichen CI-Abnahme noch offen.
+Die [Abnahme zu 5534ff0](https://github.com/Lulus792/SecondBrain/actions/runs/37466622105) besteht mit allen 18 Jobs.
+Alle sechs nativen Desktop-Jobs führen sieben Prüfungen aus; alle drei entpackten
+Release-Pakete bestehen zusätzlich beide Bedienwege auf Windows x64, macOS ARM64
+und Linux x64. Die CI verwendet versteckte native Fenster mit SDL-Softwarerenderer.
 
 Tasten im Editor: Tab verlässt das Feld; Ctrl+I fügt einen Tabulator ein.
 Das gilt auch auf macOS, wo Ctrl ausdrücklich die Control-Taste bezeichnet.

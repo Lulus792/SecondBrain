@@ -104,6 +104,33 @@ Lokal zeigt `otool -L` ausschließlich macOS-Systembibliotheken. Die UI wird in 
 CI in versteckten nativen Testfenstern mit SDL-Softwarerenderer geprüft;
 dies ist kein manueller Test jeder Desktop-Umgebung oder GPU-Konfiguration.
 
+## Abnahme von Version 0.2 mit Lumen und Tastatur
+
+Der [Lauf zu 5534ff0](https://github.com/Lulus792/SecondBrain/actions/runs/37466622105)
+besteht am 6. Oktober 2026 mit 18 erfolgreichen Jobs. Er belegt die Integration
+von Sternkarte, eigener Glasdarstellung und vollständigen Tastaturwegen.
+
+| Plattform | Desktop Debug, 7 Tests | Desktop Release, 7 Tests | Entpacktes Paket, beide Bedienwege |
+| --- | --- | --- | --- |
+| Windows x64 | bestanden | bestanden | bestanden |
+| macOS ARM64 | bestanden | bestanden | bestanden |
+| Ubuntu Linux x64, X11/Xvfb | bestanden | bestanden | bestanden |
+
+Je Desktop-Job werden Renderer/Editor/Material, bisherige Bedienung, reine
+Tastaturbedienung, eigene Projektinstanz, echte Graphverweise, Anwendungszustand
+und C-Kern geprüft. Der reine Tastaturdurchlauf umfasst 85 Aussagen, einschließlich
+aktiver Texteingabe, Undo/Redo, Sternwahl, Schutzdialog, Quellen, 300 Links,
+kleinem Fenster mit 150 Prozent Schrift, Kontext, Konfliktkopie und Archiv.
+Der bisherige SDL-Bedienweg umfasst 87 Aussagen.
+
+Jeder Release-Job erstellt und entpackt sein eigenes Anwendungsarchiv und führt
+daraus beide Bedienwege mit den mitgelieferten Ressourcen aus. Die drei Pakete
+sind als Actions-Artefakte verfügbar. Lokal bestehen die entsprechenden Prüfungen
+auch auf Intel macOS 14.6.1 mit Sanitizern sowie das entpackte Intel-Paket.
+Tatsächliche große und kleine App-Renderbilder wurden lokal betrachtet und korrigiert.
+Die CI prüft versteckte native Fenster mit SDL-Softwarerenderer; sie belegt
+keine manuelle Abnahme aller GPU-Treiber oder Desktop-Umgebungen.
+
 ## Grenzen der Nachweise
 
 Die Prüfungen belegen die jeweils benannten Abläufe. Der KI-Kontext wird erzeugt

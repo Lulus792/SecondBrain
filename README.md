@@ -14,8 +14,8 @@ Version 0.2 integriert die ausgewählte Lumen-Sternkarte und schwebende Glaskart
 in die C-App. Dokumente, echte Markdown-Verweise, Kamera und sämtliche bisherigen
 Arbeitsabläufe sind verbunden. Die Oberfläche bietet durchgängige Tastaturwege
 mit sichtbarem Fokus. Aktuelle Prüfungen und ihre Plattformgrenzen stehen im
-[Umsetzungsstand](docs/STATUS.md); die vorherige Version ist bereits auf allen
-drei Systemen einschließlich entpackter Pakete geprüft.
+[Umsetzungsstand](docs/STATUS.md); Version 0.2 ist auf allen drei Systemen
+in Debug/Release und einschließlich entpackter Pakete geprüft.
 
 [GitHub Repository](https://github.com/Lulus792/SecondBrain) ·
 [Automatisierte Plattformprüfungen](https://github.com/Lulus792/SecondBrain/actions)
@@ -24,7 +24,7 @@ drei Systemen einschließlich entpackter Pakete geprüft.
 
 Fertige Pakete werden nach erfolgreichen Release-Prüfungen als
 `SecondBrain-Windows-X64`, `SecondBrain-macOS-ARM64` und `SecondBrain-Linux-X64`
-für Version 0.1 im [geprüften GitHub-Actions-Lauf](https://github.com/Lulus792/SecondBrain/actions/runs/37445131476)
+für Version 0.2 im [geprüften GitHub-Actions-Lauf](https://github.com/Lulus792/SecondBrain/actions/runs/37466622105)
 bereitgestellt. Den Download entpacken, dann das darin enthaltene
 Anwendungsarchiv entpacken. Die Anleitung `QUICKSTART.txt` gehört zum Paket.
 Ein GitHub-Login kann für den Download der Actions-Artefakte erforderlich sein.

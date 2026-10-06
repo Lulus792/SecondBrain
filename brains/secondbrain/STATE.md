@@ -40,8 +40,16 @@ Lokal bestehen sieben Release-Prüfungen und dieselben sieben Prüfungen mit
 AddressSanitizer/UndefinedBehaviorSanitizer. Der Tastaturdurchlauf prüft 85 Aussagen,
 der bisherige Bedienweg 87. Kleine Fenster mit 150 Prozent Schriftgröße sind darin
 enthalten. Die tatsächliche Darstellung wurde in groß und klein betrachtet. Die
-entpackte Intel-macOS-App besteht beide Bedienwege aus einem anderen Ordner. Nächster Schritt: native Abnahme dieser neuen Version auf allen
-drei Plattformen; die oben verlinkte CI belegt die erste Version.
+entpackte Intel-macOS-App besteht beide Bedienwege aus einem anderen Ordner.
+Die [Abnahme zu 5534ff0](https://github.com/Lulus792/SecondBrain/actions/runs/37466622105) besteht mit allen 18 Jobs.
+Desktop Debug/Release mit je sieben Prüfungen und entpackte Pakete mit beiden
+Bedienwegen bestehen auf Windows x64, macOS ARM64 und Linux x64. Der oben
+verlinkte Lauf zu 287ef48 belegt weiterhin die erste Version.
+
+Version 0.2 ist damit für den beauftragten lokalen Arbeitsablauf abgenommen.
+Die aktuelle Intel-App liegt unter dist/SecondBrain/secondbrain.app; die weiteren
+Pakete stehen im neuen GitHub-Lauf. Neue Erweiterungen werden anhand der
+offenen Fragen geplant.
 
 ## Grenzen
 

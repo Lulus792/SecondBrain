@@ -1,7 +1,7 @@
 # Umsetzungsstand von SecondBrain
 
-Stand: 6. Oktober 2026. Die erste C-Desktop-Version liegt mit geprüften Paketen
-für Windows, macOS und Linux vor.
+Stand: 6. Oktober 2026. Version 0.2 mit Lumen-Sternkarte, Glaskarten und
+Tastaturwegen liegt mit geprüften Paketen für Windows, macOS und Linux vor.
 
 ## Abgeschlossene Grundlagen
 
@@ -137,5 +137,10 @@ AddressSanitizer/UndefinedBehaviorSanitizer auf Intel macOS 14.6.1. Die tatsäch
 Bedienprüfungen enthalten 87 Aussagen für Maus/Tastatur und 85 für reine Tastatur,
 auch im kleinen Fenster mit 150 Prozent Schriftgröße. Die Graphprüfung umfasst
 20 Aussagen, einschließlich relativer/UTF-8-Verweise und Code-/Bildausschlüssen.
-Die neue Version benötigt ihre eigenen nativen Paket- und Plattformnachweise;
-die oben genannten GitHub-Läufe belegen weiterhin ihre jeweiligen älteren Stände.
+Die [Abnahme zu 5534ff0](https://github.com/Lulus792/SecondBrain/actions/runs/37466622105) besteht mit allen 18 Jobs.
+Alle sechs Desktop-Jobs führen sieben Prüfungen in Debug/Release aus. Die drei
+Release-Jobs bestehen zusätzlich beide Bedienwege aus den tatsächlich entpackten
+Paketen auf Windows x64, macOS ARM64 und Linux x64. Lokal besteht außerdem das
+entpackte Intel-macOS-Paket aus einem neuen Ordner mit Leerzeichen und Umlauten.
+`otool -L` zeigt ausschließlich macOS-Systembibliotheken. Die älteren verlinkten
+Läufe belegen weiterhin ihre jeweils benannten Stände.
