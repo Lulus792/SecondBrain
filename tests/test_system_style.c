@@ -68,7 +68,9 @@ int main(int argc,char **argv) {
     DBusConnection *bus=dbus_bus_get_private(DBUS_BUS_SESSION,&error); CHECK(bus && !dbus_error_is_set(&error)); dbus_connection_set_exit_on_disconnect(bus,FALSE);
     CHECK(dbus_bus_request_name(bus,"org.freedesktop.portal.Desktop",DBUS_NAME_FLAG_DO_NOT_QUEUE,&error)==DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER);
     CHECK(dbus_connection_add_filter(bus,portal_call,NULL,NULL)); SDL_Thread *thread=SDL_CreateThread(portal_loop,"test-settings-portal",bus); CHECK(thread);
-    SBSystemStyle native=sb_system_style_read_native(); CHECK((native.known&13)==13 && !native.dark && !native.motion && !native.contrast);
+    SBSystemStyle native=sb_system_style_read_native();
+    unsigned portal_known=SB_SYS_THEME|SB_SYS_MOTION|SB_SYS_CONTRAST;
+    CHECK((native.known&portal_known)==portal_known && !native.dark && !native.motion && !native.contrast);
     SDL_SetAtomicInt(&mode,1); native=sb_system_style_read_native(); CHECK(native.dark && native.motion && native.contrast);
     sb_system_style_free(d.style_monitor); d.style_monitor=sb_system_style_new(true); CHECK(d.style_monitor);
     Uint64 deadline=SDL_GetTicks()+5000;
