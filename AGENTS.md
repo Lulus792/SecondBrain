@@ -1,10 +1,19 @@
 # Arbeit am SecondBrain
 
-Dieses Repository entwickelt eine wiederverwendbare Wissensbasis für Menschen und KI.
-Lies zuerst README.md und docs/KONZEPT.md. Die Grundlagen und Quellen stehen in
-docs/GRUNDLAGEN.md; Vorlagen liegen in templates/brain.
+Dieses Repository entwickelt eine eigene SecondBrain-Anwendung in C für Menschen
+und KI. Lies zuerst README.md, docs/PROJEKTPLAN.md und docs/KONZEPT.md.
+Die Grundlagen und Quellen stehen in docs/GRUNDLAGEN.md; Vorlagen liegen in
+templates/brain. Der Python-Generator ist ein vorhandener Strukturprototyp.
 
 - Schreibe für den Nutzer auf Deutsch.
+- Die geplante Anwendung wird in C umgesetzt. Externe Bibliotheken sind nur
+  für die UI zulässig; fachliche Funktionen werden im Projekt selbst implementiert.
+- Anzeigen, Bearbeiten und Verwalten der Projektgedächtnisse gehören in die eigene
+  Anwendung. Externe Wissensprogramme sind keine Voraussetzung der normalen Nutzung.
+- Vor jedem ersten UI-Entwurf UI-Grundlagen und Apples Human Interface Guidelines
+  studieren und die Erkenntnisse dokumentieren. Die Gestaltung orientiert sich an Apple.
+- Der aktuelle Planungsauftrag umfasst nur das Festhalten der Anforderungen.
+  Recherche, UI-Entwürfe und C-Implementierung benötigen einen nachfolgenden Auftrag.
 - Windows, macOS und Linux sind verbindliche Zielplattformen. Plattformnachweise
   nur anhand tatsächlich ausgeführter Prüfungen nennen; CI-Konfiguration genügt nicht.
 - Jeden abgeschlossenen, geprüften Arbeitsschritt committen und nach

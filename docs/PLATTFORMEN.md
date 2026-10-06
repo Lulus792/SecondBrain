@@ -1,8 +1,12 @@
 # Plattformprüfung des SecondBrain
 
-Windows, macOS und Linux sind verbindliche Zielplattformen. Die erste Version
-benötigt Python ab 3.10 und verwendet ausschließlich dessen Standardbibliothek.
+Windows, macOS und Linux sind verbindliche Zielplattformen. Der vorhandene
+Strukturprototyp benötigt Python ab 3.10 und verwendet ausschließlich dessen Standardbibliothek.
 Markdown und JSON werden in UTF-8 geschrieben; generierte Dateien verwenden LF.
+
+Die [geplante eigene Anwendung](PROJEKTPLAN.md) wird in C umgesetzt. Die folgenden
+Nachweise gelten ausschließlich für den Python-Prototyp. Plattformprüfungen der
+C-Anwendung und ihrer zukünftigen Oberfläche stehen noch aus.
 
 ## Prüfungsumfang
 

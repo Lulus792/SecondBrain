@@ -1,22 +1,28 @@
 # SecondBrain für deine Projekte
 
-Hier entsteht eine gemeinsame Wissensbasis für dich und die KI. Jedes Projekt
-bekommt dieselbe Grundstruktur, aber eigene Ziele, Entscheidungen, Quellen und
-Notizen. Ein neuer Chat kann sich daraus den nötigen Kontext erarbeiten.
+Hier entsteht eine eigene Anwendung in C für eine gemeinsame Wissensbasis von
+dir und der KI. Sie soll Projektgedächtnisse selbst anlegen, anzeigen, bearbeiten,
+durchsuchen und verwalten. Jedes Projekt bekommt eigene Ziele, Entscheidungen,
+Quellen und Notizen auf Grundlage einer wiederverwendbaren Struktur.
 
-Die erste Version ist ein lokales System aus lesbaren Markdown-Dateien und einem
-kleinen Generator. Du kannst es im Editor bearbeiten und optional in Obsidian
-als Vault öffnen. Obsidian speichert Notizen als lokale Markdown-Dateien;
-[Dokumentation zur Speicherung](https://help.obsidian.md/Files+and+folders/How+Obsidian+stores+data).
+Die verbindlichen Anforderungen stehen im [Projektplan](docs/PROJEKTPLAN.md):
+Windows, macOS und Linux; externe Bibliotheken ausschließlich für die UI;
+UI-Recherche vor dem Entwurf und Gestaltung nach Apples Human Interface Guidelines.
+Die normale Nutzung soll vollständig in der eigenen Anwendung möglich sein.
+
+Aktuell ist dieser Plan festgehalten. Eine C-Anwendung und eine eigene Oberfläche
+sind noch nicht implementiert. Vorhanden sind recherchierte Wissensgrundlagen,
+Markdown-Vorlagen, ein Physim-Beispiel und ein Python-Generator als Strukturprototyp.
 
 [GitHub Repository](https://github.com/Lulus792/SecondBrain) ·
 [Automatisierte Plattformprüfungen](https://github.com/Lulus792/SecondBrain/actions)
 
-## Ein Second Brain erstellen
+## Vorhandener Strukturprototyp
 
-Windows, macOS und Linux sind die Zielplattformen. Python 3.10 oder neuer genügt;
-der Generator hat keine zusätzlichen Paketabhängigkeiten. Das Datum stammt aus
-der lokal eingestellten Betriebssystem-Zeitzone.
+Die folgenden Befehle betreffen den vorhandenen Python-Prototyp. Für ihn genügt
+Python 3.10 oder neuer; er hat keine zusätzlichen Paketabhängigkeiten. Das Datum
+stammt aus der lokal eingestellten Betriebssystem-Zeitzone. Die geplante
+C-Anwendung soll diese Arbeit durch ihre eigene Oberfläche ermöglichen.
 
 Im Ordner dieses Repositories unter macOS oder Linux:
 
@@ -87,6 +93,7 @@ entsprechend ablegen oder die Verweise anpassen.
 ## Konzept und Grundlagen
 
 - [Grundlagen und recherchierte Quellen](docs/GRUNDLAGEN.md)
+- [Verbindlicher Plan der C-Anwendung und UI-Recherche](docs/PROJEKTPLAN.md)
 - [Aufbau und Arbeitsweise unseres Systems](docs/KONZEPT.md)
 - [Wiederverwendbare Vorlage](templates/brain/START.md)
 
@@ -103,6 +110,8 @@ Unicode-Pfade, Verweise und den Schutz vorhandener Inhalte. Ein Symlink-Test
 wird nur ausgelassen, wenn das Betriebssystem keine Symlinks erlaubt.
 
 Die dokumentierten Ergebnisse stehen in [Plattformprüfung](docs/PLATTFORMEN.md).
+Sie gelten für den Python-Prototyp. Die zukünftige C-Anwendung und ihre Oberfläche
+benötigen eigene ausgeführte Prüfungen auf allen drei Plattformen.
 
 ## Änderungen veröffentlichen
 
