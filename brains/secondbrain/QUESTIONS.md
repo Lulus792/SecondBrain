@@ -9,7 +9,14 @@ besteht auf allen drei Systemen einschließlich Debug/Release, eigener Projektin
 Konfliktkopie, Archivierung, Beenden und entpackter Pakete.
 Für den festgelegten ersten lokalen Arbeitsablauf ist keine Abnahmefrage offen.
 
-## Mögliche spätere Erweiterungen
+## Aktuelle Designauswahl
+
+Welcher der drei Entwürfe Lumen, Glas oder Fokus trifft den gewünschten Stil?
+Eine Kombination ist ebenfalls möglich. Bestätigt sind dunkle, dezente Farben,
+kleine leuchtende Sterne und schwebende Bedienelemente. Glasartige Karten werden
+als zusätzliche Variante verglichen. Beleg: [Designrecherche](../../docs/UI_GALAXIE.md).
+
+## Weitere mögliche Erweiterungen
 
 Diese Fragen blockieren den ersten lokalen Arbeitsablauf nicht.
 Sie sind noch keine Implementierungsaufträge oder zugesagten Funktionen.

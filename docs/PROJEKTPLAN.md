@@ -93,7 +93,18 @@ stehen im [Umsetzungsstand](STATUS.md).
   Die Instanz liegt unter [brains/secondbrain](../brains/secondbrain/START.md)
   und wurde in der eigenen Anwendung geladen und betrachtet.
 
-## Veröffentlichung und Nachweise
+## Neue Gestaltungsphase: Wissensgalaxie
+
+- [x] Räumliche Wissensnetze und Sternkarten recherchieren.
+- [x] Den Nutzer nach Stimmung, Sternendarstellung und Bedienelementen fragen.
+- [x] Drei vergleichbare Entwürfe einschließlich glasartiger Karten vorbereiten.
+- [ ] Entwurf oder Kombination auswählen und weiter ausarbeiten.
+
+Referenzen, Antworten und der Status der Vorschauen stehen in
+[UI_GALAXIE.md](UI_GALAXIE.md). Diese Phase ist zunächst eine Designauswahl;
+die neue Ansicht ist noch nicht Bestandteil der geprüften Desktop-App.
+
+## Laufende Veröffentlichung und Nachweise
 
 Jeder abgeschlossene, geprüfte Arbeitsschritt wird committet und nach
 `origin` unter `Lulus792/SecondBrain` gepusht. Die Historie bleibt erhalten.

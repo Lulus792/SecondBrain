@@ -49,3 +49,13 @@ Plattformnachweise nennen tatsächlich erfolgreiche Läufe. Pakettests starten d
 wirklich entpackte App.
 Beleg: [Projektanweisungen](../../AGENTS.md),
 [Plattformnachweise](../../docs/PLATTFORMEN.md).
+
+## D07: Gestaltung der räumlichen Wissensansicht
+
+Bestätigte Nutzerpräferenzen vom 6. Oktober 2026: dunkel und elegant mit
+dezenten Farben; kleine leuchtende Sterne mit klaren Beschriftungen; wenige
+schwebende Bedienelemente und Notizen bei Auswahl. Zusätzlich soll eine Variante
+mit glasartigen Karten über der Galaxie gezeigt werden.
+
+Lumen, Glas und Fokus sind Entwürfe zur Auswahl. Die Wahl und eine entsprechende
+C-Implementierung stehen noch aus. Beleg: [Designrecherche](../../docs/UI_GALAXIE.md).

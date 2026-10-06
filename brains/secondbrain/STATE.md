@@ -30,9 +30,12 @@ weitere Pakete stehen im verlinkten GitHub-Lauf als Actions-Artefakte bereit.
 
 ## Nächster Schritt
 
-Ein reales Projekt in der App öffnen oder anlegen und Wissen pflegen.
-Neue Anforderungen oder Fehler anhand eines konkreten Arbeitsablaufs erfassen;
-die möglichen späteren Erweiterungen stehen in [QUESTIONS.md](QUESTIONS.md).
+Der Nutzer möchte eine räumliche Wissensgalaxie und wählt zunächst zwischen
+Designentwürfen. Die [neue Recherche](../../docs/UI_GALAXIE.md) dokumentiert
+Referenzen, bestätigte Vorlieben und Lumen, Glas sowie Fokus. Die C-App bleibt
+auf dem geprüften Stand der ersten Version; eine Galaxie-Ansicht ist dort noch
+nicht integriert. Nächster Schritt: Entwurf oder Kombination auswählen und
+anschließend gezielt ausarbeiten.
 
 ## Grenzen
 
