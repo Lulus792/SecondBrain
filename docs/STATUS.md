@@ -541,3 +541,15 @@ vollständige Tastaturablauf bestehen (62,22 Sekunden). ASan/UBSan bestehen für
 system-appearance und ui-rendering-editor (26,03 Sekunden). Die tatsächlichen
 hellen/dunklen Bilder und der fokussierte Einstellungsdialog bei 200 Prozent
 Schrift wurden betrachtet. Die native CI-Abnahme zu diesem Schritt steht noch aus.
+
+
+## Abnahme der Kontrastnacharbeit 0.6.1
+
+[Lauf zu b064bd5](https://github.com/Lulus792/SecondBrain/actions/runs/37529776082)
+besteht mit allen 18 Jobs: 16 Desktoptests je Debug/Release auf Windows x64,
+macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Lokal besteht das entpackte
+Intel-Paket mit 126 Desktop-, 105 Tastatur- und 75 Sicherungs-UI-Aussagen sowie
+Einstellungsprozessen und CLI-Sicherung. Sein tatsächlicher Start wurde betrachtet.
+dist/SecondBrain ist auf 0.6.1 aktualisiert. Archiv-SHA-256:
+`77dc5b20ccbd95d9a50bb652a59d937952eeba10e418cf08b0846dcc4055cee8`.
+Vollständige assistive Bedienung und Kontrastabnahme aller Zustände bleiben offen.

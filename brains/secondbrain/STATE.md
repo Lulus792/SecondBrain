@@ -78,10 +78,11 @@ besteht mit 18 Jobs, 16 Desktoptests je Debug/Release und drei Paketen. Lokal
 bestehen alle 16 Release- und ASan/UBSan-Tests. Eigene Kontrastansichten
 wurden betrachtet und ein zu heller Hinweis korrigiert. Das entpackte Intel-Paket
 besteht die Desktop-/Tastatur-/Sicherungswege, Einstellungsneustart und CLI-Sicherung.
-dist/SecondBrain ist auf 0.6.0. Die Nacharbeit 0.6.1 zeichnet Sternkerne und
+dist/SecondBrain ist auf 0.6.1. Die Nacharbeit 0.6.1 zeichnet Sternkerne und
 Kanten klar, erhält Beschriftungen mit Deckflächen und trennt den Fokusring vom
 normalen Rand. Der lokale Gesamtprüflauf und abschließende Raster-/Tastaturprüfungen bestehen;
-gezielte ASan/UBSan-Prüfungen bestehen ebenfalls. Plattformabnahme folgt.
+gezielte ASan/UBSan-Prüfungen bestehen ebenfalls. Die [Abnahme zu b064bd5](https://github.com/Lulus792/SecondBrain/actions/runs/37529776082)
+besteht mit 18 Jobs, 16 Desktoptests je Debug/Release und drei entpackten Paketen.
 
 ## Auftrag und verbleibende Abnahmen
 
