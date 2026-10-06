@@ -346,3 +346,28 @@ ist durch native CI und Paketprüfung belegt.
 Weitere Eventtypen und menschliche assistive Navigation bleiben eigene Abnahmen.
 Dokumentstruktur, Grapheme/Zeilen, Fortschrittsansagen, OS-Vorgaben, Schrift-Fallback
 und übrige Release-Aufgaben bleiben aktiv. 1.0 bleibt bis zur Nutzerfreigabe gesperrt.
+
+
+## 0.6.0: Native Systemvorgaben
+
+[Lauf zu 444471d](https://github.com/Lulus792/SecondBrain/actions/runs/37527601503):
+18 erfolgreiche Jobs, 16 Desktoptests je Debug/Release auf Windows x64, macOS
+ARM64 und Linux x64 sowie drei entpackte Pakete. Der neue system-appearance-Test
+prüft Policy und getrennt gespeicherte eigene Werte. macOS/Windows lesen native
+Vorgaben; Linux prüft echte D-Bus-Anfragen, laufende Änderung, Fehlererhalt und
+Erholung mit einem privaten Testportal. Dies belegt keinen interaktiven Wechsel
+aller Desktopbackends oder persönliche OS-Einstellungen.
+
+Lokal auf Intel macOS 14.6.1: alle 16 Release-Tests (191,75 Sekunden) und alle
+16 ASan/UBSan-Tests (398,57 Sekunden), einschließlich 21 Systemdarstellungs- und
+121 nativer Zugänglichkeitsaussagen. Tatsächliche helle/dunkle Kontrastbilder
+wurden betrachtet; nicht ausgewählte Sterne und Kanten bleiben zu blass. Die
+vollständige Kontrast- und Geräteabnahme bleibt offen.
+
+
+Das entpackte Intel-Paket 0.6.0 besteht lokal mit 126 Desktop-, 105 Tastatur- und
+75 Sicherungs-UI-Aussagen sowie zwei Einstellungsprozessen und dem CLI-Sicherungs-
+ablauf in Unicode-Pfaden. dist/SecondBrain ist auf 0.6.0 aktualisiert; der Start
+mit dem eigenen Projektgedächtnis und das tatsächliche Bild sind geprüft.
+Archiv-SHA-256: `897c24cea9a2bea02575c60afd7697d6ed73dce7da07d9a16fe43d84c50f173e`.
+Die Pakete bleiben Entwicklungspakete ohne Herausgeberzertifikat. 1.0 bleibt gesperrt.

@@ -35,7 +35,8 @@ Arbeitsordner. Die normalen Selbsttests und Screenshots ohne `--settings` lesen
 und schreiben keine Nutzereinstellungen.
 
 Das eigene C-Modul verwendet ein versioniertes UTF-8-Textformat mit prozentkodierten
-Pfadwerten, neun Pflichtfeldern und höchstens 32 KiB. Unbekannte Versionen,
+Pfadwerten und höchstens 32 KiB. Version 1 enthält neun Pflichtfelder,
+Version 2 elf. Unbekannte Versionen,
 Doppelfelder, ungültige Werte und beschädigte Dateien werden gemeldet und nicht
 überschrieben. Speichern erfolgt über eine exklusiv angelegte temporäre Datei und
 atomischen Austausch. Eine zwischenzeitliche Änderung durch eine andere Instanz
@@ -54,8 +55,8 @@ getrennte Prozesse und vergleicht die isolierte Konfiguration.
 Der native Ordnerdialog basiert auf SDL3. Sein Öffnen und seine tatsächliche
 Bedienung mit Maus, Tastatur und Screenreader müssen zusätzlich auf allen drei
 Zielsystemen interaktiv abgenommen werden. Simulierte Rückgabeereignisse sind
-kein solcher Nachweis. Automatische Übernahme von Systemdarstellung und
-Systembewegung sowie ein fertiger erster Start bleiben Release-Aufgaben.
+kein solcher Nachweis. Systemvorgaben sind ab 0.6.0 im unten beschriebenen Umfang angebunden;
+ein fertiger erster Start und interaktive Abnahmen bleiben Release-Aufgaben.
 
 ## Originalquellen
 
@@ -112,7 +113,9 @@ Systemwerte werden nicht als eigene Auswahl in die Datei zurückgeschrieben.
 Die gezielte lokale Prüfung besteht für Auflösung, Speichern, Altformat und
 Neustart; native macOS-Flags werden read-only abgefragt. Linux testet ein privates
 Settings-Portal mit tatsächlichen D-Bus-Nachrichten, Wechsel, Fehler und Erholung.
-Die native Plattform-/Gesamtabnahme folgt nach dem laufenden Schritt. Die
+Der [Lauf zu 444471d](https://github.com/Lulus792/SecondBrain/actions/runs/37527601503)
+besteht mit 18 Jobs, einschließlich 16 Desktoptests je Debug/Release und drei
+entpackten Paketen. Lokal bestehen alle 16 Release- und ASan/UBSan-Tests. Die
 vollständige Kontrastmessung, Windows-Custom-High-Contrast-Paletten und reale
 Bedienung nach Änderungen der Systemsteuerung bleiben eigene Prüfungen.
 

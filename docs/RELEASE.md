@@ -21,18 +21,22 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   Zielvolumes und Wiederherstellung nach hartem Prozessabbruch.
 - [ ] **Alltagskomfort vervollständigen:** Einstellungen und letzten Arbeitsordner
   dauerhaft speichern, native Ordnerauswahl, verständlicher erster Start.
-  Speicherung und native Ordnerwahl sind in 0.3.1 implementiert; erster Start,
-  Systemvorgaben und interaktive native Dialogabnahme bleiben offen.
+  Speicherung und native Ordnerwahl sind in 0.3.1 implementiert; Systemvorgaben
+  sind in 0.6.0 im dokumentierten Umfang angebunden. Erster Start und interaktive
+  native Dialogabnahme bleiben offen.
 - [ ] **Barrierefreiheit abnehmen:** native Screenreader-Anbindung, Kontraste,
   Fokusreihenfolge, große Schrift, Schrift-Fallback und Systemeinstellung für
   reduzierte Bewegung. Die App bietet bereits Tastaturwege, größere Schrift und
-  eigene Schalter für Transparenz und Bewegung; OS-Einstellungen werden noch nicht übernommen.
+  eigene Schalter für Transparenz und Bewegung. In 0.6.0 ergänzen bekannte native
+  Vorgaben die eigene Auswahl, ohne sie dauerhaft zu verändern.
   In 0.5.0 sind native Adapter integriert und macOS-Provideraktionen gezielt geprüft.
   UIA-/AT-SPI-Clientabfragen bestehen inzwischen auf den nativen CI-Systemen.
   In 0.5.1 bestehen native Dialog-/Hilfetexte auf allen drei Systemen. Dokumentstruktur,
   Unicode-Textgeometrie und tatsächliche VoiceOver/NVDA/Orca-Abnahme bleiben offen.
   Die Cache-Signalstruktur ist in 0.5.2 korrigiert und mit echtem Linux-Clientcache
-  geprüft; weitere Eventtypen bleiben gesonderte Abnahmen.
+  geprüft; weitere Eventtypen bleiben gesonderte Abnahmen. Systemvorgaben bestehen
+  in 0.6.0 auf allen drei CI-Systemen; reale Einstellungswechsel, Windows-Custom-
+  High-Contrast-Paletten und vollständige Kontrastmessung bleiben offen.
 - [ ] **Leistung und Stabilität im Alltag prüfen:** große reale Wissensbasen,
   schnelle Eingabefolgen, lange Sitzungen, mehrere Displays, Skalierung und
   GPU-Treiber auf allen Zielsystemen. Die bisherigen Tests verwenden versteckte

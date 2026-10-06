@@ -73,9 +73,13 @@ Weitere Eventtypen und menschliche Screenreader-Abnahme bleiben offen.
 
 0.6.0 ergänzt Systemdarstellung und native Zugänglichkeitsvorgaben. Die eigene
 Auswahl wird getrennt von der wirksamen Darstellung gespeichert; alte vollständige
-Einstellungsdateien werden erhalten. Gezielte lokale Policy-/Neustart-/Altformat-
-Prüfungen bestehen; Gesamt-/Plattformabnahme läuft noch. Eigene Kontrastansichten
-wurden betrachtet und ein zu heller Hinweis korrigiert.
+Einstellungsdateien werden erhalten. Die [Abnahme zu 444471d](https://github.com/Lulus792/SecondBrain/actions/runs/37527601503)
+besteht mit 18 Jobs, 16 Desktoptests je Debug/Release und drei Paketen. Lokal
+bestehen alle 16 Release- und ASan/UBSan-Tests. Eigene Kontrastansichten
+wurden betrachtet und ein zu heller Hinweis korrigiert. Das entpackte Intel-Paket
+besteht die Desktop-/Tastatur-/Sicherungswege, Einstellungsneustart und CLI-Sicherung.
+dist/SecondBrain ist auf 0.6.0. Nicht ausgewählte Sternkerne und Kanten benötigen
+noch stärkeren Kontrast.
 
 ## Auftrag und verbleibende Abnahmen
 

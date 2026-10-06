@@ -260,3 +260,16 @@ ist durch native CI und Paketprüfung belegt.
 Weitere Eventtypen und menschliche assistive Navigation bleiben eigene Abnahmen.
 Dokumentstruktur, Grapheme/Zeilen, Fortschrittsansagen, OS-Vorgaben, Schrift-Fallback
 und übrige Release-Aufgaben bleiben aktiv. 1.0 bleibt bis zur Nutzerfreigabe gesperrt.
+
+
+## 0.6.0: Systemvorgaben als Teilabnahme
+
+Bekannte native Bewegungs-, Transparenz- und Kontrastvorgaben ergänzen die eigene
+Auswahl. Optional folgt die App der Systemdarstellung. Die eigene Auswahl bleibt
+separat gespeichert. [Vertrag und Grenzen](EINSTELLUNGEN.md).
+[Lauf zu 444471d](https://github.com/Lulus792/SecondBrain/actions/runs/37527601503)
+besteht mit 18 Jobs, 16 Desktoptests je Debug/Release und drei Paketen. Lokal
+bestehen 16 Release- und 16 ASan/UBSan-Tests. Reale Systemsteuerungswechsel,
+Windows-Custom-High-Contrast-Farben, Schrift-Fallback und vollständige Kontrast-
+abnahme bleiben offen. Betrachtete helle/dunkle Bilder zeigen klare Karten und
+Auswahl, aber noch zu blasse nicht ausgewählte Sternkerne und Verbindungslinien.

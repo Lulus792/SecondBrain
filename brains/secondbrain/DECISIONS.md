@@ -150,3 +150,14 @@ prüfung und Client mit tatsächlichem Cache belegen die Korrektur. Die Quelldat
 Hashschutz und Wiederholbarkeit sind dokumentiert; unbekannte Quelländerungen
 werden für den Patch abgewiesen. [Abhängigkeiten](../../third_party/README.md)
 und [native Abnahme](../../docs/BARRIEREFREIHEIT_PLAN.md).
+
+
+## D15: Eigene Auswahl und wirksame Systemdarstellung trennen
+
+Lumen bleibt die vom Nutzer gewählte Basis. Optional folgt die App der
+Systemdarstellung; bekannte Vorgaben für Bewegung, Transparenz und Kontrast
+ergänzen manuelle Einschränkungen. Die Einstellungsdatei speichert ausschließlich
+die eigene Auswahl, damit normale Systemwerte diese wiederherstellen können.
+Linux fragt das Portal außerhalb des UI-Threads ab. Fehlende Antworten erhalten
+den letzten gültigen Stand. Version 1 bleibt lesbar; Speichern schreibt Version 2.
+[Vertrag, Plattformumfang und Grenzen](../../docs/EINSTELLUNGEN.md).

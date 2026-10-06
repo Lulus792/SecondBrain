@@ -495,6 +495,18 @@ wurde nach tatsächlicher Bildbetrachtung korrigiert.
 
 Formatversion 2 ergänzt Systemdarstellung und Kontrast. Alte vollständige
 Version-1-Dateien werden gelesen und erst beim Speichern aktualisiert. Die
-gezielten lokalen Prüfungen für Policy, Altformat, Speichern und Neustart bestehen;
-native macOS-Vorgaben werden read-only gelesen. Vollständige Release-, Sanitizer-
-und Plattformnachweise folgen nach Abschluss. [Vertrag und Grenzen](EINSTELLUNGEN.md).
+[Abnahme zu 444471d](https://github.com/Lulus792/SecondBrain/actions/runs/37527601503)
+besteht mit allen 18 Jobs: 16 Desktoptests je Debug/Release auf Windows x64,
+macOS ARM64 und Linux x64 sowie die drei entpackten Pakete. Lokal bestehen alle
+16 Release-Tests (191,75 Sekunden) und alle 16 ASan/UBSan-Tests (398,57 Sekunden).
+Die native Mac-Abfrage liest die vorhandenen Vorgaben, ohne sie zu ändern; Linux
+prüft das tatsächliche D-Bus-Protokoll mit einem privaten Testportal. Diese
+Prüfwege ersetzen keine manuelle Abnahme echter Systemsteuerungswechsel. [Vertrag und Grenzen](EINSTELLUNGEN.md).
+
+
+Das entpackte Intel-Paket 0.6.0 besteht lokal mit 126 Desktop-, 105 Tastatur- und
+75 Sicherungs-UI-Aussagen sowie zwei Einstellungsprozessen und dem CLI-Sicherungs-
+ablauf in Unicode-Pfaden. dist/SecondBrain ist auf 0.6.0 aktualisiert; der Start
+mit dem eigenen Projektgedächtnis und das tatsächliche Bild sind geprüft.
+Archiv-SHA-256: `897c24cea9a2bea02575c60afd7697d6ed73dce7da07d9a16fe43d84c50f173e`.
+Die Pakete bleiben Entwicklungspakete ohne Herausgeberzertifikat. 1.0 bleibt gesperrt.
