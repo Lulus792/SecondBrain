@@ -187,8 +187,12 @@ Lokal bestehen alle sieben Release-Prüfungen: 126 Aussagen im Maus-Bedienweg un
 105 im reinen Tastaturweg. Wiederholtes Scrollen am Ende, Archiv-Rückkehr,
 Menüpfeile und große Leseansicht sind enthalten. Leisten wurden bei kleinem Fenster
 mit 200 Prozent Schrift anhand ihrer tatsächlichen Geometrie geprüft und betrachtet.
-Neun Python-Prüfungen bestehen. Weitere Sanitizer-, Paket- und Plattformnachweise
-werden erst nach ihrem Abschluss ergänzt.
+Neun Python-Prüfungen bestehen. Dieselben sieben Tests bestehen mit AddressSanitizer und
+UndefinedBehaviorSanitizer. Das entpackte und verschobene Intel-macOS-Paket besteht
+beide Bedienwege. Die [Abnahme zu c224223](https://github.com/Lulus792/SecondBrain/actions/runs/37494305314) ist mit allen 18 Jobs erfolgreich abgeschlossen. Desktop Debug/Release mit
+je sieben Tests und beide Bedienwege aus entpackten Release-Paketen bestehen auf
+Windows x64, macOS ARM64 und Linux x64. Die Software- und Geräteabnahme bleibt auf
+den dokumentierten Umfang begrenzt.
 
 Dieser Entwicklungsschritt schließt das aktive Gesamtziel nicht ab. Die weiteren
 Arbeiten der [Release-Liste](RELEASE.md) bleiben beauftragt; die Versionsnummer

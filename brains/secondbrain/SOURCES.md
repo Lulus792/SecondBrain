@@ -20,6 +20,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   Apple-Grundlagen und Graphumfang.
 - [Architektur](../../docs/ARCHITEKTUR.md): C17-Kern, Plattformschicht, UI und Build.
 - [UI-Politur vor 1.0](../../docs/UI_POLITUR.md): neuer Auftrag, erneute Apple-Recherche und Abnahmekriterien.
+- [Native UI-Anbindung](../../docs/BARRIEREFREIHEIT_PLAN.md): recherchierte Schnittstellen und offene Umsetzung; noch kein Screenreader-Nachweis.
 - [MIT-Lizenz](../../LICENSE): gewählte Lizenz des eigenen Codes.
 - [UI-Abhängigkeiten](../../third_party/README.md): Herkunft, Versionen, Lizenzen, Anpassungen.
 

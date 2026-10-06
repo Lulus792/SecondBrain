@@ -75,7 +75,11 @@ Der erste Entwicklungsschritt 0.3.0 implementiert Archiv-Rückkehr, eigene Scrol
 Weltpositions-Fahrten, große Leseansicht, feste Schließen-Knöpfe und eigene Icons.
 Sieben lokale Release-Prüfungen bestehen mit 126 Maus- und 105 Tastaturaussagen;
 kleine Ansichten mit 200 Prozent Schrift wurden betrachtet. Die eigene MIT-Lizenz
-ist gewählt. Weitere Nachweise werden im [Umsetzungsstand](../../docs/STATUS.md) ergänzt.
+ist gewählt. Dieselben sieben
+Tests bestehen mit AddressSanitizer/UndefinedBehaviorSanitizer. Das entpackte
+Intel-macOS-Paket besteht beide Bedienwege. Die [Abnahme zu c224223](https://github.com/Lulus792/SecondBrain/actions/runs/37494305314) besteht mit allen 18 Jobs einschließlich Desktop Debug/Release und entpackter
+Pakete auf Windows x64, macOS ARM64 und Linux x64. Umfang und Grenzen nennt der
+[Umsetzungsstand](../../docs/STATUS.md).
 
 Das Gesamtziel bleibt aktiv. Nächste Arbeiten sind Sicherung/Wiederherstellung,
 dauerhafte Einstellungen, native Ordnerwahl, Screenreader-Anbindung, weitere

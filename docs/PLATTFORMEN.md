@@ -155,3 +155,17 @@ AddressSanitizer/UndefinedBehaviorSanitizer. Das Archiv SecondBrain-0.2.1-Darwin
 besteht nach Entpacken in einen anderen Ordner beide Bedienwege. Große und kleine
 Renderbilder mit 150 Prozent Schriftgröße wurden betrachtet. Die oben genannten
 Grenzen der Software- und Geräteabnahme gelten weiterhin.
+
+## Entwicklungsschritt 0.3.0
+
+Die [Abnahme zu c224223](https://github.com/Lulus792/SecondBrain/actions/runs/37494305314) besteht am 6. Oktober 2026 mit allen 18 Jobs. Die sechs nativen Desktop-Jobs
+bestehen mit je sieben Tests auf Windows x64, macOS ARM64 und Linux x64 in Debug
+und Release. Die drei entpackten Release-Pakete bestehen beide Bedienwege mit
+126 Maus- und 105 reinen Tastaturaussagen.
+
+Lokal auf Intel macOS 14.6.1 bestehen dieselben sieben Release- und sieben
+Sanitizer-Tests. Das entpackte Archiv SecondBrain-0.3.0-Darwin-x86_64 besteht beide
+Bedienwege einschließlich Ressourcen und MIT-Lizenz aus einem anderen Ordner.
+Kleine Darstellungen mit 200 Prozent Schrift sind geometrisch geprüft und betrachtet.
+Die Tests belegen die benannten Abläufe mit versteckten SDL-Softwarerenderer-Fenstern.
+Das aktive Gesamtziel und die übrigen Release-Abnahmen bleiben offen.
