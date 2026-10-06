@@ -1,6 +1,6 @@
 # Projektplan für die SecondBrain Anwendung
 
-Stand: 6. Oktober 2026. SecondBrain soll eine eigene Anwendung in C werden,
+Stand: 6. Oktober 2026. SecondBrain ist eine eigene Anwendung in C,
 mit der der Nutzer und die KI projektbezogenes Wissen verwenden können.
 Die Anwendung übernimmt das Anlegen, Anzeigen, Bearbeiten und Verwalten der
 Projektgedächtnisse. Die folgenden Anforderungen sind verbindlich festgehalten;
@@ -13,14 +13,15 @@ Der Nutzer soll seine Second Brains vollständig innerhalb dieser Anwendung
 betrachten und bearbeiten können. Für jedes Projekt, etwa Physim, lässt sich
 ein eigenes Projektgedächtnis mit derselben Grundstruktur anlegen.
 
-Zur geplanten eigenen Oberfläche gehören der Zugang zu Zielen, aktuellem Stand,
+Zur eigenen Oberfläche gehören der Zugang zu Zielen, aktuellem Stand,
 Entscheidungen, offenen Fragen, Quellen, Wissensnotizen und Arbeitsübergaben.
 Erfassung, Navigation, Suche und die Verwaltung mehrerer Projekte sollen
 möglichst durch SecondBrain selbst bereitgestellt werden.
 
 Obsidian, ein externer Markdown-Editor oder eine andere Wissensanwendung sollen
-für die normale Nutzung nicht erforderlich sein. Wie die KI auf Projektkontext
-zugreift und ihn pflegt, ist im weiteren Plan zu konkretisieren.
+für die normale Nutzung nicht erforderlich sein. Die erste KI-Anbindung erfolgt
+über kopierbaren Kontext aus gespeicherten Kerninformationen und den Zugriff
+auf lesbare Projektdateien. Lesen und Pflege werden ausdrücklich beauftragt.
 
 ## Sprache und Abhängigkeiten
 
@@ -30,12 +31,11 @@ zugreift und ihn pflegt, ist im weiteren Plan zu konkretisieren.
   fachliche Funktionen werden im Projekt selbst umgesetzt.
 - C-Standardbibliothek und notwendige Betriebssystem-APIs bilden die Grundlage
   der plattformspezifischen Anbindung.
-- Die UI-Abhängigkeiten werden später nach der Designrecherche und anhand
-  ihrer Eignung für alle Zielplattformen ausgewählt.
+- Nach der Designrecherche wurden SDL3 und Nuklear für die UI ausgewählt.
+  Die Begründung und Abgrenzung stehen in [ARCHITEKTUR.md](ARCHITEKTUR.md).
 
-Der vorhandene Python-Generator ist ein Strukturprototyp. Er legt noch keine
-Technologie für die geplante Anwendung fest und ist keine vorgesehene
-Laufzeitvoraussetzung der C-Anwendung.
+Der vorhandene Python-Generator bleibt ein Strukturprototyp. Die C-Anwendung
+benötigt ihn zur Laufzeit nicht.
 
 ## Zielplattformen und Daten
 
@@ -45,8 +45,8 @@ Funktionen benötigen eine klar abgegrenzte Anbindung.
 
 Vorhandenes Projektwissen soll bei der Weiterentwicklung erhalten bleiben.
 Die vorhandenen Markdown-Vorlagen und das Physim-Beispiel dienen als Grundlage
-für das Wissensmodell. Das endgültige Speicherformat und die Übernahme des
-Prototyps werden vor der Implementierung festgelegt.
+für das Wissensmodell. Die C-Anwendung verwendet UTF-8-Markdown und kleine
+JSON-Metadaten und kann die vorhandenen Instanzen direkt öffnen.
 
 ## UI Recherche vor dem Entwurf
 
@@ -55,7 +55,7 @@ Orientierung sind Apples Human Interface Guidelines und die UI-Gestaltung von
 Apple. Die Recherche geht der Gestaltung von Ansichten, Navigation und
 Komponenten voraus.
 
-Die spätere Recherche soll insbesondere untersuchen:
+Die vor dem Entwurf durchgeführte Recherche untersucht:
 
 - Informationshierarchie und Orientierung bei mehreren Projekten.
 - Typografie, Abstände, Farben und verständliche Darstellung dichter Inhalte.
@@ -66,21 +66,23 @@ Die spätere Recherche soll insbesondere untersuchen:
 
 Erkenntnisse und Originalquellen werden zuerst dokumentiert. Daraus folgen
 begründete Designprinzipien und erst anschließend konkrete UI-Entwürfe.
-Die anschließende Recherche ist in [UI Recherche](UI_RECHERCHE.md) dokumentiert.
-Konkrete Entwürfe werden daraus abgeleitet.
+Die Recherche ist in [UI Recherche](UI_RECHERCHE.md) dokumentiert.
+Der [konkrete Entwurf](UI_ENTWURF.md) wurde daraus abgeleitet.
 
-## Reihenfolge der weiteren Arbeit
+## Durchlaufene Umsetzungsreihenfolge
 
-1. UI-Grundlagen und Apple-Gestaltung recherchieren und dokumentieren.
-2. Produktabläufe und Anforderungen an die eigene Oberfläche konkretisieren.
-3. Daraus UI-Entwürfe erarbeiten und bewerten.
-4. Architektur, C-Standard, Speicherformat, Buildverfahren und zulässige
+- [x] UI-Grundlagen und Apple-Gestaltung recherchieren und dokumentieren.
+- [x] Produktabläufe und Anforderungen an die eigene Oberfläche konkretisieren.
+- [x] Daraus UI-Entwürfe erarbeiten und bewerten.
+- [x] Architektur, C-Standard, Speicherformat, Buildverfahren und zulässige
    UI-Bibliotheken festlegen.
-5. Einen vollständigen Arbeitsablauf in C implementieren und schrittweise erweitern.
-6. Verhalten und Darstellung auf Windows, macOS und Linux tatsächlich prüfen.
+- [x] Einen vollständigen Arbeitsablauf in C implementieren und schrittweise erweitern.
+- [x] Verhalten und Darstellung auf Windows, macOS und Linux tatsächlich prüfen.
+- [x] Entpackte Pakete ohne Python-Laufzeit auf allen drei Systemen prüfen.
 
 Der Nutzer hat nach dem Festhalten des Plans die Umsetzung des Projekts
-beauftragt. Diese Reihenfolge gilt für die nun laufende Arbeit.
+beauftragt. Die erste Version durchlief diese Reihenfolge; Nachweise und Grenzen
+stehen im [Umsetzungsstand](STATUS.md).
 
 ## Eigenes Projektgedächtnis
 
@@ -99,4 +101,5 @@ Die Regel gilt für Planung, Recherche, Design und Implementierung.
 
 Plattformunterstützung wird anhand ausgeführter Prüfungen dokumentiert.
 Die bisherigen Python-Prüfungen belegen den Strukturprototyp; sie sind kein
-Nachweis für die zukünftige C-Anwendung oder deren Oberfläche.
+Nachweis für die C-Anwendung oder deren Oberfläche. Dafür bestehen eigene
+Kern-, UI-, Desktop- und Paketprüfungen.

@@ -1,7 +1,7 @@
 # Umsetzungsstand von SecondBrain
 
-Stand: 6. Oktober 2026. Die Umsetzung ist aktiv; die vollständige Desktop-Anwendung
-liegt als erste Desktop-Version mit geprüften Paketen vor.
+Stand: 6. Oktober 2026. Die erste C-Desktop-Version liegt mit geprüften Paketen
+für Windows, macOS und Linux vor.
 
 ## Abgeschlossene Grundlagen
 
@@ -25,7 +25,7 @@ Der Kern linkt ausschließlich gegen Standard- und Betriebssystembibliotheken.
 Die Vorlagen werden beim CMake-Konfigurieren in den Kern eingebettet.
 
 Ein natives Kommandozeilenwerkzeug dient der Entwicklung und der Dateianbindung
-an KI-Werkzeuge. Es ersetzt die ausstehende eigene Oberfläche nicht.
+an KI-Werkzeuge. Die normale Nutzung erfolgt über die eigene Oberfläche.
 
 ## Ausgeführte Prüfungen
 
@@ -49,7 +49,7 @@ sind für Wechsel, Archivierung und Beenden implementiert. Externe Textquellen
 können schreibgeschützt geladen werden, während die eigene Bearbeitung erhalten
 bleibt. Bei einem Speicherkonflikt kann eine eigene Fassung als neue Wissensnotiz
 gesichert werden. Diese Zustandsabläufe sind anhand tatsächlicher Dateien geprüft;
-ihre Bedienelemente werden nun in das Hauptfenster eingebunden.
+ihre Bedienelemente sind in das Hauptfenster eingebunden.
 
 SDL3 und Nuklear sind ausschließlich im UI-Ziel eingebunden. Die Grundlage
 verarbeitet Texteingaben, stellt Schriften mit passender Pixeldichte dar und
@@ -81,7 +81,7 @@ Die Desktop-Oberfläche ist implementiert: Projekte und Notizen anlegen,
 Markdown lesen und bearbeiten, speichern, suchen, archivieren, Quellen und
 Ordner schreibgeschützt betrachten sowie KI-Kontext kopieren. Die Bedienprüfung
 steuert dieselben Komponenten mit SDL-Maus-, Tastatur- und Zwischenablageereignissen.
-Lokal bestehen alle vier C-/UI-Prüfungen, auch mit AddressSanitizer und
+Lokal bestehen alle fünf C-/UI-Prüfungen, auch mit AddressSanitizer und
 UndefinedBehaviorSanitizer. Tatsächlich gerenderte Ansichten wurden
 in groß/hell und klein/dunkel mit 150 Prozent Schriftgröße betrachtet.
 
@@ -97,9 +97,16 @@ besteht mit sechs Desktop-Jobs (Debug und Release) und drei erfolgreichen Prüfu
 der entpackten Pakete auf Windows x64, macOS ARM64 und Linux x64.
 Die Pakete stehen als Actions-Artefakte zum Download bereit.
 
-Die Bedienprüfung umfasst nun zusätzlich Konfliktkopie, Archivierung und
-Speichern beim Beenden. Lokal besteht dieser erweiterte Ablauf; der eigene
-Projektkontext wird als zusätzlicher UI-Import geprüft.
+Die [Abnahme zu 287ef48](https://github.com/Lulus792/SecondBrain/actions/runs/37445131476)
+besteht mit allen 18 Jobs. Jeder der sechs Desktop-Jobs führt fünf Prüfungen aus;
+die Release-Jobs prüfen zusätzlich die entpackten Pakete. Der Ablauf umfasst
+Konfliktkopie, Archivierung, Speichern beim Beenden und den Import dieser eigenen
+Projektinstanz. Lange Titel wurden in kleiner Darstellung mit großer Schrift geprüft.
+Lokal liegt die Intel-macOS-App unter `dist/SecondBrain/secondbrain.app`.
+
+Version 0.1 erfüllt den festgelegten lokalen Arbeitsablauf. Erweiterungen und
+bekannte Grenzen stehen unter [Distribution](DISTRIBUTION.md) und im eigenen
+[Fragenregister](../brains/secondbrain/QUESTIONS.md).
 Nuklear besitzt hier keine Anbindung an native
 Screenreader; vergrößerte Schrift und Tastaturbefehle ersetzen diesen fehlenden
 Zugang nicht.

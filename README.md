@@ -8,9 +8,9 @@ Quellen und Notizen auf Grundlage einer wiederverwendbaren Struktur.
 Die verbindlichen Anforderungen stehen im [Projektplan](docs/PROJEKTPLAN.md):
 Windows, macOS und Linux; externe Bibliotheken ausschließlich für die UI;
 UI-Recherche vor dem Entwurf und Gestaltung nach Apples Human Interface Guidelines.
-Die normale Nutzung soll vollständig in der eigenen Anwendung möglich sein.
+Die normale Nutzung erfolgt in der eigenen Anwendung.
 
-Die Umsetzung läuft. UI-Recherche und Oberflächenentwurf sind dokumentiert;
+Version 0.1 liegt vor. UI-Recherche und Oberflächenentwurf sind dokumentiert;
 ein unabhängiger C17-Kern und ein natives Entwicklungswerkzeug sind implementiert.
 Die UI-Grundlage mit Schriften, Darstellung und Texteditor ist ebenfalls
 implementiert und auf allen drei Plattformen geprüft.
@@ -26,7 +26,7 @@ Der aktuelle Nachweis steht im [Umsetzungsstand](docs/STATUS.md).
 
 Fertige Pakete werden nach erfolgreichen Release-Prüfungen als
 `SecondBrain-Windows-X64`, `SecondBrain-macOS-ARM64` und `SecondBrain-Linux-X64`
-im jeweiligen [GitHub-Actions-Lauf](https://github.com/Lulus792/SecondBrain/actions)
+im [geprüften GitHub-Actions-Lauf](https://github.com/Lulus792/SecondBrain/actions/runs/37445131476)
 bereitgestellt. Den Download entpacken, dann das darin enthaltene
 Anwendungsarchiv entpacken. Die Anleitung `QUICKSTART.txt` gehört zum Paket.
 Ein GitHub-Login kann für den Download der Actions-Artefakte erforderlich sein.

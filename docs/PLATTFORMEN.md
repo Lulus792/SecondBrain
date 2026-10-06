@@ -6,7 +6,7 @@ Markdown und JSON werden in UTF-8 geschrieben; generierte Dateien verwenden LF.
 
 Die [eigene Anwendung](PROJEKTPLAN.md) wird in C umgesetzt. Die folgenden
 Prototypnachweise betreffen Python; die native C-Prüfung steht im eigenen Abschnitt
-weiter unten. Die vollständige Prüfung der Projektoberfläche steht noch aus.
+weiter unten. Desktop- und Paketnachweise stehen in einem eigenen Abschnitt.
 
 ## Prüfungsumfang
 
@@ -56,8 +56,8 @@ UTF-8, Suche, Speicherkonflikte, Archivierung, KI-Kontext und Metadaten.
 Lokal bestehen außerdem Kern- und UI-Grundlagenprüfung mit AppleClang 16 auf
 Intel macOS 14.6.1 sowie zusätzliche Läufe mit AddressSanitizer und
 UndefinedBehaviorSanitizer. Die UI-Prüfung rendert mit dem nativen Cocoa-Fenster
-und SDL-Softwarerenderer. Sie belegt Renderer und Editorbausteine; die vollständige
-Projektoberfläche wird daraus noch aufgebaut.
+und SDL-Softwarerenderer. Dieser frühere Lauf belegt Renderer und Editorbausteine;
+die Desktop-Prüfung ist davon getrennt.
 
 ## Native UI Grundlagenprüfung
 
@@ -68,13 +68,46 @@ Wiederholen. Linux verwendet X11 unter Xvfb, Windows und macOS ihre nativen
 Fenstersysteme; die Tests rendern über den SDL-Softwarerenderer in einem versteckten
 Testfenster. Die Kern- und Python-Jobs dieses Laufs bestehen ebenfalls.
 
-Diese Ergebnisse belegen die verwendeten Bausteine. Die noch zu implementierende
-Projektoberfläche benötigt zusätzlich vollständige Bedien- und Paketprüfungen.
+Diese Ergebnisse belegen die verwendeten Bausteine. Die Projektoberfläche wird
+zusätzlich durch vollständige Bedien- und Paketprüfungen nachgewiesen.
+
+## Desktop und entpackte Pakete
+
+Der [Lauf zu 287ef48](https://github.com/Lulus792/SecondBrain/actions/runs/37445131476)
+besteht am 6. Oktober 2026 mit 18 erfolgreichen Jobs. Er prüft den C-Kern
+und die Desktop-App in Debug/Release auf allen drei Systemen und bewahrt die
+älteren Python-Prüfungen. Die sechs Desktop-Jobs führen je fünf Prüfungen aus:
+Renderer/Editor, vollständiger Bedienablauf, eigene Projektinstanz,
+Anwendungszustand und C-Kern. Alle drei Release-Jobs entpacken das tatsächliche
+Anwendungsarchiv und starten daraus denselben Bedienablauf.
+
+| Plattform | Desktop Debug | Desktop Release | Entpacktes Paket |
+| --- | --- | --- | --- |
+| Windows x64 | bestanden | bestanden | bestanden |
+| macOS ARM64 | bestanden | bestanden | bestanden |
+| Ubuntu Linux x64, X11/Xvfb | bestanden | bestanden | bestanden |
+
+Der Desktop-Ablauf steuert die tatsächlichen Bedienelemente über SDL-Ereignisse.
+Er umfasst Projekt-/Notizerstellung, Unicode-Bearbeitung, Speichern und Wiederöffnen,
+Suche, Wechsel mit Speichern/Verwerfen/Abbrechen, schreibgeschützte Quellen,
+Kontext und Zwischenablage, Konfliktkopie, Archivierung und Speichern beim Beenden.
+Die eigene Projektinstanz wird aus dem Repository geöffnet und tatsächlich gerendert.
+
+Lokal bestehen alle fünf Prüfungen mit AddressSanitizer und
+UndefinedBehaviorSanitizer auf Intel macOS 14.6.1. Tatsächliche Renderbilder
+wurden in groß/hell und klein/dunkel mit 150 Prozent Schrift betrachtet,
+einschließlich langer Dokumenttitel. Die CI veröffentlicht Testbilder und
+Protokolle getrennt von den Anwendungspaketen.
+
+Die [Distribution](DISTRIBUTION.md) dokumentiert Paketaufbau und Start.
+Lokal zeigt `otool -L` ausschließlich macOS-Systembibliotheken. Die UI wird in der
+CI in versteckten nativen Testfenstern mit SDL-Softwarerenderer geprüft;
+dies ist kein manueller Test jeder Desktop-Umgebung oder GPU-Konfiguration.
 
 ## Grenzen der Nachweise
 
-Die Prüfungen belegen das getestete Verhalten des Generators. Sie bewerten
-keine KI-Integration oder Drittprogramme wie Obsidian. Die lokale Physim-Instanz
+Die Prüfungen belegen die jeweils benannten Abläufe. Der KI-Kontext wird erzeugt
+und kopiert; ein externer KI-Anbieter wurde dabei nicht integriert. Die Physim-Instanz
 enthält Quellenverweise und dokumentierte Aussagen, keine neue Physim-Abnahme.
 
 Wissensbasen bleiben bei einem Betriebssystemwechsel lesbar. Lokale Projektpfade

@@ -5,10 +5,11 @@ dort Orientierung und Wissen; die KI erhält einen nachvollziehbaren Einstieg
 mit Verweisen auf die maßgeblichen Quellen. Der Kern bleibt klein genug, um ihn
 bei der täglichen Arbeit aktuell zu halten.
 
-Dieses Konzept beschreibt das Wissensmodell und die Arbeitsweise. Die geplante
+Dieses Konzept beschreibt das Wissensmodell und die Arbeitsweise. Die
 eigene Anwendung in C sowie die Anforderungen an UI-Recherche und Gestaltung
 stehen im [verbindlichen Projektplan](PROJEKTPLAN.md). Die dargestellten Dateien
-gehören zum vorhandenen Strukturprototyp; die Oberfläche ist noch zu entwerfen.
+werden vom vorhandenen Strukturprototyp und von der eigenen C-Anwendung verwendet.
+Entwurf, Umsetzung und Nachweise stehen in [STATUS.md](STATUS.md).
 
 ## Aufbau einer Projektinstanz
 
@@ -70,17 +71,18 @@ werden. Welche Genauigkeit Physim für ein bestimmtes Experiment fordert, gehör
 weiterhin in den Physim-Kontext. So bleiben allgemeines Wissen und konkrete
 Anforderungen unterscheidbar.
 
-## Vorhandener Prototyp und geplante Anwendung
+## Strukturprototyp und eigene Anwendung
 
 Der vorhandene Strukturprototyp umfasst die lokale Vorlage, einen Generator und ein
 vorbereitetes Physim-Beispiel. Das Anlegen erfordert einen Befehl. Suche kann
 im Prototyp über lokale Textsuche erfolgen.
 
-Die geplante C-Anwendung übernimmt Projektverwaltung, Anzeige, Bearbeitung,
-Erfassung und Suche selbst. Vor der Gestaltung wird UI-Design mit Orientierung
-an Apple studiert. Die genaue KI-Anbindung und mögliche automatische Vorschläge
-zur Pflege werden später konkretisiert. Automatische Änderungen benötigen einen
-Abgleich mit den Quellen.
+Die C-Anwendung übernimmt Projektverwaltung, Anzeige, Bearbeitung, Erfassung
+und Suche selbst. Vor der Gestaltung wurde UI-Design mit Orientierung an Apple
+studiert. Der Kontextbefehl stellt gespeicherte Kerninformationen zum Kopieren
+bereit; KI-Werkzeuge können zudem die lesbaren Dateien verwenden. Automatische
+Vorschläge zur Pflege sind eine mögliche spätere Erweiterung und benötigen
+einen Abgleich mit den Quellen.
 
 Wenn wir Vorlagen weiterentwickeln, bleibt vorhandenes Projektwissen erhalten.
 Die Versionsnummer macht Unterschiede sichtbar. Eine spätere Migration muss

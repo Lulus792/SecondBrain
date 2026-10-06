@@ -9,27 +9,30 @@ aktuelle Nachweise und Grenzen stehen im [Umsetzungsstand](../../docs/STATUS.md)
 - Der eigene C17-Kern verwaltet Projekte, Markdown, Suche, Archiv und Kontext.
 - Die eigene Desktop-App bietet Anlegen, Lesen, Bearbeiten, Speichern, Quellen
   und Projektwechsel mit Schutz ungespeicherter Änderungen und Speicherkonflikte.
-- Der [Desktop-Lauf zu 07ca223](https://github.com/Lulus792/SecondBrain/actions/runs/37443300206)
-  besteht auf Windows, macOS und Linux, einschließlich des vollständigen Bedienablaufs.
-- Lokal bestehen alle vier C-/UI-Prüfungen auch mit AddressSanitizer und
+- Die [Abnahme zu 287ef48](https://github.com/Lulus792/SecondBrain/actions/runs/37445131476)
+  besteht mit 18 Jobs. Desktop Debug/Release und entpackte Pakete bestehen auf
+  Windows x64, macOS ARM64 und Linux x64.
+- Lokal bestehen alle fünf C-/UI-Prüfungen auch mit AddressSanitizer und
   UndefinedBehaviorSanitizer auf Intel macOS 14.6.1.
 - Ein tatsächliches macOS-Archiv besteht nach Entpacken und Verschieben denselben
   Bedienablauf. Das [Paketverfahren](../../docs/DISTRIBUTION.md) ist implementiert.
 - Diese Wissensbasis wurde mit dem C-Kern angelegt und mit projektspezifischen
   Inhalten und relativen Originalquellen befüllt.
 
-## Laufende Arbeit
+## Ergebnis der Umsetzung
 
-Der [Paketlauf zu aeb1d0d](https://github.com/Lulus792/SecondBrain/actions/runs/37443877273)
-besteht mit Desktop Debug/Release und den entpackten Paketen auf allen drei Systemen.
-Die eigene Instanz ist in der App geladen und betrachtet; ihre lokalen Quellen
-sind erreichbar. Der erweiterte Bedienablauf prüft jetzt zusätzlich Konfliktkopie,
-Archivierung und Speichern beim Beenden.
+Version 0.1 ist bereit für den lokalen Arbeitsablauf. Diese eigene Instanz ist in
+der App geladen und betrachtet; ihre lokalen Quellen sind erreichbar. Der
+Bedienablauf prüft auch Konfliktkopie, Archivierung und Speichern beim Beenden.
+Der eigene Projektkontext wird in allen sechs Desktop-Jobs geöffnet und gerendert.
+Die Intel-macOS-App liegt lokal unter dist/SecondBrain/secondbrain.app;
+weitere Pakete stehen im verlinkten GitHub-Lauf als Actions-Artefakte bereit.
 
 ## Nächster Schritt
 
-Den nächsten GitHub-Lauf einschließlich eigener Projektinstanz und erweitertem
-Bedienablauf auswerten. Danach die Abnahme und diesen Stand mit dem Ergebnis ergänzen.
+Ein reales Projekt in der App öffnen oder anlegen und Wissen pflegen.
+Neue Anforderungen oder Fehler anhand eines konkreten Arbeitsablaufs erfassen;
+die möglichen späteren Erweiterungen stehen in [QUESTIONS.md](QUESTIONS.md).
 
 ## Grenzen
 
