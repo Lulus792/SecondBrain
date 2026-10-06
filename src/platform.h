@@ -17,5 +17,15 @@ SBStatus sb_fs_remove(const char *path);
 SBStatus sb_fs_absolute(const char *path, char *out, size_t capacity);
 unsigned long sb_process_id(void);
 SBStatus sb_fs_home(char *out, size_t capacity);
+typedef struct SBFile SBFile;
+SBStatus sb_file_open(const char *path, bool create, SBFile **out);
+SBStatus sb_file_read(SBFile *file, void *data, size_t capacity, size_t *read);
+SBStatus sb_file_write(SBFile *file, const void *data, size_t length);
+SBStatus sb_file_close(SBFile *file, bool durable);
+SBStatus sb_fs_publish_new(const char *from, const char *to);
+SBStatus sb_fs_rmdir(const char *path);
+#ifdef SB_TEST_FILE_FAILURES
+void sb_test_file_fail_after(size_t bytes);
+#endif
 
 #endif

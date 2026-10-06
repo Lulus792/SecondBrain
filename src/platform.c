@@ -1,3 +1,5 @@
+#define _GNU_SOURCE 1
+#define _DARWIN_C_SOURCE 1
 #define _POSIX_C_SOURCE 200809L
 #define _XOPEN_SOURCE 700
 #include "platform.h"
@@ -5,6 +7,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef SB_TEST_FILE_FAILURES
+static size_t failure_budget=SIZE_MAX;
+void sb_test_file_fail_after(size_t bytes) { failure_budget=bytes; }
+static bool injected_write_failure(size_t length) {
+    if (failure_budget==SIZE_MAX) return false;
+    if (length>failure_budget) return true;
+    failure_budget-=length; return false;
+}
+#endif
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -19,6 +30,57 @@ static wchar_t *wide(const char *path) {
     out = malloc((size_t)count * sizeof(*out));
     if (out) MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, path, -1, out, count);
     return out;
+}
+
+struct SBFile { HANDLE handle; };
+SBStatus sb_file_open(const char *path, bool create, SBFile **out) {
+    *out=NULL; wchar_t *w=wide(path);
+    if (!w) return sb_error(SB_INVALID,"Ungültiger Dateipfad.");
+    HANDLE handle=CreateFileW(w,create ? GENERIC_WRITE : GENERIC_READ,
+        create ? 0 : FILE_SHARE_READ,NULL,create ? CREATE_NEW : OPEN_EXISTING,
+        FILE_FLAG_OPEN_REPARSE_POINT,NULL);
+    free(w);
+    if (handle==INVALID_HANDLE_VALUE) return sb_error(create && sb_fs_kind(path)!=0 ? SB_EXISTS : SB_IO,"Datei konnte nicht geöffnet werden: %s",path);
+    BY_HANDLE_FILE_INFORMATION info;
+    if (!GetFileInformationByHandle(handle,&info) || (info.dwFileAttributes & (FILE_ATTRIBUTE_REPARSE_POINT|FILE_ATTRIBUTE_DIRECTORY)) || GetFileType(handle)!=FILE_TYPE_DISK) {
+        CloseHandle(handle); if (create) sb_fs_remove(path); return sb_error(SB_INVALID,"Keine reguläre Datei: %s",path);
+    }
+    SBFile *file=malloc(sizeof(*file));
+    if (!file) { CloseHandle(handle); if (create) sb_fs_remove(path); return sb_error(SB_MEMORY,"Nicht genug Arbeitsspeicher."); }
+    file->handle=handle; *out=file; return sb_ok();
+}
+SBStatus sb_file_read(SBFile *file,void *data,size_t capacity,size_t *read) {
+    DWORD got=0;
+    if (capacity>UINT32_MAX || !ReadFile(file->handle,data,(DWORD)capacity,&got,NULL)) return sb_error(SB_IO,"Datei konnte nicht gelesen werden.");
+    *read=got; return sb_ok();
+}
+SBStatus sb_file_write(SBFile *file,const void *data,size_t length) {
+#ifdef SB_TEST_FILE_FAILURES
+    if (injected_write_failure(length)) return sb_error(SB_IO,"Simulierter voller Datenträger.");
+#endif
+    const unsigned char *cursor=data;
+    while (length) {
+        DWORD written=0,part=length>UINT32_MAX ? UINT32_MAX : (DWORD)length;
+        if (!WriteFile(file->handle,cursor,part,&written,NULL) || !written) return sb_error(SB_IO,"Sicherung konnte nicht geschrieben werden. Prüfe den freien Speicherplatz.");
+        cursor+=written; length-=written;
+    }
+    return sb_ok();
+}
+SBStatus sb_file_close(SBFile *file,bool durable) {
+    if (!file) return sb_ok();
+    bool synced=!durable || FlushFileBuffers(file->handle);
+    bool closed=CloseHandle(file->handle)!=0; free(file);
+    return synced && closed ? sb_ok() : sb_error(SB_IO,"Datei konnte nicht dauerhaft abgeschlossen werden.");
+}
+SBStatus sb_fs_publish_new(const char *from,const char *to) {
+    wchar_t *a=wide(from),*b=wide(to);
+    bool moved=a && b && MoveFileExW(a,b,MOVEFILE_WRITE_THROUGH);
+    free(a); free(b);
+    return moved ? sb_ok() : sb_error(sb_fs_kind(to)>0 ? SB_EXISTS : SB_IO,"Ziel konnte nicht ohne Überschreiben veröffentlicht werden: %s",to);
+}
+SBStatus sb_fs_rmdir(const char *path) {
+    wchar_t *w=wide(path); bool ok=w && RemoveDirectoryW(w); free(w);
+    return ok ? sb_ok() : sb_error(SB_IO,"Temporärer Ordner konnte nicht entfernt werden: %s",path);
 }
 
 int sb_fs_kind(const char *path) {
@@ -185,6 +247,54 @@ SBStatus sb_fs_home(char *out, size_t capacity) {
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+struct SBFile { int handle; };
+SBStatus sb_file_open(const char *path,bool create,SBFile **out) {
+    *out=NULL;
+    int handle=open(path,(create ? O_WRONLY|O_CREAT|O_EXCL : O_RDONLY)|O_NOFOLLOW|O_NONBLOCK,0600);
+    if (handle<0) return sb_error(create && errno==EEXIST ? SB_EXISTS : SB_IO,"Datei konnte nicht geöffnet werden: %s",path);
+    struct stat info;
+    if (fstat(handle,&info) || !S_ISREG(info.st_mode)) { close(handle); if (create) unlink(path); return sb_error(SB_INVALID,"Keine reguläre Datei: %s",path); }
+    SBFile *file=malloc(sizeof(*file));
+    if (!file) { close(handle); if (create) unlink(path); return sb_error(SB_MEMORY,"Nicht genug Arbeitsspeicher."); }
+    file->handle=handle; *out=file; return sb_ok();
+}
+SBStatus sb_file_read(SBFile *file,void *data,size_t capacity,size_t *got) {
+    ssize_t count;
+    do { count=read(file->handle,data,capacity); } while (count<0 && errno==EINTR);
+    if (count<0) return sb_error(SB_IO,"Datei konnte nicht gelesen werden.");
+    *got=(size_t)count; return sb_ok();
+}
+SBStatus sb_file_write(SBFile *file,const void *data,size_t length) {
+#ifdef SB_TEST_FILE_FAILURES
+    if (injected_write_failure(length)) return sb_error(SB_IO,"Simulierter voller Datenträger.");
+#endif
+    const unsigned char *cursor=data;
+    while (length) {
+        ssize_t count=write(file->handle,cursor,length);
+        if (count<0 && errno==EINTR) continue;
+        if (count<=0) return sb_error(SB_IO,"Sicherung konnte nicht geschrieben werden. Prüfe den freien Speicherplatz.");
+        cursor+=count; length-=(size_t)count;
+    }
+    return sb_ok();
+}
+SBStatus sb_file_close(SBFile *file,bool durable) {
+    if (!file) return sb_ok();
+    bool synced=!durable || fsync(file->handle)==0;
+    bool closed=close(file->handle)==0; free(file);
+    return synced && closed ? sb_ok() : sb_error(SB_IO,"Datei konnte nicht dauerhaft abgeschlossen werden.");
+}
+SBStatus sb_fs_publish_new(const char *from,const char *to) {
+#ifdef __APPLE__
+    int result=renamex_np(from,to,RENAME_EXCL);
+#elif defined(__linux__)
+    int result=renameat2(AT_FDCWD,from,AT_FDCWD,to,RENAME_NOREPLACE);
+#else
+    return sb_error(SB_IO,"Exklusives Veröffentlichen wird auf diesem System nicht unterstützt.");
+#endif
+    return result==0 ? sb_ok() : sb_error(errno==EEXIST || errno==ENOTEMPTY ? SB_EXISTS : SB_IO,"Ziel konnte nicht ohne Überschreiben veröffentlicht werden: %s",to);
+}
+SBStatus sb_fs_rmdir(const char *path) { return rmdir(path)==0 ? sb_ok() : sb_error(SB_IO,"Temporärer Ordner konnte nicht entfernt werden: %s",path); }
 
 int sb_fs_kind(const char *path) {
     struct stat item;

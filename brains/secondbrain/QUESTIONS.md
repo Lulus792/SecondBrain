@@ -22,9 +22,10 @@ Beleg: [Designrecherche](../../docs/UI_GALAXIE.md) und [Umsetzung](../../docs/UI
 
 ## Vollständiger Release
 
-Welche Betriebssystemversionen und Funktionen werden für 1.0 zugesagt? Welche
-Lizenz soll der eigene Code erhalten? Welche Vertriebswege sollen signierte
-Pakete und Notarisierung verwenden? Die [Release-Liste](../../docs/RELEASE.md)
+Welche Betriebssystemversionen werden für 1.0 zugesagt? Die eigene Lizenz ist
+auf Nutzerentscheidung MIT. Die Arbeiten der Release-Liste sind beauftragt;
+1.0 wird erst auf ausdrückliche Freigabe gesetzt. Signierte Pakete benötigen
+noch Apple-Developer-Konto beziehungsweise Windows-Signaturzertifikat. Die [Release-Liste](../../docs/RELEASE.md)
 hält die erforderlichen Arbeiten und ihre Abnahme fest. Die abschließende
 sprachliche Bereinigung bleibt ein Schritt vor dem fertigen Endprodukt.
 
@@ -37,7 +38,8 @@ Sie sind noch keine Implementierungsaufträge oder zugesagten Funktionen.
   ausdrücklich beauftragte KI die Dateien und prüft Originalquellen.
 - Soll Wissen über mehrere Projekte gemeinsam durchsucht oder synchronisiert werden?
 - Wie werden Vorlagen migriert, ohne individuelle Inhalte zu ersetzen?
-- Welcher UI-Zugang kann native Screenreader vollständig unterstützen?
+- Native Screenreader sind Teil des beauftragten Release-Umfangs; welche
+  tatsächlichen assistiven Prüfungen sind auf allen Systemen ausführbar?
 - Welche weiteren Schriftsysteme, Markdown-Elemente und Suchnormalisierungen
   werden in der tatsächlichen Nutzung gebraucht?
 - Werden signierte Pakete, Installer und dauerhafte Release-Downloads benötigt?

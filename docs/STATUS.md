@@ -252,3 +252,18 @@ unter dist/SecondBrain/secondbrain.app ist aktualisiert; otool -L zeigt nur
 macOS-Systembibliotheken. Die Tests verwenden versteckte native Fenster und
 SDL-Softwaredarstellung. Tatsächliche OS-Dialoge, Screenreader, reale GPU-/Display-
 Umgebungen und Langzeitsitzungen bleiben gesonderte offene Abnahmen.
+
+
+## Sicherungskern in Arbeit
+
+Der eigene C-Kern implementiert Inhaltsarchive mit SHA-256, Lesen/Prüfen,
+Wiederherstellen unter freiem Namen, exklusives Veröffentlichen und Abbruch-
+Aufräumen. Der CLI bietet backup, inspect und restore. Gezielte lokale Prüfungen
+umfassen komplette Rundreise, binäre Anhänge, leere Ordner, Unicode, bekannte
+Hashvektoren, beschädigte und gefährliche Pfade, Bestandschutz und Schreibfehler
+nach Teilfortschritt. Die Desktop-Anbindung ist noch nicht implementiert.
+[Vertrag, Prüfumfang und Grenzen](SICHERUNG.md).
+
+Lokal bestehen die sieben betroffenen Prüfungen in Release und mit ASan/UBSan: 482
+Integritäts- und 27 Schreibfehleraussagen sowie getrennte Produktions-CLI-Prozesse.
+Neue Plattformnachweise folgen erst nach ausgeführten CI-Jobs.

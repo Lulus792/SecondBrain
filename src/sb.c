@@ -299,6 +299,37 @@ static SBStatus metadata_name(const char *json, char *name) {
     if (*cursor || !found) return sb_error(SB_INVALID, "Projektname fehlt oder Metadaten sind ungültig.");
     return sb_ok();
 }
+SBStatus sb_metadata_validate(const char *json,size_t length,char name[SB_NAME_CAP]) {
+    if (strlen(json)!=length || !sb_utf8_valid(json,length)) return sb_error(SB_INVALID,"Ungültige Projektmetadaten.");
+    return metadata_name(json,name);
+}
+SBStatus sb_metadata_reidentify(const char *json,size_t length,const char *id,char **out,size_t *out_length) {
+    char name[SB_NAME_CAP]; const char *cursor=json,*begin=NULL,*end=NULL;
+    Buffer buffer={0}; bool found=false;
+    *out=NULL;
+    if (!sb_id_valid(id)) return sb_error(SB_INVALID,"Ungültige Projektkennung.");
+    TRY(sb_metadata_validate(json,length,name));
+    spaces(&cursor); ++cursor; spaces(&cursor);
+    while (*cursor!='}') {
+        char *key=NULL,*value=NULL; SBStatus status=json_string(&cursor,&key);
+        if (status.code!=SB_OK) return status;
+        spaces(&cursor); ++cursor; spaces(&cursor);
+        const char *start=cursor;
+        if (!strcmp(key,"id")) {
+            if (found) { free(key); return sb_error(SB_INVALID,"Doppelte Projektkennung."); }
+            status=json_string(&cursor,&value); found=true; begin=start; end=cursor;
+        } else status=json_skip(&cursor,0);
+        free(key); free(value);
+        if (status.code!=SB_OK) return status;
+        spaces(&cursor); if (*cursor==',') { ++cursor; spaces(&cursor); }
+    }
+    SBStatus status=add(&buffer,json,(size_t)((found ? begin : cursor)-json));
+    if (!found && status.code==SB_OK) status=append(&buffer," ,\"id\": ");
+    if (status.code==SB_OK) status=json_escape(&buffer,id);
+    if (status.code==SB_OK) status=append(&buffer,found ? end : cursor);
+    if (status.code!=SB_OK) { free(buffer.data); return status; }
+    *out=buffer.data; *out_length=buffer.length; return sb_ok();
+}
 
 static SBStatus expand(const char *input, const char *name, const char *date,
                        const char *repo, const char *hint, char **out) {

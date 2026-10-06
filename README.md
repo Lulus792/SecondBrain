@@ -140,7 +140,8 @@ cmake --build build/core --config Debug
 ctest --test-dir build/core -C Debug --output-on-failure
 ```
 
-`secondbrain-cli` unterstützt `new`, `list`, `search` und `context`.
+`secondbrain-cli` unterstützt `new`, `list`, `search`, `context` sowie
+`backup`, `inspect` und `restore`. [Sicherungsvertrag](docs/SICHERUNG.md).
 Der ältere Python-Generator ist als [Strukturprototyp](docs/STRUKTURPROTOTYP.md)
 dokumentiert. Neue Vorlagen überschreiben keine bestehenden Instanzen.
 Abgeschlossene, geprüfte Arbeitsschritte werden committet und nach GitHub gepusht.

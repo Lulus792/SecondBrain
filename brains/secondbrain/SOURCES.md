@@ -20,6 +20,8 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   Apple-Grundlagen und Graphumfang.
 - [Architektur](../../docs/ARCHITEKTUR.md): C17-Kern, Plattformschicht, UI und Build.
 - [UI-Politur vor 1.0](../../docs/UI_POLITUR.md): neuer Auftrag, erneute Apple-Recherche und Abnahmekriterien.
+- [Sicherung und Wiederherstellung](../../docs/SICHERUNG.md): eigener C-Vertrag,
+  Bestandsschutz, Fehlerprüfungen und geplanter Desktop-Ablauf.
 - [Einstellungen und Arbeitsstand](../../docs/EINSTELLUNGEN.md): Dateivertrag,
   native Ordnerwahl, Wiederherstellung und Prüfgrenzen.
 - [Native UI-Anbindung](../../docs/BARRIEREFREIHEIT_PLAN.md): recherchierte Schnittstellen und offene Umsetzung; noch kein Screenreader-Nachweis.

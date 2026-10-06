@@ -10,7 +10,7 @@
 #define SB_TEXT_LIMIT (16u * 1024u * 1024u)
 
 typedef enum {
-    SB_OK, SB_INVALID, SB_EXISTS, SB_NOT_FOUND, SB_IO, SB_MEMORY, SB_CONFLICT, SB_LIMIT
+    SB_OK, SB_INVALID, SB_EXISTS, SB_NOT_FOUND, SB_IO, SB_MEMORY, SB_CONFLICT, SB_LIMIT, SB_CANCELLED
 } SBCode;
 
 typedef struct { SBCode code; char message[512]; } SBStatus;
@@ -52,5 +52,7 @@ SBStatus sb_context_build(const SBProject *project, char **out);
 SBStatus sb_markdown_title(const char *text, char *out, size_t capacity);
 uint64_t sb_hash(const char *data, size_t length);
 void sb_text_free(char *text);
+SBStatus sb_metadata_validate(const char *json,size_t length,char name[SB_NAME_CAP]);
+SBStatus sb_metadata_reidentify(const char *json,size_t length,const char *id,char **out,size_t *out_length);
 
 #endif
