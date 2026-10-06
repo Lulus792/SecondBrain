@@ -162,6 +162,8 @@ static void passive_add(SBDesktop *d,const char *id,const char *text,accesskit_r
     struct nk_rect clip=d->ui.ctx->current->layout->clip;
     float left=fmaxf(bounds.x,clip.x),top=fmaxf(bounds.y,clip.y);
     p->bounds=nk_rect(left,top,fmaxf(0,fminf(bounds.x+bounds.w,clip.x+clip.w)-left),fmaxf(0,fminf(bounds.y+bounds.h,clip.y+clip.h)-top));
+    /* Nuklear's native window title sits outside its content clip. */
+    if (id && !strcmp(id,"modal-title")) p->bounds=bounds;
     ++d->passive_count;
 }
 static void native_wrap(SBDesktop *d,const char *text) {

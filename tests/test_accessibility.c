@@ -108,6 +108,8 @@ int main(int argc,char **argv) {
     text=dump(&d); CHECK(!strstr(text,help_line)); accesskit_string_free(text);
     strcpy(d.model.editor,"Ungespeicherter Entwurf");
     OK(sb_app_request(&d.model,SB_ACT_NOTE,"STATE.md")); CHECK(d.model.guard); frame(&d);
+    bool title_bounds=false; for (size_t i=0;i<d.passive_count;++i) if (!strcmp(d.passive[i].id,"modal-title")) title_bounds=d.passive[i].bounds.w>0 && d.passive[i].bounds.h>0;
+    CHECK(title_bounds);
     text=dump(&d); CHECK(strstr(text,"Änderungen erhalten") && strstr(text,"Dieses Dokument enthält ungespeicherte Änderungen"));
     CHECK(!strstr(text,"Projektdokumente")); accesskit_string_free(text);
     sb_desktop_free(&d);
