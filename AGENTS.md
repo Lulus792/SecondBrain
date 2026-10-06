@@ -12,8 +12,9 @@ templates/brain. Der Python-Generator ist ein vorhandener Strukturprototyp.
   Anwendung. Externe Wissensprogramme sind keine Voraussetzung der normalen Nutzung.
 - Vor jedem ersten UI-Entwurf UI-Grundlagen und Apples Human Interface Guidelines
   studieren und die Erkenntnisse dokumentieren. Die Gestaltung orientiert sich an Apple.
-- Der aktuelle Planungsauftrag umfasst nur das Festhalten der Anforderungen.
-  Recherche, UI-Entwürfe und C-Implementierung benötigen einen nachfolgenden Auftrag.
+- Der Nutzer hat die Umsetzung des vollständigen Projekts beauftragt. Der
+  ursprüngliche reine Planungsauftrag ist damit erweitert. Die UI-Recherche steht
+  in docs/UI_RECHERCHE.md; Entwurf und Implementierung folgen darauf.
 - Windows, macOS und Linux sind verbindliche Zielplattformen. Plattformnachweise
   nur anhand tatsächlich ausgeführter Prüfungen nennen; CI-Konfiguration genügt nicht.
 - Jeden abgeschlossenen, geprüften Arbeitsschritt committen und nach

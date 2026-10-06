@@ -65,8 +65,8 @@ Die spätere Recherche soll insbesondere untersuchen:
 
 Erkenntnisse und Originalquellen werden zuerst dokumentiert. Daraus folgen
 begründete Designprinzipien und erst anschließend konkrete UI-Entwürfe.
-Mit diesem Plan wurde noch keine UI-Recherche durchgeführt und kein Layout,
-Mockup oder visuelles System festgelegt.
+Die anschließende Recherche ist in [UI Recherche](UI_RECHERCHE.md) dokumentiert.
+Konkrete Entwürfe werden daraus abgeleitet.
 
 ## Reihenfolge der weiteren Arbeit
 
@@ -78,8 +78,8 @@ Mockup oder visuelles System festgelegt.
 5. Einen vollständigen Arbeitsablauf in C implementieren und schrittweise erweitern.
 6. Verhalten und Darstellung auf Windows, macOS und Linux tatsächlich prüfen.
 
-Diese Reihenfolge beschreibt die geplante Weiterarbeit. Der aktuelle Auftrag
-umfasst ausschließlich das Festhalten des Plans.
+Der Nutzer hat nach dem Festhalten des Plans die Umsetzung des Projekts
+beauftragt. Diese Reihenfolge gilt für die nun laufende Arbeit.
 
 ## GitHub und Nachweise
 
