@@ -30,8 +30,9 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   In 0.5.0 sind native Adapter integriert und macOS-Provideraktionen gezielt geprüft.
   UIA-/AT-SPI-Clientabfragen bestehen inzwischen auf den nativen CI-Systemen.
   In 0.5.1 bestehen native Dialog-/Hilfetexte auf allen drei Systemen. Dokumentstruktur,
-  Unicode-Textgeometrie, AT-SPI-Cache-/Signal-Kompatibilität und tatsächliche
-  VoiceOver/NVDA/Orca-Abnahme bleiben offen.
+  Unicode-Textgeometrie und tatsächliche VoiceOver/NVDA/Orca-Abnahme bleiben offen.
+  Die Cache-Signalstruktur ist in 0.5.2 korrigiert und mit echtem Linux-Clientcache
+  geprüft; weitere Eventtypen bleiben gesonderte Abnahmen.
 - [ ] **Leistung und Stabilität im Alltag prüfen:** große reale Wissensbasen,
   schnelle Eingabefolgen, lange Sitzungen, mehrere Displays, Skalierung und
   GPU-Treiber auf allen Zielsystemen. Die bisherigen Tests verwenden versteckte

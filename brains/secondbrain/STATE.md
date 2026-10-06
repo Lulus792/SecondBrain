@@ -61,8 +61,15 @@ in den nativen Baum. Die [korrigierte Plattformprüfung zu 9eeb402](https://gith
 15 Desktoptests je Debug/Release und drei Paketen. Lokal bestehen Release-Lauf,
 Sanitizer-Gesamtlauf des Zwischenstands und gezielte abschließende native/Tastatur/
 Sicherungs-Nachprüfungen. dist/SecondBrain ist auf 0.5.1 aktualisiert. Vollständige Dokumentstruktur, Unicode-Textnavigation,
-Fortschrittsansagen, AT-SPI-Cache-/Signal-Kompatibilität und menschliche assistive
-Bedienung bleiben offen.
+Fortschrittsansagen und menschliche assistive Bedienung bleiben offen.
+
+0.5.2 korrigiert die Linux-Cache-Signalstruktur. Die [Abnahme zu 8bcc048](https://github.com/Lulus792/SecondBrain/actions/runs/37522537774)
+besteht mit 18 Jobs, 15 Desktoptests je Debug/Release und drei Paketen. Die echte
+Wire-Prüfung zeigt in beiden Linux-Konfigurationen keine falsche Signatur und eine
+gültige Sammelantwort; der Client verarbeitet Events ohne Cacheleerung. Linux baut
+diese UI-Abhängigkeit aus festgelegter Quelle mit Cargo/Rust ab 1.87. Anwendung und
+Kern bleiben C; Pakete brauchen die Toolchain nicht. dist/SecondBrain ist auf 0.5.2.
+Weitere Eventtypen und menschliche Screenreader-Abnahme bleiben offen.
 
 ## Auftrag und verbleibende Abnahmen
 

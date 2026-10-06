@@ -136,3 +136,17 @@ macOS/Linux die statische Bibliothek. Original-Lizenzen werden ausgeliefert.
 Die Entscheidung setzt den beauftragten Screenreader-Umfang technisch um;
 vollständige native und assistive Abnahme ist weiterhin erforderlich.
 [Anbindung und Nachweise](../../docs/BARRIEREFREIHEIT_PLAN.md).
+
+
+## D14: Linux-UI-Cachekorrektur aus festgelegter Quelle
+
+Die Release-Arbeit hat eine tatsächlich fehlerhafte AT-SPI-Signalstruktur in der
+UI-Abhängigkeit bestätigt. Linux baut AccessKit-C 0.23.1 mit accesskit_unix 0.24.0
+und einer Korrektur von zwei Signalaufrufen aus verifizierter Quelle. Die
+Anwendungsimplementierung bleibt C; Cargo/Rust baut ausschließlich die externe
+UI-Bibliothek. macOS-/Windows-Bibliotheken bleiben auf derselben Version.
+Der Kern und fertige Pakete benötigen keine Rust-Toolchain. Eigene C-Protokoll-
+prüfung und Client mit tatsächlichem Cache belegen die Korrektur. Die Quelldaten,
+Hashschutz und Wiederholbarkeit sind dokumentiert; unbekannte Quelländerungen
+werden für den Patch abgewiesen. [Abhängigkeiten](../../third_party/README.md)
+und [native Abnahme](../../docs/BARRIEREFREIHEIT_PLAN.md).

@@ -314,3 +314,35 @@ Schrift-Fallback/OS-Vorgaben und menschliche assistive Bedienung. Der Linux-
 Clientlauf zeigt trotz erfolgreicher Abfragen AT-SPI-Cache-Signaturwarnungen.
 Die Cache-/Signal-Kompatibilität muss getrennt untersucht werden; direkte
 Abfragen beweisen sie nicht. Die gesamte Release-Liste bleibt aktiv; 1.0 bleibt gesperrt.
+
+
+## 0.5.2: AT-SPI-Cachekorrektur abgenommen
+
+Der [Lauf zu 8bcc048](https://github.com/Lulus792/SecondBrain/actions/runs/37522537774) besteht mit allen 18 Jobs: 15 Desktoptests je
+Debug/Release auf Windows x64, macOS ARM64 und Linux x64 und alle drei entpackten
+Pakete. Die zusätzliche Linux-Prüfung beobachtet echte Cache-Signale und GetItems,
+während der Client Änderungsevents verarbeitet und seinen Cache nicht vor jeder
+Abfrage leert. Release: 45 Add-/41 Remove-Signale, 0 falsche Signaturen, gültige
+Sammelantwort. Debug: 46 Add-/41 Remove-Signale, ebenfalls 0 falsche Signaturen
+und gültige Sammelantwort. Der ursprüngliche Adapter mit derselben Wire-Regression
+lieferte 87 falsche Signaturen. Dieser Fehler ist damit gezielt nachgeprüft.
+
+Linux baut die festgelegte UI-Abhängigkeit mit einer Korrektur von zwei Signal-
+aufrufen. Cargo/Rust ab 1.87 ist eine Linux-UI-Buildvoraussetzung; fertige Pakete,
+macOS-/Windows-Builds und der reine C-Kern benötigen sie nicht. Die UI-Quelle und
+ihre Versionen sind über Archiv-/Quellhashes und Cargo --locked festgelegt.
+Lokale Prüfungen bestätigen wiederholbaren Patch, Pfade mit Leerzeichen,
+Ablehnung unbekannter Quelländerungen, den Lockgraph sowie die Compilerprüfung
+der geänderten UI-Bibliothek. Die tatsächliche Linux-Abnahme erfolgt im obigen Lauf.
+
+Der lokale Intel-Mac-Provider besteht weiterhin (121 Aussagen). Das entpackte
+Intel-Paket startet aus einem Unicode-Pfad, und sein tatsächliches Bild wurde
+betrachtet. dist/SecondBrain ist auf 0.5.2 aktualisiert. Paket-SHA-256:
+`84bea47339b7b9e2453da706cb1bc3b038e71960277eaa149fb7db66e105e719`.
+Die gesamte lokale Desktop-/Sanitizerabnahme wird hier nicht erneut behauptet;
+die unveränderten Mac-Produktpfade sind zuvor geprüft, die neue Linux-Korrektur
+ist durch native CI und Paketprüfung belegt.
+
+Weitere Eventtypen und menschliche assistive Navigation bleiben eigene Abnahmen.
+Dokumentstruktur, Grapheme/Zeilen, Fortschrittsansagen, OS-Vorgaben, Schrift-Fallback
+und übrige Release-Aufgaben bleiben aktiv. 1.0 bleibt bis zur Nutzerfreigabe gesperrt.
