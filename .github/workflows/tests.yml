@@ -24,14 +24,14 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y xvfb libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxfixes-dev libxss-dev libxtst-dev libwayland-dev libxkbcommon-dev libegl1-mesa-dev libgl1-mesa-dev libdbus-1-dev libudev-dev libdrm-dev libgbm-dev
+          sudo apt-get install -y xvfb libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxfixes-dev libxss-dev libxtst-dev libwayland-dev libxkbcommon-dev libegl1-mesa-dev libgl1-mesa-dev libdbus-1-dev libudev-dev libdrm-dev libgbm-dev libatspi2.0-dev at-spi2-core dbus-x11 libglib2.0-bin
       - name: Configure UI
-        run: cmake -S . -B build/ui -DSB_BUILD_UI=ON -DCMAKE_BUILD_TYPE=${{ matrix.config }}
+        run: cmake -S . -B build/ui -DSB_BUILD_UI=ON -DSB_REQUIRE_NATIVE_ACCESSIBILITY_TESTS=ON -DCMAKE_BUILD_TYPE=${{ matrix.config }}
       - name: Build UI and editor checks
         run: cmake --build build/ui --config ${{ matrix.config }} --parallel 4
       - name: Verify UI on Linux
         if: runner.os == 'Linux'
-        run: xvfb-run -a ctest --test-dir build/ui -C ${{ matrix.config }} --output-on-failure
+        run: sh tools/run_linux_ui_tests.sh ctest --test-dir build/ui -C ${{ matrix.config }} --output-on-failure
       - name: Verify UI on Windows and macOS
         if: runner.os != 'Linux'
         run: ctest --test-dir build/ui -C ${{ matrix.config }} --output-on-failure

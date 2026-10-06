@@ -68,3 +68,29 @@ Bewegung und Schrift-Fallback sind eigenständige offene Arbeiten.
 Die native macOS-Auswahlersetzung über setAccessibilitySelectedText: ist im
 verwendeten Adapter nicht verfügbar. Die Auswahl und das Setzen des Gesamtwerts
 sind getrennt geprüft; eine vollständig assistive Editorbedienung ist noch offen.
+
+
+## Native Clientprüfung ergänzen
+
+Der nächste Prüfschritt ergänzt C-Clients für Windows UI Automation und Linux
+AT-SPI. Das ist zunächst eine implementierte Prüfung, noch kein bestandener
+Plattformnachweis. UIA benutzt einen eigenen COM-MTA-Thread; die App verarbeitet
+weiter ihre Fensterereignisse. Quelle:
+[Microsoft: UIA-Threading](https://learn.microsoft.com/en-us/windows/win32/winauto/uiauto-threading),
+eingesehen 6. Oktober 2026. Der C-Client verwendet die offiziellen SDK-COM-Interfaces.
+
+Unter Linux verwendet ausschließlich das Testziel libatspi. Diese zusätzliche
+UI-Prüfabhängigkeit wird nicht in das Produkt eingebunden oder ausgeliefert.
+CI fordert sie ausdrücklich an. Eine private D-Bus-Sitzung mit in-memory
+GSettings aktiviert den Zugänglichkeitsbus. Der Client sucht ausschließlich die
+eigene Prozesskennung und fragt Rollen, Namen, Textwerte und Aktionen ab.
+[GNOME EditableText](https://gnome.pages.gitlab.gnome.org/at-spi2-core/libatspi/method.EditableText.set_text_contents.html),
+[get_desktop](https://gnome.pages.gitlab.gnome.org/at-spi2-core/libatspi/func.get_desktop.html),
+[init](https://gnome.pages.gitlab.gnome.org/at-spi2-core/libatspi/func.init.html) und
+[exit](https://gnome.pages.gitlab.gnome.org/at-spi2-core/libatspi/func.exit.html),
+eingesehen 6. Oktober 2026. Initialisierung und einmalige Freigabe beachten den
+Bibliotheksvertrag; ein fehlender Client wird ausdrücklich als fehlende Prüfung
+benannt und im vorgeschriebenen CI-Build nicht still übersprungen.
+
+Geprüfter lokaler Stand dieses Prüfschritts: macOS-Providerregression besteht.
+Die tatsächlichen Windows-/Linux-Ergebnisse werden nach dem nativen Lauf ergänzt.

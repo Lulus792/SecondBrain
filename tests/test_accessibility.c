@@ -1,5 +1,6 @@
 #include "desktop.h"
 #include "platform.h"
+#include "native_probe.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,6 +34,7 @@ static unsigned checks;
 #define CHECK(x) do { ++checks; if (!(x)) { fprintf(stderr,"ACCESSIBILITY FAIL %d: %s\n",__LINE__,#x); return 1; } } while (0)
 #define OK(x) CHECK((x).code==SB_OK)
 static void frame(SBDesktop *d) { nk_input_begin(d->ui.ctx); SDL_Event e; while (SDL_PollEvent(&e)) sb_desktop_event(d,&e); sb_desktop_tick(d,1.0f/60); nk_input_end(d->ui.ctx); sb_desktop_frame(d); sb_ui_draw(&d->ui); SDL_RenderPresent(d->ui.renderer); sb_desktop_apply(d); }
+static void pump(void *context) { frame(context); }
 static char *dump(SBDesktop *d) { accesskit_tree_update *tree=sb_accessibility_tree(d->accessibility); char *text=accesskit_tree_update_debug(tree); accesskit_tree_update_free(tree); return text; }
 int main(int argc,char **argv) {
     CHECK(argc==3); SBDesktop d; char root[SB_PATH_CAP],suffix[90];
@@ -72,6 +74,19 @@ int main(int argc,char **argv) {
     void *reader=native_find(view,d.model.title,0); CHECK(reader!=NULL);
     const char *read_value=utf8(send(reader,"accessibilityValue")); CHECK(read_value && strstr(read_value,"Projekt"));
     printf("Native macOS accessibility provider queried and used: button press, text value, project note creation, editor and save.\n");
+#endif
+#if defined(_WIN32) || defined(SB_ATSPI_TEST)
+    CHECK(sb_native_probe(d.ui.window,"Neue Notiz",NULL,SB_NATIVE_PRESS,NULL,0,pump,&d)); CHECK(d.form==SB_FORM_NOTE);
+    CHECK(sb_native_probe(d.ui.window,"Titel","Native Notiz ü",SB_NATIVE_SET_VALUE,NULL,0,pump,&d)); CHECK(!strcmp(d.name,"Native Notiz ü"));
+    char native_value[1024];
+    CHECK(sb_native_probe(d.ui.window,"Titel",NULL,SB_NATIVE_READ_VALUE,native_value,sizeof(native_value),pump,&d)); CHECK(!strcmp(native_value,"Native Notiz ü"));
+    CHECK(sb_native_probe(d.ui.window,"Anlegen",NULL,SB_NATIVE_PRESS,NULL,0,pump,&d)); CHECK(d.form==SB_FORM_NONE && !strcmp(d.model.path,"knowledge/native-notiz-ue.md"));
+    CHECK(sb_native_probe(d.ui.window,"Dokument bearbeiten","# Native Notiz\n\nÜber den Provider bearbeitet.\n",SB_NATIVE_SET_VALUE,NULL,0,pump,&d)); CHECK(strstr(d.model.editor,"Provider bearbeitet") && sb_app_dirty(&d.model));
+    CHECK(sb_native_probe(d.ui.window,"Dokument bearbeiten",NULL,SB_NATIVE_READ_VALUE,native_value,sizeof(native_value),pump,&d)); CHECK(strstr(native_value,"Provider bearbeitet"));
+    CHECK(sb_native_probe(d.ui.window,"Speichern",NULL,SB_NATIVE_PRESS,NULL,0,pump,&d)); CHECK(!sb_app_dirty(&d.model));
+    printf("Native UIA/AT-SPI client queried and used: roles, button press, Unicode text value, note creation, editor and save.\n");
+#elif !defined(__APPLE__)
+    printf("Native AT-SPI client probe unavailable in this build; only snapshot/queue contract tested.\n");
 #endif
     sb_desktop_free(&d);
     /* Snapshot/queue contract is tested on every OS, independently of the native client. */
