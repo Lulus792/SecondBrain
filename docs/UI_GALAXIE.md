@@ -85,6 +85,10 @@ Diese Richtung legt den Schwerpunkt auf vertieftes Lesen mit räumlichem Kontext
 
 ## Geprüfte Vorschau
 
+Der [Quellstand der drei Vorschauen](design/galaxie-entwuerfe.html) ist als
+Designstudie versioniert. Er ist ein Vorschaufragment für den Vergleich der
+Oberflächen und kein Laufzeitbestandteil der C-Anwendung.
+
 Die drei Entwürfe wurden im Browser betrachtet. Ein tatsächlicher Klick auf
 einen Stern in Lumen öffnet die Beispielnotiz. In Glas wurden Kamera-Drehung,
 Auswahl einer verknüpften Karte und das Schließen der Karten geprüft. Titel,

@@ -1,0 +1,428 @@
+<div id="secondbrain-designrichtungen" class="viz-carousel" aria-label="Designrichtungen für SecondBrain" data-previous-label="Vorheriger Entwurf" data-next-label="Nächster Entwurf">
+  <section data-variant="Lumen" aria-label="Lumen – eleganter Sternenraum">
+    <div class="sb-window sb-lumen" data-design="lumen" aria-label="Lumen">
+      <header class="sb-header">
+        <div class="sb-brand"><span class="sb-mark" aria-hidden="true">✦</span><span>SecondBrain <small>Lumen · Designentwurf</small></span></div>
+        <label class="sb-project-label">Projekt <select class="sb-project"><option value="physim">Physim</option><option value="secondbrain">SecondBrain</option><option value="research">Recherche</option></select></label>
+        <label class="sb-search-label"><span>Suchen</span><input class="sb-search" type="search" placeholder="Notiz finden" aria-label="Notiz in Lumen suchen"></label>
+      </header>
+      <div class="sb-workspace">
+        <canvas class="sb-space" role="img" aria-label="Räumliche Sternkarte mit Beispielnotizen aus Physim, SecondBrain und Recherche. Ziehen dreht die Karte, Shift und Ziehen verschiebt sie. Notizen sind auch über die beschrifteten Buttons auswählbar."></canvas>
+        <div class="sb-overline"><span>DEIN WISSENSRAUM</span><strong class="sb-world-title">Physim</strong></div>
+        <aside class="sb-reader" hidden>
+          <div class="sb-reader-top"><span class="sb-kicker">WISSENSNOTIZ · BEISPIEL</span><button class="sb-close cursor-interaction" type="button" aria-label="Notiz in Lumen schließen">×</button></div>
+          <h2 class="sb-note-title">Energieerhaltung</h2>
+          <p class="sb-note-body">Wie lässt sich die Energie einer Simulation über lange Zeit stabil halten?</p>
+          <div class="sb-note-meta">VERKNÜPFT MIT</div>
+          <div class="sb-neighbors"></div>
+          <button class="sb-focus cursor-interaction" type="button">Zu diesem Stern</button>
+        </aside>
+        <div class="sb-camera">
+          <button class="cursor-interaction" data-action="left" type="button" aria-label="Lumen nach links drehen">↶</button>
+          <button class="cursor-interaction" data-action="right" type="button" aria-label="Lumen nach rechts drehen">↷</button>
+          <button class="cursor-interaction" data-action="out" type="button" aria-label="Lumen herauszoomen">−</button>
+          <button class="cursor-interaction" data-action="in" type="button" aria-label="Lumen hineinzoomen">+</button>
+          <button class="cursor-interaction" data-action="home" type="button">Übersicht</button>
+        </div>
+      </div>
+      <footer class="sb-footer"><span>Ziehen: drehen · Shift: verschieben · Scrollen: zoomen</span><span class="sb-selection" aria-live="polite">Energieerhaltung</span></footer>
+    </div>
+  </section>
+  <section data-variant="Glas" aria-label="Glas – schwebende Karten über der Galaxie" hidden>
+    <div class="sb-window sb-glass" data-design="glass" aria-label="Glas">
+      <header class="sb-header">
+        <div class="sb-brand"><span class="sb-mark" aria-hidden="true">✦</span><span>SecondBrain <small>Glas · Designentwurf</small></span></div>
+        <label class="sb-project-label">Projekt <select class="sb-project"><option value="physim">Physim</option><option value="secondbrain">SecondBrain</option><option value="research">Recherche</option></select></label>
+        <label class="sb-search-label"><span>Suchen</span><input class="sb-search" type="search" placeholder="Stern finden" aria-label="Notiz in Glas suchen"></label>
+      </header>
+      <div class="sb-workspace">
+        <div class="sb-glass-scene">
+          <canvas class="sb-space" role="img" aria-label="Galaxie aus kleinen leuchtenden Sternen mit schwebenden Glaskarten für Beispielnotizen. Ziehen dreht, Shift und Ziehen verschiebt und Scrollen zoomt."></canvas>
+          <div class="sb-overline"><span>WISSEN ENTDECKEN</span><strong class="sb-world-title">Physim</strong></div>
+          <div class="sb-related-cards" aria-label="Verbundene Notizen">
+            <button class="sb-mini-card cursor-interaction" data-node="integration" type="button"><span>VERBINDUNG</span><strong>Numerische Integration</strong><small>Methoden und Genauigkeit</small></button>
+            <button class="sb-mini-card cursor-interaction" data-node="sources" type="button"><span>ORIGINALQUELLEN</span><strong>Quellen</strong><small>Belege zur Erkenntnis</small></button>
+          </div>
+          <aside class="sb-reader">
+            <div class="sb-reader-top"><span class="sb-kicker">WISSENSNOTIZ · BEISPIEL</span><button class="sb-close cursor-interaction" type="button" aria-label="Notiz in Glas schließen">×</button></div>
+            <h2 class="sb-note-title">Energieerhaltung</h2>
+            <p class="sb-note-body">Wie lässt sich die Energie einer Simulation über lange Zeit stabil halten?</p>
+            <div class="sb-neighbors"></div>
+            <button class="sb-focus cursor-interaction" type="button">Zu diesem Stern</button>
+          </aside>
+          <div class="sb-camera">
+            <button class="cursor-interaction" data-action="left" type="button" aria-label="Glas nach links drehen">↶</button>
+            <button class="cursor-interaction" data-action="right" type="button" aria-label="Glas nach rechts drehen">↷</button>
+            <button class="cursor-interaction" data-action="out" type="button" aria-label="Glas herauszoomen">−</button>
+            <button class="cursor-interaction" data-action="in" type="button" aria-label="Glas hineinzoomen">+</button>
+            <button class="cursor-interaction" data-action="home" type="button">Übersicht</button>
+          </div>
+        </div>
+      </div>
+      <footer class="sb-footer"><span>Ziehen: drehen · Shift: verschieben · Scrollen: zoomen</span><span class="sb-selection" aria-live="polite">Energieerhaltung</span></footer>
+    </div>
+  </section>
+  <section data-variant="Fokus" aria-label="Fokus – Sternbild mit schwebender Lesekarte" hidden>
+    <div class="sb-window sb-focus-design" data-design="focus" aria-label="Fokus">
+      <header class="sb-header">
+        <div class="sb-brand"><span class="sb-mark" aria-hidden="true">✧</span><span>SecondBrain <small>Fokus · Designentwurf</small></span></div>
+        <label class="sb-project-label">Projekt <select class="sb-project"><option value="physim">Physim</option><option value="secondbrain">SecondBrain</option><option value="research">Recherche</option></select></label>
+        <label class="sb-search-label"><span>Suchen</span><input class="sb-search" type="search" placeholder="Notiz finden" aria-label="Notiz in Fokus suchen"></label>
+      </header>
+      <div class="sb-workspace">
+        <div class="sb-focus-scene">
+          <canvas class="sb-space" role="img" aria-label="Räumliches Sternbild mit der ausgewählten Notiz und ihren direkten Verbindungen. Darunter schwebt eine Lesekarte. Ziehen dreht, Shift und Ziehen verschiebt, Scrollen zoomt."></canvas>
+          <div class="sb-overline"><span>VERBUNDENES WISSEN</span><strong class="sb-world-title">Physim</strong></div>
+          <div class="sb-camera">
+            <button class="cursor-interaction" data-action="left" type="button" aria-label="Fokus nach links drehen">↶</button>
+            <button class="cursor-interaction" data-action="right" type="button" aria-label="Fokus nach rechts drehen">↷</button>
+            <button class="cursor-interaction" data-action="out" type="button" aria-label="Fokus herauszoomen">−</button>
+            <button class="cursor-interaction" data-action="in" type="button" aria-label="Fokus hineinzoomen">+</button>
+            <button class="cursor-interaction" data-action="home" type="button">Übersicht</button>
+          </div>
+        </div>
+        <aside class="sb-reader">
+          <div class="sb-reader-top"><span class="sb-kicker">WISSENSNOTIZ · BEISPIEL</span><button class="sb-close cursor-interaction" type="button" aria-label="Notiz in Fokus schließen">×</button></div>
+          <h2 class="sb-note-title">Energieerhaltung</h2>
+          <p class="sb-note-body">Wie lässt sich die Energie einer Simulation über lange Zeit stabil halten?</p>
+          <div class="sb-reading-extra"><h3>Gedanke</h3><p>Eine Erkenntnis bleibt mit ihren Quellen und den zugehörigen Entscheidungen verbunden. Die Karte zeigt den Zusammenhang; diese Fläche bietet Platz zum Lesen.</p></div>
+          <div class="sb-note-meta">VERKNÜPFTE NOTIZEN</div>
+          <div class="sb-neighbors"></div>
+          <button class="sb-focus cursor-interaction" type="button">In der Karte fokussieren</button>
+        </aside>
+      </div>
+      <footer class="sb-footer"><span>Ziehen: drehen · Shift: verschieben · Scrollen: zoomen</span><span class="sb-selection" aria-live="polite">Energieerhaltung</span></footer>
+    </div>
+  </section>
+</div>
+<style>
+#secondbrain-designrichtungen .sb-window {
+  --sb-shell:light-dark(#f5f7fb,#0e1520); --sb-panel:light-dark(#ffffff,#172231);
+  --sb-ink:light-dark(#243247,#e7edf6); --sb-muted:light-dark(#5c6b7f,#a6b3c4);
+  --sb-line:light-dark(#dfe5ed,#2d3c50); --sb-control:light-dark(#edf1f7,#233146);
+  --sb-accent:light-dark(#397cc6,#8ebfff); --sb-space-bg:light-dark(#0a1426,#070e1a);
+  --sb-star-ink:light-dark(#dce9fb,#dce9fb); --sb-star-muted:light-dark(#8299bc,#8299bc);
+  --sb-physim:light-dark(#8bd6e6,#8bd6e6); --sb-secondbrain:light-dark(#aebaff,#aebaff);
+  --sb-research:light-dark(#e2c393,#e2c393); --sb-shadow:light-dark(#b3bfce,#050a12);
+  font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:var(--sb-ink); background:var(--sb-shell); height:640px; display:flex; flex-direction:column;
+  border:1px solid var(--sb-line); border-radius:18px; overflow:hidden; box-sizing:border-box;
+}
+#secondbrain-designrichtungen .sb-window * {box-sizing:border-box}
+#secondbrain-designrichtungen .sb-reader[hidden],#secondbrain-designrichtungen .sb-related-cards[hidden] {display:none!important}
+#secondbrain-designrichtungen .sb-header {min-height:78px;padding:14px 24px;display:flex;align-items:center;gap:24px;background:var(--sb-panel);z-index:2;border-bottom:1px solid var(--sb-line)}
+#secondbrain-designrichtungen .sb-brand {display:flex;align-items:center;gap:10px;flex:1;min-width:150px;font-size:16px;font-weight:500}
+#secondbrain-designrichtungen .sb-mark {font-size:27px;color:var(--sb-accent)}
+#secondbrain-designrichtungen .sb-brand small {display:block;font-size:11px;font-weight:400;color:var(--sb-muted);letter-spacing:.035em}
+#secondbrain-designrichtungen label {font-size:11px;color:var(--sb-muted)}
+#secondbrain-designrichtungen select,#secondbrain-designrichtungen input {display:block;font:inherit;font-size:13px;margin-top:3px;height:32px;border:1px solid var(--sb-line);border-radius:9px;background:var(--sb-shell);color:var(--sb-ink);padding:0 10px;max-width:100%}
+#secondbrain-designrichtungen input {width:160px}
+#secondbrain-designrichtungen select {width:137px}
+#secondbrain-designrichtungen .sb-workspace {position:relative;flex:1;min-height:0;isolation:isolate}
+#secondbrain-designrichtungen .sb-space {position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#secondbrain-designrichtungen .sb-space:active {cursor:grabbing}
+#secondbrain-designrichtungen .sb-overline {position:absolute;top:24px;left:28px;pointer-events:none;color:var(--sb-star-ink);z-index:1}
+#secondbrain-designrichtungen .sb-overline span {display:block;font-size:10px;letter-spacing:.16em;color:var(--sb-star-muted);margin-bottom:6px}
+#secondbrain-designrichtungen .sb-overline strong {font-size:25px;font-weight:500;letter-spacing:-.035em}
+#secondbrain-designrichtungen button {font:inherit;font-size:12px;border:1px solid var(--sb-line);border-radius:9px;padding:7px 11px;background:var(--sb-control);color:var(--sb-ink)}
+#secondbrain-designrichtungen button:hover {background:var(--sb-shell)}
+#secondbrain-designrichtungen .sb-reader {position:absolute;right:22px;bottom:70px;width:250px;padding:20px;background:var(--sb-panel);border:1px solid var(--sb-line);border-radius:16px;box-shadow:0 20px 60px color-mix(in srgb,var(--sb-shadow) 28%,transparent);z-index:1}
+#secondbrain-designrichtungen .sb-reader-top {display:flex;align-items:center;justify-content:space-between;gap:8px}
+#secondbrain-designrichtungen .sb-kicker {font-size:10px;letter-spacing:.1em;color:var(--sb-muted)}
+#secondbrain-designrichtungen .sb-close {border:0;background:transparent;padding:0 6px;font-size:22px;line-height:1}
+#secondbrain-designrichtungen h2 {font-size:22px;line-height:1.25;letter-spacing:-.035em;font-weight:500;margin:17px 0 10px}
+#secondbrain-designrichtungen h3 {font-size:14px;font-weight:500;margin:18px 0 8px}
+#secondbrain-designrichtungen p {font-size:13px;line-height:1.65;margin:0 0 15px}
+#secondbrain-designrichtungen .sb-note-meta {font-size:10px;color:var(--sb-muted);letter-spacing:.08em;margin:22px 0 8px}
+#secondbrain-designrichtungen .sb-neighbors {display:flex;gap:6px;flex-wrap:wrap}
+#secondbrain-designrichtungen .sb-neighbors button {background:var(--sb-shell);font-size:11px;padding:5px 8px}
+#secondbrain-designrichtungen .sb-focus {margin-top:18px;color:var(--sb-accent);background:var(--sb-shell);width:100%}
+#secondbrain-designrichtungen .sb-camera {position:absolute;left:28px;bottom:22px;display:flex;gap:5px;padding:6px;background:var(--sb-panel);border:1px solid var(--sb-line);border-radius:13px;z-index:2}
+#secondbrain-designrichtungen .sb-camera button {border:0;background:transparent;min-width:29px;padding:5px 8px}
+#secondbrain-designrichtungen .sb-camera button:hover {background:var(--sb-control)}
+#secondbrain-designrichtungen .sb-footer {min-height:39px;display:flex;align-items:center;justify-content:space-between;gap:15px;padding:9px 24px;background:var(--sb-panel);border-top:1px solid var(--sb-line);font-size:11px;color:var(--sb-muted)}
+#secondbrain-designrichtungen .sb-selection {color:var(--sb-ink);overflow-wrap:anywhere}
+#secondbrain-designrichtungen .sb-orbit {--sb-shell:light-dark(#f3eff8,#16101f);--sb-panel:light-dark(#ffffff,#231b32);--sb-control:light-dark(#eee6f7,#352841);--sb-line:light-dark(#e4dce9,#493657);--sb-accent:light-dark(#8c59c5,#d2b0fb);--sb-space-bg:light-dark(#190e29,#10091c);--sb-physim:light-dark(#edb987,#edb987);--sb-secondbrain:light-dark(#b7a4f6,#b7a4f6);--sb-research:light-dark(#83d9ca,#83d9ca);--sb-star-muted:light-dark(#b4a0c9,#b4a0c9);--sb-star-ink:light-dark(#f2e8fd,#f2e8fd)}
+#secondbrain-designrichtungen .sb-orbit .sb-workspace {display:grid;grid-template-columns:174px 1fr}
+#secondbrain-designrichtungen .sb-orbit-nav {background:var(--sb-panel);border-right:1px solid var(--sb-line);padding:28px 15px;display:flex;flex-direction:column;gap:8px;z-index:1}
+#secondbrain-designrichtungen .sb-orbit-nav button {text-align:left;border:0;background:transparent;font-size:12px}
+#secondbrain-designrichtungen .sb-orbit-nav button:hover,#secondbrain-designrichtungen .sb-orbit-nav button[aria-pressed="true"] {background:var(--sb-control)}
+#secondbrain-designrichtungen .sb-nav-divider {margin-top:25px}
+#secondbrain-designrichtungen .sb-orbit-scene {position:relative;min-width:0}
+#secondbrain-designrichtungen .sb-orbit .sb-reader {right:18px;bottom:65px;width:242px;border-radius:21px}
+#secondbrain-designrichtungen .sb-orbit .sb-overline strong {font-size:25px}
+#secondbrain-designrichtungen .sb-atlas {--sb-shell:light-dark(#f3f4f3,#131d22);--sb-panel:light-dark(#ffffff,#19262d);--sb-control:light-dark(#edf2f1,#263940);--sb-line:light-dark(#dde6e1,#344a52);--sb-accent:light-dark(#326c72,#8cc7c7);--sb-space-bg:light-dark(#f3f5f2,#101c23);--sb-star-ink:light-dark(#294650,#c5d9df);--sb-star-muted:light-dark(#728b93,#7b9da8);--sb-physim:light-dark(#3a767d,#91c8cd);--sb-secondbrain:light-dark(#6b77a8,#a8b5e3);--sb-research:light-dark(#a78658,#ceb084)}
+#secondbrain-designrichtungen .sb-atlas .sb-workspace {display:grid;grid-template-columns:minmax(0,1fr) 290px}
+#secondbrain-designrichtungen .sb-atlas-scene {position:relative;min-width:0}
+#secondbrain-designrichtungen .sb-atlas .sb-reader {position:relative;inset:auto;width:auto;border:0;border-left:1px solid var(--sb-line);border-radius:0;box-shadow:none;padding:28px 25px}
+#secondbrain-designrichtungen .sb-atlas .sb-overline {color:var(--sb-ink)}
+#secondbrain-designrichtungen .sb-atlas .sb-overline span {color:var(--sb-muted)}
+#secondbrain-designrichtungen .sb-atlas .sb-camera {left:20px}
+#secondbrain-designrichtungen .sb-atlas .sb-note-body {font-size:14px}
+#secondbrain-designrichtungen .sb-atlas .sb-reader[hidden] {display:block}
+#secondbrain-designrichtungen .sb-reading-extra p {color:var(--sb-muted)}
+#secondbrain-designrichtungen .sb-window {color-scheme:dark;position:relative}
+#secondbrain-designrichtungen .sb-header {position:absolute;top:14px;left:14px;right:14px;border:0;border-radius:14px;min-height:64px;padding:10px 18px;background:var(--sb-panel)}
+#secondbrain-designrichtungen .sb-lumen .sb-header {background:transparent}
+#secondbrain-designrichtungen .sb-lumen .sb-brand,#secondbrain-designrichtungen .sb-lumen .sb-header label {color:#dce9fb}
+#secondbrain-designrichtungen .sb-workspace {min-height:0}
+#secondbrain-designrichtungen .sb-overline {top:108px}
+#secondbrain-designrichtungen .sb-glass-scene,#secondbrain-designrichtungen .sb-focus-scene {position:absolute;inset:0}
+#secondbrain-designrichtungen .sb-glass {--sb-space-bg:#0a1120;--sb-physim:#91c8db;--sb-secondbrain:#aeb4db;--sb-research:#c5b396}
+#secondbrain-designrichtungen .sb-glass .sb-header,#secondbrain-designrichtungen .sb-glass .sb-reader,#secondbrain-designrichtungen .sb-glass .sb-camera,#secondbrain-designrichtungen .sb-glass .sb-mini-card {background:rgba(30,46,66,.7);backdrop-filter:blur(20px) saturate(125%);border:1px solid rgba(218,234,255,.16);box-shadow:0 16px 48px rgba(0,0,0,.24),inset 0 1px 0 rgba(230,244,255,.08)}
+#secondbrain-designrichtungen .sb-glass .sb-reader {bottom:76px;right:24px;width:268px}
+#secondbrain-designrichtungen .sb-related-cards {position:absolute;left:24px;bottom:98px;width:192px;display:flex;flex-direction:column;gap:14px;z-index:1}
+#secondbrain-designrichtungen .sb-mini-card {display:block;text-align:left;border-radius:15px;padding:15px 17px}
+#secondbrain-designrichtungen .sb-mini-card span,#secondbrain-designrichtungen .sb-mini-card small {display:block;font-size:10px;color:#a6bbd4;letter-spacing:.07em}
+#secondbrain-designrichtungen .sb-mini-card strong {display:block;font-size:13px;font-weight:500;margin:7px 0 5px}
+#secondbrain-designrichtungen .sb-mini-card small {font-size:11px;letter-spacing:0}
+#secondbrain-designrichtungen .sb-focus-design .sb-reader {left:26%;right:26px;bottom:77px;width:auto;padding:20px 24px;border-radius:18px}
+#secondbrain-designrichtungen .sb-focus-design .sb-reader h2 {margin:9px 0}
+#secondbrain-designrichtungen .sb-focus-design .sb-reading-extra {display:none}
+#secondbrain-designrichtungen .sb-focus-design .sb-note-meta {margin:8px 0}
+#secondbrain-designrichtungen .sb-focus-design .sb-focus {position:absolute;right:24px;bottom:20px;width:auto;margin:0}
+#secondbrain-designrichtungen .sb-focus-design .sb-neighbors {padding-right:190px}
+#secondbrain-designrichtungen .sb-focus-design .sb-note-body {max-width:520px}
+@media(max-width:700px) {
+  #secondbrain-designrichtungen .sb-window {height:865px;border-radius:14px}
+  #secondbrain-designrichtungen .sb-header {padding:12px 16px;gap:10px;flex-wrap:wrap}
+  #secondbrain-designrichtungen .sb-brand {flex-basis:100%}
+  #secondbrain-designrichtungen .sb-project-label,#secondbrain-designrichtungen .sb-search-label {flex:1;min-width:110px}
+  #secondbrain-designrichtungen select,#secondbrain-designrichtungen input {width:100%}
+  #secondbrain-designrichtungen .sb-reader {position:absolute;bottom:74px;left:16px;right:16px;width:auto;max-width:none;padding:18px}
+  #secondbrain-designrichtungen .sb-reader h2 {margin:10px 0 8px;font-size:21px}
+  #secondbrain-designrichtungen .sb-note-meta {margin:12px 0 6px}
+  #secondbrain-designrichtungen .sb-focus {margin-top:12px}
+  #secondbrain-designrichtungen .sb-orbit .sb-workspace {grid-template-columns:1fr}
+  #secondbrain-designrichtungen .sb-orbit-nav {display:none}
+  #secondbrain-designrichtungen .sb-orbit .sb-reader {left:16px;right:16px;bottom:74px;width:auto}
+  #secondbrain-designrichtungen .sb-atlas .sb-workspace {display:flex;flex-direction:column}
+  #secondbrain-designrichtungen .sb-atlas-scene {flex:1;min-height:300px}
+  #secondbrain-designrichtungen .sb-atlas .sb-reader {border-left:0;border-top:1px solid var(--sb-line);padding:18px}
+  #secondbrain-designrichtungen .sb-reading-extra {display:none}
+  #secondbrain-designrichtungen .sb-footer {align-items:flex-start;flex-direction:column;gap:4px;padding:10px 16px}
+  #secondbrain-designrichtungen .sb-overline {left:20px;top:20px}
+  #secondbrain-designrichtungen .sb-camera {left:16px;bottom:16px}
+  #secondbrain-designrichtungen .sb-header {top:9px;left:9px;right:9px;padding:10px 12px}
+  #secondbrain-designrichtungen .sb-overline {top:150px}
+  #secondbrain-designrichtungen .sb-glass .sb-reader,#secondbrain-designrichtungen .sb-focus-design .sb-reader {left:16px;right:16px;bottom:74px;width:auto}
+  #secondbrain-designrichtungen .sb-related-cards {left:auto;right:14px;top:157px;bottom:auto;width:145px}
+  #secondbrain-designrichtungen .sb-related-cards .sb-mini-card:last-child {display:none}
+  #secondbrain-designrichtungen .sb-mini-card {padding:11px}
+  #secondbrain-designrichtungen .sb-focus-design .sb-neighbors {padding-right:0}
+  #secondbrain-designrichtungen .sb-focus-design .sb-focus {position:static;width:100%;margin-top:12px}
+}
+@media(pointer:coarse) {#secondbrain-designrichtungen button {min-height:44px}#secondbrain-designrichtungen input,#secondbrain-designrichtungen select {height:40px;font-size:16px}#secondbrain-designrichtungen .sb-close {min-width:44px}}
+</style>
+<script>
+(function(){
+  const root=document.getElementById('secondbrain-designrichtungen');
+  if(!root)return;
+  const sample=[
+    {id:'physim',title:'Physim',group:'physim',hub:true,pos:[-240,-40,0],body:'Das Projekt als eigener Wissensraum. Auftrag, Erkenntnisse, Quellen und Entscheidungen bleiben verbunden.'},
+    {id:'energie',title:'Energieerhaltung',group:'physim',pos:[-340,-170,40],body:'Wie lässt sich die Energie einer Simulation über lange Zeit stabil halten? Eine Beispielnotiz für Physim.'},
+    {id:'integration',title:'Numerische Integration',short:'Integration',group:'physim',pos:[-120,-180,-70],body:'Methoden, Genauigkeit und Stabilität gemeinsam betrachten. Diese Beispielnotiz verknüpft die mathematische Idee mit einer Simulation.'},
+    {id:'experiment',title:'Experimente',group:'physim',pos:[-100,90,90],body:'Versuche und Beobachtungen sammeln. Ein Ergebnis bleibt mit der Fragestellung und den verwendeten Quellen verbunden.'},
+    {id:'sources',title:'Quellen',group:'physim',pos:[-420,75,-60],body:'Originalquellen bilden die Grundlage. Von einer Erkenntnis gelangst du direkt zu ihren Belegen.'},
+    {id:'fragen',title:'Offene Fragen',group:'physim',pos:[-270,175,70],body:'Was fehlt noch für den nächsten Schritt? Offene Fragen bleiben sichtbar und lassen sich gezielt mit anderem Wissen verbinden.'},
+    {id:'secondbrain',title:'SecondBrain',group:'secondbrain',hub:true,pos:[260,-60,-100],body:'Die eigene Anwendung als Projektwelt: Ziele, C-Kern, Oberfläche und Nachweise.'},
+    {id:'ui',title:'UI-Gestaltung',group:'secondbrain',pos:[390,-180,-30],body:'Gestaltung mit klarer Hierarchie, gut lesbarem Text und räumlicher Orientierung. Die Galaxie ist ein Zugang zum Wissen.'},
+    {id:'core',title:'C-Kern',group:'secondbrain',pos:[120,-220,-80],body:'Projektverwaltung und Speicherung gehören zum eigenen Kern. Die Oberfläche zeigt dieselben lesbaren Projektdateien.'},
+    {id:'platform',title:'Plattformtests',group:'secondbrain',pos:[410,70,90],body:'Windows, macOS und Linux haben eigene Nachweise. Ein geplantes Merkmal und ein bestandener Test werden getrennt dokumentiert.'},
+    {id:'decisions',title:'Entscheidungen',group:'secondbrain',pos:[200,110,-100],body:'Wesentliche Entscheidungen erklären, warum ein Weg gewählt wurde. Ihre Gründe und Quellen bleiben zugänglich.'},
+    {id:'research',title:'Recherche',group:'research',hub:true,pos:[50,210,-280],body:'Eine weitere Beispielwelt für Themen, Quellen und neue Gedanken. Kein zusätzliches Projekt wurde dafür angelegt.'},
+    {id:'ideen',title:'Neue Ideen',group:'research',pos:[-90,265,-250],body:'Noch ungeordnete Gedanken können im Eingang gesammelt und später mit einem passenden Projekt verbunden werden.'},
+    {id:'papers',title:'Fachliteratur',group:'research',pos:[120,345,-320],body:'Quellen und Erkenntnisse zusammenhalten. Eine sichtbare Verbindung soll einen nachvollziehbaren Zusammenhang darstellen.'}
+  ];
+  const edges=[['physim','energie'],['physim','integration'],['physim','experiment'],['physim','sources'],['physim','fragen'],['energie','integration'],['energie','experiment'],['integration','sources'],['secondbrain','ui'],['secondbrain','core'],['secondbrain','platform'],['secondbrain','decisions'],['ui','decisions'],['core','platform'],['research','ideen'],['research','papers'],['sources','papers'],['ui','ideen']];
+  const byId=new Map(sample.map(n=>[n.id,n]));
+  const renders=[];
+  const saved=window.openai&&window.openai.widgetState;
+  function remember(kind,state){
+    if(window.openai&&window.openai.setWidgetState)
+      window.openai.setWidgetState({modelContent:{preview:{design:kind,note:state.selected}},privateContent:{design:kind,yaw:state.yaw,pitch:state.pitch,zoom:state.zoom}}).catch(function(){});
+  }
+  root.querySelectorAll('.sb-window').forEach(function(app){
+    const kind=app.dataset.design,canvas=app.querySelector('canvas'),ctx=canvas.getContext('2d');
+    if(!ctx)return;
+    const reader=app.querySelector('.sb-reader'),select=app.querySelector('select'),search=app.querySelector('input');
+    const state={selected:'energie',project:'physim',yaw:.12,pitch:.22,zoom:1,panX:0,panY:0,stars:kind==='focus'?200:390,glow:kind==='glass'?.8:.65,links:true,appearance:'Dunkel'};
+    if(saved&&saved.modelContent&&saved.modelContent.preview&&saved.modelContent.preview.design===kind&&byId.has(saved.modelContent.preview.note))
+      state.selected=saved.modelContent.preview.note;
+    let width=1,height=1,palette={},hits=[],drag=null,scheduled=false,animation=0;
+    const probe=document.createElement('span');probe.style.display='none';app.appendChild(probe);
+    function color(variable){probe.style.color='var('+variable+')';return getComputedStyle(probe).color;}
+    function colors(){
+      palette={bg:color('--sb-space-bg'),ink:color('--sb-star-ink'),muted:color('--sb-star-muted'),physim:color('--sb-physim'),secondbrain:color('--sb-secondbrain'),research:color('--sb-research'),accent:color('--sb-accent')};
+    }
+    function point(pos){
+      let x=pos[0],y=pos[1],z=pos[2];
+      if(kind==='atlas')return {x:width*.5+(x+state.panX)*width/900*state.zoom,y:height*.5+(y+state.panY)*height/710*state.zoom,k:1,z:z};
+      const a=x*Math.cos(state.yaw)-z*Math.sin(state.yaw),b=x*Math.sin(state.yaw)+z*Math.cos(state.yaw);
+      const c=y*Math.cos(state.pitch)-b*Math.sin(state.pitch),d=y*Math.sin(state.pitch)+b*Math.cos(state.pitch);
+      const k=1000/Math.max(450,1200+d),usable=width>700?width-190:width;
+      const scale=Math.min(usable/1080,height/910)*state.zoom;
+      return {x:(width>700?usable*.5+20:width*.5)+(a+state.panX)*k*scale,y:height*(width<=700?.36:kind==='focus'?.39:.48)+(c+state.panY)*k*scale,k:k*scale,z:d};
+    }
+    function positions(){
+      if(kind!=='orbit')return sample.map(n=>({node:n,p:point(n.pos)}));
+      const group=sample.filter(n=>n.group===state.project),count=group.length-1;
+      return group.map(function(n,i){
+        if(n.hub)return {node:n,p:point([0,0,0])};
+        const angle=(i-1)/Math.max(count,1)*Math.PI*2-.9,r=145+(i%3)*39;
+        return {node:n,p:point([Math.cos(angle)*r,Math.sin(angle)*r*.58,Math.sin(angle)*r*.72])};
+      });
+    }
+    function draw(){
+      scheduled=false;
+      if(!width||!height)return;
+      ctx.clearRect(0,0,width,height);ctx.fillStyle=palette.bg;ctx.fillRect(0,0,width,height);
+      if(kind!=='atlas'){
+        [['physim',.3,.35],['secondbrain',.74,.3],['research',.52,.8]].forEach(function(a){
+          const glow=ctx.createRadialGradient(width*a[1],height*a[2],0,width*a[1],height*a[2],width*.5);
+          glow.addColorStop(0,palette[a[0]]);glow.addColorStop(1,'rgba(0,0,0,0)');
+          ctx.globalAlpha=.075*state.glow;ctx.fillStyle=glow;ctx.fillRect(0,0,width,height);ctx.globalAlpha=1;
+        });
+      }
+      for(let i=0;i<state.stars;i++){
+        const fx=(Math.sin(i*127.1+41)*43758.5453)%1,fy=(Math.sin(i*311.7+29)*12658.147)%1;
+        const x=(Math.abs(fx)*width+state.yaw*19*(i%3+1)+width)%width,y=(Math.abs(fy)*height+state.pitch*17+height)%height;
+        ctx.globalAlpha=kind==='atlas'?.13:.14+(i%7)*.055;ctx.fillStyle=palette.ink;
+        ctx.beginPath();ctx.arc(x,y,i%23===0?1.4:.6,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+      }
+      const projected=positions(),points=new Map(projected.map(v=>[v.node.id,v.p]));
+      if(kind==='orbit'){
+        ctx.strokeStyle=palette.muted;ctx.lineWidth=1;ctx.globalAlpha=.2;
+        [145,184,223].forEach(function(r){
+          ctx.beginPath();
+          for(let a=0;a<=100;a++){const theta=a/100*Math.PI*2,p=point([Math.cos(theta)*r,Math.sin(theta)*r*.58,Math.sin(theta)*r*.72]);if(!a)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);}
+          ctx.stroke();
+        });ctx.globalAlpha=1;
+      }
+      if(state.links){
+        edges.forEach(function(edge){
+          const a=points.get(edge[0]),b=points.get(edge[1]);if(!a||!b)return;
+          const active=edge.includes(state.selected);
+          ctx.strokeStyle=active?palette[byId.get(state.selected).group]:palette.muted;ctx.globalAlpha=active?.58:kind==='focus'?.055:.18;ctx.lineWidth=active?1.4:1;
+          ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.globalAlpha=1;
+        });
+      }
+      hits=[];const query=search.value.trim().toLocaleLowerCase();
+      projected.sort((a,b)=>b.p.z-a.p.z).forEach(function(v){
+        const n=v.node,p=v.p,active=n.id===state.selected,neighbor=active||edges.some(e=>e.includes(state.selected)&&e.includes(n.id)),match=(!query||n.title.toLocaleLowerCase().includes(query))&&(kind!=='focus'||neighbor);
+        if(p.x<0||p.x>width||p.y<0||p.y>height)return;
+        const r=kind==='orbit'?(n.hub?24:8+(sample.indexOf(n)%3)*3)*Math.max(.5,p.k):n.hub?7:active?5:3.3;
+        ctx.globalAlpha=match?1:.15;ctx.shadowColor=palette[n.group];ctx.shadowBlur=(kind==='atlas'?3:active?26:n.hub?20:10)*state.glow;
+        if(kind==='orbit'){
+          const gradient=ctx.createRadialGradient(p.x-r*.3,p.y-r*.35,0,p.x,p.y,r);
+          gradient.addColorStop(0,palette.ink);gradient.addColorStop(.35,palette[n.group]);gradient.addColorStop(1,palette.bg);ctx.fillStyle=gradient;
+        }else ctx.fillStyle=active?palette.ink:palette[n.group];
+        ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+        if(active){ctx.strokeStyle=palette[n.group];ctx.globalAlpha=.65;ctx.lineWidth=1;ctx.beginPath();ctx.arc(p.x,p.y,r+7,0,Math.PI*2);ctx.stroke();}
+        ctx.globalAlpha=1;hits.push({id:n.id,x:p.x,y:p.y,r:Math.max(18,r+8),node:n});
+      });
+      const occupied=[];
+      projected.sort((a,b)=>(b.node.id===state.selected?10:b.node.hub?5:0)-(a.node.id===state.selected?10:a.node.hub?5:0)).forEach(function(v){
+        const n=v.node,p=v.p,active=n.id===state.selected;
+        if(query&&!n.title.toLocaleLowerCase().includes(query))return;
+        if(kind==='focus'&&n.id!==state.selected&&!edges.some(e=>e.includes(state.selected)&&e.includes(n.id)))return;
+        if(width<400&&!active&&!n.hub)return;
+        const label=n.short||n.title;ctx.font=(n.hub?'500 ':'400 ')+(n.hub?'14':'12')+'px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+        const w=ctx.measureText(label).width,x=Math.max(12,Math.min(width-w-12,p.x+13)),y=p.y-10;
+        const box={x:x,y:y-14,w:w+12,h:20};
+        if(y<110||y>height-70||occupied.some(b=>box.x<b.x+b.w&&box.x+box.w>b.x&&box.y<b.y+b.h&&box.y+box.h>b.y))return;
+        if(kind!=='atlas'&&reader&&!reader.hidden){
+          const cr=canvas.getBoundingClientRect(),rr=reader.getBoundingClientRect();
+          if(x+w>rr.left-cr.left&&x<rr.right-cr.left&&y>rr.top-cr.top&&y<rr.bottom-cr.top)return;
+        }
+        ctx.globalAlpha=active||n.hub?1:.78;ctx.fillStyle=palette.ink;ctx.fillText(label,x,y);ctx.globalAlpha=1;occupied.push(box);
+      });
+    }
+    function schedule(){if(!scheduled){scheduled=true;requestAnimationFrame(draw);}}
+    function resize(){
+      const rect=canvas.getBoundingClientRect();if(rect.width<1||rect.height<1)return;
+      width=rect.width;height=rect.height;const ratio=Math.min(2,window.devicePixelRatio||1);
+      canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);ctx.setTransform(ratio,0,0,ratio,0,0);colors();schedule();
+    }
+    function content(){
+      const n=byId.get(state.selected);app.querySelector('.sb-note-title').textContent=n.title;
+      app.querySelector('.sb-note-body').textContent=n.body;
+      app.querySelector('.sb-selection').textContent=n.title;
+      app.querySelector('.sb-world-title').textContent=byId.get(state.project).title;
+      const neighbors=app.querySelector('.sb-neighbors');neighbors.replaceChildren();
+      edges.filter(e=>e.includes(n.id)).slice(0,3).forEach(function(e){
+        const id=e[0]===n.id?e[1]:e[0],b=document.createElement('button');
+        b.type='button';b.className='cursor-interaction';b.textContent=byId.get(id).short||byId.get(id).title;b.addEventListener('click',()=>choose(id,false));neighbors.appendChild(b);
+      });
+      const related=edges.filter(e=>e.includes(n.id)).map(e=>e[0]===n.id?e[1]:e[0]);
+      app.querySelectorAll('.sb-mini-card').forEach(function(card,i){
+        const other=byId.get(related[i]);card.hidden=!other;if(!other)return;
+        card.dataset.node=other.id;card.querySelector('span').textContent='VERBINDUNG';
+        card.querySelector('strong').textContent=other.title;
+        card.querySelector('small').textContent=byId.get(other.group).title+(other.hub?' · Projekt':' · Notiz');
+      });
+    }
+    function choose(id,focus){
+      if(!byId.has(id))return;state.selected=id;state.project=byId.get(id).group;select.value=state.project;
+      if(kind==='orbit'){state.project=byId.get(id).group;select.value=state.project;}
+      reader.hidden=false;const cards=app.querySelector('.sb-related-cards');if(cards)cards.hidden=false;
+      content();if(focus)focusNode();schedule();remember(kind,state);
+    }
+    function focusNode(){
+      cancelAnimationFrame(animation);
+      const n=byId.get(state.selected),pos=kind==='orbit'?[0,0,0]:n.pos;
+      const endX=kind==='atlas'?-pos[0]:-(pos[0]*Math.cos(state.yaw)-pos[2]*Math.sin(state.yaw));
+      const endY=kind==='atlas'?-pos[1]:-(pos[1]*Math.cos(state.pitch));
+      const startX=state.panX,startY=state.panY,startZ=state.zoom,targetZoom=kind==='orbit'?1.22:1.6,start=performance.now();
+      const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function move(now){const t=reduced?1:Math.min(1,(now-start)/380),ease=1-Math.pow(1-t,3);
+        state.panX=startX+(endX-startX)*ease;state.panY=startY+(endY-startY)*ease;state.zoom=startZ+(targetZoom-startZ)*ease;schedule();
+        if(t<1)animation=requestAnimationFrame(move);else remember(kind,state);
+      }animation=requestAnimationFrame(move);
+    }
+    canvas.addEventListener('pointerdown',function(e){cancelAnimationFrame(animation);drag={x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,shift:e.shiftKey,moved:false};canvas.setPointerCapture(e.pointerId);});
+    canvas.addEventListener('pointermove',function(e){
+      if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;
+      if(Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>4)drag.moved=true;
+      if(kind==='atlas'||drag.shift){state.panX+=dx*900/width/state.zoom;state.panY+=dy*710/height/state.zoom;}
+      else{state.yaw+=dx*.006;state.pitch=Math.max(-1.1,Math.min(1.1,state.pitch+dy*.004));}schedule();
+    });
+    canvas.addEventListener('pointerup',function(e){
+      if(!drag)return;
+      if(!drag.moved){const rect=canvas.getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top;
+        const nearest=hits.filter(h=>Math.hypot(h.x-x,h.y-y)<h.r).sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y))[0];
+        if(nearest)choose(nearest.id,false);
+      }drag=null;remember(kind,state);
+    });
+    canvas.addEventListener('pointercancel',()=>{drag=null;});
+    canvas.addEventListener('wheel',function(e){e.preventDefault();cancelAnimationFrame(animation);state.zoom=Math.max(.45,Math.min(3.5,state.zoom*Math.exp(-e.deltaY*.0015)));schedule();},{passive:false});
+    app.querySelectorAll('[data-action]').forEach(function(b){b.addEventListener('click',function(){
+      const a=b.dataset.action;cancelAnimationFrame(animation);
+      if(a==='in')state.zoom=Math.min(3.5,state.zoom*1.2);if(a==='out')state.zoom=Math.max(.45,state.zoom/1.2);
+      if(a==='left'){if(kind==='atlas')state.panX+=80;else state.yaw-=.3;}
+      if(a==='right'){if(kind==='atlas')state.panX-=80;else state.yaw+=.3;}
+      if(a==='home'){state.zoom=1;state.panX=0;state.panY=0;state.yaw=kind==='orbit'?-.24:.12;state.pitch=kind==='orbit'?.5:.22;}
+      schedule();remember(kind,state);
+    });});
+    app.querySelector('.sb-focus').addEventListener('click',focusNode);
+    app.querySelector('.sb-close').addEventListener('click',function(){reader.hidden=true;const cards=app.querySelector('.sb-related-cards');if(cards)cards.hidden=true;app.querySelector('.sb-selection').textContent='Wähle einen Stern';schedule();});
+    app.querySelectorAll('[data-node]').forEach(b=>b.addEventListener('click',()=>choose(b.dataset.node,false)));
+    select.addEventListener('change',function(){state.project=select.value;choose(select.value,kind!=='orbit');});
+    search.addEventListener('input',schedule);
+    function redesign(){
+      if(state.appearance==='System')app.style.removeProperty('color-scheme');else app.style.colorScheme=state.appearance==='Hell'?'light':'dark';
+      colors();schedule();
+    }
+    content();if(reader.hidden)app.querySelector('.sb-selection').textContent='Wähle einen Stern';
+    new ResizeObserver(resize).observe(canvas);resize();renders.push(redesign);
+    if(globalThis.Tweak){
+      const tweak=new Tweak({container:app,onChange:redesign});
+      tweak.addSlider(state,'stars',{label:'Sternendichte',min:40,max:850,step:10});
+      tweak.addSlider(state,'glow',{label:'Leuchten',min:.15,max:1.6,step:.05});
+      tweak.addToggle(state,'links',{label:'Verbindungen anzeigen'});
+      tweak.addSelect(state,'appearance',{label:'Darstellung',options:['System','Dunkel','Hell']});
+    }
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>renders.forEach(f=>f()));
+})();
+</script>
