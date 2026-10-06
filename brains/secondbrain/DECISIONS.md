@@ -172,3 +172,14 @@ Große Schrift scrollt die Aktionen unter einer festen Überschrift. Dialogabbru
 stellt den Ursprungsfokus wieder her. Apple HIG Onboarding dient als Grundlage;
 Kartengestaltung und Zustandsmodell sind eigene Übertragung.
 [Entwurf und Nachweise](../../docs/ERSTER_START.md).
+
+
+## D17: Alte Metadaten erhalten und unbekannte Schemas abweisen
+
+Der Leser unterstützt weiterhin Minimalmetadaten mit Name, prüft vorhandene
+bekannte Felder jedoch konsistent. Schema 1 ist bekannt; spätere Schemas werden
+nicht als aktuelles Format verwendet. Vorlagenversion ist Herkunft, kein Auftrag
+zur Änderung bestehender Dateien. Längenbasierte Prüfung und Neuidentifizierung
+verwenden begrenzte Kopien. Notizen/Quellen müssen UTF-8 ohne NUL sein, um einen
+unsichtbaren Rest nicht durch C-Textverwendung zu verlieren. Fehler verändern
+die Originale nicht. [Datenvertrag](../../docs/DATENVERTRAG.md).

@@ -54,6 +54,15 @@ int main(int argc, char **argv) {
     CHECK(app.source && strstr(app.source, "Relevantes Wissen") && sb_app_dirty(&app));
     CHECK(sb_app_source(&app, "fehlt.md").code == SB_NOT_FOUND);
     CHECK(app.source && strstr(app.source, "Relevantes Wissen"));
+    {
+        const char nul[]={"# Quelle\0Unsichtbarer Rest"};
+        OK(sb_path_join(temporary,sizeof(temporary),workspace,"nul.txt"));
+        OK(sb_fs_write_new(temporary,nul,sizeof(nul)-1));
+        CHECK(sb_app_source(&app,"nul.txt").code==SB_INVALID);
+        CHECK(app.source && strstr(app.source,"Relevantes Wissen") && sb_app_dirty(&app));
+        size_t length=0; OK(sb_fs_read(temporary,&text,&length));
+        CHECK(length==sizeof(nul)-1 && !memcmp(text,nul,length)); free(text); text=NULL;
+    }
     sb_app_source_close(&app);
     CHECK(!app.source && strstr(app.editor, "Ungespeicherter Zusatz"));
     CHECK(sb_app_source(&app, "%00.md").code == SB_INVALID);

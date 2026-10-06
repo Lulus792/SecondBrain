@@ -585,3 +585,34 @@ macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Lokal besteht das entpack
 Intel-Paket mit 126 Desktop-, 105 Tastatur- und 75 Sicherungs-UI-Aussagen sowie
 Einstellungsprozessen und CLI-Sicherung. Archiv-SHA-256: `335f869ca5f4e3403ea21fa54abc148245d84b2e241e1dd846d4a2d71bb08b1e`.
 Menschliche assistive Bedienung und echte native Dialogbedienung bleiben offen.
+
+
+## 0.7.1: Metadaten- und Textvertrag
+
+Die Metadatenprüfung erhält bisher lesbare Minimaldateien und prüft bekannte
+Felder, doppelte Schlüssel und Schema 1. Unbekannte Schemas werden gemeldet;
+Vorlagenversionen lösen kein Überschreiben aus. Projektliste und Sicherungen
+verwenden dieselbe Prüfung. Längenbasierte APIs kopieren exakt die angegebenen
+Bytes, ohne außerhalb eines Eingabepuffers nach einem Terminator zu suchen.
+
+Notizen, Dokumentliste und externe Quellen lehnen NUL-Zeichen vor der Verwendung
+als C-Text ab. Damit kann ein unsichtbarer Dateirest nicht durch Editieren verloren
+gehen. Originaldatei, bisherige Quelle und offener Entwurf bleiben erhalten.
+[Vertrag und offene Grenzen](DATENVERTRAG.md).
+
+Alle acht UI-unabhängigen Kerntests und vier gezielte ASan/UBSan-Prüfungen bestehen.
+Der neue Modelltest korrigiert seine relative Quelle: bei bereits geöffneter Quelle
+ist deren Ordner die Basis. Der vollständige Desktop- und Plattformnachweis folgt.
+
+
+Abschließender lokaler Nachweis: Der vollständige Desktoplauf prüfte alle 18
+Tests; die neue Quellenregression hatte zunächst einen falschen relativen Link
+und wurde korrigiert. Die abschließenden vier Release-Nachprüfungen bestehen
+(0,49 Sekunden), einschließlich 122 Metadaten- und 89 Modellaussagen. Alle acht
+reinen Kerntests bestehen (3,60 Sekunden); die vier gezielten ASan/UBSan-Wege
+bestehen (2,68 Sekunden). Mit dem bisherigen Kern schlägt die neue Regression
+beim unbekannten Schema 2 fehl (Exit 1). Plattform- und Paketabnahme zu 0.7.1
+folgen gesondert. Es fand keine automatische Migration bestehender Daten statt.
+
+Das vollständig geprüfte Paket 0.7.0 wurde lokal nach dist/SecondBrain übernommen;
+sein tatsächlicher Start mit dem eigenen Projektgedächtnis ist betrachtet.

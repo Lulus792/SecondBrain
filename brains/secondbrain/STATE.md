@@ -23,9 +23,9 @@ Historische Arbeitsabschnitte bleiben im [Journal](journal/2026-10-06.md).
 - [0.6.1-Abnahme zu b064bd5](https://github.com/Lulus792/SecondBrain/actions/runs/37529776082):
   18 erfolgreiche Jobs, 16 Desktoptests je Debug/Release auf Windows x64,
   macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Raster- und Fokuskontrast
-  sind gezielt nachgeprüft. dist/SecondBrain ist lokal auf 0.6.1.
+  sind gezielt nachgeprüft. dist/SecondBrain ist lokal auf 0.7.0.
 
-## Laufende Arbeit: erster Start
+## Abgenommener erster Start
 
 0.7.0 bündelt im leeren Zustand Anlegen, Öffnen, Wiederherstellung, Hilfe und
 Darstellung. Große Schrift scrollt die Aktionen unter einer festen Überschrift.
@@ -35,10 +35,18 @@ Die [Abnahme zu beba1e5](https://github.com/Lulus792/SecondBrain/actions/runs/37
 besteht mit 18 Jobs, 17 Desktoptests je Debug/Release und drei entpackten Paketen.
 [Recherche und Vertrag](../../docs/ERSTER_START.md).
 
+## Laufende Arbeit: Datenvertrag
+
+0.7.1 prüft Metadatenfelder und unbekannte Schemas konsistent und verhindert
+NUL-bedingte Textverkürzung. Alle acht UI-unabhängigen Kerntests und gezielte
+ASan/UBSan-Prüfungen sowie abschließende Desktop-Nachprüfungen bestehen.
+Die Regression schlägt beim bisherigen Kern fehl; Plattform-/Paketabnahme folgt.
+[Datenvertrag](../../docs/DATENVERTRAG.md).
+
 ## Weiterarbeiten und Grenzen
 
-Der vollständige Auftrag vor 1.0 bleibt aktiv. Nächste Schritte: die Einstiegs-
-abnahme abschließen, native Dokument-/Unicode-Semantik und Schrift-Fallback,
+Der vollständige Auftrag vor 1.0 bleibt aktiv. Nächste Schritte: Datenabnahme und
+Einzelprojekt-Fehlerzustände, native Dokument-/Unicode-Semantik und Schrift-Fallback,
 Datenvertrag, reale Sicherungsfehler, Leistung und dauerhafte Distribution abnehmen.
 OS-Dialogbedienung, VoiceOver/NVDA/Orca, echte Systemsteuerungswechsel, individuelle
 Windows-Kontrastfarben und Geräte-/Langzeitprüfungen sind noch nicht vollständig belegt.

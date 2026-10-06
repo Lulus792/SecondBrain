@@ -139,6 +139,7 @@ im Einsatz. [Konzept und Arbeitsweise](docs/KONZEPT.md).
 Der fachliche Kern verwendet C und Betriebssystem-APIs. SDL3, Nuklear und AccessKit
 werden für die UI eingesetzt. Die Herkunft und Lizenzen der Abhängigkeiten stehen unter
 [third_party](third_party/README.md); die Architektur in [docs/ARCHITEKTUR.md](docs/ARCHITEKTUR.md).
+Dateiformate und Updateverhalten stehen im [Datenvertrag](docs/DATENVERTRAG.md).
 Der eigene Code steht unter der [MIT-Lizenz](LICENSE). Für die UI-Abhängigkeiten
 und Schriften gelten ihre jeweiligen mitgelieferten Lizenzen.
 

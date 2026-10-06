@@ -304,7 +304,7 @@ SBStatus sb_app_source(SBApp *app, const char *link) {
     result = directory ? source_listing(absolute, &text) : sb_fs_read(absolute, &text, &length);
     if (result.code != SB_OK) return result;
     if (directory) length = strlen(text);
-    if (!sb_utf8_valid(text, length)) { free(text); return sb_error(SB_INVALID, "Die Quelle ist keine UTF-8-Textdatei."); }
+    if (!sb_text_valid(text, length)) { free(text); return sb_error(SB_INVALID, "Die Quelle ist keine UTF-8-Textdatei ohne NUL-Zeichen."); }
     free(app->source); app->source = text;
     app->source_directory = directory;
     strcpy(app->source_path, absolute);

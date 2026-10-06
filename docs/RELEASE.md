@@ -12,7 +12,10 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
 
 - [ ] **Umfang und Datenvertrag festlegen:** unterstützte OS-Versionen, Dateigrenzen,
   Markdown-Umfang, Verhalten bei defekten Metadaten und künftigen Vorlagenmigrationen.
-  Bestandsschutz und Konflikterkennung sind implementiert; Migrationen noch nicht.
+  Bestandsschutz und Konflikterkennung sind implementiert. Der
+  [Datenvertrag](DATENVERTRAG.md) beschreibt ab 0.7.1 Metadatenversionen, Altformat,
+  Textgrenzen und NUL-Abweisung mit erhaltenen Originalbytes. Einzelne beschädigte
+  Projekte in der UI, OS-Mindestversionen und zukünftige Migrationen bleiben offen.
 - [ ] **Wiederherstellung anbieten:** Sicherung und Wiederherstellen von Projektwissen
   mit geprüften Abbruch-, Speicherplatz- und beschädigten-Datei-Szenarien.
   Atomisches Speichern ersetzt keine Sicherung oder Versionshistorie.

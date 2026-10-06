@@ -32,6 +32,7 @@ SBStatus sb_ok(void);
 SBStatus sb_error(SBCode code, const char *format, ...);
 SBStatus sb_path_join(char *out, size_t capacity, const char *directory, const char *name);
 bool sb_utf8_valid(const char *text, size_t length);
+bool sb_text_valid(const char *text,size_t length);
 bool sb_id_valid(const char *id);
 SBStatus sb_projects_list(const char *workspace, SBProjects *out);
 void sb_projects_free(SBProjects *projects);

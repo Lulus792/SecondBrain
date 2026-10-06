@@ -8,6 +8,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Projektplan](../../docs/PROJEKTPLAN.md): verbindliche Nutzeranforderungen und Todos.
 - [Projektanweisungen](../../AGENTS.md): C, UI-Abhängigkeiten, GitHub und Arbeitsregeln.
 - [Grundlagen](../../docs/GRUNDLAGEN.md): Second-Brain-Konzept mit Originalquellen.
+- [Datenvertrag](../../docs/DATENVERTRAG.md): Metadatenversionen, Textgrenzen, Altformat und Updateverhalten.
 - [Konzept](../../docs/KONZEPT.md): Wissensstruktur und gemeinsame Pflege.
 
 ## Gestaltung und Architektur

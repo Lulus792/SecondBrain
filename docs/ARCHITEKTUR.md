@@ -65,3 +65,7 @@ nk_text_edit-Zustand über dem Modellpuffer; Such- und Dialogfelder teilen seine
 Undo-Historie nicht. Dokumentwechsel setzen diese Historie zurück.
 app/keyboard_test.c prüft die tatsächlichen Wege ausschließlich mit SDL-Tastatur-
 und Zwischenablageereignissen. Die Paketprüfung führt beide Bedienprüfungen aus.
+
+Der [Datenvertrag](DATENVERTRAG.md) legt Metadaten, Textgrenzen und den
+Bestandsschutz beim Update fest. Metadatenliste und Sicherungsprüfung verwenden
+dieselbe eigene C-Prüfung; Textimporte lehnen NUL vor dem Editor ab.

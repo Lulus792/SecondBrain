@@ -79,6 +79,9 @@ bool sb_utf8_valid(const char *text, size_t length) {
     return true;
 }
 
+bool sb_text_valid(const char *text,size_t length) {
+    return text && !memchr(text,0,length) && sb_utf8_valid(text,length);
+}
 bool sb_id_valid(const char *id) {
     size_t length = strlen(id);
     if (!length || length > 64 || *id == '-' || id[length - 1] == '-') return false;
@@ -267,9 +270,20 @@ static SBStatus json_skip(const char **cursor, unsigned depth) {
     return sb_ok();
 }
 
+static SBStatus metadata_version(const char **cursor,uint32_t *value) {
+    if (**cursor<'1' || **cursor>'9') return sb_error(SB_INVALID,"Metadatenversion muss eine positive ganze Zahl sein.");
+    *value=0;
+    while (isdigit((unsigned char)**cursor)) {
+        unsigned digit=(unsigned)(**cursor-'0');
+        if (*value>(UINT32_MAX-digit)/10) return sb_error(SB_INVALID,"Metadatenversion ist zu groß.");
+        *value=*value*10+digit; ++*cursor;
+    }
+    if (**cursor && !strchr(" \t\r\n,}",**cursor)) return sb_error(SB_INVALID,"Ungültige Metadatenversion.");
+    return sb_ok();
+}
 static SBStatus metadata_name(const char *json, char *name) {
     const char *cursor = json;
-    bool found = false;
+    unsigned seen=0;
     spaces(&cursor);
     if (*cursor++ != '{') return sb_error(SB_INVALID, "Metadaten müssen ein JSON-Objekt sein.");
     spaces(&cursor);
@@ -280,11 +294,31 @@ static SBStatus metadata_name(const char *json, char *name) {
         spaces(&cursor);
         if (*cursor++ != ':') { free(key); return sb_error(SB_INVALID, "Ungültige Projektmetadaten."); }
         spaces(&cursor);
-        if (!strcmp(key, "name")) {
-            if (found) { free(key); return sb_error(SB_INVALID, "Doppelter Projektname in Metadaten."); }
+        const char *fields[]={"name","schema_version","template_version","id","created","project_root"};
+        unsigned field=6;
+        for (unsigned i=0;i<6;++i) if (!strcmp(key,fields[i])) { field=i; break; }
+        if (field<6 && (seen&(1u<<field))) { free(key); return sb_error(SB_INVALID,"Doppeltes Metadatenfeld: %s",fields[field]); }
+        if (field<6) seen|=1u<<field;
+        if (field==0) {
             result = json_string(&cursor, &value);
             if (result.code == SB_OK && !name_valid(value)) result = sb_error(SB_INVALID, "Ungültiger Projektname in Metadaten.");
-            if (result.code == SB_OK) { strcpy(name, value); found = true; }
+            if (result.code == SB_OK) strcpy(name, value);
+        } else if (field==1 || field==2) {
+            uint32_t version=0; result=metadata_version(&cursor,&version);
+            if (result.code==SB_OK && field==1 && version!=1)
+                result=sb_error(SB_INVALID,"Projektschema %u wird von dieser App nicht unterstützt.",(unsigned)version);
+        } else if (field>=3 && field<6) {
+            if (field==5 && !strncmp(cursor,"null",4)) cursor+=4;
+            else {
+                result=json_string(&cursor,&value);
+                if (result.code==SB_OK && field==3 && !sb_id_valid(value)) result=sb_error(SB_INVALID,"Ungültige Projektkennung in Metadaten.");
+                if (result.code==SB_OK && field==4 && !name_valid(value)) result=sb_error(SB_INVALID,"Ungültige Erstellungsangabe in Metadaten.");
+                if (result.code==SB_OK && field==5) {
+                    if (strlen(value)>=SB_PATH_CAP) result=sb_error(SB_LIMIT,"Verknüpfter Projektpfad ist zu lang.");
+                    for (const unsigned char *p=(const unsigned char *)value;result.code==SB_OK && *p;++p)
+                        if (*p<32 || *p==127) result=sb_error(SB_INVALID,"Verknüpfter Projektpfad enthält Steuerzeichen.");
+                }
+            }
         } else result = json_skip(&cursor, 0);
         free(key); free(value);
         if (result.code != SB_OK) return result;
@@ -296,39 +330,55 @@ static SBStatus metadata_name(const char *json, char *name) {
     }
     if (*cursor++ != '}') return sb_error(SB_INVALID, "Unvollständige Projektmetadaten.");
     spaces(&cursor);
-    if (*cursor || !found) return sb_error(SB_INVALID, "Projektname fehlt oder Metadaten sind ungültig.");
+    if (*cursor || !(seen&1)) return sb_error(SB_INVALID, "Projektname fehlt oder Metadaten sind ungültig.");
     return sb_ok();
 }
+static SBStatus metadata_copy(const char *json,size_t length,char **out,char name[SB_NAME_CAP]) {
+    *out=NULL;
+    if (length>SB_TEXT_LIMIT) return sb_error(SB_LIMIT,"Projektmetadaten überschreiten 16 MiB.");
+    if (!sb_text_valid(json,length))
+        return sb_error(SB_INVALID,"Ungültige Projektmetadaten.");
+    char *copy=malloc(length+1); if (!copy) return sb_error(SB_MEMORY,"Nicht genug Arbeitsspeicher.");
+    memcpy(copy,json,length); copy[length]=0;
+    SBStatus status=metadata_name(copy,name);
+    if (status.code!=SB_OK) { free(copy); return status; }
+    *out=copy; return sb_ok();
+}
 SBStatus sb_metadata_validate(const char *json,size_t length,char name[SB_NAME_CAP]) {
-    if (strlen(json)!=length || !sb_utf8_valid(json,length)) return sb_error(SB_INVALID,"Ungültige Projektmetadaten.");
-    return metadata_name(json,name);
+    char *copy=NULL,candidate[SB_NAME_CAP];
+    SBStatus status=metadata_copy(json,length,&copy,candidate);
+    if (status.code==SB_OK) strcpy(name,candidate);
+    free(copy); return status;
 }
 SBStatus sb_metadata_reidentify(const char *json,size_t length,const char *id,char **out,size_t *out_length) {
-    char name[SB_NAME_CAP]; const char *cursor=json,*begin=NULL,*end=NULL;
+    char name[SB_NAME_CAP],*copy=NULL; const char *cursor,*begin=NULL,*end=NULL;
     Buffer buffer={0}; bool found=false;
-    *out=NULL;
+    *out=NULL; *out_length=0;
     if (!sb_id_valid(id)) return sb_error(SB_INVALID,"Ungültige Projektkennung.");
-    TRY(sb_metadata_validate(json,length,name));
+    SBStatus status=metadata_copy(json,length,&copy,name);
+    if (status.code!=SB_OK) return status;
+    cursor=copy;
     spaces(&cursor); ++cursor; spaces(&cursor);
     while (*cursor!='}') {
-        char *key=NULL,*value=NULL; SBStatus status=json_string(&cursor,&key);
-        if (status.code!=SB_OK) return status;
+        char *key=NULL,*value=NULL; status=json_string(&cursor,&key);
+        if (status.code!=SB_OK) goto cleanup;
         spaces(&cursor); ++cursor; spaces(&cursor);
         const char *start=cursor;
         if (!strcmp(key,"id")) {
-            if (found) { free(key); return sb_error(SB_INVALID,"Doppelte Projektkennung."); }
+            if (found) { free(key); status=sb_error(SB_INVALID,"Doppelte Projektkennung."); goto cleanup; }
             status=json_string(&cursor,&value); found=true; begin=start; end=cursor;
         } else status=json_skip(&cursor,0);
         free(key); free(value);
-        if (status.code!=SB_OK) return status;
+        if (status.code!=SB_OK) goto cleanup;
         spaces(&cursor); if (*cursor==',') { ++cursor; spaces(&cursor); }
     }
-    SBStatus status=add(&buffer,json,(size_t)((found ? begin : cursor)-json));
+    status=add(&buffer,copy,(size_t)((found ? begin : cursor)-copy));
     if (!found && status.code==SB_OK) status=append(&buffer," ,\"id\": ");
     if (status.code==SB_OK) status=json_escape(&buffer,id);
     if (status.code==SB_OK) status=append(&buffer,found ? end : cursor);
-    if (status.code!=SB_OK) { free(buffer.data); return status; }
-    *out=buffer.data; *out_length=buffer.length; return sb_ok();
+    if (status.code==SB_OK) { *out=buffer.data; *out_length=buffer.length; buffer.data=NULL; }
+cleanup:
+    free(copy); free(buffer.data); return status;
 }
 
 static SBStatus expand(const char *input, const char *name, const char *date,
@@ -439,7 +489,7 @@ static SBStatus project_visit(const char *name, int kind, void *userdata) {
     if (sb_fs_kind(path) != 1) return sb_ok();
     result = sb_fs_read(path, &json, &length);
     if (result.code == SB_OK && !sb_utf8_valid(json, length)) result = sb_error(SB_INVALID, "Projektmetadaten enthalten ungültiges UTF-8.");
-    if (result.code == SB_OK) result = metadata_name(json, project.name);
+    if (result.code == SB_OK) result = sb_metadata_validate(json,length,project.name);
     free(json);
     if (result.code != SB_OK) return sb_error(result.code, "Projekt %s: %s", name, result.message);
     strcpy(project.id, name);
@@ -501,7 +551,7 @@ static SBStatus note_visit(const char *name, int kind, void *userdata) {
     }
     if (kind != 1 || n < 3 || strcmp(name + n - 3, ".md")) return sb_ok();
     result = sb_fs_read(full, &text, &length);
-    if (result.code == SB_OK && !sb_utf8_valid(text, length)) result = sb_error(SB_INVALID, "Dokument enthält ungültiges UTF-8: %s", note.path);
+    if (result.code == SB_OK && !sb_text_valid(text, length)) result = sb_error(SB_INVALID, "Dokument enthält ungültiges UTF-8 oder NUL-Zeichen: %s", note.path);
     if (result.code == SB_OK) result = sb_markdown_title(text, note.title, sizeof(note.title));
     free(text);
     if (result.code != SB_OK) return result;
@@ -547,7 +597,7 @@ SBStatus sb_note_load(const SBProject *project, const char *relative, char **tex
     TRY(note_path(project, relative, path));
     result = sb_fs_read(path, text, &length);
     if (result.code != SB_OK) return result;
-    if (!sb_utf8_valid(*text, length)) { free(*text); *text = NULL; return sb_error(SB_INVALID, "Dokument enthält ungültiges UTF-8."); }
+    if (!sb_text_valid(*text, length)) { free(*text); *text = NULL; return sb_error(SB_INVALID, "Dokument enthält ungültiges UTF-8 oder NUL-Zeichen."); }
     if (revision) { revision->hash = sb_hash(*text, length); revision->length = length; revision->exists = true; }
     return sb_ok();
 }
