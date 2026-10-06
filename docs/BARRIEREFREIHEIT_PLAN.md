@@ -202,3 +202,21 @@ Schrift-Fallback/OS-Vorgaben und menschliche assistive Bedienung. Der Linux-
 Clientlauf zeigt trotz erfolgreicher Abfragen AT-SPI-Cache-Signaturwarnungen.
 Die Cache-/Signal-Kompatibilität muss getrennt untersucht werden; direkte
 Abfragen beweisen sie nicht. Die gesamte Release-Liste bleibt aktiv; 1.0 bleibt gesperrt.
+
+
+## AT-SPI-Cache: Ursache und Regression
+
+Die [offizielle Cache-Schnittstelle](https://github.com/GNOME/at-spi2-core/blob/main/xml/Cache.xml),
+am 6. Oktober 2026 gelesen, verlangt AddAccessible mit
+`((so)(so)(so)iiassusau)` und RemoveAccessible mit `(so)` als je einem strukturierten
+Argument. Der unveränderte Linux-Adapter accesskit_unix 0.24.0 aus AccessKit-C 0.23.1
+übergibt die Struktur direkt als D-Bus-Body; die äußere Ebene fehlt in den tatsächlichen
+Clientwarnungen. Die Korrektur fasst sie als ein Argument auf. Sie betrifft zwei
+Signalaufrufe der externen UI-Bibliothek; Fachcode und C-Anbindung bleiben C.
+
+Eine neue C-Regression beobachtet die Signale auf einer separaten privaten
+Zugänglichkeitsbus-Verbindung, ausschließlich für die eigene Provider-Buskennung.
+Add-/Remove-Signaturen, tatsächliches Auftreten beider Signale und die nicht leere
+GetItems-Sammelantwort werden geprüft. Der neue Test wird zuerst gegen die
+unveränderte UI-Bibliothek ausgeführt, anschließend gegen die Korrektur.
+Die lokale macOS-Providerregression besteht; Linux-Ergebnisse folgen aus der CI.

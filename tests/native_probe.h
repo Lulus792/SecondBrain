@@ -4,4 +4,5 @@
 enum { SB_NATIVE_PRESS,SB_NATIVE_SET_VALUE,SB_NATIVE_READ_VALUE,SB_NATIVE_READ_NAME };
 bool sb_native_probe(SDL_Window *window,const char *label,const char *value,int operation,
     char *output,size_t capacity,void (*pump)(void *),void *context);
+bool sb_native_cache_check(void);
 #endif

@@ -112,6 +112,9 @@ int main(int argc,char **argv) {
     CHECK(title_bounds);
     text=dump(&d); CHECK(strstr(text,"Änderungen erhalten") && strstr(text,"Dieses Dokument enthält ungespeicherte Änderungen"));
     CHECK(!strstr(text,"Projektdokumente")); accesskit_string_free(text);
+#ifdef SB_ATSPI_TEST
+    CHECK(sb_native_cache_check());
+#endif
     sb_desktop_free(&d);
     /* Snapshot/queue contract is tested on every OS, independently of the native client. */
     CHECK(SDL_Init(SDL_INIT_VIDEO));

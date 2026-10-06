@@ -12,7 +12,51 @@
 #include <uiautomation.h>
 #elif defined(SB_ATSPI_TEST)
 #include <atspi/atspi.h>
-static void close_atspi(void) { (void)atspi_exit(); }
+#include <atspi/atspi-application.h>
+static DBusConnection *cache_connection;
+static char *cache_owner;
+static unsigned cache_added,cache_removed,cache_invalid;
+static void close_atspi(void) {
+    if (cache_connection) { dbus_connection_close(cache_connection); dbus_connection_unref(cache_connection); }
+    g_free(cache_owner); (void)atspi_exit();
+}
+static bool cache_open(const char *owner) {
+    if (cache_connection) return !strcmp(cache_owner,owner);
+    DBusError error; dbus_error_init(&error);
+    DBusConnection *session=dbus_bus_get(DBUS_BUS_SESSION,&error);
+    DBusMessage *call=dbus_message_new_method_call("org.a11y.Bus","/org/a11y/bus","org.a11y.Bus","GetAddress");
+    DBusMessage *reply=session && call ? dbus_connection_send_with_reply_and_block(session,call,3000,&error) : NULL;
+    const char *address=NULL;
+    if (reply && dbus_message_get_args(reply,&error,DBUS_TYPE_STRING,&address,DBUS_TYPE_INVALID)) cache_connection=dbus_connection_open_private(address,&error);
+    if (call) dbus_message_unref(call); if (reply) dbus_message_unref(reply); if (session) dbus_connection_unref(session);
+    if (cache_connection && !dbus_bus_register(cache_connection,&error)) { dbus_connection_close(cache_connection); dbus_connection_unref(cache_connection); cache_connection=NULL; }
+    if (cache_connection) {
+        dbus_connection_set_exit_on_disconnect(cache_connection,FALSE);
+        cache_owner=g_strdup(owner);
+        char rule[512]; snprintf(rule,sizeof(rule),"type='signal',interface='org.a11y.atspi.Cache',sender='%s'",owner);
+        dbus_bus_add_match(cache_connection,rule,&error); dbus_connection_flush(cache_connection);
+    }
+    bool success=cache_connection && !dbus_error_is_set(&error);
+    if (!success) fprintf(stderr,"Cache observer setup failed: %s\n",error.message ? error.message : "no connection");
+    dbus_error_free(&error); return success;
+}
+static void cache_drain(void) {
+    if (!cache_connection) return;
+    dbus_connection_read_write(cache_connection,50);
+    DBusMessage *message;
+    while ((message=dbus_connection_pop_message(cache_connection))) {
+        const char *sender=dbus_message_get_sender(message);
+        if (sender && !strcmp(sender,cache_owner) && dbus_message_get_type(message)==DBUS_MESSAGE_TYPE_SIGNAL) {
+            const char *expected=NULL;
+            if (dbus_message_is_signal(message,"org.a11y.atspi.Cache","AddAccessible")) { ++cache_added; expected="((so)(so)(so)iiassusau)"; }
+            if (dbus_message_is_signal(message,"org.a11y.atspi.Cache","RemoveAccessible")) { ++cache_removed; expected="(so)"; }
+            if (expected && strcmp(dbus_message_get_signature(message),expected)) {
+                ++cache_invalid; if (cache_invalid<=3) fprintf(stderr,"Cache signal failed: %s has signature %s, expected %s\n",dbus_message_get_member(message),dbus_message_get_signature(message),expected);
+            }
+        }
+        dbus_message_unref(message);
+    }
+}
 #endif
 typedef struct {
     void *native; const char *label,*value; int operation;
@@ -83,6 +127,7 @@ static AtspiAccessible *find(AtspiAccessible *object,const char *label,unsigned 
     return NULL;
 }
 static bool query(Probe *p) {
+    if (!dbus_threads_init_default()) return false;
     int initialized=atspi_init();
     if (initialized!=0 && initialized!=1) return false;
     if (initialized==0) atexit(close_atspi);
@@ -105,6 +150,8 @@ static bool query(Probe *p) {
     }
     bool success=false; GError *error=NULL;
     if (element) {
+        AtspiObject *object=ATSPI_OBJECT(element);
+        if (!object->app || !cache_open(object->app->bus_name)) { g_object_unref(element); return false; }
         if (p->operation==SB_NATIVE_PRESS) {
             AtspiAction *action=atspi_accessible_get_action_iface(element);
             if (atspi_accessible_get_role(element,NULL)==ATSPI_ROLE_PUSH_BUTTON && action) success=atspi_action_do_action(action,0,&error);
@@ -127,7 +174,7 @@ static bool query(Probe *p) {
         g_object_unref(element);
     }
     if (!success) fprintf(stderr,"AT-SPI operation %d on '%s' failed: %s\n",p->operation,p->label,error ? error->message : "object/pattern not found");
-    g_clear_error(&error); return success;
+    g_clear_error(&error); cache_drain(); return success;
 }
 #else
 static bool query(Probe *p) { (void)p; return false; }
@@ -149,4 +196,24 @@ bool sb_native_probe(SDL_Window *window,const char *label,const char *value,int 
         pump(context); SDL_Delay(10);
     }
     SDL_WaitThread(thread,NULL); pump(context); pump(context); return p.result;
+}
+bool sb_native_cache_check(void) {
+#ifdef SB_ATSPI_TEST
+    cache_drain();
+    if (!cache_connection) return false;
+    DBusError error; dbus_error_init(&error);
+    DBusMessage *call=dbus_message_new_method_call(cache_owner,"/org/a11y/atspi/cache","org.a11y.atspi.Cache","GetItems");
+    DBusMessage *reply=call ? dbus_connection_send_with_reply_and_block(cache_connection,call,3000,&error) : NULL;
+    bool bulk=reply && !strcmp(dbus_message_get_signature(reply),"a((so)(so)(so)iiassusau)");
+    if (bulk) {
+        DBusMessageIter array,items; dbus_message_iter_init(reply,&array); dbus_message_iter_recurse(&array,&items);
+        bulk=dbus_message_iter_get_arg_type(&items)==DBUS_TYPE_STRUCT;
+    }
+    if (!bulk) fprintf(stderr,"Cache GetItems failed: %s\n",error.message ? error.message : reply ? dbus_message_get_signature(reply) : "no reply");
+    if (call) dbus_message_unref(call); if (reply) dbus_message_unref(reply); dbus_error_free(&error);
+    printf("Native cache: %u additions, %u removals, %u invalid signatures, bulk=%s\n",cache_added,cache_removed,cache_invalid,bulk ? "valid" : "invalid");
+    return bulk && cache_added && cache_removed && !cache_invalid;
+#else
+    return true;
+#endif
 }
