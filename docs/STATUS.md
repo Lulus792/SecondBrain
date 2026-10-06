@@ -575,3 +575,13 @@ Mausrad innerhalb/außerhalb der Karte besteht (5,56 Sekunden). ASan/UBSan beste
 für ersten Start, Systemdarstellung und native Zugänglichkeit (42,09 Sekunden;
 40/51/121 Aussagen). Der volle lokale Release-Lauf enthält 17 bestandene Tests.
 Die Plattform- und entpackte Paketabnahme zu 0.7.0 steht noch aus.
+
+
+## Abnahme des Einstiegs 0.7.0
+
+[Lauf zu beba1e5](https://github.com/Lulus792/SecondBrain/actions/runs/37531214816)
+besteht mit allen 18 Jobs: 17 Desktoptests je Debug/Release auf Windows x64,
+macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Lokal besteht das entpackte
+Intel-Paket mit 126 Desktop-, 105 Tastatur- und 75 Sicherungs-UI-Aussagen sowie
+Einstellungsprozessen und CLI-Sicherung. Archiv-SHA-256: `335f869ca5f4e3403ea21fa54abc148245d84b2e241e1dd846d4a2d71bb08b1e`.
+Menschliche assistive Bedienung und echte native Dialogbedienung bleiben offen.

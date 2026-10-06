@@ -383,3 +383,13 @@ Einstellungsprozessen und CLI-Sicherung. Sein tatsächlicher Start wurde betrach
 dist/SecondBrain ist auf 0.6.1 aktualisiert. Archiv-SHA-256:
 `77dc5b20ccbd95d9a50bb652a59d937952eeba10e418cf08b0846dcc4055cee8`.
 Vollständige assistive Bedienung und Kontrastabnahme aller Zustände bleiben offen.
+
+
+## Abnahme des Einstiegs 0.7.0
+
+[Lauf zu beba1e5](https://github.com/Lulus792/SecondBrain/actions/runs/37531214816)
+besteht mit allen 18 Jobs: 17 Desktoptests je Debug/Release auf Windows x64,
+macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Lokal besteht das entpackte
+Intel-Paket mit 126 Desktop-, 105 Tastatur- und 75 Sicherungs-UI-Aussagen sowie
+Einstellungsprozessen und CLI-Sicherung. Archiv-SHA-256: `335f869ca5f4e3403ea21fa54abc148245d84b2e241e1dd846d4a2d71bb08b1e`.
+Menschliche assistive Bedienung und echte native Dialogbedienung bleiben offen.

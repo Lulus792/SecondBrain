@@ -31,7 +31,8 @@ Historische Arbeitsabschnitte bleiben im [Journal](journal/2026-10-06.md).
 Darstellung. Große Schrift scrollt die Aktionen unter einer festen Überschrift.
 Dialogabbruch erhält den Ursprung. Alle 17 lokalen Release-Tests bestehen;
 die abschließende Mausradprüfung und gezielte ASan/UBSan-Prüfungen bestehen ebenfalls.
-Die Plattform-/Paketabnahme zu 0.7.0 folgt.
+Die [Abnahme zu beba1e5](https://github.com/Lulus792/SecondBrain/actions/runs/37531214816)
+besteht mit 18 Jobs, 17 Desktoptests je Debug/Release und drei entpackten Paketen.
 [Recherche und Vertrag](../../docs/ERSTER_START.md).
 
 ## Weiterarbeiten und Grenzen

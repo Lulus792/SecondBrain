@@ -23,8 +23,8 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   dauerhaft speichern, native Ordnerauswahl, verständlicher erster Start.
   Speicherung und native Ordnerwahl sind in 0.3.1 implementiert; Systemvorgaben
   sind in 0.6.0 im dokumentierten Umfang angebunden. Der leere Einstieg ist in
-  0.7.0 implementiert und lokal geprüft. Seine Plattformabnahme und interaktive
-  native Dialogabnahme bleiben offen.
+  0.7.0 implementiert und auf allen drei CI-Plattformen sowie in Paketen geprüft.
+  Interaktive native Dialog- und menschliche Bedienabnahmen bleiben offen.
 - [ ] **Barrierefreiheit abnehmen:** native Screenreader-Anbindung, Kontraste,
   Fokusreihenfolge, große Schrift, Schrift-Fallback und Systemeinstellung für
   reduzierte Bewegung. Die App bietet bereits Tastaturwege, größere Schrift und
