@@ -92,3 +92,7 @@ Materialien und die Lumen-Farbpalette bleiben erhalten.
 Die lokale Release-Prüfung von 0.2.1 besteht mit allen sieben Tests. Der reine
 Tastaturweg prüft 99 Aussagen ohne injizierte Mausereignisse; der Maus-Bedienweg
 prüft 93 Aussagen einschließlich halber Mausradschritte und Richtungswechsel.
+
+Dieselben sieben Tests bestehen mit AddressSanitizer/UndefinedBehaviorSanitizer.
+Der [Plattformlauf zu 29b15d1](https://github.com/Lulus792/SecondBrain/actions/runs/37479319260) besteht mit allen 18 Jobs einschließlich beider Bedienwege aus den entpackten
+Windows-, macOS- und Linux-Release-Paketen.

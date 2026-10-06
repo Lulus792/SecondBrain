@@ -1,6 +1,6 @@
 # Umsetzungsstand von SecondBrain
 
-Stand: 6. Oktober 2026. Version 0.2 mit Lumen-Sternkarte, Glaskarten und
+Stand: 6. Oktober 2026. Version 0.2.1 mit Lumen-Sternkarte, Glaskarten und
 Tastaturwegen liegt mit geprüften Paketen für Windows, macOS und Linux vor.
 
 ## Abgeschlossene Grundlagen
@@ -163,5 +163,12 @@ Auf Intel macOS 14.6.1 bestehen alle sieben Release-Prüfungen und neun Python-P
 Der Maus-Bedienweg prüft 93 Aussagen, der reine Tastaturweg 99. Neue Prüfungen erfassen
 sofortiges Öffnen mit und ohne Entwurf, Zwischenstände der Kamerabewegung, weiches
 Scrollen, halbe Mausradschritte, Richtungswechsel und reduzierte Bewegung. Große und
-kleine tatsächliche Darstellungen wurden betrachtet. Der neue Plattformlauf und die
-Paket-/Sanitizer-Abnahme werden nach ihrem Abschluss gesondert dokumentiert.
+kleine tatsächliche Darstellungen wurden betrachtet. Dieselben sieben Tests bestehen
+mit AddressSanitizer und UndefinedBehaviorSanitizer. Das tatsächlich entpackte und
+verschobene Intel-macOS-Paket besteht beide Bedienwege mit 93 und 99 Aussagen.
+
+Die [Abnahme zu 29b15d1](https://github.com/Lulus792/SecondBrain/actions/runs/37479319260) ist mit allen 18 Jobs erfolgreich abgeschlossen. Desktop Debug/Release mit jeweils
+sieben Prüfungen und beide Bedienwege aus entpackten Release-Paketen bestehen auf
+Windows x64, macOS ARM64 und Linux x64. Die CI prüft versteckte native Fenster
+mit SDL-Softwarerenderer; manuelle Freigaben aller Geräte und GPU-Treiber sind
+damit weiterhin nicht behauptet. Die lokale App unter dist/SecondBrain ist aktualisiert.

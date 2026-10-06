@@ -140,3 +140,18 @@ Wissensbasen bleiben bei einem Betriebssystemwechsel lesbar. Lokale Projektpfade
 müssen am Zielrechner erreichbar sein. Absolute Laufwerksverweise sind an den
 jeweiligen Rechner gebunden; relative Verweise bleiben bei gemeinsamem
 Verschieben des Projekts und seiner Wissensbasis nutzbar.
+
+## Abnahme von Version 0.2.1
+
+Der [Lauf zu 29b15d1](https://github.com/Lulus792/SecondBrain/actions/runs/37479319260) ist am 6. Oktober 2026 mit allen 18 Jobs erfolgreich abgeschlossen. Alle sechs
+Desktop-Jobs bestehen mit jeweils sieben Tests auf Windows x64, macOS ARM64 und
+Linux x64 in Debug/Release. Alle drei entpackten Release-Pakete bestehen den
+Maus-Bedienweg mit 93 und den reinen Tastaturweg mit 99 Aussagen. Geprüft werden
+zusätzlich direkte Pfeilnavigation, Schutz offener Entwürfe, Zwischenstände der
+Kamerabewegung, weiches Scrollen, kleine Mausradschritte und reduzierte Bewegung.
+
+Auf Intel macOS 14.6.1 bestehen lokal alle sieben Tests in Release und mit
+AddressSanitizer/UndefinedBehaviorSanitizer. Das Archiv SecondBrain-0.2.1-Darwin-x86_64
+besteht nach Entpacken in einen anderen Ordner beide Bedienwege. Große und kleine
+Renderbilder mit 150 Prozent Schriftgröße wurden betrachtet. Die oben genannten
+Grenzen der Software- und Geräteabnahme gelten weiterhin.

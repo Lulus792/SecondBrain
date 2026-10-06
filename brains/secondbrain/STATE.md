@@ -58,9 +58,12 @@ Ausrichtung sind implementiert. Die README hat nach Recherche von neun GitHub-
 Projekten einen neuen Einstieg mit tatsächlicher App-Vorschau. Die Arbeitsfassung
 enthält nur das eigene Projektgedächtnis und neutrale Beispiele.
 
-Lokal bestehen sieben Release-Prüfungen (93 Maus- und 99 Tastaturaussagen) und neun
-Python-Prüfungen. Weitere Paket-, Sanitizer- und Plattformnachweise werden nach
-Abschluss im [Umsetzungsstand](../../docs/STATUS.md) ergänzt. Die [Release-Liste](../../docs/RELEASE.md)
+Lokal bestehen sieben Release-Prüfungen (93 Maus- und 99 Tastaturaussagen), dieselben
+sieben Tests mit AddressSanitizer/UndefinedBehaviorSanitizer und neun Python-Prüfungen.
+Das entpackte Intel-macOS-Paket besteht beide Bedienwege. Die [Abnahme zu 29b15d1](https://github.com/Lulus792/SecondBrain/actions/runs/37479319260)
+besteht mit allen 18 Jobs einschließlich Debug/Release und entpackter Pakete auf
+Windows x64, macOS ARM64 und Linux x64. Der [Umsetzungsstand](../../docs/STATUS.md)
+beschreibt Umfang und Grenzen. Die [Release-Liste](../../docs/RELEASE.md)
 ordnet die Lücken vor 1.0; die Endprodukt-Texte werden abschließend erst vor dem
 vollständigen Release geprüft.
 
