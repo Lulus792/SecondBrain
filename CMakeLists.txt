@@ -124,7 +124,9 @@ if(SB_BUILD_UI)
             "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/NotoSans-Regular.ttf"
             "${CMAKE_CURRENT_BINARY_DIR}/ui-test.bmp")
         add_test(NAME desktop-workflow COMMAND secondbrain --self-test "${CMAKE_CURRENT_BINARY_DIR}/desktop-data")
-        set_tests_properties(desktop-workflow PROPERTIES TIMEOUT 60)
+        add_test(NAME project-example COMMAND secondbrain --workspace "${CMAKE_CURRENT_SOURCE_DIR}/brains"
+            --project secondbrain --snapshot "${CMAKE_CURRENT_BINARY_DIR}/own-project.bmp")
+        set_tests_properties(desktop-workflow project-example PROPERTIES TIMEOUT 90)
     endif()
 endif()
 

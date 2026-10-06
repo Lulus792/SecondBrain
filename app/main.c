@@ -22,15 +22,16 @@ static SBStatus font_path(const char *assets, char *out) {
 int main(int argc, char **argv) {
     SBDesktop desktop;
     char workspace[SB_PATH_CAP], font[SB_PATH_CAP], home[SB_PATH_CAP];
-    const char *workspace_arg = NULL, *assets = NULL, *test_root = NULL, *snapshot = NULL;
+    const char *workspace_arg = NULL, *project_arg = NULL, *assets = NULL, *test_root = NULL, *snapshot = NULL;
     SBStatus status;
     for (int i = 1; i < argc; ++i) {
         if (!strcmp(argv[i], "--workspace") && i + 1 < argc) workspace_arg = argv[++i];
+        else if (!strcmp(argv[i], "--project") && i + 1 < argc) project_arg = argv[++i];
         else if (!strcmp(argv[i], "--assets") && i + 1 < argc) assets = argv[++i];
         else if (!strcmp(argv[i], "--self-test") && i + 1 < argc) test_root = argv[++i];
         else if (!strcmp(argv[i], "--snapshot") && i + 1 < argc) snapshot = argv[++i];
         else if (!strcmp(argv[i], "--help")) {
-            printf("SecondBrain\n  --workspace ORDNER\n  --assets ASSETORDNER\n"
+            printf("SecondBrain\n  --workspace ORDNER\n  --project KENNUNG\n  --assets ASSETORDNER\n"
                    "  --self-test TESTORDNER\n  --snapshot BILD.bmp\n");
             return 0;
         } else { fprintf(stderr, "Unbekannte oder unvollständige Option: %s\n", argv[i]); return 2; }
@@ -57,6 +58,10 @@ int main(int argc, char **argv) {
     if (status.code == SB_OK) status = font_path(assets, font);
     if (status.code == SB_OK) status = sb_desktop_init(&desktop, workspace, font, snapshot != NULL);
     if (status.code != SB_OK) { fprintf(stderr, "%s\n", status.message); return 1; }
+    if (project_arg) {
+        status = sb_app_request(&desktop.model, SB_ACT_PROJECT, project_arg);
+        if (status.code != SB_OK) { fprintf(stderr, "%s\n", status.message); sb_desktop_free(&desktop); return 1; }
+    }
     unsigned frames = 0;
     while (!desktop.model.quit) {
         SDL_Event event;

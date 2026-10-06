@@ -58,6 +58,7 @@ jobs:
           path: |
             build/ui/Testing/Temporary/LastTest.log
             build/ui/ui-test.bmp
+            build/ui/own-project.bmp
             build/ui/desktop-data/**/*.bmp
             build/ui/package-check/**/*.bmp
           retention-days: 30

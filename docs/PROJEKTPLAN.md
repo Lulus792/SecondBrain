@@ -4,7 +4,8 @@ Stand: 6. Oktober 2026. SecondBrain soll eine eigene Anwendung in C werden,
 mit der der Nutzer und die KI projektbezogenes Wissen verwenden können.
 Die Anwendung übernimmt das Anlegen, Anzeigen, Bearbeiten und Verwalten der
 Projektgedächtnisse. Die folgenden Anforderungen sind verbindlich festgehalten;
-die Umsetzung und der UI-Entwurf sind noch ausstehend.
+UI-Recherche, Entwurf und erste C-Desktop-Version sind umgesetzt. Den aktuellen
+Nachweis nennt [STATUS.md](STATUS.md).
 
 ## Produktziel
 
@@ -83,10 +84,12 @@ beauftragt. Diese Reihenfolge gilt für die nun laufende Arbeit.
 
 ## Eigenes Projektgedächtnis
 
-- [ ] Ein eigenes Second Brain für das SecondBrain-Projekt erstellen. Die
+- [x] Ein eigenes Second Brain für das SecondBrain-Projekt erstellen. Die
   Anwendung soll damit auch für ihre eigene Entwicklung verwendet werden.
   Ziele, Stand, Entscheidungen, Quellen und offene Aufgaben werden darin
   nachvollziehbar gepflegt.
+  Die Instanz liegt unter [brains/secondbrain](../brains/secondbrain/START.md)
+  und wurde in der eigenen Anwendung geladen und betrachtet.
 
 ## Veröffentlichung und Nachweise
 

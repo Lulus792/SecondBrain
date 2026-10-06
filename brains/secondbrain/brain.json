@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "template_version": 1,
+  "id": "secondbrain",
+  "name": "SecondBrain",
+  "created": "2026-10-06",
+  "project_root": "../.."
+}

@@ -1,7 +1,7 @@
 # Umsetzungsstand von SecondBrain
 
 Stand: 6. Oktober 2026. Die Umsetzung ist aktiv; die vollständige Desktop-Anwendung
-ist noch nicht fertiggestellt.
+liegt als erste Desktop-Version mit geprüften Paketen vor.
 
 ## Abgeschlossene Grundlagen
 
@@ -63,14 +63,19 @@ Texteingaben. Die tatsächliche Testdarstellung wurde betrachtet. Die UI-CI
 prüft diese Grundlage zusätzlich mit nativen Fenstersystemen der drei Plattformen.
 Der [UI-Lauf zu 2c1a911](https://github.com/Lulus792/SecondBrain/actions/runs/37437068287)
 besteht mit erfolgreichen UI-Jobs auf Windows, macOS und Linux. Diese Bausteinprüfung
-ist von der noch ausstehenden vollständigen Bedienprüfung getrennt.
+belegt die Bausteine; die Desktop-Prüfung wird unten separat beschrieben.
 
-## Weiter ausstehend
+## Eigenes Projektgedächtnis
 
-- [ ] Ein eigenes Second Brain für dieses SecondBrain-Projekt erstellen und in
+- [x] Ein eigenes Second Brain für dieses SecondBrain-Projekt erstellen und in
   der Anwendung verwenden. Es soll Projektziele, aktuellen Stand, Entscheidungen,
   Quellen und offene Aufgaben enthalten und dem Nutzer sowie der KI als
   gemeinsames Projektgedächtnis dienen.
+  [Die Instanz](../brains/secondbrain/START.md) wurde mit dem C-Kern angelegt,
+  befüllt, durchsucht und in der eigenen App geladen und betrachtet.
+  Alle lokalen Quellenverweise und der relative Repository-Verweis wurden geprüft.
+
+## Desktop und Pakete
 
 Die Desktop-Oberfläche ist implementiert: Projekte und Notizen anlegen,
 Markdown lesen und bearbeiten, speichern, suchen, archivieren, Quellen und
@@ -87,8 +92,14 @@ C-/UI-Prüfungen einschließlich des vollständigen Bedienablaufs aus.
 CPack erzeugt Pakete mit statischem SDL, Schriften und Lizenzen. Lokal besteht
 die entpackte macOS-App den Bedienablauf aus einem anderen Arbeitsordner mit
 Leerzeichen und Umlauten. `otool -L` zeigt ausschließlich Systembibliotheken.
-Die Paketprüfungen auf Windows, macOS und Linux werden nun ausgeführt.
-Das aktive Ziel bleibt bis zu deren Abschluss und dem eigenen Projektgedächtnis
-die vollständige Umsetzung. Nuklear besitzt hier keine Anbindung an native
+Der [Paketlauf zu aeb1d0d](https://github.com/Lulus792/SecondBrain/actions/runs/37443877273)
+besteht mit sechs Desktop-Jobs (Debug und Release) und drei erfolgreichen Prüfungen
+der entpackten Pakete auf Windows x64, macOS ARM64 und Linux x64.
+Die Pakete stehen als Actions-Artefakte zum Download bereit.
+
+Die Bedienprüfung umfasst nun zusätzlich Konfliktkopie, Archivierung und
+Speichern beim Beenden. Lokal besteht dieser erweiterte Ablauf; der eigene
+Projektkontext wird als zusätzlicher UI-Import geprüft.
+Nuklear besitzt hier keine Anbindung an native
 Screenreader; vergrößerte Schrift und Tastaturbefehle ersetzen diesen fehlenden
 Zugang nicht.

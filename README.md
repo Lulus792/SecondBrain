@@ -1,8 +1,8 @@
 # SecondBrain für deine Projekte
 
-Hier entsteht eine eigene Anwendung in C für eine gemeinsame Wissensbasis von
-dir und der KI. Sie soll Projektgedächtnisse selbst anlegen, anzeigen, bearbeiten,
-durchsuchen und verwalten. Jedes Projekt bekommt eigene Ziele, Entscheidungen,
+SecondBrain ist eine eigene Desktop-Anwendung in C für eine gemeinsame Wissensbasis
+von dir und der KI. Sie legt Projektgedächtnisse an, zeigt sie an und unterstützt
+Bearbeitung, Suche und Verwaltung. Jedes Projekt bekommt eigene Ziele, Entscheidungen,
 Quellen und Notizen auf Grundlage einer wiederverwendbaren Struktur.
 
 Die verbindlichen Anforderungen stehen im [Projektplan](docs/PROJEKTPLAN.md):
@@ -15,8 +15,8 @@ ein unabhängiger C17-Kern und ein natives Entwicklungswerkzeug sind implementie
 Die UI-Grundlage mit Schriften, Darstellung und Texteditor ist ebenfalls
 implementiert und auf allen drei Plattformen geprüft.
 Die eigene Desktop-Oberfläche ist implementiert und anhand eines vollständigen
-Bedienablaufs auf Windows, macOS und Linux geprüft. Die Paketerstellung und eine
-Prüfung der entpackten App sind eingerichtet; der erste lokale Paketlauf besteht.
+Bedienablaufs auf Windows, macOS und Linux geprüft. Die entpackten Pakete bestehen
+ebenfalls auf allen drei Systemen.
 Der aktuelle Nachweis steht im [Umsetzungsstand](docs/STATUS.md).
 
 [GitHub Repository](https://github.com/Lulus792/SecondBrain) ·
@@ -90,8 +90,8 @@ Zur Laufzeit benötigt es kein Python.
 
 Die folgenden Befehle betreffen den vorhandenen Python-Prototyp. Für ihn genügt
 Python 3.10 oder neuer; er hat keine zusätzlichen Paketabhängigkeiten. Das Datum
-stammt aus der lokal eingestellten Betriebssystem-Zeitzone. Die geplante
-C-Anwendung soll diese Arbeit durch ihre eigene Oberfläche ermöglichen.
+stammt aus der lokal eingestellten Betriebssystem-Zeitzone. Die C-Anwendung
+ermöglicht diese Arbeit durch ihre eigene Oberfläche.
 
 Im Ordner dieses Repositories unter macOS oder Linux:
 
@@ -151,6 +151,11 @@ KI-Chat. Die jeweiligen Projektanweisungen bleiben maßgeblich.
 
 ## Das Physim Beispiel
 
+SecondBrain besitzt auch ein [eigenes Projektgedächtnis](brains/secondbrain/START.md)
+mit Anforderungen, Entscheidungen, Stand, Originalquellen und Wissensnotizen.
+Es erscheint als Projekt „SecondBrain“, wenn du die App mit `--workspace brains`
+startest. `--project secondbrain` wählt es direkt aus.
+
 [Physim öffnen](brains/physim/START.md). Das Beispiel verknüpft dein vorhandenes
 Repository und enthält einen ersten Projektauftrag, einen Quellenindex sowie
 einen vorsichtigen Überblick. Stand: 6. Oktober 2026. Aussagen zum Funktionsumfang
@@ -179,8 +184,8 @@ Unicode-Pfade, Verweise und den Schutz vorhandener Inhalte. Ein Symlink-Test
 wird nur ausgelassen, wenn das Betriebssystem keine Symlinks erlaubt.
 
 Die dokumentierten Ergebnisse stehen in [Plattformprüfung](docs/PLATTFORMEN.md).
-Sie gelten für den Python-Prototyp. Die zukünftige C-Anwendung und ihre Oberfläche
-benötigen eigene ausgeführte Prüfungen auf allen drei Plattformen.
+Die Nachweise unterscheiden Python-Prototyp, C-Kern, UI-Bausteine,
+Desktop-Bedienablauf und entpackte Pakete anhand tatsächlich ausgeführter Prüfungen.
 
 ## Änderungen veröffentlichen
 
@@ -190,6 +195,6 @@ auch für weitere Arbeit in diesem Repository und ist in AGENTS.md festgehalten.
 Prüfergebnisse und Einschränkungen werden mit dem jeweiligen Stand dokumentiert.
 
 Bestehende Instanzen behalten ihre ursprüngliche Vorlagenversion. Gemeinsames
-Wissen kannst du später projektübergreifend verlinken; automatische Suche,
+Wissen kannst du später projektübergreifend verlinken; projektübergreifende Suche,
 Synchronisation, Chat-Anbindung und Vorlagenmigration sind mögliche spätere
 Erweiterungen.

@@ -4,6 +4,9 @@ Dieses Repository entwickelt eine eigene SecondBrain-Anwendung in C für Mensche
 und KI. Lies zuerst README.md, docs/PROJEKTPLAN.md und docs/KONZEPT.md.
 Die Grundlagen und Quellen stehen in docs/GRUNDLAGEN.md; Vorlagen liegen in
 templates/brain. Der Python-Generator ist ein vorhandener Strukturprototyp.
+Das eigene Projektgedächtnis beginnt in brains/secondbrain/START.md. Lies dessen
+Stand und Quellen für weitere Projektarbeit und aktualisiere es nach wesentlichen
+geprüften Fortschritten. Originalquellen bleiben für den jeweiligen Auftrag maßgeblich.
 
 - Schreibe für den Nutzer auf Deutsch.
 - Die geplante Anwendung wird in C umgesetzt. Externe Bibliotheken sind nur
