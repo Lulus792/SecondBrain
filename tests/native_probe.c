@@ -104,14 +104,17 @@ static bool query(Probe *p) {
         if (p->operation==SB_NATIVE_PRESS) {
             AtspiAction *action=atspi_accessible_get_action_iface(element);
             if (atspi_accessible_get_role(element,NULL)==ATSPI_ROLE_PUSH_BUTTON && action) success=atspi_action_do_action(action,0,&error);
+            if (action) g_object_unref(action);
         } else if (p->operation==SB_NATIVE_SET_VALUE) {
             AtspiEditableText *edit=atspi_accessible_get_editable_text_iface(element);
             if (edit) success=atspi_editable_text_set_text_contents(edit,p->value,&error);
+            if (edit) g_object_unref(edit);
         } else {
             AtspiText *text=atspi_accessible_get_text_iface(element);
             char *value=text ? atspi_text_get_text(text,0,-1,&error) : NULL;
             if (value && strlen(value)<p->capacity) { strcpy(p->output,value); success=true; }
             g_free(value);
+            if (text) g_object_unref(text);
         }
         g_object_unref(element);
     }

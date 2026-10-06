@@ -28,7 +28,7 @@ jobs:
       - name: Configure UI
         run: cmake -S . -B build/ui -DSB_BUILD_UI=ON -DSB_REQUIRE_NATIVE_ACCESSIBILITY_TESTS=ON -DCMAKE_BUILD_TYPE=${{ matrix.config }}
       - name: Build UI and editor checks
-        run: cmake --build build/ui --config ${{ matrix.config }} --parallel 4
+        run: cmake -DSB_BUILD_DIR=build/ui -DSB_BUILD_CONFIG=${{ matrix.config }} -P tools/build_checked.cmake
       - name: Verify UI on Linux
         if: runner.os == 'Linux'
         run: sh tools/run_linux_ui_tests.sh ctest --test-dir build/ui -C ${{ matrix.config }} --output-on-failure
