@@ -694,3 +694,28 @@ Native Plattform- und entpackte Paketabnahme zu 0.7.3 folgen gesondert.
 
 Das abgenommene Intel-Paket 0.7.2 ist nach dist/SecondBrain übernommen. Sein
 tatsächlicher Start mit dem eigenen Projektgedächtnis ist betrachtet.
+
+
+## Abnahme von 0.7.3
+
+[Lauf zu 7331eca](https://github.com/Lulus792/SecondBrain/actions/runs/37536230101)
+besteht mit allen 18 Jobs: 22 Desktoptests je Debug/Release auf Windows x64,
+macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Lokal besteht das entpackte
+Intel-Paket mit 126 Desktop-, 105 Tastatur- und 75 Sicherungs-UI-Aussagen sowie
+Einstellungsprozessen und CLI-Sicherung. Archiv-SHA-256:
+`ce836ac9efc670a6a515539197387179b1a47c0df12183306de3f8f28e88f404`. Die vollständige Release-Arbeit bleibt offen.
+
+
+## Dauerhafte Vorabversionen vorbereiten
+
+Der neue Tag-Workflow verwendet den vollständigen Plattformtest als wiederverwendbaren
+Workflow und erhält einen Intel-Mac-Lauf zusätzlich zu den bisherigen Architekturen.
+Versionsprüfung verweigert automatisch 1.0 und abweichende Tags. Vier Archive und
+SHA256SUMS werden nur nach Paketabnahme hochgeladen und anschließend wieder gegen
+die geprüften Bytes verglichen. Erst danach wird ein Release-Entwurf veröffentlicht.
+Vorhandene Releases werden nicht ersetzt. Tag-/Manifestregression und actionlint
+1.7.12 bestehen lokal. Tatsächliche Veröffentlichung und Intel-CI-Abnahme folgen.
+
+Alle zwölf reinen Kerntests einschließlich des Veröffentlichungsschutzes bestehen
+(4,86 Sekunden). actionlint 1.7.12 meldet keine Workflowfehler. Dies bestätigt die
+lokale Vorbereitung, noch keine tatsächliche Release-Veröffentlichung.

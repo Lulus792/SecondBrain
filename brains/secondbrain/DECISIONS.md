@@ -202,3 +202,14 @@ Metadatenrevision vor Ersetzen/Verschieben. Der Metadatenleser öffnet nur regul
 Dateien über die vorhandene geprüfte Dateihandle-Schicht. Erkanntes unbekanntes
 Schema, defekte/entfernte Metadaten erhalten Datei, Entwurf und Save-Guard. Dies
 ist keine globale Transaktionssperre. [Datenvertrag](../../docs/DATENVERTRAG.md).
+
+
+## D20: Vorabversion erst nach vollständiger Paketabnahme veröffentlichen
+
+Ein v0-Tag muss zur CMake-Version passen. Der Publisher verwendet denselben
+vollständigen Test-Workflow und prüft vier native Pakete einschließlich Intel-
+macOS. SHA256SUMS bindet die heruntergeladenen Releasebytes an die geprüften
+Archive. Erst danach wird der Entwurf öffentlich. Vorhandene Releases werden
+nicht ersetzt; automatische 1.0-Veröffentlichung bleibt gesperrt. Der Nutzer
+hat die vollständige Release-Vorbereitung und laufende GitHub-Veröffentlichung
+beauftragt. [Veröffentlichungsvertrag](../../docs/DISTRIBUTION.md).

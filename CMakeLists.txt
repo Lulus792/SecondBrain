@@ -291,6 +291,9 @@ if(BUILD_TESTING)
     add_test(NAME project-cli-discovery COMMAND "${CMAKE_COMMAND}"
         "-DSB_CLI=$<TARGET_FILE:secondbrain-cli>" "-DSB_TEST_ROOT=${CMAKE_CURRENT_BINARY_DIR}/project-cli-data"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_project_cli.cmake")
+    add_test(NAME release-contract COMMAND "${CMAKE_COMMAND}"
+        "-DSB_SOURCE_ROOT=${CMAKE_CURRENT_SOURCE_DIR}" "-DSB_TEST_ROOT=${CMAKE_CURRENT_BINARY_DIR}/release-contract-data"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_release_contract.cmake")
 endif()
 
 if(SB_BUILD_UI)

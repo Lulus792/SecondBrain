@@ -53,8 +53,17 @@ besteht mit 18 Jobs, 21 Desktoptests je Debug/Release und drei entpackten Pakete
 0.7.3 prüft aktuelle Metadaten zusätzlich vor Schreibaktionen, auch bei bereits
 geöffnetem Projekt. Elf reine Kerntests bestehen; Save-Guard, Entwurf und
 Originaldatei bleiben bei erkannten Metadatenfehlern erhalten. 22 Release-Tests,
-elf Kerntests und gezielte ASan/UBSan-/UI-Nachprüfungen bestehen; native Plattform-
-und Paketabnahme folgen.
+elf Kerntests und gezielte ASan/UBSan-/UI-Nachprüfungen bestehen. Die [Abnahme
+zu 7331eca](https://github.com/Lulus792/SecondBrain/actions/runs/37536230101) besteht
+mit 18 Jobs, 22 Desktoptests je Debug/Release und drei entpackten Paketen.
+
+## Laufende Arbeit: dauerhafte Distribution
+
+Die vorbereitete Vorabversions-Pipeline verwendet dieselben Plattformtests,
+plant zusätzlich Intel-macOS-Pakete und verifiziert Uploads anhand der Prüfsummen
+vor Veröffentlichung. Alle zwölf Kerntests einschließlich Tag-/Manifestprüfung und Workflow-Lint
+bestehen lokal;
+tatsächliche Erstveröffentlichung und Intel-CI-Abnahme stehen noch aus.
 
 ## Weiterarbeiten und Grenzen
 

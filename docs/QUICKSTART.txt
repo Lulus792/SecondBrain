@@ -1,4 +1,4 @@
-SecondBrain 0.4.0 (in Entwicklung)
+SecondBrain (in Entwicklung)
 
 Dieses Paket enthält die eigene Desktop-Anwendung. Python, ein Compiler
 und eine externe Wissensanwendung sind zum Starten nicht erforderlich.
@@ -12,7 +12,8 @@ Standardmäßig liegen deine Projektgedächtnisse im Ordner SecondBrain im
 Benutzerverzeichnis. Die Projektwahl oder Command/Control+O öffnet einen anderen Ordner.
 Mit --workspace /pfad/zum/ordner lässt sich dieser auch beim Start angeben.
 
-1. Den Projekt-Knopf mit dem Plus-Icon wählen, Namen und Ordnerkennung eingeben.
+1. Beim leeren Start "Neues Projekt" wählen, Namen und Ordnerkennung eingeben.
+   Alternativ einen Arbeitsordner öffnen oder eine Sicherung wiederherstellen.
 2. Den Projektauftrag und aktuellen Stand über "Bearbeiten" ergänzen.
 3. Mit "Notiz" und dem Plus-Icon Wissen, Ideen oder Übergaben erfassen.
 4. Bewusst speichern. Wechsel und Beenden schützen ungespeicherte Änderungen.
@@ -33,7 +34,8 @@ Die App verarbeitet UTF-8-Markdown und JSON. Lokale Textquellen sind
 schreibgeschützt; Webquellen öffnen auf ausdrücklichen Klick im Browser.
 Es gibt keine automatische Synchronisation oder automatische KI-Aktualisierung.
 Der Editor unterstützt begrenztes Rückgängig/Wiederholen. Der Lesemodus
-unterstützt grundlegendes Markdown. Eine native Screenreader-Anbindung fehlt.
+unterstützt grundlegendes Markdown. Native Zugänglichkeitsadapter sind angebunden;
+menschliche Screenreader-Abnahme und vollständige Textnavigation bleiben offen.
 
 Diese Pakete sind nicht mit einem externen Herausgeberzertifikat signiert
 oder durch Apple notarisiert. Betriebssystem-Prüfungen können den Start
@@ -57,3 +59,8 @@ Offene Bearbeitungen bleiben offen. Abbrechen oder Escape beendet die Aufgabe
 nach dem Aufräumen temporärer Daten. Dateidialoge besitzen auch einen Pfad-Eingabeweg.
 
 Darstellung und zuletzt geöffnetes Projekt werden beim regulären Beenden gespeichert.
+
+Update: App schließen, die neue Version in einen eigenen Ordner entpacken und
+starten. Deine Projektgedächtnisse bleiben im bisherigen Arbeitsordner. Falls
+die zuletzt gespeicherte Auswahl fehlt, denselben Arbeitsordner erneut öffnen.
+Versionen ändern bestehende Vorlageninhalte nicht automatisch.

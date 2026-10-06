@@ -1,6 +1,6 @@
 # Anwendungspakete
 
-SecondBrain 0.2.0 ist eine lokale Desktop-Anwendung. Zum Bauen werden ein
+SecondBrain ist eine lokale Desktop-Anwendung in Entwicklung. Zum Bauen werden ein
 C17-Compiler und CMake ab 3.20 benötigt. Zum Starten des fertigen Pakets sind
 Python, CMake und ein Compiler nicht erforderlich.
 
@@ -56,7 +56,8 @@ gespeicherte Unicode-Zeichen begrenzt. Die Suchnormalisierung deckt ASCII und
 häufige lateinische Zeichen ab. Die mitgelieferten Schriften decken Deutsch,
 Latein, Griechisch, Kyrillisch und grundlegende mathematische Symbole ab;
 für weitere Schriftsysteme besteht noch kein vollständiger Schrift-Fallback.
-Nuklear hat in dieser Version keine native Screenreader-Anbindung.
+AccessKit ergänzt die native Zugänglichkeit. Vollständige Dokumentsemantik
+und menschliche Screenreader-Abnahme bleiben offen.
 
 KI-Kontext wird aus den gespeicherten Kerninformationen kopiert. Weitere
 Notizen sind über die Projektdateien erreichbar. Ein KI-Chat muss das Lesen und
@@ -84,3 +85,37 @@ Ab 0.6.0 gehören libdbus-1 und GIO/GLib zur Linux-UI-Systemanbindung. Zum Bauen
 werden ihre Entwicklungsdateien benötigt (libdbus-1-dev, libglib2.0-dev); zur
 Laufzeit die üblichen Desktop-Systembibliotheken. Ein reiner C-Kernbuild bleibt
 unabhängig davon. Die Bibliothekskopien werden nicht im Anwendungspaket gebündelt.
+
+
+## Dauerhafte Vorabversionen vorbereiten
+
+Der neue Workflow prerelease.yml akzeptiert ausschließlich Tags v0.MINOR.PATCH,
+die zur CMake-Version passen. Er verwendet dieselben vollständigen Plattform-
+prüfungen wie die normale CI, einschließlich zusätzlich geplantem Intel-Mac-Runner.
+Erst danach werden vier Archive mit SHA256SUMS in einen GitHub-Release-Entwurf
+hochgeladen, wieder heruntergeladen und gegen die lokalen geprüften Bytes verglichen.
+Nur nach diesem Vergleich wird die Vorabversion veröffentlicht. Eine bestehende
+Release-Version wird nicht ersetzt; ein Fehler nach dem Anlegen kann einen
+unveröffentlichten Entwurf hinterlassen. Tags werden nicht erzwungen verschoben.
+
+Die tatsächliche Erstveröffentlichung und der Intel-CI-Nachweis stehen noch aus;
+Workflow-Konfiguration allein ist kein Distributionsnachweis. Automatische
+1.0-Veröffentlichung ist gesperrt. Signierung und Notarisierung bleiben mangels
+Herausgeberzertifikaten offen. Der Release-Auftrag und die laufenden GitHub-Pushes
+sind vom Nutzer autorisiert; 1.0 benötigt weiterhin seine ausdrückliche Freigabe.
+
+## Paket aktualisieren und prüfen
+
+App schließen und die neue Version separat entpacken. Der Arbeitsordner mit
+Projektgedächtnissen bleibt erhalten. Falls nötig denselben Ordner erneut wählen.
+Keine Projektmigration erfolgt automatisch. Vor größeren Änderungen lässt sich
+in der App eine Sicherung erstellen. Für Prüfsummen SHA256SUMS und das passende
+Archiv herunterladen; die berechnete SHA-256-Zeile mit der Zeile dieses Archivs
+vergleichen. macOS: shasum -a 256 DATEI; Linux: sha256sum DATEI; PowerShell:
+Get-FileHash DATEI -Algorithm SHA256.
+
+Grundlagen am 6. Oktober 2026 gelesen:
+[Workflow-Wiederverwendung](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows),
+[GitHub CLI Releases](https://cli.github.com/manual/gh_release_create),
+[Draft-Veröffentlichung](https://cli.github.com/manual/gh_release_edit) und
+[Runner-Architekturen](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).

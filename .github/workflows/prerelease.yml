@@ -1,0 +1,66 @@
+name: Verified development release
+
+on:
+  push:
+    tags: ['v0.*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prerelease-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check development tag and version
+        env:
+          SB_TAG: ${{ github.ref_name }}
+        run: cmake "-DSB_TAG=$SB_TAG" -P tools/check_prerelease_tag.cmake
+
+  verify:
+    needs: version
+    uses: ./.github/workflows/tests.yml
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          pattern: SecondBrain-*
+          path: release-assets
+          merge-multiple: true
+      - name: Validate archives and generate checksum manifest
+        env:
+          SB_TAG: ${{ github.ref_name }}
+        run: |
+          cmake "-DSB_TAG=$SB_TAG" -P tools/check_prerelease_tag.cmake
+          cmake "-DSB_VERSION=${SB_TAG#v}" -DSB_ASSET_DIR=release-assets -P tools/release_assets.cmake
+      - name: Stage, verify and publish development release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SB_TAG: ${{ github.ref_name }}
+          SB_SOURCE_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$SB_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Existing release preserved; refusing to replace its assets."
+            exit 1
+          fi
+          cat docs/releases/development.md > release-notes.md
+          printf '\nQuellstand: `%s`\n' "$SB_SOURCE_SHA" >> release-notes.md
+          gh release create "$SB_TAG" release-assets/*.zip release-assets/*.tar.gz release-assets/SHA256SUMS \
+            --repo "$GITHUB_REPOSITORY" --verify-tag --draft --prerelease --latest=false \
+            --title "SecondBrain $SB_TAG" --notes-file release-notes.md
+          gh release download "$SB_TAG" --repo "$GITHUB_REPOSITORY" --dir downloaded-release
+          cmake "-DSB_VERSION=${SB_TAG#v}" -DSB_ASSET_DIR=downloaded-release -DSB_VERIFY=ON \
+            -DSB_EXPECTED_SUMS=release-assets/SHA256SUMS -P tools/release_assets.cmake
+          gh release edit "$SB_TAG" --repo "$GITHUB_REPOSITORY" --draft=false --prerelease --latest=false

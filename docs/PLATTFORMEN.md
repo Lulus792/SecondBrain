@@ -414,3 +414,13 @@ besteht auch im Produktions-CLI-Prozesstest auf den nativen CI-Systemen. Lokal
 besteht das entpackte Intel-Paket mit 126 Desktop-, 105 Tastatur- und 75 Sicherungs-
 UI-Aussagen sowie Einstellungsprozessen und CLI-Sicherung. Archiv-SHA-256:
 `9989fc424de596e021504e0ac71132231d20347d4e923cc68ab82e81f38a8c1d`. Menschliche assistive Bedienung und übrige Release-Abnahmen bleiben offen.
+
+
+## Abnahme von 0.7.3
+
+[Lauf zu 7331eca](https://github.com/Lulus792/SecondBrain/actions/runs/37536230101)
+besteht mit allen 18 Jobs: 22 Desktoptests je Debug/Release auf Windows x64,
+macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Lokal besteht das entpackte
+Intel-Paket mit 126 Desktop-, 105 Tastatur- und 75 Sicherungs-UI-Aussagen sowie
+Einstellungsprozessen und CLI-Sicherung. Archiv-SHA-256:
+`ce836ac9efc670a6a515539197387179b1a47c0df12183306de3f8f28e88f404`. Die vollständige Release-Arbeit bleibt offen.
