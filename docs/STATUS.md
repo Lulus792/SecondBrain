@@ -317,3 +317,25 @@ Software-Renderer. Native OS-Dateidialoge, physisch volle Zielvolumes, harter
 Prozessabbruch, Screenreader und Geräte-/Langzeitabnahme bleiben offen.
 Die vollständige Release-Liste bleibt beauftragt; 1.0 bleibt bis zur
 Nutzerfreigabe gesperrt.
+
+
+## Entwicklungsschritt 0.5.0: native Zugänglichkeit
+
+AccessKit 0.23.1 ist ausschließlich in der UI integriert. Alle drei nativen
+Adapter werden mit der SDL-Fensterlebensdauer verbunden. Eigene C-Snapshots
+beschreiben Bedienelemente, Editor, Lesewert und Dokumentsterne. Aktionen werden
+begrenzt gepuffert, auf dem UI-Thread geprüft und nach Kontextwechsel verworfen.
+Windows erhält die zugehörige UI-DLL im Paket; Original-Lizenzen sind enthalten.
+
+Die lokale Intel-macOS-Providerprüfung besteht für native Schaltflächen,
+Texteingaben, Notizerstellung, Bearbeiten/Speichern, Textauswahl und Lesewerte.
+Ein gezielter Test verhindert die Anwendung verspäteter Änderungen auf ein
+anderes Dokument. Der plattformübergreifende Vertrag prüft außerdem ungültiges
+UTF-8, Auswahlgrenzen, Schreibschutz, neue Knotenkennungen und Queue-Grenzen.
+Die Gesamt-/Plattformabnahme dieses Schritts folgt nach den laufenden Prüfungen.
+
+Offen bleiben tatsächliche UIA-/AT-SPI-Clientabfragen, VoiceOver/NVDA/Orca-Bedienung,
+vollständige passive Dialogtexte, Grapheme/Zeilengeometrie und Leistung großer
+Dokumente. Die native macOS-Methode für Auswahlersetzung ist im verwendeten
+Adapter nicht verfügbar; Setzen des Gesamtwerts und Auswahl sind geprüft.
+[Details und Grenzen](BARRIEREFREIHEIT_PLAN.md). 1.0 bleibt gesperrt.

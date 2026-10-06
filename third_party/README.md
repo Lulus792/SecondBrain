@@ -37,6 +37,21 @@ Der SDL-Renderer-Header bleibt unverändert. app/ui.c ergänzt die Einfügefunkt
 verarbeitet mehrteilige Texteingaben vollständig und übersetzt Command-Tasten
 unter macOS in die passenden Editieraktionen.
 
+## AccessKit
+
+Die [C-Bindings 0.23.1](https://github.com/AccessKit/accesskit-c/releases/tag/0.23.1)
+werden als unverändertes, vorgebautes UI-Paket geladen. SHA-256:
+`35b7ca8a6f1e038b5da35e1e9e5a0adaed9bfcf21e1496d29598fbbadcc7043f`.
+Die Bibliothek ist intern in Rust implementiert; unsere Anbindung verwendet C.
+Der Build benötigt dafür keinen Rust-Compiler. macOS/Linux verwenden die statische
+Bibliothek; unter Windows wird die UI-DLL neben der Anwendung ausgeliefert.
+Der Kern bleibt unabhängig und ohne externe Bibliotheken baubar.
+
+Unveränderte MIT-, Apache-2.0- und Chromium-BSD-Lizenztexte sowie AUTHORS liegen
+unter licenses/AccessKit-* und gehören zu jedem Anwendungspaket. Native Adapter
+sind integriert; die Grenzen der Abnahme stehen im
+[Zugänglichkeitsstand](../docs/BARRIEREFREIHEIT_PLAN.md).
+
 ## Schriftasset
 
 Noto Sans Regular und Noto Sans Mono Regular stammen aus

@@ -1,0 +1,223 @@
+#include "accessibility.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#if defined(__APPLE__)
+#include <objc/runtime.h>
+#endif
+typedef struct { char id[100]; accesskit_node_id node; uint64_t context; } Identity;
+typedef struct {
+    char id[100],label[SB_NAME_CAP]; char *value;
+    accesskit_node_id node; struct nk_rect bounds; accesskit_role role;
+    bool editable,selected; size_t anchor,caret;
+} Item;
+typedef struct Pending { SBAccessibleAction action; struct Pending *next; } Pending;
+struct SBAccessibility {
+    SDL_Window *window; SDL_Mutex *mutex;
+    Identity *identities; size_t identity_count;
+    Item *items; size_t count; char title[SB_NAME_CAP],focus[100],message[512];
+    uint64_t generation,signature,context; accesskit_node_id next_node; bool modal,alive;
+    Pending *head,*tail; size_t queued,queued_bytes;
+#if defined(__APPLE__)
+    accesskit_macos_subclassing_adapter *adapter;
+#elif defined(_WIN32)
+    accesskit_windows_subclassing_adapter *adapter;
+#else
+    accesskit_unix_adapter *adapter;
+#endif
+};
+static char *copy(const char *s) { if (!s) return NULL; size_t n=strlen(s)+1; char *p=malloc(n); if (p) memcpy(p,s,n); return p; }
+static accesskit_node_id identify(SBAccessibility *a,const char *id,uint64_t context) {
+    for (size_t i=0;i<a->identity_count;++i) if (a->identities[i].context==context && !strcmp(a->identities[i].id,id)) return a->identities[i].node;
+    Identity *p=realloc(a->identities,(a->identity_count+1)*sizeof(*p)); if (!p) return 0;
+    a->identities=p; Identity *v=&p[a->identity_count++]; snprintf(v->id,sizeof(v->id),"%s",id); v->node=16+(++a->next_node); v->context=context;
+    return v->node;
+}
+static accesskit_node_id run_id(accesskit_node_id node) { return UINT64_C(0x8000000000000000)|node; }
+static size_t characters(const char *s) { size_t n=0; for (;s && *s;++s) if (((unsigned char)*s&0xc0)!=0x80) ++n; return n; }
+static bool permits(const Item *v,accesskit_action action) {
+    switch (action) {
+    case ACCESSKIT_ACTION_FOCUS: case ACCESSKIT_ACTION_SCROLL_INTO_VIEW: return true;
+    case ACCESSKIT_ACTION_CLICK: return v->role==ACCESSKIT_ROLE_BUTTON || v->role==ACCESSKIT_ROLE_LINK || v->role==ACCESSKIT_ROLE_LIST_BOX_OPTION;
+    case ACCESSKIT_ACTION_SET_VALUE: return v->editable;
+    case ACCESSKIT_ACTION_REPLACE_SELECTED_TEXT: case ACCESSKIT_ACTION_SET_TEXT_SELECTION:
+        return v->editable && v->role==ACCESSKIT_ROLE_MULTILINE_TEXT_INPUT;
+    case ACCESSKIT_ACTION_SCROLL_UP: case ACCESSKIT_ACTION_SCROLL_DOWN:
+        return v->role==ACCESSKIT_ROLE_DOCUMENT || v->role==ACCESSKIT_ROLE_MULTILINE_TEXT_INPUT;
+    default: return false;
+    }
+}
+static accesskit_tree_update *build_locked(SBAccessibility *a) {
+    accesskit_node_id focus=1;
+    for (size_t i=0;i<a->count;++i) if (!strcmp(a->items[i].id,a->focus)) focus=a->items[i].node;
+    accesskit_tree_update *tree=accesskit_tree_update_with_capacity_and_focus(a->count*2+3,focus);
+    accesskit_tree_info *info=accesskit_tree_info_new(1); accesskit_tree_update_set_tree_info(tree,info);
+    accesskit_node *root=accesskit_node_new(ACCESSKIT_ROLE_WINDOW); accesskit_node_set_label(root,a->title);
+    accesskit_node *container=accesskit_node_new(a->modal ? ACCESSKIT_ROLE_DIALOG : ACCESSKIT_ROLE_GROUP);
+    if (a->modal) accesskit_node_set_modal(container);
+    accesskit_node_set_label(container,a->modal ? "Aktuelle Aufgabe" : "Projektarbeitsfläche"); accesskit_node_push_child(root,2);
+    accesskit_node *documents=NULL;
+    for (size_t i=0;i<a->count;++i) {
+        Item *v=&a->items[i]; accesskit_node *node=accesskit_node_new(v->role);
+        accesskit_node_set_label(node,v->label);
+        accesskit_rect rect={v->bounds.x,v->bounds.y,v->bounds.x+v->bounds.w,v->bounds.y+v->bounds.h}; accesskit_node_set_bounds(node,rect);
+        accesskit_node_add_action(node,ACCESSKIT_ACTION_FOCUS); accesskit_node_add_action(node,ACCESSKIT_ACTION_SCROLL_INTO_VIEW);
+        if (v->role==ACCESSKIT_ROLE_BUTTON || v->role==ACCESSKIT_ROLE_LINK || v->role==ACCESSKIT_ROLE_LIST_BOX_OPTION) accesskit_node_add_action(node,ACCESSKIT_ACTION_CLICK);
+        if (v->role==ACCESSKIT_ROLE_LIST_BOX_OPTION) accesskit_node_set_selected(node,v->selected);
+        if (v->value) {
+            accesskit_node_set_value(node,v->value);
+            if (!v->editable) accesskit_node_set_read_only(node);
+            else {
+                accesskit_node_add_action(node,ACCESSKIT_ACTION_SET_VALUE);
+                if (v->role==ACCESSKIT_ROLE_MULTILINE_TEXT_INPUT) {
+                    accesskit_node_add_action(node,ACCESSKIT_ACTION_REPLACE_SELECTED_TEXT);
+                    accesskit_node_add_action(node,ACCESSKIT_ACTION_SET_TEXT_SELECTION);
+                }
+            }
+            if (v->role==ACCESSKIT_ROLE_DOCUMENT || v->role==ACCESSKIT_ROLE_MULTILINE_TEXT_INPUT) {
+                accesskit_node_add_action(node,ACCESSKIT_ACTION_SCROLL_UP); accesskit_node_add_action(node,ACCESSKIT_ACTION_SCROLL_DOWN);
+            }
+            accesskit_node *text=accesskit_node_new(ACCESSKIT_ROLE_TEXT_RUN); accesskit_node_set_value(text,v->value); accesskit_node_set_bounds(text,rect);
+            size_t n=characters(v->value); uint8_t *lengths=n ? malloc(n) : NULL;
+            if (lengths) {
+                size_t at=0; const unsigned char *p=(const unsigned char *)v->value;
+                while (*p) { unsigned size=*p<0x80 ? 1 : *p<0xe0 ? 2 : *p<0xf0 ? 3 : 4; lengths[at++]=(uint8_t)size; p+=size; }
+                accesskit_node_set_character_lengths(text,n,lengths); free(lengths);
+            }
+            accesskit_node_push_child(node,run_id(v->node)); accesskit_tree_update_push_node(tree,run_id(v->node),text);
+            if (v->editable && v->role==ACCESSKIT_ROLE_MULTILINE_TEXT_INPUT) {
+                accesskit_text_selection selection={{run_id(v->node),v->anchor},{run_id(v->node),v->caret}};
+                accesskit_node_set_text_selection(node,selection);
+            }
+        }
+        if (!strncmp(v->id,"star:",5)) {
+            if (!documents) { documents=accesskit_node_new(ACCESSKIT_ROLE_LIST_BOX); accesskit_node_set_label(documents,"Projektdokumente"); accesskit_node_push_child(container,4); }
+            accesskit_node_push_child(documents,v->node);
+        } else accesskit_node_push_child(container,v->node);
+        accesskit_tree_update_push_node(tree,v->node,node);
+    }
+    if (documents) accesskit_tree_update_push_node(tree,4,documents);
+    if (a->message[0]) {
+        accesskit_node *status=accesskit_node_new(ACCESSKIT_ROLE_LABEL); accesskit_node_set_value(status,a->message); accesskit_node_set_live(status,ACCESSKIT_LIVE_POLITE);
+        accesskit_node_push_child(container,3); accesskit_tree_update_push_node(tree,3,status);
+    }
+    accesskit_tree_update_push_node(tree,2,container); accesskit_tree_update_push_node(tree,1,root); return tree;
+}
+accesskit_tree_update *sb_accessibility_tree(SBAccessibility *a) { SDL_LockMutex(a->mutex); accesskit_tree_update *t=build_locked(a); SDL_UnlockMutex(a->mutex); return t; }
+static accesskit_tree_update *factory(void *userdata) { return sb_accessibility_tree(userdata); }
+bool sb_accessibility_submit(SBAccessibility *a,accesskit_node_id node,accesskit_action kind,const char *value,size_t anchor,size_t caret) {
+    size_t bytes=value ? strlen(value)+1 : 0;
+    if (value && (bytes>SB_TEXT_LIMIT || !sb_utf8_valid(value,bytes-1))) return false;
+    SDL_LockMutex(a->mutex);
+    Item *item=NULL;
+    for (size_t i=0;i<a->count;++i) if (a->items[i].node==node || run_id(a->items[i].node)==node) { item=&a->items[i]; break; }
+    bool accepted=false;
+    bool data_valid=(kind!=ACCESSKIT_ACTION_SET_VALUE && kind!=ACCESSKIT_ACTION_REPLACE_SELECTED_TEXT) || value;
+    if (kind==ACCESSKIT_ACTION_SET_TEXT_SELECTION && item && (anchor>characters(item->value) || caret>characters(item->value))) data_valid=false;
+    if (a->alive && item && permits(item,kind) && data_valid && a->queued<64 && bytes<=2*SB_TEXT_LIMIT-a->queued_bytes) {
+        Pending *p=calloc(1,sizeof(*p));
+        if (p) {
+            strcpy(p->action.id,item->id); p->action.action=kind; p->action.generation=a->generation;
+            p->action.value=copy(value); p->action.anchor=anchor; p->action.caret=caret;
+            if (value && !p->action.value) free(p);
+            else { if (a->tail) a->tail->next=p; else a->head=p; a->tail=p; ++a->queued; a->queued_bytes+=bytes; accepted=true; }
+        }
+    }
+    SDL_UnlockMutex(a->mutex); return accepted;
+}
+void sb_accessibility_request(SBAccessibility *a,accesskit_action_request *request) {
+    const char *value=NULL; size_t anchor=0,caret=0;
+    if (request->data.has_value && request->data.value.tag==ACCESSKIT_ACTION_DATA_VALUE) value=request->data.value.value;
+    if (request->data.has_value && request->data.value.tag==ACCESSKIT_ACTION_DATA_SET_TEXT_SELECTION) {
+        accesskit_text_selection selection=request->data.value.set_text_selection;
+        if (selection.anchor.node!=run_id(request->target_node) || selection.focus.node!=run_id(request->target_node)) {
+            accesskit_action_request_free(request); return;
+        }
+        anchor=request->data.value.set_text_selection.anchor.character_index; caret=request->data.value.set_text_selection.focus.character_index;
+    }
+    sb_accessibility_submit(a,request->target_node,request->action,value,anchor,caret);
+    accesskit_action_request_free(request);
+}
+static void action(accesskit_action_request *request,void *userdata) { sb_accessibility_request(userdata,request); }
+#ifndef __APPLE__
+static void deactivate(void *userdata) { (void)userdata; }
+#endif
+SBAccessibility *sb_accessibility_new(SDL_Window *window) {
+    SBAccessibility *a=calloc(1,sizeof(*a)); if (!a) return NULL;
+    a->mutex=SDL_CreateMutex(); if (!a->mutex) { free(a); return NULL; } a->alive=true; a->window=window; strcpy(a->title,"SecondBrain");
+    SDL_PropertiesID properties=SDL_GetWindowProperties(window);
+#if defined(__APPLE__)
+    void *native=SDL_GetPointerProperty(properties,SDL_PROP_WINDOW_COCOA_WINDOW_POINTER,NULL);
+    if (native) {
+        static bool forwarded=false;
+        if (!forwarded) { accesskit_macos_add_focus_forwarder_to_window_class(class_getName(object_getClass(native))); forwarded=true; }
+        a->adapter=accesskit_macos_subclassing_adapter_for_window(native,factory,a,action,a);
+    }
+#elif defined(_WIN32)
+    HWND native=SDL_GetPointerProperty(properties,SDL_PROP_WINDOW_WIN32_HWND_POINTER,NULL);
+    if (native) a->adapter=accesskit_windows_subclassing_adapter_new(native,factory,a,action,a);
+#else
+    (void)properties; a->adapter=accesskit_unix_adapter_new(factory,a,action,a,deactivate,a);
+#endif
+    return a;
+}
+static void clear_items(SBAccessibility *a) { for (size_t i=0;i<a->count;++i) free(a->items[i].value); free(a->items); a->items=NULL; a->count=0; }
+void sb_accessibility_update(SBAccessibility *a,const char *title,const char *focus,const SBAccessibleItem *items,size_t count,const char *message,bool modal,uint64_t context) {
+    if (!a) return;
+    uint64_t signature=sb_hash(title,strlen(title))^sb_hash(focus,strlen(focus))^sb_hash(message,strlen(message))^(uint64_t)modal;
+    for (size_t i=0;i<count;++i) { signature=signature*1099511628211ULL^sb_hash(items[i].id,strlen(items[i].id))^sb_hash(items[i].label,strlen(items[i].label))^sb_hash((const char *)&items[i].bounds,sizeof(items[i].bounds))^items[i].role^items[i].anchor^(items[i].caret<<1)^(uint64_t)items[i].selected^((uint64_t)items[i].editable<<8); if (items[i].value) signature^=sb_hash(items[i].value,strlen(items[i].value)); }
+    SDL_LockMutex(a->mutex);
+    bool changed=signature!=a->signature || context!=a->context;
+    if (changed) {
+        if (context!=a->context) { free(a->identities); a->identities=NULL; a->identity_count=0; }
+        Item *next=calloc(count,sizeof(*next));
+        if (count && !next) { SDL_UnlockMutex(a->mutex); return; }
+        bool complete=true;
+        for (size_t i=0;i<count;++i) {
+            snprintf(next[i].id,sizeof(next[i].id),"%s",items[i].id); snprintf(next[i].label,sizeof(next[i].label),"%s",items[i].label);
+            next[i].value=copy(items[i].value); if (items[i].value && !next[i].value) complete=false;
+            next[i].node=identify(a,items[i].id,context); if (!next[i].node) complete=false;
+            next[i].bounds=items[i].bounds; next[i].role=items[i].role; next[i].editable=items[i].editable; next[i].selected=items[i].selected; next[i].anchor=items[i].anchor; next[i].caret=items[i].caret;
+        }
+        if (!complete) { for (size_t i=0;i<count;++i) free(next[i].value); free(next); SDL_UnlockMutex(a->mutex); return; }
+        bool controls=context!=a->context || count!=a->count;
+        if (!controls) for (size_t i=0;i<count;++i) if (strcmp(a->items[i].id,next[i].id)) { controls=true; break; }
+        clear_items(a); a->items=next; a->count=count; a->signature=signature; a->context=context;
+        if (controls) ++a->generation;
+        snprintf(a->title,sizeof(a->title),"%s",title); snprintf(a->focus,sizeof(a->focus),"%s",focus); snprintf(a->message,sizeof(a->message),"%s",message); a->modal=modal;
+    }
+    SDL_UnlockMutex(a->mutex);
+    if (!a->adapter) return;
+#if defined(__APPLE__)
+    accesskit_macos_queued_events *focus_events=accesskit_macos_subclassing_adapter_update_view_focus_state(a->adapter,(SDL_GetWindowFlags(a->window)&SDL_WINDOW_INPUT_FOCUS)!=0);
+    if (focus_events) accesskit_macos_queued_events_raise(focus_events);
+    if (changed) { accesskit_macos_queued_events *e=accesskit_macos_subclassing_adapter_update_if_active(a->adapter,factory,a); if (e) accesskit_macos_queued_events_raise(e); }
+#elif defined(_WIN32)
+    if (changed) { accesskit_windows_queued_events *e=accesskit_windows_subclassing_adapter_update_if_active(a->adapter,factory,a); if (e) accesskit_windows_queued_events_raise(e); }
+#else
+    int x=0,y=0,w=0,h=0,top=0,left=0,bottom=0,right=0; SDL_GetWindowPosition(a->window,&x,&y); SDL_GetWindowSize(a->window,&w,&h); SDL_GetWindowBordersSize(a->window,&top,&left,&bottom,&right);
+    accesskit_rect outer={x-left,y-top,x+w+right,y+h+bottom},inner={x,y,x+w,y+h};
+    accesskit_unix_adapter_set_root_window_bounds(a->adapter,outer,inner); accesskit_unix_adapter_update_window_focus_state(a->adapter,(SDL_GetWindowFlags(a->window)&SDL_WINDOW_INPUT_FOCUS)!=0);
+    if (changed) accesskit_unix_adapter_update_if_active(a->adapter,factory,a);
+#endif
+}
+bool sb_accessibility_next_action(SBAccessibility *a,SBAccessibleAction *out) {
+    if (!a) return false; SDL_LockMutex(a->mutex); Pending *p=a->head;
+    if (p) { a->head=p->next; if (!a->head) a->tail=NULL; --a->queued; if (p->action.value) a->queued_bytes-=strlen(p->action.value)+1; *out=p->action; free(p); }
+    SDL_UnlockMutex(a->mutex); return p!=NULL;
+}
+bool sb_accessibility_current(SBAccessibility *a,const SBAccessibleAction *action,uint64_t context) { SDL_LockMutex(a->mutex); bool valid=action->generation==a->generation && context==a->context; SDL_UnlockMutex(a->mutex); return valid; }
+void sb_accessibility_action_free(SBAccessibleAction *action) { free(action->value); memset(action,0,sizeof(*action)); }
+void sb_accessibility_free(SBAccessibility *a) {
+    if (!a) return;
+    SDL_LockMutex(a->mutex); a->alive=false; SDL_UnlockMutex(a->mutex);
+#if defined(__APPLE__)
+    if (a->adapter) accesskit_macos_subclassing_adapter_free(a->adapter);
+#elif defined(_WIN32)
+    if (a->adapter) accesskit_windows_subclassing_adapter_free(a->adapter);
+#else
+    if (a->adapter) accesskit_unix_adapter_free(a->adapter);
+#endif
+    Pending *p=a->head; while (p) { Pending *next=p->next; sb_accessibility_action_free(&p->action); free(p); p=next; }
+    clear_items(a); free(a->identities); SDL_DestroyMutex(a->mutex); free(a);
+}

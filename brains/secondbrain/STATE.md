@@ -43,6 +43,15 @@ Alle entpackten Pakete bestehen Sicherungs-UI, beide bisherigen Bedienwege,
 Einstellungsneustart und Produktions-CLI. Lokal bestehen Paket und gezielte
 Sanitizer-Nachprüfung nach dem korrigierten Clipboard-Prüfbetrieb.
 
+## Laufende Arbeit: native Zugänglichkeit
+
+0.5.0 bindet AccessKit ausschließlich in der UI an alle drei Plattformadapter an.
+Der native macOS-Provider wird tatsächlich über NSAccessibility abgefragt und
+bedient: Schaltflächen, Texteingaben, Notizerstellung, Speichern, Auswahl und Lesen.
+Alte Aktionen nach Dokumentwechsel werden verworfen. Die Gesamt-/Plattformprüfung
+läuft noch; UIA-/AT-SPI-Clientabfragen und menschliche Screenreader-Abnahme bleiben
+offen. [Umfang und Grenzen](../../docs/BARRIEREFREIHEIT_PLAN.md).
+
 ## Auftrag und verbleibende Abnahmen
 
 Das vollständige [Ziel vor 1.0](../../docs/RELEASE.md) bleibt aktiv: Sicherungs-UI,

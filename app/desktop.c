@@ -7,6 +7,12 @@
 #include <time.h>
 #include <math.h>
 static void backup_poll(SBDesktop *d);
+static void accessible_actions(SBDesktop *d);
+static void accessible_publish(SBDesktop *d);
+static uint64_t accessible_context(const SBDesktop *d) {
+    return sb_hash(d->model.project.root,strlen(d->model.project.root))^sb_hash(d->model.source_path,strlen(d->model.source_path))^
+        ((uint64_t)d->model.generation<<24)^((uint64_t)d->form<<8)^(uint64_t)d->model.guard;
+}
 
 static const char *sections[] = {"all", "overview", "knowledge", "inbox", "journal", "archive"};
 static const char *section_names[] = {"Alle Dokumente", "Orientierung", "Wissen", "Eingang", "Übergaben", "Archiv"};
@@ -22,6 +28,7 @@ static float approach(float current, float destination, float factor, float thre
     return fabsf(destination-value) < threshold ? destination : value;
 }
 void sb_desktop_tick(SBDesktop *d, float seconds) {
+    accessible_actions(d);
     backup_poll(d);
     d->seconds = fmaxf(0, fminf(seconds, 0.05f));
     float factor = d->reduced_motion ? 1 : 1-expf(-d->seconds/0.085f);
@@ -297,6 +304,7 @@ SBStatus sb_desktop_init(SBDesktop *d, const char *workspace, const char *font, 
     status = sb_ui_init(&d->ui, font, 1336, 840, testing);
     if (status.code != SB_OK) return status;
     d->dialogs=sb_dialogs_new();
+    d->accessibility=sb_accessibility_new(d->ui.window);
     status = sb_app_init(&d->model, workspace);
     if (status.code != SB_OK) {
         sb_fs_absolute(workspace, d->model.workspace, sizeof(d->model.workspace));
@@ -355,6 +363,7 @@ SBStatus sb_desktop_store_preferences(SBDesktop *d) {
     return status;
 }
 void sb_desktop_free(SBDesktop *d) {
+    sb_accessibility_free(d->accessibility);
     sb_backup_job_free(d->backup);
     sb_dialogs_free(d->dialogs);
     if (d->text_edit_ready) nk_textedit_free(&d->text_edit);
@@ -506,6 +515,92 @@ static void focus_set(SBDesktop *d, const char *id) {
     for (unsigned i=0;i<4;++i) { d->scrolling[i].pending=0; d->scrolling[i].elastic=0; d->scrolling[i].ready=false; d->scrolling[i].active=false; }
     d->ui.ctx->text_edit.active = 0;
     for (struct nk_window *w = d->ui.ctx->begin; w; w = w->next) w->edit.active = 0;
+}
+static char *accessible_field(SBDesktop *d,const char *id,size_t *capacity) {
+#define FIELD(tag,member) if (!strcmp(id,tag)) { *capacity=sizeof(d->member); return d->member; }
+    FIELD("search",search) FIELD("form-name",name) FIELD("form-id",id)
+    FIELD("form-repo",repository) FIELD("form-folder",folder)
+    FIELD("backup-path",backup_path) FIELD("restore-id",restore_id)
+#undef FIELD
+    *capacity=0; return NULL;
+}
+static void accessible_actions(SBDesktop *d) {
+    SBAccessibleAction action;
+    while (sb_accessibility_next_action(d->accessibility,&action)) {
+        if (!sb_accessibility_current(d->accessibility,&action,accessible_context(d))) { sb_accessibility_action_free(&action); continue; }
+        SBTarget *target=NULL;
+        for (size_t i=0;i<d->target_count;++i) if (!strcmp(d->targets[i].id,action.id)) { target=&d->targets[i]; break; }
+        if (!strncmp(action.id,"star:",5) && d->form==SB_FORM_NONE && !d->model.guard) {
+            char *end=NULL; unsigned long index=strtoul(action.id+5,&end,10);
+            if (end && !*end && index<d->model.notes.count && (action.action==ACCESSKIT_ACTION_CLICK || action.action==ACCESSKIT_ACTION_FOCUS)) {
+                d->card=true; d->star=index; d->follow_star=true; focus_set(d,"galaxy"); request(d,SB_ACT_NOTE,d->model.notes.items[index].path);
+            }
+        } else if (target) {
+            if (action.action==ACCESSKIT_ACTION_FOCUS || action.action==ACCESSKIT_ACTION_SCROLL_INTO_VIEW) focus_set(d,action.id);
+            else if (action.action==ACCESSKIT_ACTION_CLICK && target->kind==SB_FOCUS_BUTTON) { focus_set(d,action.id); snprintf(d->activate,sizeof(d->activate),"%s",action.id); }
+            else if (action.action==ACCESSKIT_ACTION_SCROLL_UP || action.action==ACCESSKIT_ACTION_SCROLL_DOWN) {
+                unsigned slot=d->form==SB_FORM_CONTEXT ? 2 : d->form!=SB_FORM_NONE ? 3 : !strcmp(action.id,"editor") ? 1 : 0;
+                d->scrolling[slot].pending+=action.action==ACCESSKIT_ACTION_SCROLL_DOWN ? 220 : -220;
+            } else if (!strcmp(action.id,"editor") && d->editing && d->text_edit_ready && !d->model.source && !d->model.guard) {
+                struct nk_text_edit *edit=&d->text_edit;
+                size_t total=(size_t)nk_utf_len(d->model.editor,(int)strlen(d->model.editor));
+                if (action.action==ACCESSKIT_ACTION_SET_TEXT_SELECTION && action.anchor<=total && action.caret<=total) {
+                    edit->select_start=(int)action.anchor; edit->select_end=edit->cursor=(int)action.caret; focus_set(d,"editor");
+                } else if ((action.action==ACCESSKIT_ACTION_SET_VALUE || action.action==ACCESSKIT_ACTION_REPLACE_SELECTED_TEXT) && action.value && sb_utf8_valid(action.value,strlen(action.value))) {
+                    size_t n=strlen(action.value);
+                    if (n<SB_TEXT_LIMIT) {
+                        int start=edit->select_start,end=edit->select_end;
+                        if (action.action==ACCESSKIT_ACTION_SET_VALUE) nk_textedit_select_all(edit);
+                        bool success=n ? nk_textedit_paste(edit,action.value,(int)n)!=0 : nk_textedit_cut(edit)!=0;
+                        if (success) { d->model.editor[edit->string.buffer.allocated]=0; focus_set(d,"editor"); }
+                        else { edit->select_start=start; edit->select_end=end; d->message=sb_error(SB_LIMIT,"Text konnte nicht eingefügt werden."); }
+                    } else d->message=sb_error(SB_LIMIT,"Text überschreitet die Editorgrenze.");
+                }
+            } else if (target->kind==SB_FOCUS_TEXT && action.action==ACCESSKIT_ACTION_SET_VALUE && action.value) {
+                size_t capacity=0; char *field=accessible_field(d,action.id,&capacity); size_t n=strlen(action.value);
+                if (field && n<capacity && sb_utf8_valid(action.value,n) && !strchr(action.value,'\n') && !strchr(action.value,'\r')) {
+                    strcpy(field,action.value); if (!strcmp(action.id,"form-id")) d->id_manual=true;
+                    if (!strcmp(action.id,"backup-path")) d->restore_checked=false;
+                    focus_set(d,action.id);
+                } else d->message=sb_error(SB_INVALID,"Eingabe ist ungültig oder zu lang.");
+            }
+        }
+        sb_accessibility_action_free(&action);
+    }
+}
+static void accessible_publish(SBDesktop *d) {
+    if (!d->accessibility) return;
+    bool modal=d->form!=SB_FORM_NONE || d->model.guard;
+    size_t stars=modal ? 0 : d->model.notes.count;
+    size_t count=d->target_count+stars;
+    SBAccessibleItem *items=calloc(count,sizeof(*items)); char (*ids)[100]=stars ? calloc(stars,sizeof(*ids)) : NULL;
+    if ((count && !items) || (stars && !ids)) { free(items); free(ids); return; }
+    for (size_t i=0;i<d->target_count;++i) {
+        SBTarget *t=&d->targets[i]; SBAccessibleItem *v=&items[i]; v->id=t->id; v->label=t->label; v->bounds=t->bounds;
+        v->role=t->kind==SB_FOCUS_TEXT ? !strcmp(t->id,"editor") ? ACCESSKIT_ROLE_MULTILINE_TEXT_INPUT : !strcmp(t->id,"search") ? ACCESSKIT_ROLE_SEARCH_INPUT : ACCESSKIT_ROLE_TEXT_INPUT :
+            t->kind==SB_FOCUS_READER ? ACCESSKIT_ROLE_DOCUMENT : t->kind==SB_FOCUS_MAP ? ACCESSKIT_ROLE_GROUP : !strncmp(t->id,"link:",5) ? ACCESSKIT_ROLE_LINK : ACCESSKIT_ROLE_BUTTON;
+        if (t->kind==SB_FOCUS_TEXT) {
+            size_t capacity=0; v->value=!strcmp(t->id,"editor") ? d->model.editor : accessible_field(d,t->id,&capacity); v->editable=true;
+            if (!strcmp(t->id,"editor") && d->text_edit_ready) { v->anchor=(size_t)d->text_edit.select_start; v->caret=(size_t)d->text_edit.select_end; }
+        } else if (t->kind==SB_FOCUS_READER) v->value=d->form==SB_FORM_CONTEXT ? d->context : d->model.source ? d->model.source : d->model.editor;
+        if (!strcmp(t->id,"galaxy")) v->label="Dokumente in der Sternkarte";
+    }
+    for (size_t i=0;i<stars;++i) {
+        snprintf(ids[i],100,"star:%zu",i); SBAccessibleItem *v=&items[d->target_count+i];
+        v->id=ids[i]; v->label=d->model.notes.items[i].title; v->role=ACCESSKIT_ROLE_LIST_BOX_OPTION;
+        v->selected=!strcmp(d->model.path,d->model.notes.items[i].path);
+        if (i<d->ui.space.count && d->ui.space.points[i].visible) {
+            SBPoint p=d->ui.space.points[i]; v->bounds=nk_rect(p.x-10,p.y-10,20,20);
+        }
+    }
+    char title[SB_NAME_CAP]; snprintf(title,sizeof(title),"%s",d->model.has_project ? d->model.project.name : "SecondBrain");
+    const char *status=d->message.message;
+    char progress[150];
+    if (d->backup) { snprintf(progress,sizeof(progress),"Sicherung: %zu von %zu Einträgen, %llu Bytes",d->backup_state.entries,d->backup_state.total,(unsigned long long)d->backup_state.bytes); status=progress; }
+    char native_focus[100]; snprintf(native_focus,sizeof(native_focus),"%s",d->focus);
+    if (!strcmp(d->focus,"galaxy") && d->star<stars) snprintf(native_focus,sizeof(native_focus),"star:%zu",d->star);
+    sb_accessibility_update(d->accessibility,title,native_focus,items,count,status,modal,accessible_context(d));
+    free(items); free(ids);
 }
 static void focus_step(SBDesktop *d, int direction) {
     if (!d->target_count) return;
@@ -1486,4 +1581,5 @@ void sb_desktop_frame(SBDesktop *d) {
     if (d->focus_scroll_frames) --d->focus_scroll_frames;
     nk_style_set_font(d->ui.ctx,&d->ui.normal->handle);
     nk_sdl_update_TextInput(d->ui.ctx);
+    accessible_publish(d);
 }

@@ -123,3 +123,16 @@ Ordnerkennung wird im Metadaten-id angepasst; andere Inhalte bleiben erhalten.
 Die UI arbeitet im Hintergrund, wahrt Save-Konflikte und erhält andere offene
 Entwürfe. Abbruch und Beenden haben explizite Zustände. Quelle: Nutzerauftrag
 vor 1.0, ursprüngliche Release-Liste und [Sicherungsvertrag](../../docs/SICHERUNG.md).
+
+
+## D13: Native Zugänglichkeit ausschließlich in der UI
+
+AccessKit-C 0.23.1 ergänzt SDL3/Nuklear als UI-Abhängigkeit. Der Anwendungscode
+bleibt C; die vorgebaute Bibliothek ist intern Rust. Der fachliche Kern bleibt
+unabhängig. Eigene Snapshots und eine begrenzte Aktionswarteschlange verbinden
+native Semantik mit bestehenden Schutz- und Fokuswegen. Kontextwechsel erzeugen
+neue native Kennungen und verwerfen alte Aktionen. Windows verwendet die DLL,
+macOS/Linux die statische Bibliothek. Original-Lizenzen werden ausgeliefert.
+Die Entscheidung setzt den beauftragten Screenreader-Umfang technisch um;
+vollständige native und assistive Abnahme ist weiterhin erforderlich.
+[Anbindung und Nachweise](../../docs/BARRIEREFREIHEIT_PLAN.md).

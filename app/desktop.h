@@ -5,6 +5,7 @@
 #include "settings.h"
 #include "dialog.h"
 #include "backup_job.h"
+#include "accessibility.h"
 
 typedef enum { SB_FORM_NONE, SB_FORM_PROJECT, SB_FORM_NOTE, SB_FORM_WORKSPACE, SB_FORM_SETTINGS, SB_FORM_CONTEXT, SB_FORM_HELP, SB_FORM_ACTIONS, SB_FORM_PROJECTS, SB_FORM_FILTER,SB_FORM_BACKUP,SB_FORM_RESTORE } SBForm;
 typedef enum {
@@ -31,6 +32,7 @@ typedef struct {
     SBRevision settings_revision;
     bool settings_enabled;
     SBNativeDialogs *dialogs;
+    SBAccessibility *accessibility;
     unsigned dialog_serial;
     SBBackupJob *backup;
     SBBackupJobState backup_state;
