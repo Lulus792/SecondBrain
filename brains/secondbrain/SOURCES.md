@@ -22,6 +22,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [UI-Politur vor 1.0](../../docs/UI_POLITUR.md): neuer Auftrag, erneute Apple-Recherche und Abnahmekriterien.
 - [Sicherung und Wiederherstellung](../../docs/SICHERUNG.md): eigener C-Vertrag,
   Bestandsschutz, Fehlerprüfungen und geplanter Desktop-Ablauf.
+- [Erster Start](../../docs/ERSTER_START.md): Apple-Grundlage, direkte Projektwege und Prüfgrenzen.
 - [Einstellungen und Arbeitsstand](../../docs/EINSTELLUNGEN.md): Dateivertrag,
   native Ordnerwahl, Wiederherstellung und Prüfgrenzen.
 - [Native UI-Anbindung](../../docs/BARRIEREFREIHEIT_PLAN.md): integrierte Adapter, tatsächliche macOS-Provider-/UIA-/AT-SPI-Clientprüfungen und offene assistive Abnahme.

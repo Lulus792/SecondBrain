@@ -553,3 +553,25 @@ Einstellungsprozessen und CLI-Sicherung. Sein tatsächlicher Start wurde betrach
 dist/SecondBrain ist auf 0.6.1 aktualisiert. Archiv-SHA-256:
 `77dc5b20ccbd95d9a50bb652a59d937952eeba10e418cf08b0846dcc4055cee8`.
 Vollständige assistive Bedienung und Kontrastabnahme aller Zustände bleiben offen.
+
+
+## 0.7.0: Verständlicher leerer Einstieg
+
+Ohne geöffnetes Projekt zeigt eine zentrale Karte direkte Wege zum Anlegen,
+Öffnen, Wiederherstellen, zur Hilfe und Darstellung. Speicherort und kurze
+Erklärung ersetzen die Dokumentwerkzeuge des leeren Zustands. Große Schrift
+verwendet einen festen Titel und scrollbare Aktionen. Dialogabbruch erhält den
+Ursprungsfokus; das betrifft auch während des Frame-Aufbaus geöffnete Fenster.
+[Recherche, Verhalten und Grenzen](ERSTER_START.md).
+
+Alle 17 lokalen Release-Tests bestehen (177,06 Sekunden). Die tatsächlichen Bilder
+zeigen Lumen und die helle Kontrastansicht bei 200 Prozent Schrift. Abschließende
+Mausrad-/Sanitizer- und native Plattformabnahmen folgen gesondert. Der erste
+Größentest wurde auf die tatsächlich vorhandene Mindestgröße 780 × 520 korrigiert.
+
+
+Abschließende lokale Nachprüfung: erster Start mit 40 Aussagen einschließlich
+Mausrad innerhalb/außerhalb der Karte besteht (5,56 Sekunden). ASan/UBSan bestehen
+für ersten Start, Systemdarstellung und native Zugänglichkeit (42,09 Sekunden;
+40/51/121 Aussagen). Der volle lokale Release-Lauf enthält 17 bestandene Tests.
+Die Plattform- und entpackte Paketabnahme zu 0.7.0 steht noch aus.

@@ -39,7 +39,9 @@ Entpacke den Download und das darin enthaltene Anwendungsarchiv. Die Datei
 Umständen einen GitHub-Login und bleiben 30 Tage verfügbar.
 
 Ohne Argumente verwendet die App `SecondBrain` in deinem Benutzerordner.
-Lege über **Projekte → Neues Projekt** ein Gedächtnis an. Über die Projektwahl
+Beim ersten Start führt **Neues Projekt** direkt zum eigenen Gedächtnis.
+**Arbeitsordner öffnen** und **Sicherung wiederherstellen** bieten die anderen
+Einstiegswege. Bei geöffnetem Projekt findest du sie in der Projektwahl. Über die Projektwahl
 oder Command/Control+O kannst du einen bestehenden Arbeitsordner öffnen.
 Ein externer Wissenseditor und Python sind für die App nicht erforderlich.
 

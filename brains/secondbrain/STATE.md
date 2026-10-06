@@ -1,98 +1,48 @@
 # SecondBrain: aktueller Stand
 
-Stand: 6. Oktober 2026. Maßgebliche Details und historische Nachweise stehen im
-[Umsetzungsstand](../../docs/STATUS.md) und in [Plattformprüfungen](../../docs/PLATTFORMEN.md).
-Diese Übersicht hält den aktuellen Einstieg klein.
+Stand: 6. Oktober 2026. Originale: [Umsetzungsstand](../../docs/STATUS.md),
+[Plattformnachweise](../../docs/PLATTFORMEN.md) und [Release-Liste](../../docs/RELEASE.md).
+Historische Arbeitsabschnitte bleiben im [Journal](journal/2026-10-06.md).
 
 ## Implementiert und belegt
 
-- Eigene C17-App mit Projekt-/Notizerstellung, Lesen, Bearbeiten, Suche, Quellen,
-  Archiv und kopierbarem Kontext; Entwürfe und erkannte Speicherkonflikte sind geschützt.
-- Lumen-Sternkarte, eigene Glasdarstellung und Icons, direkte Pfeilnavigation,
+- Eigene C17-App: Projekte und Notizen anlegen, lesen, bearbeiten, suchen und
+  archivieren; Quellen lesen und gespeicherten KI-Kontext kopieren. Entwürfe und
+  erkannte Speicherkonflikte bleiben geschützt.
+- Lumen-Sternkarte und eigene Glasdarstellung/Icons; direkte Pfeilnavigation,
   Raumfahrt, begrenztes weiches Scrollen, Menüpfeile und große Leseansicht.
-- In 0.3.1: dauerhafte Darstellung, Fenster und letzte Projektposition; native
-  Ordnerauswahl integriert, alte Callback-Antworten geschützt.
-- [0.3.1-Abnahme zu 259fca1](https://github.com/Lulus792/SecondBrain/actions/runs/37499338633):
-  18 erfolgreiche Jobs. Je zehn Desktoptests in Debug/Release und entpackte Pakete
-  bestehen auf Windows x64, macOS ARM64 und Linux x64. Der anfängliche Linux-
-  Größenfehler wurde durch Warten auf tatsächliche Fenstergeometrie behoben.
-- Lokal auf Intel macOS 14.6.1 bestehen Release-, Sanitizer- und Paketprüfungen;
-  126 Maus-/105 Tastaturaussagen und Prozessneustarts sind enthalten. Die App
-  liegt unter dist/SecondBrain/secondbrain.app. Kleine Ansichten wurden betrachtet.
-- Dieses eigene Projektgedächtnis wurde mit dem C-Kern angelegt und in der App
-  gelesen; seine Quellen verbinden Auftrag, Originale und Nachweise.
+- Eigene Sicherungsarchive mit SHA-256, Vorschau, Hintergrundarbeit und Abbruch;
+  Wiederherstellung veröffentlicht ausschließlich einen freien neuen Projektordner.
+  [Vertrag](../../docs/SICHERUNG.md).
+- Einstellungen, letzter Arbeitsordner und Projektposition bleiben gespeichert.
+  Native Dialoge sind angebunden. Eigene Auswahl bleibt getrennt von bekannten
+  OS-Vorgaben für Darstellung, Bewegung, Transparenz und Kontrast.
+- AccessKit ausschließlich in der UI; tatsächliche native Provider-/UIA-/AT-SPI-
+  Abfragen und Aktionen bestehen. Die Linux-Cache-Signalstruktur ist korrigiert.
+  [Umfang und Grenzen](../../docs/BARRIEREFREIHEIT_PLAN.md).
+- [0.6.1-Abnahme zu b064bd5](https://github.com/Lulus792/SecondBrain/actions/runs/37529776082):
+  18 erfolgreiche Jobs, 16 Desktoptests je Debug/Release auf Windows x64,
+  macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Raster- und Fokuskontrast
+  sind gezielt nachgeprüft. dist/SecondBrain ist lokal auf 0.6.1.
 
-## Laufende Arbeit: Sicherung und Wiederherstellung
+## Laufende Arbeit: erster Start
 
-Der eigene C-Kern implementiert Inhaltsarchive mit SHA-256, vollständige Prüfung,
-exklusives Veröffentlichen, neuen Zielordnernamen und Aufräumen bei Abbruch/Fehler.
-Binäre Anhänge und leere Ordner sind enthalten; externe Projektverknüpfungen werden
-nicht kopiert. Bestehende Sicherungen und Projektordner werden nicht ersetzt.
-Der Entwicklungs-CLI bietet backup, inspect und restore.
-[Vertrag und Grenzen](../../docs/SICHERUNG.md).
+0.7.0 bündelt im leeren Zustand Anlegen, Öffnen, Wiederherstellung, Hilfe und
+Darstellung. Große Schrift scrollt die Aktionen unter einer festen Überschrift.
+Dialogabbruch erhält den Ursprung. Alle 17 lokalen Release-Tests bestehen;
+die abschließende Mausradprüfung und gezielte ASan/UBSan-Prüfungen bestehen ebenfalls.
+Die Plattform-/Paketabnahme zu 0.7.0 folgt.
+[Recherche und Vertrag](../../docs/ERSTER_START.md).
 
-Die gezielten lokalen Prüfungen umfassen komplette Rundreise, Unicode, bekannte
-SHA-256-Vektoren, beschädigte/unzulässige Archive, Abbruch, Quellenkonflikte und
-simulierten vollen Datenträger. Produktions-CLI wird separat über Prozesse geprüft.
-Die Desktop-Anbindung ist in 0.4.0 umgesetzt: Aktionen/Projekte bieten Sichern
-und Wiederherstellen, Hintergrundarbeit mit Abbruch, prüfbare Vorschau und
-erhaltene Entwürfe. Der Tastaturdurchlauf umfasst 75 Aussagen und eine
-8-MiB-Datei. Die [0.4.0-Abnahme zu d2d9c2b](https://github.com/Lulus792/SecondBrain/actions/runs/37508856383) besteht mit 18 Jobs:
-14 Desktoptests je Debug/Release auf Windows x64, macOS ARM64 und Linux x64.
-Alle entpackten Pakete bestehen Sicherungs-UI, beide bisherigen Bedienwege,
-Einstellungsneustart und Produktions-CLI. Lokal bestehen Paket und gezielte
-Sanitizer-Nachprüfung nach dem korrigierten Clipboard-Prüfbetrieb.
+## Weiterarbeiten und Grenzen
 
-## Laufende Arbeit: native Zugänglichkeit
+Der vollständige Auftrag vor 1.0 bleibt aktiv. Nächste Schritte: die Einstiegs-
+abnahme abschließen, native Dokument-/Unicode-Semantik und Schrift-Fallback,
+Datenvertrag, reale Sicherungsfehler, Leistung und dauerhafte Distribution abnehmen.
+OS-Dialogbedienung, VoiceOver/NVDA/Orca, echte Systemsteuerungswechsel, individuelle
+Windows-Kontrastfarben und Geräte-/Langzeitprüfungen sind noch nicht vollständig belegt.
 
-0.5.0 bindet AccessKit ausschließlich in der UI an alle drei Plattformadapter an.
-Der native macOS-Provider wird tatsächlich über NSAccessibility abgefragt und
-bedient: Schaltflächen, Texteingaben, Notizerstellung, Speichern, Auswahl und Lesen.
-Alte Aktionen nach Dokumentwechsel werden verworfen. Die [Plattformprüfung zu 0c9fc8b](https://github.com/Lulus792/SecondBrain/actions/runs/37512645717) besteht mit 18 Jobs,
-15 Desktoptests je Debug/Release und drei entpackten Paketen. Lokal bestehen
-alle 15 Release- und ASan/UBSan-Tests. Das entpackte Intel-Paket startet
-aus einem Unicode-Pfad; dist/SecondBrain ist auf 0.5.0 aktualisiert. Der [Clientlauf zu 8ff50ee](https://github.com/Lulus792/SecondBrain/actions/runs/37515016302) besteht ebenfalls mit allen 18 Jobs:
-UIA und AT-SPI werden tatsächlich für Namen/Rollen, Unicode-Eingabe, Notizerstellung,
-Editor und Speichern benutzt. Menschliche Screenreader-Abnahme und vollständige
-Text-/Dialogsemantik bleiben offen. [Umfang und Grenzen](../../docs/BARRIEREFREIHEIT_PLAN.md).
-
-Die Erweiterung 0.5.1 übernimmt sichtbare Dialog-/Hilfetexte und Entwurfswarnungen
-in den nativen Baum. Die [korrigierte Plattformprüfung zu 9eeb402](https://github.com/Lulus792/SecondBrain/actions/runs/37518758088) besteht mit 18 Jobs,
-15 Desktoptests je Debug/Release und drei Paketen. Lokal bestehen Release-Lauf,
-Sanitizer-Gesamtlauf des Zwischenstands und gezielte abschließende native/Tastatur/
-Sicherungs-Nachprüfungen. dist/SecondBrain ist auf 0.5.1 aktualisiert. Vollständige Dokumentstruktur, Unicode-Textnavigation,
-Fortschrittsansagen und menschliche assistive Bedienung bleiben offen.
-
-0.5.2 korrigiert die Linux-Cache-Signalstruktur. Die [Abnahme zu 8bcc048](https://github.com/Lulus792/SecondBrain/actions/runs/37522537774)
-besteht mit 18 Jobs, 15 Desktoptests je Debug/Release und drei Paketen. Die echte
-Wire-Prüfung zeigt in beiden Linux-Konfigurationen keine falsche Signatur und eine
-gültige Sammelantwort; der Client verarbeitet Events ohne Cacheleerung. Linux baut
-diese UI-Abhängigkeit aus festgelegter Quelle mit Cargo/Rust ab 1.87. Anwendung und
-Kern bleiben C; Pakete brauchen die Toolchain nicht. dist/SecondBrain ist auf 0.5.2.
-Weitere Eventtypen und menschliche Screenreader-Abnahme bleiben offen.
-
-0.6.0 ergänzt Systemdarstellung und native Zugänglichkeitsvorgaben. Die eigene
-Auswahl wird getrennt von der wirksamen Darstellung gespeichert; alte vollständige
-Einstellungsdateien werden erhalten. Die [Abnahme zu 444471d](https://github.com/Lulus792/SecondBrain/actions/runs/37527601503)
-besteht mit 18 Jobs, 16 Desktoptests je Debug/Release und drei Paketen. Lokal
-bestehen alle 16 Release- und ASan/UBSan-Tests. Eigene Kontrastansichten
-wurden betrachtet und ein zu heller Hinweis korrigiert. Das entpackte Intel-Paket
-besteht die Desktop-/Tastatur-/Sicherungswege, Einstellungsneustart und CLI-Sicherung.
-dist/SecondBrain ist auf 0.6.1. Die Nacharbeit 0.6.1 zeichnet Sternkerne und
-Kanten klar, erhält Beschriftungen mit Deckflächen und trennt den Fokusring vom
-normalen Rand. Der lokale Gesamtprüflauf und abschließende Raster-/Tastaturprüfungen bestehen;
-gezielte ASan/UBSan-Prüfungen bestehen ebenfalls. Die [Abnahme zu b064bd5](https://github.com/Lulus792/SecondBrain/actions/runs/37529776082)
-besteht mit 18 Jobs, 16 Desktoptests je Debug/Release und drei entpackten Paketen.
-
-## Auftrag und verbleibende Abnahmen
-
-Das vollständige [Ziel vor 1.0](../../docs/RELEASE.md) bleibt aktiv: Sicherungs-UI,
-native Screenreader, erster Start, OS-Vorgaben, Daten-/Leistungsabnahme,
-dauerhafte Distribution, Support und abschließende Produkttexte. Die Version 1.0
-bleibt bis zur ausdrücklichen Nutzerfreigabe gesperrt. Eigener Code: MIT.
-Apple-Developer-Konto und Windows-Signaturzertifikat sind noch nicht vorhanden.
-
-Die bisherigen UI-Nachweise verwenden SDL-Ereignisse, versteckte native Fenster
-und Softwarebilder. Tatsächliche OS-Dialog-, VoiceOver-/NVDA-/Orca-, GPU-/Display-
-und Langzeitabnahmen fehlen. Markdown und Schriftabdeckung bleiben begrenzt.
-Automatische Synchronisation und Chat-Anbieter sind optionale spätere Funktionen.
+Eigener Code: MIT. Apple-Developer-Konto und Windows-Signaturzertifikat fehlen.
+1.0 bleibt bis zur ausdrücklichen Nutzerfreigabe gesperrt. Produkttexte werden
+auf Nutzerwunsch erst abschließend bereinigt, wenn das Produkt vollständig ist.
+Chat-Anbieter, Synchronisation und automatische KI-Pflege sind spätere Optionen.

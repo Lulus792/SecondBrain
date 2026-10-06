@@ -161,3 +161,14 @@ die eigene Auswahl, damit normale Systemwerte diese wiederherstellen können.
 Linux fragt das Portal außerhalb des UI-Threads ab. Fehlende Antworten erhalten
 den letzten gültigen Stand. Version 1 bleibt lesbar; Speichern schreibt Version 2.
 [Vertrag, Plattformumfang und Grenzen](../../docs/EINSTELLUNGEN.md).
+
+
+## D16: Einstieg aus dem tatsächlichen Projektzustand
+
+Ohne geöffnetes Projekt bündelt eine schwebende Karte die direkten fachlichen
+Wege; das erste Projekt führt zur normalen Arbeitsansicht. Es gibt keinen
+verpflichtenden Tutorial-Schritt und keinen getrennten Erststart-Schalter.
+Große Schrift scrollt die Aktionen unter einer festen Überschrift. Dialogabbruch
+stellt den Ursprungsfokus wieder her. Apple HIG Onboarding dient als Grundlage;
+Kartengestaltung und Zustandsmodell sind eigene Übertragung.
+[Entwurf und Nachweise](../../docs/ERSTER_START.md).

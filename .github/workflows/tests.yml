@@ -62,6 +62,7 @@ jobs:
             build/ui/Testing/Temporary/LastTest.log
             build/ui/checked-ctest.log
             build/ui/system-style-data/**/*.bmp
+            build/ui/welcome-data/**/*.bmp
             build/ui/ui-test.bmp
             build/ui/own-project.bmp
             build/ui/desktop-data/**/*.bmp

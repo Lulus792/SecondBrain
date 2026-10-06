@@ -119,6 +119,14 @@ static unsigned scroll_slot(SBDesktop *d, float x, float y, bool pointer) {
         }
         return d->form == SB_FORM_CONTEXT ? 2 : 3;
     }
+    if (!d->model.has_project) {
+        if (pointer) {
+            int w,h; SDL_GetWindowSize(d->ui.window,&w,&h);
+            float cw=fminf(w-36.0f,620*d->ui.scale),ch=fminf(h-36.0f,520*d->ui.scale);
+            if (x<(w-cw)/2 || x>=(w+cw)/2 || y<(h-ch)/2 || y>=(h+ch)/2) return 4;
+        }
+        return 2;
+    }
     if (pointer) {
         for (size_t i=0;i<d->target_count;++i) {
             SBTarget *item = &d->targets[i];
@@ -683,6 +691,7 @@ static bool inside(float x, float y, struct nk_rect r) {
     return x >= r.x && y >= r.y && x < r.x + r.w && y < r.y + r.h;
 }
 static bool map_input(SBDesktop *d, float x, float y) {
+    if (!d->model.has_project) return false;
     if (d->form != SB_FORM_NONE || d->model.guard || !inside(x, y, d->map_bounds)) return false;
     for (unsigned i = 0; i < d->ui.space.glass_count; ++i) {
         SDL_FRect r = d->ui.space.glass[i].rect;
@@ -1570,7 +1579,7 @@ static void galaxy(SBDesktop *d, int width, int height, struct nk_rect card, str
                 if (label_count < 80) labels[label_count++] = r;
             }
         }
-        if (!space->count) nk_draw_text(canvas, nk_rect(60,cy-20,width-120.0f,70),
+        if (!space->count && d->model.has_project) nk_draw_text(canvas, nk_rect(60,cy-20,width-120.0f,70),
             "Dein Projektwissen wird hier zur Sternkarte.", (int)strlen("Dein Projektwissen wird hier zur Sternkarte."),
             &d->ui.body->handle,nk_rgba(0,0,0,0),d->ui.contrast ? ctx->style.text.color : d->ui.dark ? nk_rgb(166,185,211) : nk_rgb(70,88,112));
     }
@@ -1599,6 +1608,45 @@ static void camera_tools(SBDesktop *d, int width, int height, float available, n
         nk_layout_row_end(ctx);
     }
     nk_end(ctx); ctx->style.window.padding=padding;
+}
+static void welcome(SBDesktop *d,int width,int height,nk_flags flags) {
+    struct nk_context *ctx=d->ui.ctx; float s=d->ui.scale;
+    float w=fminf(width-36.0f,620*s),h=fminf(height-36.0f,520*s);
+    struct nk_rect bounds=nk_rect((width-w)/2,(height-h)/2,w,h);
+    glass(d,bounds,16); d->focus_group=0;
+    if (nk_begin(ctx,"Welcome",bounds,flags|NK_WINDOW_NO_SCROLLBAR)) {
+        nk_layout_row_dynamic(ctx,36*s,1);
+        passive_add(d,"welcome-title","Dein Projektgedächtnis",ACCESSKIT_ROLE_HEADING,nk_widget_bounds(ctx));
+        nk_style_set_font(ctx,&d->ui.heading->handle);
+        nk_label(ctx,"Dein Projektgedächtnis",NK_TEXT_LEFT);
+        nk_style_set_font(ctx,&d->ui.normal->handle);
+        float remaining=ctx->current->layout->bounds.y+ctx->current->layout->bounds.h-
+            (ctx->current->layout->at_y+ctx->current->layout->row.height)-ctx->style.window.spacing.y;
+        nk_layout_row_dynamic(ctx,fmaxf(24,remaining),1);
+        nk_uint sx=0,sy=0; nk_group_get_scroll(ctx,"WelcomeBody",&sx,&sy); smooth_scroll(d,2,&sy);
+        nk_group_set_scroll(ctx,"WelcomeBody",sx,sy);
+        if (nk_group_begin(ctx,"WelcomeBody",NK_WINDOW_NO_SCROLLBAR)) {
+            nk_layout_row_dynamic(ctx,60*s,1);
+            native_wrap(d,"Halte Ziele, Notizen und Quellen für jedes Projekt zusammen. Die Dateien bleiben auf deinem Rechner und sind auch für eine KI lesbar.");
+            nk_layout_row_dynamic(ctx,36*s,1);
+            if (button(d,"new-project","Neues Projekt")) command(d,SB_CMD_NEW_PROJECT);
+            if (button(d,"workspace-detail","Arbeitsordner öffnen")) command(d,SB_CMD_WORKSPACE);
+            if (button(d,"restore-project","Sicherung wiederherstellen")) command(d,SB_CMD_RESTORE);
+            if (button(d,"help-actions","Tastaturhilfe")) d->form=SB_FORM_HELP;
+            if (button(d,"settings-actions","Darstellung")) d->form=SB_FORM_SETTINGS;
+            nk_layout_row_dynamic(ctx,24*s,1); native_label(d,"Aktueller Arbeitsordner",NK_TEXT_LEFT);
+            char path[SB_NAME_CAP]; compact_label(d,d->model.workspace,path,sizeof(path),w-80);
+            nk_layout_row_dynamic(ctx,28*s,1);
+            passive_add(d,"welcome-workspace",d->model.workspace,ACCESSKIT_ROLE_LABEL,nk_widget_bounds(ctx));
+            nk_label(ctx,path,NK_TEXT_LEFT);
+            if (nk_widget_is_hovered(ctx)) tooltip(d,d->model.workspace);
+            if (d->message.message[0]) {
+                nk_layout_row_dynamic(ctx,60*s,1); native_wrap(d,d->message.message);
+            }
+            scroll_measure(d,2); nk_group_end(ctx);
+        }
+    }
+    nk_end(ctx);
 }
 void sb_desktop_frame(SBDesktop *d) {
     int width, height; SDL_GetWindowSize(d->ui.window,&width,&height);
@@ -1630,13 +1678,20 @@ void sb_desktop_frame(SBDesktop *d) {
     d->ui.space.dark = d->ui.dark; d->ui.space.solid = d->solid; d->ui.space.contrast=d->ui.contrast;
     galaxy(d,width,height,card,list);
     nk_flags flags = modal ? NK_WINDOW_NO_INPUT : 0;
-    tools(d,width,header,flags);
-    if (d->browser && !d->expanded) document_list(d,list,flags);
-    if (d->card || !d->model.has_project) {
+    if (d->model.has_project) tools(d,width,header,flags);
+    else { d->target_count=0; welcome(d,width,height,flags); }
+    if (d->model.has_project && d->browser && !d->expanded) document_list(d,list,flags);
+    if (d->model.has_project && d->card) {
         glass(d,card,16); d->focus_group = 2;
         detail(d,card.x,card.y,card.w,card.h,flags);
     }
-    if (!d->browser && !(d->card && (d->editing || d->expanded))) camera_tools(d,width,height,d->card ? card.x-36 : width-36.0f,flags);
+    if (d->model.has_project && !d->browser && !(d->card && (d->editing || d->expanded))) camera_tools(d,width,height,d->card ? card.x-36 : width-36.0f,flags);
+    if (!modal && (d->form!=SB_FORM_NONE || d->model.guard)) {
+        /* A button can open its form while this frame is being constructed. */
+        snprintf(d->saved_focus,sizeof(d->saved_focus),"%s",d->focus);
+        memset(d->scrolling,0,sizeof(d->scrolling));
+        enter=true; d->focus_form=d->form; d->focus_guard=d->model.guard;
+    }
     if (d->form!=SB_FORM_NONE || d->model.guard) { d->target_count = 0; passive_clear(d); d->focus_group = 3; }
     d->semantic_context=accessible_context(d);
     struct nk_style_item old_background = d->ui.ctx->style.window.fixed_background;

@@ -22,7 +22,8 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
 - [ ] **Alltagskomfort vervollständigen:** Einstellungen und letzten Arbeitsordner
   dauerhaft speichern, native Ordnerauswahl, verständlicher erster Start.
   Speicherung und native Ordnerwahl sind in 0.3.1 implementiert; Systemvorgaben
-  sind in 0.6.0 im dokumentierten Umfang angebunden. Erster Start und interaktive
+  sind in 0.6.0 im dokumentierten Umfang angebunden. Der leere Einstieg ist in
+  0.7.0 implementiert und lokal geprüft. Seine Plattformabnahme und interaktive
   native Dialogabnahme bleiben offen.
 - [ ] **Barrierefreiheit abnehmen:** native Screenreader-Anbindung, Kontraste,
   Fokusreihenfolge, große Schrift, Schrift-Fallback und Systemeinstellung für
