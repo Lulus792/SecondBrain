@@ -622,7 +622,7 @@ static void accessible_publish(SBDesktop *d) {
     }
     for (size_t i=0;i<d->passive_count;++i) {
         SBPassiveText *p=&d->passive[i]; SBAccessibleItem *v=&items[d->target_count+i];
-        v->id=p->id; v->label=p->text; v->bounds=p->bounds; v->role=p->role;
+        v->id=p->id; v->label=p->text; v->value=p->text; v->bounds=p->bounds; v->role=p->role;
         order[d->target_count+i]=((uint64_t)p->group<<32)|p->order;
     }
     for (size_t i=1;i<controls;++i) {

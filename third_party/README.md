@@ -47,6 +47,15 @@ Der Build benötigt dafür keinen Rust-Compiler. macOS/Linux verwenden die stati
 Bibliothek; unter Windows wird die UI-DLL neben der Anwendung ausgeliefert.
 Der Kern bleibt unabhängig und ohne externe Bibliotheken baubar.
 
+Die eigene macOS-C-Anbindung gleicht die vom Adapter gelieferte Heading-Rolle an
+NSAccessibilityHeadingRole an, wenn die Systemkonstante vorhanden ist. Die
+unveränderte 0.23.1-Bibliothek liefert dort noch die Zeichenfolge Heading. Die
+Korrektur verwendet Objective-C-Runtime-APIs im App-Prozess und verändert keine
+Dateien der Bibliothek. Sie wird nur an der AccessKit-View-Klasse und an AccessKitNode
+angebracht; ältere Systeme ohne die Konstante behalten den Adapterwert. Der
+native macOS-Test vergleicht mit der tatsächlichen Systemkonstante. Diese
+Versionsanpassung ist bei einer Änderung der UI-Abhängigkeit erneut zu prüfen.
+
 Unveränderte MIT-, Apache-2.0- und Chromium-BSD-Lizenztexte sowie AUTHORS liegen
 unter licenses/AccessKit-* und gehören zu jedem Anwendungspaket. Native Adapter
 sind integriert; die Grenzen der Abnahme stehen im

@@ -4,6 +4,42 @@
 #include <stdio.h>
 #if defined(__APPLE__)
 #include <objc/runtime.h>
+#include <objc/message.h>
+#include <dlfcn.h>
+/* AccessKit 0.23.1 returns the literal "Heading". New AppKit exposes its actual
+   heading role; preserve that native contract without changing the C tree role. */
+static SDL_SpinLock mac_role_lock;
+static IMP mac_children_original,mac_role_original;
+static void *mac_heading_role;
+static void *mac_role(void *self,SEL selector) {
+    SDL_LockSpinlock(&mac_role_lock); IMP original=mac_role_original; SDL_UnlockSpinlock(&mac_role_lock);
+    void *role=((void *(*)(void *,SEL))original)(self,selector);
+    const char *name=role ? ((const char *(*)(void *,SEL))objc_msgSend)(role,sel_registerName("UTF8String")) : NULL;
+    return name && !strcmp(name,"Heading") ? mac_heading_role : role;
+}
+static void *mac_children(void *self,SEL selector) {
+    SDL_LockSpinlock(&mac_role_lock); IMP original=mac_children_original; SDL_UnlockSpinlock(&mac_role_lock);
+    void *children=((void *(*)(void *,SEL))original)(self,selector);
+    SDL_LockSpinlock(&mac_role_lock);
+    if (!mac_role_original) {
+        Class node=objc_getClass("AccessKitNode");
+        Method method=node ? class_getInstanceMethod(node,sel_registerName("accessibilityRole")) : NULL;
+        if (method) { mac_role_original=method_getImplementation(method); method_setImplementation(method,(IMP)mac_role); }
+    }
+    SDL_UnlockSpinlock(&mac_role_lock); return children;
+}
+static void mac_native_roles(void *window) {
+    void **role=dlsym(RTLD_DEFAULT,"NSAccessibilityHeadingRole"); if (!role || !*role) return;
+    void *view=((void *(*)(void *,SEL))objc_msgSend)(window,sel_registerName("contentView"));
+    Class view_class=object_getClass(view); SEL selector=sel_registerName("accessibilityChildren");
+    Method method=class_getInstanceMethod(view_class,selector);
+    SDL_LockSpinlock(&mac_role_lock);
+    if (method && !mac_children_original) {
+        mac_heading_role=*role; mac_children_original=method_getImplementation(method);
+        if (!class_addMethod(view_class,selector,(IMP)mac_children,method_getTypeEncoding(method))) method_setImplementation(method,(IMP)mac_children);
+    }
+    SDL_UnlockSpinlock(&mac_role_lock);
+}
 #endif
 typedef struct { char id[100]; accesskit_node_id node; uint64_t context; } Identity;
 typedef struct {
@@ -157,6 +193,7 @@ SBAccessibility *sb_accessibility_new(SDL_Window *window) {
         static bool forwarded=false;
         if (!forwarded) { accesskit_macos_add_focus_forwarder_to_window_class(class_getName(object_getClass(native))); forwarded=true; }
         a->adapter=accesskit_macos_subclassing_adapter_for_window(native,factory,a,action,a);
+        mac_native_roles(native);
     }
 #elif defined(_WIN32)
     HWND native=SDL_GetPointerProperty(properties,SDL_PROP_WINDOW_WIN32_HWND_POINTER,NULL);

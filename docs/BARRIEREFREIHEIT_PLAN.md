@@ -162,3 +162,13 @@ prüft der gemeinsame Vertrag 700 Zeichen lange Beschriftungen und abgelehnte
 Aktionen auf reinem Text. Gesamt-/Plattformnachweise folgen nach Prüfung.
 Markdown-Dokumentstruktur, Grapheme/Zeilen, Fortschrittsansagen und menschliche
 assistive Navigation bleiben weitere Arbeiten.
+
+
+Die erste native Plattformnachprüfung findet eine tatsächliche macOS-Abweichung:
+Auf neuerem AppKit ist NSAccessibilityHeadingRole vorhanden, der unveränderte
+Adapter liefert dort trotzdem Heading. Die eigene C-Anbindung passt ausschließlich
+diese native Rolle an die Systemkonstante an. Statische Textknoten erhalten neben
+ihrem Namen einen tatsächlichen lesbaren Textwert und Textlauf. Die ursprünglichen
+fehlgeschlagenen Plattformläufe bleiben als Nachweise erhalten; die korrigierten
+nativen Prüfungen folgen. Die Runtime-Anpassung und ihr enger Versionsbezug stehen
+im [Abhängigkeitsverzeichnis](../third_party/README.md).
