@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-project(SecondBrain VERSION 0.7.3 LANGUAGES C)
+project(SecondBrain VERSION 0.8.0 LANGUAGES C)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
@@ -24,8 +24,34 @@ string(APPEND SB_TEMPLATE_C "};\n#define SB_TEMPLATE_COUNT (sizeof(sb_templates)
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/generated")
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/generated/sb_templates.h" "${SB_TEMPLATE_C}")
 
-add_library(sb_core STATIC src/sb.c src/platform.c src/settings.c src/sha256.c src/backup.c)
+set(SB_SOURCE_REVISION "source")
+find_package(Git QUIET)
+if(GIT_FOUND)
+    execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse --show-toplevel
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" OUTPUT_VARIABLE SB_GIT_ROOT
+        OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+    execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse --short=12 HEAD
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" OUTPUT_VARIABLE SB_GIT_REVISION
+        OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET RESULT_VARIABLE SB_GIT_RESULT)
+    if(SB_GIT_RESULT EQUAL 0 AND SB_GIT_ROOT STREQUAL CMAKE_CURRENT_SOURCE_DIR AND SB_GIT_REVISION MATCHES "^[0-9a-f]+$")
+        set(SB_SOURCE_REVISION "${SB_GIT_REVISION}")
+        execute_process(COMMAND "${GIT_EXECUTABLE}" diff --quiet HEAD --
+            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" RESULT_VARIABLE SB_GIT_DIRTY ERROR_QUIET)
+        if(NOT SB_GIT_DIRTY EQUAL 0)
+            string(APPEND SB_SOURCE_REVISION "-dirty")
+        endif()
+    endif()
+endif()
+foreach(SB_ID IN ITEMS CMAKE_SYSTEM_NAME CMAKE_SYSTEM_PROCESSOR)
+    if(NOT "${${SB_ID}}" MATCHES "^[A-Za-z0-9_.+-]+$")
+        message(FATAL_ERROR "Unsupported build identifier: ${SB_ID}")
+    endif()
+endforeach()
+configure_file(src/sb_version.h.in generated/sb_version.h @ONLY)
+
+add_library(sb_core STATIC src/version.c src/sb.c src/platform.c src/settings.c src/sha256.c src/backup.c)
 target_include_directories(sb_core PUBLIC src PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
+target_compile_definitions(sb_core PRIVATE SB_BUILD_CONFIGURATION="$<CONFIG>")
 if(MSVC)
     target_compile_options(sb_core PRIVATE /W4 /utf-8)
     target_compile_definitions(sb_core PRIVATE _CRT_SECURE_NO_WARNINGS)
@@ -291,6 +317,18 @@ if(BUILD_TESTING)
     add_test(NAME project-cli-discovery COMMAND "${CMAKE_COMMAND}"
         "-DSB_CLI=$<TARGET_FILE:secondbrain-cli>" "-DSB_TEST_ROOT=${CMAKE_CURRENT_BINARY_DIR}/project-cli-data"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_project_cli.cmake")
+    add_test(NAME version-identification COMMAND "${CMAKE_COMMAND}"
+        "-DSB_CLI=$<TARGET_FILE:secondbrain-cli>" "-DSB_VERSION=${PROJECT_VERSION}"
+        "-DSB_CONFIG=$<CONFIG>" "-DSB_SYSTEM=${CMAKE_SYSTEM_NAME}" "-DSB_ARCH=${CMAKE_SYSTEM_PROCESSOR}"
+        "-DSB_REVISION=${SB_SOURCE_REVISION}" "-DSB_TEST_ROOT=${CMAKE_CURRENT_BINARY_DIR}/version-data"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_version.cmake")
+    if(SB_BUILD_UI)
+        add_test(NAME desktop-version-identification COMMAND "${CMAKE_COMMAND}"
+            "-DSB_CLI=$<TARGET_FILE:secondbrain>" "-DSB_VERSION=${PROJECT_VERSION}"
+            "-DSB_CONFIG=$<CONFIG>" "-DSB_SYSTEM=${CMAKE_SYSTEM_NAME}" "-DSB_ARCH=${CMAKE_SYSTEM_PROCESSOR}"
+            "-DSB_REVISION=${SB_SOURCE_REVISION}" "-DSB_TEST_ROOT=${CMAKE_CURRENT_BINARY_DIR}/desktop-version-data"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_version.cmake")
+    endif()
     add_test(NAME release-contract COMMAND "${CMAKE_COMMAND}"
         "-DSB_SOURCE_ROOT=${CMAKE_CURRENT_SOURCE_DIR}" "-DSB_TEST_ROOT=${CMAKE_CURRENT_BINARY_DIR}/release-contract-data"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_release_contract.cmake")

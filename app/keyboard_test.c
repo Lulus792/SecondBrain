@@ -1,5 +1,6 @@
 #include "desktop.h"
 #include "platform.h"
+#include "version.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -171,6 +172,13 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
     key(d,SDLK_COMMA,MOD); CHECK(d->form == SB_FORM_SETTINGS);
     CHECK(activate(d,"font-plus") && activate(d,"font-plus") && d->ui.scale == 1.5f);
     CHECK(activate(d,"transparency") && d->solid);
+    CHECK(activate(d,"about") && d->form == SB_FORM_ABOUT);
+    CHECK(activate(d,"copy-version"));
+    text=SDL_GetClipboardText(); CHECK(text && !strcmp(text,sb_build_info()) && !strstr(text,d->model.project.root)); SDL_free(text); text=NULL;
+    CHECK(sb_path_join(path,sizeof(path),directory,"about-small.bmp").code == SB_OK);
+    CHECK(sb_ui_capture(&d->ui,path).code == SB_OK);
+    CHECK(activate(d,"about-back") && d->form == SB_FORM_SETTINGS);
+    CHECK(activate(d,"about") && d->form == SB_FORM_ABOUT);
     key(d,SDLK_ESCAPE,0); CHECK(d->form == SB_FORM_NONE);
     CHECK(activate(d,"filter") && d->form == SB_FORM_FILTER);
     CHECK(activate(d,"section:all") && d->form == SB_FORM_NONE);

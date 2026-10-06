@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 3.20)
+file(MAKE_DIRECTORY "${SB_TEST_ROOT}")
+# Empty current directory: version reporting must not create a workspace or settings.
+file(GLOB SB_BEFORE "${SB_TEST_ROOT}/*" "${SB_TEST_ROOT}/.*")
+execute_process(COMMAND "${SB_CLI}" --version WORKING_DIRECTORY "${SB_TEST_ROOT}"
+    RESULT_VARIABLE SB_RESULT OUTPUT_VARIABLE SB_OUTPUT ERROR_VARIABLE SB_ERROR TIMEOUT 15)
+set(SB_EXPECTED "SecondBrain ${SB_VERSION}\nBuild: ${SB_REVISION}\nSystem: ${SB_SYSTEM} / ${SB_ARCH}\nConfiguration: ${SB_CONFIG}\n")
+string(REPLACE "\r\n" "\n" SB_OUTPUT "${SB_OUTPUT}")
+if(NOT SB_RESULT EQUAL 0 OR NOT SB_OUTPUT STREQUAL SB_EXPECTED OR NOT SB_ERROR STREQUAL "")
+    message(FATAL_ERROR "Version reporting failed: ${SB_RESULT}\n${SB_OUTPUT}\n${SB_ERROR}")
+endif()
+file(GLOB SB_AFTER "${SB_TEST_ROOT}/*" "${SB_TEST_ROOT}/.*")
+if(NOT SB_BEFORE STREQUAL SB_AFTER)
+    message(FATAL_ERROR "Version reporting modified its current directory")
+endif()

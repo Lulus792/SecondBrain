@@ -1,6 +1,7 @@
 #include "desktop.h"
 #include "platform.h"
 #include "icons.h"
+#include "version.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1347,8 +1348,9 @@ static void popup(SBDesktop *d, int width, int height) {
         d->form == SB_FORM_WORKSPACE ? "Arbeitsordner öffnen" : d->form == SB_FORM_SETTINGS ? "Projekte und Darstellung" :
         d->form == SB_FORM_CONTEXT ? "KI-Kontext" : d->form == SB_FORM_ACTIONS ? "Dokumentaktionen" :
         d->form == SB_FORM_PROJECTS ? "Projekt wählen" : d->form == SB_FORM_FILTER ? "Wissensbereich" :
-        d->form==SB_FORM_BACKUP ? "Projekt sichern" : d->form==SB_FORM_RESTORE ? "Sicherung wiederherstellen" : "Tastaturhilfe";
+        d->form==SB_FORM_BACKUP ? "Projekt sichern" : d->form==SB_FORM_RESTORE ? "Sicherung wiederherstellen" : d->form==SB_FORM_ABOUT ? "Über SecondBrain" : "Tastaturhilfe";
     if (d->form==SB_FORM_ACTIONS || d->form==SB_FORM_FILTER) h=fminf(height-40,(6*42+80)*s+56);
+    if (d->form==SB_FORM_ABOUT) h=fminf(height-40,340*s+60);
     if (d->form==SB_FORM_WORKSPACE) h=fminf(height-40,300*s+40);
     if (d->form==SB_FORM_BACKUP || d->form==SB_FORM_RESTORE) h=fminf(height-40,(d->form==SB_FORM_RESTORE && d->restore_checked ? 520 : 340)*s+60);
     glass(d,nk_rect((width-w)/2,(height-h)/2,w,h),16);
@@ -1491,6 +1493,27 @@ static void popup(SBDesktop *d, int width, int height) {
             nk_layout_row_dynamic(ctx,36*s,1);
             if (d->system_style.contrast) native_wrap(d,"Kontrast durch Systemeinstellung erhöht.");
             else if (button(d,"contrast",d->requested_style.contrast ? "Normalen Kontrast verwenden" : "Kontrast erhöhen")) { SBStyleChoice style=d->requested_style; style.contrast=!style.contrast; sb_desktop_set_style(d,style); }
+            nk_layout_row_dynamic(ctx,36*s,1);
+            if (button(d,"about","Über SecondBrain")) { d->message=sb_ok(); d->form=SB_FORM_ABOUT; }
+        } else if (d->form == SB_FORM_ABOUT) {
+            char heading[80]; snprintf(heading,sizeof(heading),"Version %s · In Entwicklung",sb_version());
+            nk_layout_row_dynamic(ctx,48*s,1); native_wrap(d,heading);
+            /* Nuklear wrapping treats a newline as a glyph; lay out each build line. */
+            const char *line=strchr(sb_build_info(),'\n');
+            if (line) ++line;
+            while (line && *line) {
+                const char *end=strchr(line,'\n'); char value[180];
+                size_t length=end ? (size_t)(end-line) : strlen(line);
+                snprintf(value,sizeof(value),"%.*s",(int)length,line);
+                nk_layout_row_dynamic(ctx,36*s,1); native_wrap(d,value);
+                line=end ? end+1 : NULL;
+            }
+            nk_layout_row_dynamic(ctx,48*s,1); native_wrap(d,"© 2026 Angelus Vincent · MIT-Lizenz");
+            nk_layout_row_dynamic(ctx,36*s,1);
+            if (button(d,"copy-version",!strcmp(d->message.message,"Versionsinfos kopiert.") ? "Versionsinfos kopiert" : "Versionsinfos kopieren"))
+                result(d,SDL_SetClipboardText(sb_build_info()) ? sb_ok() : sb_error(SB_IO,"Die Zwischenablage ist nicht erreichbar."),"Versionsinfos kopiert.");
+            nk_layout_row_dynamic(ctx,36*s,1);
+            if (button(d,"about-back","Zurück zu den Einstellungen")) { d->message=sb_ok(); d->form=SB_FORM_SETTINGS; }
         } else if (d->form == SB_FORM_CONTEXT) {
             nk_layout_row_dynamic(ctx,24*s,1); muted(d,"Gespeicherte Kerninformationen");
             nk_layout_row_dynamic(ctx, 36 * s, 1);
@@ -1512,7 +1535,7 @@ static void popup(SBDesktop *d, int width, int height) {
                 nk_layout_row_dynamic(ctx, 40 * s, 1); native_wrap(d, help[i]);
             }
         }
-        if (d->message.message[0] && d->form!=SB_FORM_ACTIONS && d->form!=SB_FORM_FILTER && d->form!=SB_FORM_CONTEXT && d->form!=SB_FORM_BACKUP && d->form!=SB_FORM_RESTORE) {
+        if (d->message.message[0] && d->form!=SB_FORM_ACTIONS && d->form!=SB_FORM_FILTER && d->form!=SB_FORM_CONTEXT && d->form!=SB_FORM_BACKUP && d->form!=SB_FORM_RESTORE && (d->form!=SB_FORM_ABOUT || d->message.code!=SB_OK)) {
             nk_layout_row_dynamic(ctx,52*s,1); native_wrap(d,d->message.message);
         }
         scroll_measure(d,3); nk_group_end(ctx);

@@ -31,12 +31,18 @@ eigene Umsetzung nach Apple-Vorbild.
 
 ## Starten
 
-Die [GitHub-Actions-Läufe](https://github.com/Lulus792/SecondBrain/actions/workflows/tests.yml)
-stellen nach bestandenen Release-Prüfungen Pakete bereit:
-`SecondBrain-Windows-X64`, `SecondBrain-macOS-ARM64` und `SecondBrain-Linux-X64`.
-Entpacke den Download und das darin enthaltene Anwendungsarchiv. Die Datei
-`QUICKSTART.txt` erklärt den Start auf deinem System. Downloads erfordern unter
-Umständen einen GitHub-Login und bleiben 30 Tage verfügbar.
+Die [Vorabversion v0.7.3](https://github.com/Lulus792/SecondBrain/releases/tag/v0.7.3)
+ist für Windows x64, macOS auf Apple Silicon und Intel sowie Linux x64 verfügbar.
+Lade das passende ZIP oder tar.gz herunter und entpacke es. `QUICKSTART.txt`
+erklärt den Start; `SHA256SUMS` enthält die Prüfsummen. Diese Vorabversion ist
+noch kein stabiler 1.0-Release.
+
+Neuere Entwicklungsstände findest du als befristete Pakete in den
+[GitHub-Actions-Läufen](https://github.com/Lulus792/SecondBrain/actions/workflows/tests.yml):
+`SecondBrain-Windows-X64`, `SecondBrain-macOS-ARM64`,
+`SecondBrain-macOS-X64` und `SecondBrain-Linux-X64`. Entpacke den Download
+und das enthaltene Anwendungsarchiv. Diese Downloads erfordern unter Umständen
+einen GitHub-Login und bleiben 30 Tage verfügbar.
 
 Ohne Argumente verwendet die App `SecondBrain` in deinem Benutzerordner.
 Beim ersten Start führt **Neues Projekt** direkt zum eigenen Gedächtnis.
@@ -162,6 +168,10 @@ Abgeschlossene, geprüfte Arbeitsschritte werden committet und nach GitHub gepus
 - [Aufgaben bis zum vollständigen Release](docs/RELEASE.md)
 - [UI-Recherche](docs/UI_RECHERCHE.md) und [Gestaltung](docs/UI_GALAXIE.md)
 - [Grundlagen des Second-Brain-Konzepts](docs/GRUNDLAGEN.md)
+
+Ab 0.8.0 kannst du unter **Darstellung → Über SecondBrain** die Version ansehen und
+die Buildangaben kopieren. Im Terminal zeigen App und CLI mit `--version`
+dieselben Angaben, ohne einen Arbeitsordner zu öffnen.
 
 Fehlerberichte sollten Betriebssystem, Version, Schritte zum Wiederholen und das
 beobachtete Verhalten enthalten. [GitHub Issues](https://github.com/Lulus792/SecondBrain/issues).

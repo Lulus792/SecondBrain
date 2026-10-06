@@ -1,6 +1,6 @@
 # SecondBrain Quellen
 
-Zuletzt eingesehen: 6. Oktober 2026. Relative Verweise erwarten diese Instanz
+Zuletzt eingesehen: 7. Oktober 2026. Relative Verweise erwarten diese Instanz
 unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 
 ## Auftrag und Arbeitsweise
@@ -39,7 +39,9 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Kernprüfung](../../tests/test_core.c), [Zustandsprüfung](../../tests/test_model.c),
   [Editorprüfung](../../tests/test_ui.c), [Bedienprüfung](../../app/self_test.c):
   Prüfumfänge; ihr Quelltext allein belegt keine ausgeführten Ergebnisse.
-- [Paketprüfung](../../tests/test_package.cmake): Start der entpackten Anwendung.
+- [Paketprüfung](../../tests/test_package.cmake): Start und Versionsidentität der entpackten Anwendung.
+- [Versionsprüfung](../../tests/test_version.cmake): tatsächliche Prozessausgabe ohne UI-Start.
+- [Vorabversion v0.7.3](https://github.com/Lulus792/SecondBrain/releases/tag/v0.7.3): vier veröffentlichte Pakete und Prüfsummen.
 
 ## Anwendung verwenden
 

@@ -119,3 +119,12 @@ Grundlagen am 6. Oktober 2026 gelesen:
 [GitHub CLI Releases](https://cli.github.com/manual/gh_release_create),
 [Draft-Veröffentlichung](https://cli.github.com/manual/gh_release_edit) und
 [Runner-Architekturen](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).
+
+## Veröffentlicht am 7. Oktober 2026
+
+Die [Vorabversion v0.7.3](https://github.com/Lulus792/SecondBrain/releases/tag/v0.7.3)
+enthält dauerhaft vier Archive (Windows x64, Linux x64, macOS ARM64 und Intel)
+und SHA256SUMS. Der [Veröffentlichungslauf](https://github.com/Lulus792/SecondBrain/actions/runs/37537383565)
+besteht mit 22 Jobs einschließlich entpackter Paketprüfungen und erneutem
+Herunterladen der Uploads. Tag und Quellstand d109b8a bleiben unverändert.
+Die Pakete sind Entwicklungsstände ohne Herausgeberzertifikate oder Notarisierung.

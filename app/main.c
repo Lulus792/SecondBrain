@@ -1,4 +1,5 @@
 #include "desktop.h"
+#include "version.h"
 #include "platform.h"
 #include <SDL3/SDL_main.h>
 #include <stdio.h>
@@ -20,6 +21,7 @@ static SBStatus font_path(const char *assets, char *out) {
     return result;
 }
 int main(int argc, char **argv) {
+    if (argc == 2 && !strcmp(argv[1], "--version")) { fputs(sb_build_info(), stdout); return 0; }
     SBDesktop desktop;
     char workspace[SB_PATH_CAP], font[SB_PATH_CAP], home[SB_PATH_CAP];
     const char *workspace_arg = NULL, *project_arg = NULL, *assets = NULL, *test_root = NULL, *snapshot = NULL, *settings_arg = NULL;
@@ -35,7 +37,7 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i],"--settings") && i+1<argc) settings_arg=argv[++i];
         else if (!strcmp(argv[i], "--snapshot") && i + 1 < argc) snapshot = argv[++i];
         else if (!strcmp(argv[i], "--help")) {
-            printf("SecondBrain\n  --workspace ORDNER\n  --project KENNUNG\n  --assets ASSETORDNER\n  --settings EINSTELLUNGSDATEI\n"
+            printf("SecondBrain\n  --version\n  --workspace ORDNER\n  --project KENNUNG\n  --assets ASSETORDNER\n  --settings EINSTELLUNGSDATEI\n"
                    "  --self-test TESTORDNER\n  --keyboard-test TESTORDNER\n  --backup-test TESTORDNER\n  --snapshot BILD.bmp\n");
             return 0;
         } else { fprintf(stderr, "Unbekannte oder unvollständige Option: %s\n", argv[i]); return 2; }

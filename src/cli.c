@@ -1,4 +1,5 @@
 #include "sb.h"
+#include "version.h"
 #include "backup.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,6 +15,7 @@ static int report(SBStatus status) {
     return 1;
 }
 static int run(int argc, char **argv) {
+    if (argc == 2 && !strcmp(argv[1], "--version")) { fputs(sb_build_info(), stdout); return 0; }
     SBProjects projects = {0};
     SBProject created;
     SBStatus result;
@@ -33,7 +35,7 @@ static int run(int argc, char **argv) {
         return report(result);
     }
     if (argc < 3 || (strcmp(argv[1], "list") && strcmp(argv[1], "context") && strcmp(argv[1], "search") && strcmp(argv[1],"backup")) || (!strcmp(argv[1],"backup") && argc!=5)) {
-        fprintf(stderr, "SecondBrain C17\n"
+        fprintf(stderr, "SecondBrain C17\n  secondbrain-cli --version\n"
             "  secondbrain-cli new ARBEITSORDNER KENNUNG NAME [PROJEKTORDNER]\n"
             "  secondbrain-cli list ARBEITSORDNER\n"
             "  secondbrain-cli context ARBEITSORDNER KENNUNG\n"

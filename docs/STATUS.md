@@ -1,8 +1,8 @@
 # Umsetzungsstand von SecondBrain
 
-Stand: 6. Oktober 2026. Version 0.3.0 mit Lumen-Sternkarte, Glaskarten und
-Tastaturwegen ist auf Windows, macOS und Linux geprüft. Der aktuelle
-Entwicklungsschritt 0.3.1 ergänzt Einstellungen und Ordnerwahl.
+Stand: 7. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
+veröffentlicht. Der aktuelle Entwicklungsschritt 0.8.0 ergänzt Versionsangaben.
+Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
 ## Abgeschlossene Grundlagen
 
@@ -719,3 +719,49 @@ Vorhandene Releases werden nicht ersetzt. Tag-/Manifestregression und actionlint
 Alle zwölf reinen Kerntests einschließlich des Veröffentlichungsschutzes bestehen
 (4,86 Sekunden). actionlint 1.7.12 meldet keine Workflowfehler. Dies bestätigt die
 lokale Vorbereitung, noch keine tatsächliche Release-Veröffentlichung.
+
+## Versionsangaben, 7. Oktober 2026
+
+0.8.0 ergänzt „Über SecondBrain“ unter Darstellung. Die Karte zeigt Version,
+Entwicklungsstatus und Buildangaben; Kopieren übernimmt ausschließlich diese
+Angaben. App und CLI unterstützen `--version` vor Initialisierung von UI,
+Einstellungen und Projektdateien. CMake erzeugt die Version aus PROJECT_VERSION
+und erfasst Quellrevision, Konfiguration, System und Architektur. Ein Build mit
+geänderten versionierten Dateien trägt `-dirty`; ohne eigenes Git-Repository
+lautet die Quellkennung `source`. Die Kennung stammt vom Konfigurieren,
+nicht von einer späteren dynamischen Prüfung.
+
+13 lokale Debug-Kerntests bestehen. Die ersten drei Release-Nachprüfungen
+(Versionen und Tastaturablauf) bestehen; die Bildprüfung deckte ungültig
+gezeichnete Zeilenumbrüche auf, die anschließend in einzelne Zeilen aufgeteilt
+wurden. Abschließendes Bild ist geprüft. Vier gezielte Release-Nachprüfungen bestehen
+(Versionen, erster Start und bestehende native macOS-Providerprüfung; 10,15 Sekunden).
+Das korrigierte entpackte Intel-Paket besteht mit 126 Desktop-, 112 Tastatur-
+und 75 Sicherungs-UI-Aussagen, Einstellungsneustart und CLI-Sicherung.
+SHA-256: `604ab4a379448f6c984f255d6089328e05924303662738c34f5abd43ac4e9459`.
+Ein Quellbaum ohne eigenes Git-Repository baut und meldet korrekt `Build: source`.
+Native 0.8.0-Plattformabnahme folgt.
+Die Paketprüfung vergleicht zusätzlich Archivversion, App, CLI und die beiden
+macOS-Bundle-Versionsfelder. Menschen mit Screenreadern und die native
+Menüleiste sind damit noch nicht abgenommen.
+
+## Dauerhafte Vorabversion v0.7.3
+
+[Lauf37537383565](https://github.com/Lulus792/SecondBrain/actions/runs/37537383565)
+besteht mit 22 Jobs: Versionsprüfung, 20 wiederverwendete Plattformjobs und
+Veröffentlichung. Desktop-Prüfungen laufen je Debug/Release auf Windows x64,
+Linux x64, macOS ARM64 und Intel; die vier Release-Pakete wurden entpackt und
+geprüft. [v0.7.3](https://github.com/Lulus792/SecondBrain/releases/tag/v0.7.3)
+ist öffentlich, als Vorabversion gekennzeichnet und enthält vier Archive sowie
+SHA256SUMS. Die Pipeline prüft heruntergeladene Uploads vor Veröffentlichung
+gegen die ursprünglichen Paketprüfsummen. Signierung und Notarisierung fehlen
+weiterhin; dies ist keine 1.0-Freigabe.
+
+Die vier öffentlich heruntergeladenen 0.7.3-Archive stimmen lokal mit SHA256SUMS
+und den von GitHub gemeldeten SHA-256-Digests überein; auch der Manifest-Digest
+ist geprüft. Das ersetzt keine erneute lokale Geräteabnahme aller Systeme.
+
+`dist/SecondBrain` ist lokal auf das geprüfte Intel-Paket 0.8.0 aktualisiert.
+Versionsausgabe und tatsächlicher Start mit dem eigenen Projektgedächtnis
+bestehen. Der lokale Entwicklungsbuild meldet seine damalige Quellrevision
+mit `-dirty`; die späteren CI-Pakete erfassen ihren eigenen sauberen Commit.

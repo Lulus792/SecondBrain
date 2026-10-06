@@ -73,3 +73,14 @@ Die 1.0-Arbeiten bleiben vollständig beauftragt. Die bislang geprüfte UI ist e
 Entwicklungsschritt; Sicherung, dauerhafte Einstellungen, native Ordnerauswahl,
 Screenreader-Anbindung, weitere Daten-/Leistungsprüfungen und Distribution sind
 weitere Schritte desselben Ziels. Die Versionsnummer bleibt bis zur Freigabe unter 1.0.
+
+## Versionskarte, 7. Oktober 2026
+
+Die Apple-HIG-Dokumentationsdaten zu Menus wurden erneut gelesen: kurze,
+verständliche Bezeichnungen und bekannte Tastaturwege. Die Versionskarte ist
+eine eigene Übertragung, keine behauptete Apple-Vorgabe für plattformübergreifende
+Apps. „Über SecondBrain“ liegt in den Einstellungen, übernimmt die bestehende
+Glaskarte und zeigt Entwicklungsstatus, Version und Build. Kopieren ist eine
+ausdrückliche Aktion; sie übernimmt ausschließlich Buildangaben, keine
+Projektinhalte oder Benutzerpfade. Schließen bleibt fest im Kopf; der Inhalt
+scrollt bei großem Text. Die native macOS-Menüleistenintegration bleibt offen.

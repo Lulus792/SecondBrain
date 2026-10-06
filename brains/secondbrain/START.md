@@ -19,7 +19,8 @@ abgeglichen, bevor er als aktuelle Tatsache verwendet wird.
 - [Eingang](inbox/INBOX.md) für neue Gedanken und Quellen.
 - [Anforderungen und Abnahme](knowledge/anforderungen.md) für verdichtete Erkenntnisse.
 - [Gemeinsame Pflege](knowledge/pflege.md) für Mensch und KI.
-- [Übergabe vom 6. Oktober](journal/2026-10-06.md) für den aktuellen Arbeitsabschnitt.
+- [Übergabe vom 7. Oktober](journal/2026-10-07.md) für den aktuellen Arbeitsabschnitt.
+- [Frühere Übergabe vom 6. Oktober](journal/2026-10-06.md).
 - [Archiv](archive/README.md) für inaktive Inhalte.
 
 Erstellt am 2026-10-06 mit Vorlagenversion 1. Inhalte und Quellen pflegst du oder

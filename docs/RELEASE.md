@@ -1,6 +1,6 @@
 # Auf dem Weg zu 1.0
 
-Stand: 6. Oktober 2026. Diese Liste bewertet den vorhandenen Code und die
+Stand: 7. Oktober 2026. Diese Liste bewertet den vorhandenen Code und die
 [Distribution](DISTRIBUTION.md). Der Nutzer hat die offenen Arbeiten als Umsetzungsauftrag bestätigt. Die
 Versionsnummer 1.0 darf erst nach seiner ausdrücklichen Freigabe gesetzt werden.
 Die unterstützten Umgebungen und konkreten Abnahmen werden dabei festgelegt.
@@ -52,7 +52,11 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   Prüfsummen, Änderungsübersicht und reproduzierbare Paketabnahme. Actions-Artefakte
   verfallen nach 30 Tagen. Signierung, macOS-Notarisierung und einfache Installation
   müssen für die gewählten Vertriebswege geklärt werden. Ein automatischer Updater
-  ist optional, ein dokumentierter Updateweg notwendig.
+  ist optional, ein dokumentierter Updateweg notwendig. Die dauerhafte Vorabversion
+  [v0.7.3](https://github.com/Lulus792/SecondBrain/releases/tag/v0.7.3) ist am
+  7. Oktober veröffentlicht: vier geprüfte Plattformarchive und SHA256SUMS,
+  Uploads vor Veröffentlichung erneut verifiziert. Signierung und die vollständige
+  Abnahme auf frischen Nutzerrechnern bleiben offen.
 - [ ] **Lizenz und Support klären:** Die eigene MIT-Lizenz ist auf Nutzerentscheidung festgelegt. Noch offen: alle
   Abhängigkeiten und übernommenen Anpassungen vollständig zuordnen, Fehler- und
   Sicherheitsmeldungen sowie Wartung der UI-Abhängigkeiten organisieren.

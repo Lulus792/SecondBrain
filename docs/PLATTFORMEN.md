@@ -424,3 +424,16 @@ macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Lokal besteht das entpack
 Intel-Paket mit 126 Desktop-, 105 Tastatur- und 75 Sicherungs-UI-Aussagen sowie
 Einstellungsprozessen und CLI-Sicherung. Archiv-SHA-256:
 `ce836ac9efc670a6a515539197387179b1a47c0df12183306de3f8f28e88f404`. Die vollständige Release-Arbeit bleibt offen.
+
+## Vier Paketarchitekturen und erster Release, 7. Oktober 2026
+
+Zu d109b8a/v0.7.3 besteht
+[Lauf37537383565](https://github.com/Lulus792/SecondBrain/actions/runs/37537383565)
+mit 22 Jobs: Version, 20 Plattformjobs und Veröffentlichung. Acht Desktopjobs
+führen je 23 Tests in Debug/Release auf Windows x64, Linux x64, macOS ARM64
+und Intel aus. Vier Releasejobs prüfen die entpackten Pakete einschließlich
+Desktop, Tastatur, Sicherung, Einstellungen und CLI. Die öffentliche
+[Vorabversion](https://github.com/Lulus792/SecondBrain/releases/tag/v0.7.3)
+enthält diese vier Archive und SHA256SUMS; die Pipeline prüft Uploadbytes erneut.
+Das belegt CI-Runner und Paketabläufe, keine vollständige reale Geräte- oder
+Screenreader-Abnahme. 0.8.0 bleibt ein späterer, gesondert zu prüfender Stand.

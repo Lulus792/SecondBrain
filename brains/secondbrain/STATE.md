@@ -1,6 +1,6 @@
 # SecondBrain: aktueller Stand
 
-Stand: 6. Oktober 2026. Originale: [Umsetzungsstand](../../docs/STATUS.md),
+Stand: 7. Oktober 2026. Originale: [Umsetzungsstand](../../docs/STATUS.md),
 [Plattformnachweise](../../docs/PLATTFORMEN.md) und [Release-Liste](../../docs/RELEASE.md).
 Historische Arbeitsabschnitte bleiben im [Journal](journal/2026-10-06.md).
 
@@ -23,7 +23,7 @@ Historische Arbeitsabschnitte bleiben im [Journal](journal/2026-10-06.md).
 - [0.6.1-Abnahme zu b064bd5](https://github.com/Lulus792/SecondBrain/actions/runs/37529776082):
   18 erfolgreiche Jobs, 16 Desktoptests je Debug/Release auf Windows x64,
   macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Raster- und Fokuskontrast
-  sind gezielt nachgeprüft. dist/SecondBrain ist lokal auf 0.7.2.
+  sind gezielt nachgeprüft. dist/SecondBrain ist lokal auf 0.8.0 (geprüfter Entwicklungsbuild).
 
 ## Abgenommener erster Start
 
@@ -77,3 +77,13 @@ Eigener Code: MIT. Apple-Developer-Konto und Windows-Signaturzertifikat fehlen.
 1.0 bleibt bis zur ausdrücklichen Nutzerfreigabe gesperrt. Produkttexte werden
 auf Nutzerwunsch erst abschließend bereinigt, wenn das Produkt vollständig ist.
 Chat-Anbieter, Synchronisation und automatische KI-Pflege sind spätere Optionen.
+
+## Versionsangaben 0.8.0
+
+Versionskarte und CLI-/App-Option `--version` sind implementiert. 13 Kerntests
+und erste Tastatur-/Versionsprüfungen bestehen. Das korrigierte Bild und Intel-Paket sind
+geprüft: 126 Desktop-, 112 Tastatur- und 75 Sicherungs-UI-Aussagen sowie
+Neustart und CLI-Sicherung. Native 0.8.0-Abnahme folgt gesondert.
+Die dauerhafte Vorabversion v0.7.3 ist öffentlich: 22 erfolgreiche Jobs, vier
+Archive und SHA256SUMS; öffentliche Downloads und API-Digests stimmen überein.
+[Übergabe vom 7. Oktober](journal/2026-10-07.md).
