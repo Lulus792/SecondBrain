@@ -376,3 +376,27 @@ Paket SHA-256 (SecondBrain-0.5.0-Darwin-x86_64.tar.gz):
 Dies ist keine neue vollständige lokale Paket-Bedienabnahme: alle vollständigen
 entpackten Paketwege sind im oben genannten Crossplatform-Lauf belegt. Der
 komplette Release-Auftrag bleibt aktiv; die Versionsnummer 1.0 bleibt gesperrt.
+
+
+## Native Clientabnahme auf allen drei Systemen
+
+Der [korrigierte Lauf zu 8ff50ee](https://github.com/Lulus792/SecondBrain/actions/runs/37515016302) ist erfolgreich abgeschlossen: 18 Jobs,
+15 Desktoptests je Debug/Release auf Windows x64, macOS ARM64 und Linux x64,
+plus die drei tatsächlich entpackten Pakete. Der neue Test fragt Windows UIA
+beziehungsweise Linux AT-SPI tatsächlich ab: benannte Schaltflächen und Rollen,
+Unicode-Titel setzen/lesen, Notiz anlegen, Editorwert ändern/lesen und speichern.
+Die App-Zustände werden danach geprüft. macOS behält seine native NSAccessibility-
+Providerprüfung mit Auswahl und Schutz verspäteter Aktionen.
+
+Linux verwendet eine private D-Bus-Sitzung mit in-memory GSettings; der Testclient
+sucht ausschließlich seine eigene Prozesskennung. libatspi/GObject gehören nur
+zum Testziel. Das Anwendungspaket erhält dadurch keine neue Prüfbibliothek.
+Die explizite GObject-Verlinkung behebt den anfänglichen Linux-Testbuild. Die
+vorherigen fehlgeschlagenen Läufe bleiben erhalten und werden nicht als bestanden
+gewertet. Windows-/macOS-Erfolge des ersten Clientlaufs sind separate Nachweise.
+
+Dies belegt die genannten nativen Abfragen und Aktionen, keine menschliche
+VoiceOver/NVDA/Orca-Abnahme. Passive Dialog-/Hilfetexte, graphemgenaue Textläufe,
+Zeilengeometrie, zurückhaltende Fortschrittsansagen und große animierte Dokumente
+bleiben offen. Ebenso OS-Vorgaben, Schrift-Fallback und übrige Release-Aufgaben.
+Die Produktversion bleibt 0.5.0; 1.0 bleibt bis zur Nutzerfreigabe gesperrt.

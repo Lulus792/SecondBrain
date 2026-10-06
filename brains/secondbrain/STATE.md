@@ -51,8 +51,10 @@ bedient: Schaltflächen, Texteingaben, Notizerstellung, Speichern, Auswahl und L
 Alte Aktionen nach Dokumentwechsel werden verworfen. Die [Plattformprüfung zu 0c9fc8b](https://github.com/Lulus792/SecondBrain/actions/runs/37512645717) besteht mit 18 Jobs,
 15 Desktoptests je Debug/Release und drei entpackten Paketen. Lokal bestehen
 alle 15 Release- und ASan/UBSan-Tests. Das entpackte Intel-Paket startet
-aus einem Unicode-Pfad; dist/SecondBrain ist auf 0.5.0 aktualisiert. UIA-/AT-SPI-Clientabfragen und menschliche Screenreader-Abnahme bleiben
-offen. [Umfang und Grenzen](../../docs/BARRIEREFREIHEIT_PLAN.md).
+aus einem Unicode-Pfad; dist/SecondBrain ist auf 0.5.0 aktualisiert. Der [Clientlauf zu 8ff50ee](https://github.com/Lulus792/SecondBrain/actions/runs/37515016302) besteht ebenfalls mit allen 18 Jobs:
+UIA und AT-SPI werden tatsächlich für Namen/Rollen, Unicode-Eingabe, Notizerstellung,
+Editor und Speichern benutzt. Menschliche Screenreader-Abnahme und vollständige
+Text-/Dialogsemantik bleiben offen. [Umfang und Grenzen](../../docs/BARRIEREFREIHEIT_PLAN.md).
 
 ## Auftrag und verbleibende Abnahmen
 

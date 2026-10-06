@@ -28,8 +28,9 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   reduzierte Bewegung. Die App bietet bereits Tastaturwege, größere Schrift und
   eigene Schalter für Transparenz und Bewegung; OS-Einstellungen werden noch nicht übernommen.
   In 0.5.0 sind native Adapter integriert und macOS-Provideraktionen gezielt geprüft.
-  UIA-/AT-SPI-Clientabfragen, vollständige Text-/Dialogsemantik und tatsächliche
-  VoiceOver/NVDA/Orca-Abnahme bleiben offen.
+  UIA-/AT-SPI-Clientabfragen bestehen inzwischen auf den nativen CI-Systemen.
+  Vollständige Text-/Dialogsemantik und tatsächliche VoiceOver/NVDA/Orca-Abnahme
+  bleiben offen.
 - [ ] **Leistung und Stabilität im Alltag prüfen:** große reale Wissensbasen,
   schnelle Eingabefolgen, lange Sitzungen, mehrere Displays, Skalierung und
   GPU-Treiber auf allen Zielsystemen. Die bisherigen Tests verwenden versteckte

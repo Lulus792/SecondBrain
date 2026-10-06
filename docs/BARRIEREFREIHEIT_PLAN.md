@@ -59,7 +59,8 @@ Menschen mit VoiceOver durchgeführte Bedienabnahme.
 
 Auf allen Systemen prüft derselbe Test zusätzlich Snapshot-/Aktionsvertrag,
 Unicode-Zeichenpositionen, ungültige Werte, alte Knoten, Schreibschutz und die
-Queue-Grenze. Tatsächliche Windows-UIA- und Linux-AT-SPI-Clientabfragen fehlen noch.
+Queue-Grenze. Bei der ersten Adapterabnahme fehlten noch Windows-UIA-/Linux-AT-SPI-Clientabfragen;
+die unten dokumentierte Ergänzung hat diese für den genannten Ablauf bestanden.
 Weitere offene Punkte: vollständige passive Dialog-/Hilfetexte, graphemgenaue
 Textläufe und Zeilengeometrie, zurückhaltende Fortschrittsansagen, reale assistive
 Bedienung und große Dokumente mit laufender Animation. OS-Kontrast, reduzierte
@@ -94,3 +95,37 @@ benannt und im vorgeschriebenen CI-Build nicht still übersprungen.
 
 Geprüfter lokaler Stand dieses Prüfschritts: macOS-Providerregression besteht.
 Die tatsächlichen Windows-/Linux-Ergebnisse werden nach dem nativen Lauf ergänzt.
+
+
+Der [erste Clientlauf zu 9335404](https://github.com/Lulus792/SecondBrain/actions/runs/37514295061)
+besteht auf Windows und macOS jeweils in Debug/Release einschließlich Paketen.
+Windows fragt tatsächlich UIA-Namen/Rollen/Werte ab und verwendet Invoke/SetValue.
+Linux scheiterte zunächst beim Linken des Testclients; GObject wird jetzt explizit
+angefordert, weil der Testclient seine Referenzfunktionen direkt verwendet.
+Der korrigierte Linux-Client baut und wird im folgenden Lauf nativ geprüft.
+Die Builddiagnostik veröffentlicht getrennte begrenzte Compiler-Ausgabeströme;
+die anfangs abgeschnittene GitHub-Annotation wird nicht als Compilerursache gewertet.
+
+
+## Native Clientabnahme auf allen drei Systemen
+
+Der [korrigierte Lauf zu 8ff50ee](https://github.com/Lulus792/SecondBrain/actions/runs/37515016302) ist erfolgreich abgeschlossen: 18 Jobs,
+15 Desktoptests je Debug/Release auf Windows x64, macOS ARM64 und Linux x64,
+plus die drei tatsächlich entpackten Pakete. Der neue Test fragt Windows UIA
+beziehungsweise Linux AT-SPI tatsächlich ab: benannte Schaltflächen und Rollen,
+Unicode-Titel setzen/lesen, Notiz anlegen, Editorwert ändern/lesen und speichern.
+Die App-Zustände werden danach geprüft. macOS behält seine native NSAccessibility-
+Providerprüfung mit Auswahl und Schutz verspäteter Aktionen.
+
+Linux verwendet eine private D-Bus-Sitzung mit in-memory GSettings; der Testclient
+sucht ausschließlich seine eigene Prozesskennung. libatspi/GObject gehören nur
+zum Testziel. Das Anwendungspaket erhält dadurch keine neue Prüfbibliothek.
+Die explizite GObject-Verlinkung behebt den anfänglichen Linux-Testbuild. Die
+vorherigen fehlgeschlagenen Läufe bleiben erhalten und werden nicht als bestanden
+gewertet. Windows-/macOS-Erfolge des ersten Clientlaufs sind separate Nachweise.
+
+Dies belegt die genannten nativen Abfragen und Aktionen, keine menschliche
+VoiceOver/NVDA/Orca-Abnahme. Passive Dialog-/Hilfetexte, graphemgenaue Textläufe,
+Zeilengeometrie, zurückhaltende Fortschrittsansagen und große animierte Dokumente
+bleiben offen. Ebenso OS-Vorgaben, Schrift-Fallback und übrige Release-Aufgaben.
+Die Produktversion bleibt 0.5.0; 1.0 bleibt bis zur Nutzerfreigabe gesperrt.

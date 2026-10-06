@@ -24,7 +24,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   Bestandsschutz, Fehlerprüfungen und geplanter Desktop-Ablauf.
 - [Einstellungen und Arbeitsstand](../../docs/EINSTELLUNGEN.md): Dateivertrag,
   native Ordnerwahl, Wiederherstellung und Prüfgrenzen.
-- [Native UI-Anbindung](../../docs/BARRIEREFREIHEIT_PLAN.md): integrierte Adapter, tatsächliche macOS-Providerprüfung und offene assistive Abnahme.
+- [Native UI-Anbindung](../../docs/BARRIEREFREIHEIT_PLAN.md): integrierte Adapter, tatsächliche macOS-Provider-/UIA-/AT-SPI-Clientprüfungen und offene assistive Abnahme.
 - [MIT-Lizenz](../../LICENSE): gewählte Lizenz des eigenen Codes.
 - [UI-Abhängigkeiten](../../third_party/README.md): Herkunft, Versionen, Lizenzen, Anpassungen.
 
