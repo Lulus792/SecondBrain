@@ -35,6 +35,9 @@ jobs:
       - name: Verify UI on Windows and macOS
         if: runner.os != 'Linux'
         run: ctest --test-dir build/ui -C ${{ matrix.config }} --output-on-failure
+      - name: Publish failed test diagnostics
+        if: failure()
+        run: cmake -DSB_TEST_LOG=build/ui/Testing/Temporary/LastTest.log -P tools/ci_diagnostics.cmake
       - name: Create application package
         if: matrix.config == 'Release'
         run: cpack --config build/ui/CPackConfig.cmake -C Release -B build/ui/packages
