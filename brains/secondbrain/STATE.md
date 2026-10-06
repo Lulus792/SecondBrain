@@ -34,8 +34,10 @@ Der Nutzer hat Lumens Farbpalette mit einem stärkeren Liquid-Glass-Look für
 Karten und Bedienelemente ausgewählt. Die [Designstudie](../../docs/UI_GALAXIE.md)
 dokumentiert die verfeinerte Vorschau und ihre Prüfung. Die C-App bleibt auf
 dem geprüften Stand der ersten Version; die Galaxie-Ansicht und das neue
-Glasmaterial sind dort noch nicht integriert. Nächster Schritt: Kamerabedienung,
-Graphumfang und den Materialweg für alle drei Plattformen konkretisieren.
+Glasmaterial sind dort noch nicht integriert. Die Umsetzung samt vollständiger Tastaturbedienung ist jetzt beauftragt. Das
+C-Graphmodul erkennt geprüfte interne Markdown-Verweise; alle sechs lokalen
+C-/UI-Prüfungen bestehen mit Sanitizern. [Bedienvertrag](../../docs/UI_TASTATUR.md).
+Nächster Schritt: Sternkarte, Glasrenderer und sichtbare Fokusführung integrieren.
 
 ## Grenzen
 
