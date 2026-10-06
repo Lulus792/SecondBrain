@@ -38,6 +38,10 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   UIA-/AT-SPI-Clientabfragen bestehen inzwischen auf den nativen CI-Systemen.
   In 0.5.1 bestehen native Dialog-/Hilfetexte auf allen drei Systemen. Dokumentstruktur,
   Unicode-Textgeometrie und tatsächliche VoiceOver/NVDA/Orca-Abnahme bleiben offen.
+  In 0.9.0 ergänzt eine eigene SDL_ttf-Anbindung HarfBuzz, FreeType und
+  Ersatzschriften; lokale Raster-/Text-/Paketprüfungen bestehen. Gemischte
+  Schreibrichtungen und graphemgenaue Eingabe bleiben in
+  [TEXTDARSTELLUNG.md](TEXTDARSTELLUNG.md) offen.
   Die Cache-Signalstruktur ist in 0.5.2 korrigiert und mit echtem Linux-Clientcache
   geprüft; weitere Eventtypen bleiben gesonderte Abnahmen. Systemvorgaben bestehen
   in 0.6.0 auf allen drei CI-Systemen; reale Einstellungswechsel, Windows-Custom-

@@ -83,7 +83,17 @@ Chat-Anbieter, Synchronisation und automatische KI-Pflege sind spätere Optionen
 Versionskarte und CLI-/App-Option `--version` sind implementiert. 13 Kerntests
 und erste Tastatur-/Versionsprüfungen bestehen. Das korrigierte Bild und Intel-Paket sind
 geprüft: 126 Desktop-, 112 Tastatur- und 75 Sicherungs-UI-Aussagen sowie
-Neustart und CLI-Sicherung. Native 0.8.0-Abnahme folgt gesondert.
+Neustart und CLI-Sicherung. Die native Abnahme zu 1ab4ab5 besteht mit 20 Jobs und vier Paketen;
+Windows-CRLF ist im Vergleich berücksichtigt.
 Die dauerhafte Vorabversion v0.7.3 ist öffentlich: 22 erfolgreiche Jobs, vier
 Archive und SHA256SUMS; öffentliche Downloads und API-Digests stimmen überein.
 [Übergabe vom 7. Oktober](journal/2026-10-07.md).
+
+## Textdarstellung 0.9.0
+
+Neue geformte Textläufe und Noto-Ersatzschriften sind in C an die UI angebunden.
+26 lokale Release-Tests, drei Nachprüfungen und das entpackte Intel-Paket
+bestehen; 13 reine C-Kerntests ebenfalls. Der neue Texttest schlägt beim
+bisherigen Renderer fehl. [Vertrag und Grenzen](../../docs/TEXTDARSTELLUNG.md):
+gemischte Schreibrichtungen, graphemgenaue Eingabe, Emoji und native
+Textgeometrie bleiben eigene Arbeiten. Native 0.9.0-Abnahme folgt.

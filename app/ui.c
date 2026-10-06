@@ -1,6 +1,11 @@
+struct nk_draw_list;
+struct nk_command_text;
+void sb_ui_text_draw(struct nk_draw_list *, const struct nk_command_text *);
+#define NK_DRAW_TEXT_CUSTOM sb_ui_text_draw
 #define NK_IMPLEMENTATION
 #define NK_SDL3_RENDERER_IMPLEMENTATION
 #include "ui.h"
+#include "text.h"
 #define SDL_MAIN_HANDLED
 #include <SDL3/SDL_main.h>
 #include "platform.h"
@@ -20,51 +25,22 @@ static void paste(nk_handle user, struct nk_text_edit *edit) {
 }
 
 SBStatus sb_ui_fonts(SBUi *ui, float scale) {
-    struct nk_font_atlas *atlas;
-    struct nk_font_config config = nk_font_config(0);
-    static const nk_rune ranges[] = {32, 0x024f, 0x0370, 0x052f, 0x2000, 0x206f, 0x2190, 0x22ff, 0};
-    char *bytes = NULL;
-    size_t length = 0;
-    SBStatus result = sb_fs_read(ui->font_path, &bytes, &length);
-    if (result.code != SB_OK) return result;
-    ui->density = SDL_GetWindowPixelDensity(ui->window);
-    if (ui->density < 1) ui->density = 1;
-    ui->scale = scale;
-    if (ui->normal) {
-        struct nk_sdl *backend = (struct nk_sdl *)ui->ctx->userdata.ptr;
-        nk_font_atlas_clear(&backend->atlas);
+    if (!ui->text) {
+        /* Nuklear's geometry renderer needs a white atlas texel, not a glyph atlas. */
+        char *bytes=NULL; size_t length=0;
+        SBStatus status=sb_fs_read(ui->font_path,&bytes,&length);
+        if (status.code!=SB_OK) return status;
+        static const nk_rune range[]={32,33,0};
+        struct nk_font_config config=nk_font_config(0); config.range=range;
+        struct nk_font_atlas *atlas=nk_sdl_font_stash_begin(ui->ctx);
+        struct nk_font *dummy=nk_font_atlas_add_from_memory(atlas,bytes,length,8,&config);
+        free(bytes);
+        if (!dummy) return sb_error(SB_IO,"Darstellungsatlas konnte nicht geladen werden.");
+        nk_sdl_font_stash_end(ui->ctx);
     }
-    ui->code = NULL;
-    atlas = nk_sdl_font_stash_begin(ui->ctx);
-    config.range = ranges;
-    config.oversample_h = 2; config.oversample_v = 2;
-    ui->normal = nk_font_atlas_add_from_memory(atlas, bytes, length, 15 * scale * ui->density, &config);
-    ui->body = nk_font_atlas_add_from_memory(atlas, bytes, length, 18 * scale * ui->density, &config);
-    ui->heading = nk_font_atlas_add_from_memory(atlas, bytes, length, 26 * scale * ui->density, &config);
-    {
-        char mono_path[SB_PATH_CAP], *slash;
-        char *mono = NULL;
-        size_t mono_length;
-        strcpy(mono_path, ui->font_path); slash = strrchr(mono_path, '/');
-        if (slash) {
-            *slash = 0;
-            if (sb_path_join(mono_path, sizeof(mono_path), mono_path, "NotoSansMono-Regular.ttf").code == SB_OK &&
-                sb_fs_read(mono_path, &mono, &mono_length).code == SB_OK) {
-                ui->code = nk_font_atlas_add_from_memory(atlas, mono, mono_length, 17 * scale * ui->density, &config);
-                free(mono);
-            }
-        }
-        if (!ui->code) ui->code = ui->body;
-    }
-    if (!ui->normal || !ui->body || !ui->heading) { free(bytes); return sb_error(SB_IO, "Schrift konnte nicht geladen werden."); }
-    nk_sdl_font_stash_end(ui->ctx);
-    ui->normal->handle.height = 15 * scale;
-    ui->body->handle.height = 18 * scale;
-    ui->heading->handle.height = 26 * scale;
-    if (ui->code != ui->body) ui->code->handle.height = 17 * scale;
-    nk_style_set_font(ui->ctx, &ui->normal->handle);
-    free(bytes);
-    return sb_ok();
+    float density=SDL_GetWindowPixelDensity(ui->window);
+    if (density<1) density=1;
+    return sb_ui_text_fonts(ui,scale,density);
 }
 
 void sb_ui_theme(SBUi *ui, bool dark) {
@@ -190,6 +166,7 @@ void sb_ui_draw(SBUi *ui) {
         SDL_SetRenderDrawColor(ui->renderer, 7, 14, 26, 255); SDL_RenderClear(ui->renderer);
     }
     nk_sdl_render(ui->ctx, NK_ANTI_ALIASING_ON);
+    sb_ui_text_frame_end(ui);
 }
 void sb_ui_reset_editor(SBUi *ui) {
     nk_textedit_clear_state(&ui->ctx->text_edit, NK_TEXT_EDIT_MULTI_LINE, nk_filter_default);
@@ -206,6 +183,7 @@ SBStatus sb_ui_capture(SBUi *ui, const char *path) {
 }
 void sb_ui_shutdown(SBUi *ui) {
     sb_space_free(&ui->space);
+    sb_ui_text_free(ui);
     if (ui->ctx) nk_sdl_shutdown(ui->ctx);
     if (ui->renderer) SDL_DestroyRenderer(ui->renderer);
     if (ui->window) SDL_DestroyWindow(ui->window);

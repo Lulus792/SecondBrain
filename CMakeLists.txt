@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-project(SecondBrain VERSION 0.8.0 LANGUAGES C)
+project(SecondBrain VERSION 0.9.0 LANGUAGES C)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
@@ -94,9 +94,10 @@ if(SB_BUILD_UI)
             URL_HASH SHA256=4c3b09330d866dc52eb65b66259a6684ad387252ca8c57901b3a2b534eb42e3d)
         FetchContent_MakeAvailable(SDL3)
     endif()
-    add_library(sb_ui STATIC app/ui.c app/space.c app/icons.c)
+    include(cmake/Text.cmake)
+    add_library(sb_ui STATIC app/text.c app/ui.c app/space.c app/icons.c)
     target_include_directories(sb_ui PUBLIC app third_party/ui)
-    target_link_libraries(sb_ui PUBLIC sb_core SDL3::SDL3-static)
+    target_link_libraries(sb_ui PUBLIC sb_core SDL3::SDL3-static SDL3_ttf::SDL3_ttf-static)
     if(MSVC)
         target_compile_options(sb_ui PRIVATE /utf-8)
         target_compile_definitions(sb_ui PRIVATE _CRT_SECURE_NO_WARNINGS)
@@ -143,17 +144,31 @@ if(SB_BUILD_UI)
     else()
         set(SB_ASSET_DEST "$<TARGET_FILE_DIR:secondbrain>/assets")
     endif()
+    file(GLOB SB_DEPENDENCY_NOTICES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/licenses/*.txt")
+    set(SB_RUNTIME_NOTICES ${SB_DEPENDENCY_NOTICES}
+        "${CMAKE_CURRENT_SOURCE_DIR}/third_party/ui/Nuklear-LICENSE"
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/OFL.txt"
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/OFL-CJK.txt"
+        "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
     add_custom_command(TARGET secondbrain POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets" "${SB_ASSET_DEST}"
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "${SB_ASSET_DEST}/licenses"
+        COMMAND "${CMAKE_COMMAND}" -E copy_if_different ${SB_RUNTIME_NOTICES} "${SB_ASSET_DEST}/licenses"
         VERBATIM)
     install(TARGETS secondbrain BUNDLE DESTINATION . COMPONENT Runtime
         RUNTIME DESTINATION . COMPONENT Runtime)
     if(NOT APPLE)
         install(DIRECTORY assets DESTINATION . COMPONENT Runtime)
+        install(FILES ${SB_RUNTIME_NOTICES} DESTINATION assets/licenses COMPONENT Runtime)
     endif()
     install(FILES third_party/licenses/SDL3.txt DESTINATION licenses COMPONENT Runtime)
     install(FILES third_party/ui/Nuklear-LICENSE DESTINATION licenses RENAME Nuklear.txt COMPONENT Runtime)
     install(FILES assets/fonts/OFL.txt DESTINATION licenses RENAME Noto.txt COMPONENT Runtime)
+    install(FILES assets/fonts/OFL-CJK.txt DESTINATION licenses RENAME Noto-CJK.txt COMPONENT Runtime)
+    install(FILES third_party/licenses/SDL_ttf.txt third_party/licenses/FreeType-LICENSE.txt
+        third_party/licenses/FreeType-FTL.txt third_party/licenses/FreeType-BDF.txt
+        third_party/licenses/FreeType-PCF.txt third_party/licenses/FreeType-zlib.txt
+        third_party/licenses/HarfBuzz.txt third_party/licenses/HarfBuzz-MS-USE.txt DESTINATION licenses COMPONENT Runtime)
     install(FILES third_party/licenses/AccessKit-LICENSE-MIT.txt
         third_party/licenses/AccessKit-LICENSE-APACHE.txt third_party/licenses/AccessKit-LICENSE.chromium.txt
         third_party/licenses/AccessKit-AUTHORS.txt DESTINATION licenses COMPONENT Runtime)
@@ -221,6 +236,15 @@ if(SB_BUILD_UI)
             "-DSB_TEST_ROOT=${CMAKE_CURRENT_BINARY_DIR}/process-preferences"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_preferences_process.cmake")
         set_tests_properties(preferences-process-restart PROPERTIES TIMEOUT 90)
+        add_executable(secondbrain-text-tests tests/test_text.c)
+        target_link_libraries(secondbrain-text-tests PRIVATE sb_ui)
+        if(MSVC)
+            target_compile_options(secondbrain-text-tests PRIVATE /utf-8)
+        endif()
+        add_test(NAME unicode-text-rendering COMMAND secondbrain-text-tests
+            "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/NotoSans-Regular.ttf"
+            "${CMAKE_CURRENT_BINARY_DIR}/unicode-text.bmp")
+        set_tests_properties(unicode-text-rendering PROPERTIES TIMEOUT 120 RESOURCE_LOCK secondbrain_clipboard)
         add_executable(secondbrain-ui-tests tests/test_ui.c)
         target_link_libraries(secondbrain-ui-tests PRIVATE sb_ui)
         if(MSVC)

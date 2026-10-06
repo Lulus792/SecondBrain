@@ -1,7 +1,8 @@
 # Umsetzungsstand von SecondBrain
 
 Stand: 7. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
-veröffentlicht. Der aktuelle Entwicklungsschritt 0.8.0 ergänzt Versionsangaben.
+veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
+Der aktuelle Entwicklungsschritt 0.9.0 ergänzt geformten Text und Ersatzschriften.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
 ## Abgeschlossene Grundlagen
@@ -776,3 +777,41 @@ Der Vergleich akzeptiert nun LF oder CRLF, erhält aber die vollständige Prüfu
 aller übrigen Zeichen. Sechs C-Prüffälle bestehen lokal: beide korrekten Formen,
 ein falscher Buchstabe, zusätzliches Zeichen, alleinstehendes CR und NULL.
 Native Wiederholungsabnahme folgt; kein erfolgreicher 0.8.0-Gesamtlauf behauptet.
+
+## Native Abnahme von 0.8.0
+
+[Lauf37540475172](https://github.com/Lulus792/SecondBrain/actions/runs/37540475172)
+zu 1ab4ab5 besteht mit 20 Jobs, 25 Desktoptests je Debug/Release auf Windows x64,
+Linux x64 sowie macOS ARM64/Intel und vier entpackten Release-Paketen. Der
+Windows-CRLF-Vergleich ist damit tatsächlich abgenommen. Das ist kein Nachweis
+für die nachfolgende Textanbindung 0.9.0.
+
+## Geformter Text und Ersatzschriften in 0.9.0
+
+[Textdarstellung](TEXTDARSTELLUNG.md) dokumentiert Recherche, UI-Anbindung und
+verbleibende Arbeit. SDL_ttf, FreeType und HarfBuzz verwenden festgelegte
+Archive/Submodulstände; der eigene Code ist C17 und der reine Kern bleibt
+unabhängig von der UI. Noto-Ersatzschriften ergänzen Arabisch, Hebräisch,
+Devanagari, Symbols2 und CJK/Kana/Hangul. Die Lizenztexte liegen auch innerhalb
+der Anwendungsressourcen.
+
+Alle 26 lokalen Release-Tests bestehen (262,08 Sekunden). Nach der aus dem Bild
+abgeleiteten Größenkorrektur der Ersatzschriften bestehen drei gezielte
+Nachprüfungen (6,13 Sekunden). Das endgültige entpackte Intel-Paket besteht mit
+126 Desktop-, 112 Tastatur- und 75 Sicherungs-UI-Aussagen, Einstellungen und
+CLI-Sicherung. 13 neu konfigurierte Debug-Kerntests bestehen (5,93 Sekunden);
+deren Build konfiguriert ausschließlich C und enthält keine Textbibliothek.
+Der neue Texttest scheitert mit dem bisherigen Renderer an fehlender
+arabischer Verbindung (Exit 1). Das korrigierte echte Rasterbild zeigt die
+geprüften Schriften bei 200 Prozent. Native 0.9.0-Plattformabnahme folgt.
+
+Gemischte Schreibrichtungen und Scriptwechsel, weitere Schriften/Emoji,
+graphemgenaue Bearbeitung und native Textgeometrie bleiben offen; dieser
+Schritt bestätigt weder eine vollständige Sprach- noch Screenreader-Abnahme.
+
+Gezielte ASan-/UBSan-Ausführung des eigenen Textmoduls, UI-Klebers und
+Texttests besteht mit 19 Aussagen (Verbindung, CJK/Hangul, Akzent und drei
+Schriftgrößen). Die externen statischen Bibliotheken sind dabei nicht
+instrumentiert; LeakSanitizer ist auf diesem Mac nicht Teil der Prüfung.
+Die kleine normale Textszene läuft in 0,37 Sekunden mit maximal 89.182.208
+Bytes RSS (~85 MiB). Das ist kein Langzeit- oder Großdaten-Leistungsnachweis.

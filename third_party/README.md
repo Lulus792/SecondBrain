@@ -33,7 +33,9 @@ Unicode-Zeichen. Große Änderungen können ältere beziehungsweise zu große
 Undo-Einträge verdrängen. Die UI-Regression prüft ausdrücklich große Cursorpositionen
 und verhindert eine Verwechslung von Zeichen- und Byte-Längen.
 
-Der SDL-Renderer-Header bleibt unverändert. app/ui.c ergänzt die Einfügefunktion,
+Der SDL-Renderer-Header bleibt unverändert. Ab 0.9.0 erlaubt ein bedingter
+Nuklear-Hook (`NK_DRAW_TEXT_CUSTOM`) die Darstellung geformter Textläufe
+als UI-Texturen; ohne Hook bleibt der Originalkonverter aktiv. app/ui.c ergänzt die Einfügefunktion,
 verarbeitet mehrteilige Texteingaben vollständig und übersetzt Command-Tasten
 unter macOS in die passenden Editieraktionen.
 
@@ -93,3 +95,42 @@ Sie werden nicht im Paket als eigene Bibliothekskopien ausgeliefert. Herkunft:
 [D-Bus](https://www.freedesktop.org/wiki/Software/dbus/),
 [GLib/GIO](https://gitlab.gnome.org/GNOME/glib). Voraussetzungen und Grenzen stehen
 in [Distribution](../docs/DISTRIBUTION.md) und [Einstellungen](../docs/EINSTELLUNGEN.md).
+
+## Geformter Text ab 0.9.0
+
+Die C-Anbindung in app/text.c verwendet ausschließlich für die UI
+[SDL_ttf 3.2.2](https://github.com/libsdl-org/SDL_ttf/releases/tag/release-3.2.2).
+Archiv-SHA-256: `63547d58d0185c833213885b635a2c0548201cc8f301e6587c0be1a67e1e045d`.
+Die statisch eingebundenen UI-Abhängigkeiten entsprechen den tatsächlichen
+Submodulrevisionen dieses Tags:
+
+- FreeType: SDL-Fork 9973564cfa63763a3e4ac67c09147899539b1e07, Archiv-SHA-256
+  `026a05a49d114a1235d2926f4c03a9330e4b1a6efe7c217ec9607904c32907d4`.
+  Verwendet wird die FreeType-Lizenzalternative FTL. Portions of this software
+  are copyright © 1996–2023 The FreeType Project (www.freetype.org). All rights reserved.
+- HarfBuzz: SDL-Fork 564bf9818a18709776856533829c0c04950773d6, Archiv-SHA-256
+  `a448dd6c22d8e1e1cf39438c662251c1f97f810b8780eed4a6d6ada948c99ddc`.
+  Old MIT sowie die separate Microsoft-MIT-Notiz zum USE-Anteil.
+
+Originaltexte und besondere Hinweise (FreeType BDF/PCF/zlib, HarfBuzz USE)
+liegen unter licenses/ und werden mit den Paketen ausgeliefert. FreeType-
+Fremdkompressionen und SDL_ttf-SVG-Emoji-Backend sind deaktiviert. HarfBuzz
+benötigt beim Bauen einen C++-Compiler; der eigene Code bleibt C17. Diese
+UI-Ziele sind vollständig vom separat baubaren fachlichen C-Kern getrennt.
+
+Zusätzliche unveränderte Noto-Schriften (Arabisch, Hebräisch, Devanagari,
+Symbols2) stammen aus derselben noto-fonts-Revision wie die bisherigen
+Schriften. Noto Sans CJK JP Regular stammt aus
+[noto-cjk/Sans2.004](https://github.com/notofonts/noto-cjk/tree/523d033d6cb47f4a80c58a35753646f5c3608a78),
+Revision 523d033d6cb47f4a80c58a35753646f5c3608a78. Die separate Original-Lizenz
+liegt unter assets/fonts/OFL-CJK.txt. Glyphenformen dieser CJK-Schrift folgen
+der japanischen Variante. Andere regionale Varianten und umfassende
+Schreibrichtungs-/Editorabnahme bleiben eigene Arbeiten.
+
+### Schriftprüfsummen
+
+- NotoSansArabic-Regular.ttf: `ceea25b464a656dc3b26849bab9356740401af62aedf1bfa8b7f0d9b75925b1b`.
+- NotoSansHebrew-Regular.ttf: `a7fa16fffb27bedb060a0866267c29e9859aeb9c21cc33f5b3aaf6eb062eca85`.
+- NotoSansDevanagari-Regular.ttf: `385e78e6359a9d88a0f243d53b1209d7548361ba2194e2b9ec779bcaa7e8949d`.
+- NotoSansSymbols2-Regular.ttf: `882d142b9a1ef3fd7fa4225dbe95c10fab6664206eb4964c8ff705a4f6d02988`.
+- NotoSansCJKjp-Regular.otf: `68a3fc98800b2a27b371f2fb79991daf3633bd89309d4ffaa6946fd587f375b5`.

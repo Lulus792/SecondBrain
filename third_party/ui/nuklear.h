@@ -11151,8 +11151,12 @@ nk_convert(struct nk_context *ctx, struct nk_buffer *cmds,
         } break;
         case NK_COMMAND_TEXT: {
             const struct nk_command_text *t = (const struct nk_command_text*)cmd;
+#ifdef NK_DRAW_TEXT_CUSTOM
+            NK_DRAW_TEXT_CUSTOM(&ctx->draw_list, t);
+#else
             nk_draw_list_add_text(&ctx->draw_list, t->font, nk_rect(t->x, t->y, t->w, t->h),
                 t->string, t->length, t->height, t->foreground);
+#endif
         } break;
         case NK_COMMAND_IMAGE: {
             const struct nk_command_image *i = (const struct nk_command_image*)cmd;

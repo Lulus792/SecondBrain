@@ -1,7 +1,7 @@
 # Anwendungspakete
 
 SecondBrain ist eine lokale Desktop-Anwendung in Entwicklung. Zum Bauen werden ein
-C17-Compiler und CMake ab 3.20 benötigt. Zum Starten des fertigen Pakets sind
+C17-Compiler, ein C++-Compiler für die UI-Textbibliothek und CMake ab 3.24 benötigt. Zum Starten des fertigen Pakets sind
 Python, CMake und ein Compiler nicht erforderlich.
 
 ## Paket erzeugen und prüfen

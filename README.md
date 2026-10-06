@@ -56,10 +56,12 @@ notarisiert. Voraussetzungen und Paketaufbau: [Distribution](docs/DISTRIBUTION.m
 
 ## Selbst bauen
 
-Du brauchst einen C17-Compiler und CMake ab 3.20. Auf macOS eignet sich der
+Du brauchst einen C17-Compiler und CMake ab 3.24. Auf macOS eignet sich der
 Compiler der Xcode Command Line Tools, auf Windows Visual Studio mit C-Werkzeugen,
 auf Linux GCC oder Clang sowie die Entwicklungsdateien des Fenstersystems.
-SDL3 wird bei Bedarf in einer festgelegten Version beim Build geladen.
+SDL3 und die UI-Textbibliotheken werden bei Bedarf in festgelegten Versionen
+beim Build geladen. HarfBuzz benötigt zusätzlich einen C++-Compiler;
+der eigene Anwendungscode ist C17.
 Unter Linux benötigt der UI-Build zusätzlich Cargo mit Rust ab 1.87, um die
 festgelegte Zugänglichkeitsbibliothek mit ihrer Cache-Korrektur zu bauen.
 Die fertige Anwendung benötigt keine Rust-Toolchain.
@@ -142,7 +144,7 @@ im Einsatz. [Konzept und Arbeitsweise](docs/KONZEPT.md).
 
 ## Entwicklung
 
-Der fachliche Kern verwendet C und Betriebssystem-APIs. SDL3, Nuklear und AccessKit
+Der fachliche Kern verwendet C und Betriebssystem-APIs. SDL3, Nuklear, SDL_ttf und AccessKit
 werden für die UI eingesetzt. Die Herkunft und Lizenzen der Abhängigkeiten stehen unter
 [third_party](third_party/README.md); die Architektur in [docs/ARCHITEKTUR.md](docs/ARCHITEKTUR.md).
 Dateiformate und Updateverhalten stehen im [Datenvertrag](docs/DATENVERTRAG.md).

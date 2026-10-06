@@ -18,7 +18,9 @@
 #include "sb.h"
 #include "space.h"
 
+typedef struct SBTextSystem SBTextSystem;
 typedef struct {
+    SBTextSystem *text;
     SDL_Window *window;
     SDL_Renderer *renderer;
     struct nk_context *ctx;

@@ -20,7 +20,9 @@ Inhaltsabgleich schützt vor dem Überschreiben inzwischen veränderter Original
 
 SDL3 übernimmt ausschließlich Fenster, Rendering, Eingabe, Zwischenablage und
 UI-Dialoge. Nuklear stellt die in C geschriebenen Oberflächenkomponenten und
-Textbearbeitung bereit. AccessKit stellt die native Zugänglichkeitsschicht bereit:
+Textbearbeitung bereit. SDL_ttf formt und rastert Text mit HarfBuzz und FreeType;
+ein eigener C-Hook fügt Texttexturen in die vorhandene Zeichenreihenfolge ein.
+[Schriftrollen und Grenzen](TEXTDARSTELLUNG.md). AccessKit stellt die native Zugänglichkeitsschicht bereit:
 macOS Accessibility, Windows UI Automation und Linux AT-SPI. Ein eigener C-Adapter
 veröffentlicht UI-Snapshots und verarbeitet native Aktionen auf dem UI-Thread.
 Seine Kontextkennungen verwerfen Aktionen aus inzwischen gewechselten Dokumenten.
