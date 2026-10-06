@@ -12,6 +12,8 @@ Die normale Nutzung soll vollständig in der eigenen Anwendung möglich sein.
 
 Die Umsetzung läuft. UI-Recherche und Oberflächenentwurf sind dokumentiert;
 ein unabhängiger C17-Kern und ein natives Entwicklungswerkzeug sind implementiert.
+Die UI-Grundlage mit Schriften, Darstellung und Texteditor ist ebenfalls
+implementiert und auf allen drei Plattformen geprüft.
 Die eigene Oberfläche und die vollständige App-Abnahme stehen noch aus.
 Der aktuelle Nachweis steht im [Umsetzungsstand](docs/STATUS.md).
 

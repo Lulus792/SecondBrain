@@ -53,7 +53,9 @@ UndefinedBehaviorSanitizer. Sie prüfen Unicode-Paste, Auswahlersetzung,
 Rückgängig/Wiederholen, lange Cursorpositionen, Kapazitätsfehler und mehrteilige
 Texteingaben. Die tatsächliche Testdarstellung wurde betrachtet. Die UI-CI
 prüft diese Grundlage zusätzlich mit nativen Fenstersystemen der drei Plattformen.
-Ergebnisse werden nach dem jeweiligen Lauf ergänzt.
+Der [UI-Lauf zu 2c1a911](https://github.com/Lulus792/SecondBrain/actions/runs/37437068287)
+besteht mit erfolgreichen UI-Jobs auf Windows, macOS und Linux. Diese Bausteinprüfung
+ist von der noch ausstehenden vollständigen Bedienprüfung getrennt.
 
 ## Weiter ausstehend
 

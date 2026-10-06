@@ -45,8 +45,6 @@ die lokale Simulation und alle sechs CI-Jobs.
 Die Runner-Bezeichnungen bezeichnen die tatsächlich verwendete CI-Matrix.
 Sie sind keine Zusage für jede historische Windows-, macOS- oder Linux-Version.
 
-## Grenzen
-
 ## Native C Prüfung
 
 Der [Lauf zu 4c99bb3](https://github.com/Lulus792/SecondBrain/actions/runs/37435200479)
@@ -60,6 +58,18 @@ Intel macOS 14.6.1 sowie zusätzliche Läufe mit AddressSanitizer und
 UndefinedBehaviorSanitizer. Die UI-Prüfung rendert mit dem nativen Cocoa-Fenster
 und SDL-Softwarerenderer. Sie belegt Renderer und Editorbausteine; die vollständige
 Projektoberfläche wird daraus noch aufgebaut.
+
+## Native UI Grundlagenprüfung
+
+Der [Lauf zu 2c1a911](https://github.com/Lulus792/SecondBrain/actions/runs/37437068287)
+besteht ebenfalls. Die drei UI-Jobs bauen SDL3 und das UI-Ziel und prüfen
+Renderer, Schriften, Texteingaben, Unicode-Auswahlersetzung sowie Rückgängig und
+Wiederholen. Linux verwendet X11 unter Xvfb, Windows und macOS ihre nativen
+Fenstersysteme; die Tests rendern über den SDL-Softwarerenderer in einem versteckten
+Testfenster. Die Kern- und Python-Jobs dieses Laufs bestehen ebenfalls.
+
+Diese Ergebnisse belegen die verwendeten Bausteine. Die noch zu implementierende
+Projektoberfläche benötigt zusätzlich vollständige Bedien- und Paketprüfungen.
 
 ## Grenzen der Nachweise
 
