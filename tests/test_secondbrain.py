@@ -20,10 +20,10 @@ class CreateBrainTests(unittest.TestCase):
         repository.mkdir()
         destination = self.root / "brains" / "test"
         create_brain("test", "Mein Projekt", destination, repository)
-        metadata = json.loads((destination / "brain.json").read_text())
+        metadata = json.loads((destination / "brain.json").read_text(encoding="utf-8"))
         linked = destination / metadata["project_root"]
         self.assertEqual(linked.resolve(), repository.resolve())
-        project = (destination / "PROJECT.md").read_text()
+        project = (destination / "PROJECT.md").read_text(encoding="utf-8")
         self.assertIn("Projekt%20%C3%BC%20%281%29", project)
         self.assertEqual(metadata["template_version"], 1)
         self.assertTrue((destination / "knowledge" / "NOTE_TEMPLATE.md").is_file())
@@ -35,17 +35,17 @@ class CreateBrainTests(unittest.TestCase):
             create_brain("test", "Test", destination)
         self.assertEqual(list(destination.iterdir()), [])
         sentinel = destination / "STATE.md"
-        sentinel.write_text("Nutzerwissen")
+        sentinel.write_text("Nutzerwissen", encoding="utf-8")
         with self.assertRaises(FileExistsError):
             create_brain("test", "Test", destination)
-        self.assertEqual(sentinel.read_text(), "Nutzerwissen")
+        self.assertEqual(sentinel.read_text(encoding="utf-8"), "Nutzerwissen")
 
     def test_existing_file_is_preserved(self):
         destination = self.root / "file"
-        destination.write_text("Bestehend")
+        destination.write_text("Bestehend", encoding="utf-8")
         with self.assertRaises(FileExistsError):
             create_brain("test", "Test", destination)
-        self.assertEqual(destination.read_text(), "Bestehend")
+        self.assertEqual(destination.read_text(encoding="utf-8"), "Bestehend")
     def test_dangling_symlink_is_preserved(self):
         symlink = self.root / "link"
         try:
@@ -77,9 +77,9 @@ class CreateBrainTests(unittest.TestCase):
         first, second = self.root / "first", self.root / "second"
         create_brain("first", "Erstes", first)
         create_brain("second", "Zweites", second)
-        (first / "STATE.md").write_text("Neue Erkenntnis")
-        self.assertNotIn("Neue Erkenntnis", (second / "STATE.md").read_text())
-        self.assertIn("Zweites", (second / "START.md").read_text())
+        (first / "STATE.md").write_text("Neue Erkenntnis", encoding="utf-8")
+        self.assertNotIn("Neue Erkenntnis", (second / "STATE.md").read_text(encoding="utf-8"))
+        self.assertIn("Zweites", (second / "START.md").read_text(encoding="utf-8"))
 
     def test_different_drive_falls_back_to_absolute_uri(self):
         repository = self.root / "Quellen ü"
