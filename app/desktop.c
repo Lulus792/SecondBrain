@@ -469,9 +469,13 @@ static void detail(SBDesktop *d, float x, float width, float height, nk_flags fl
     if (nk_begin(ctx, "Detail", nk_rect(x, 0, width, height), flags | (s <= 1.25f ? NK_WINDOW_NO_SCROLLBAR : 0))) {
         if (d->reset_reader) { nk_group_set_scroll(ctx, "Reader", 0, 0); d->reset_reader = false; }
         nk_style_set_font(ctx, &d->ui.heading->handle);
-        nk_layout_row_dynamic(ctx, 42 * s, 1);
-        nk_label(ctx, d->model.source ? d->model.source_title :
-                      d->model.editor ? d->model.title : "Projektwissen", NK_TEXT_LEFT);
+        const char *title = d->model.source ? d->model.source_title : d->model.editor ? d->model.title : "Projektwissen";
+        float available = fmaxf(60, width - 44);
+        struct nk_user_font *heading = &d->ui.heading->handle;
+        float measured = heading->width(heading->userdata, heading->height, title, (int)strlen(title));
+        float title_height = measured <= available ? 42 * s : (ceilf(measured / available) + 1) * (heading->height + 4);
+        nk_layout_row_dynamic(ctx, title_height, 1);
+        nk_label_wrap(ctx, title);
         nk_style_set_font(ctx, &d->ui.normal->handle);
         nk_layout_row_dynamic(ctx, 24 * s, 1);
         muted(d, d->model.source ? "Schreibgeschützte Quelle" :
@@ -489,7 +493,7 @@ static void detail(SBDesktop *d, float x, float width, float height, nk_flags fl
             target(d, "actions"); actions(d, width);
         }
         float tools = d->model.source ? 34 : s > 1.25f ? 68 : 34;
-        float body_height = fmaxf(80, height - 28 - (42 + 24 + tools + 60) * s - 40);
+        float body_height = fmaxf(80, height - 28 - title_height - (24 + tools + 60) * s - 40);
         if (d->model.source) document(d, d->model.source, width, body_height);
         else if (d->model.editor && d->editing) {
             nk_style_set_font(ctx, &d->ui.body->handle);

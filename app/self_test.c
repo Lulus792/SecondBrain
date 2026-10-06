@@ -85,7 +85,7 @@ int sb_desktop_self_test(SBDesktop *d, const char *directory) {
     CHECK(click(d, "form-name")); type(d, "Energie");
     CHECK(click(d, "submit"));
     CHECK(!strcmp(d->model.path, "knowledge/energie.md") && d->editing);
-    CHECK(replace(d, "editor", "# Energie\n\nMessung ü. Ein belegter Befund.\n"));
+    CHECK(replace(d, "editor", "# Energie und ihre Bedeutung für die Simulation in Physim\n\nMessung ü. Ein belegter Befund.\n"));
     CHECK(sb_app_dirty(&d->model) && strstr(d->model.editor, "Messung ü."));
     CHECK(click(d, "save"));
     CHECK(!sb_app_dirty(&d->model));
