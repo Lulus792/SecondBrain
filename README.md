@@ -52,6 +52,9 @@ Du brauchst einen C17-Compiler und CMake ab 3.20. Auf macOS eignet sich der
 Compiler der Xcode Command Line Tools, auf Windows Visual Studio mit C-Werkzeugen,
 auf Linux GCC oder Clang sowie die Entwicklungsdateien des Fenstersystems.
 SDL3 wird bei Bedarf in einer festgelegten Version beim Build geladen.
+Unter Linux benötigt der UI-Build zusätzlich Cargo mit Rust ab 1.87, um die
+festgelegte Zugänglichkeitsbibliothek mit ihrer Cache-Korrektur zu bauen.
+Die fertige Anwendung benötigt keine Rust-Toolchain.
 [Plattformdetails](docs/DISTRIBUTION.md).
 
 ```sh

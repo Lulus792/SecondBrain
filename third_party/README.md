@@ -43,8 +43,21 @@ Die [C-Bindings 0.23.1](https://github.com/AccessKit/accesskit-c/releases/tag/0.
 werden als unverändertes, vorgebautes UI-Paket geladen. SHA-256:
 `35b7ca8a6f1e038b5da35e1e9e5a0adaed9bfcf21e1496d29598fbbadcc7043f`.
 Die Bibliothek ist intern in Rust implementiert; unsere Anbindung verwendet C.
-Der Build benötigt dafür keinen Rust-Compiler. macOS/Linux verwenden die statische
-Bibliothek; unter Windows wird die UI-DLL neben der Anwendung ausgeliefert.
+macOS verwendet die statische Release-Bibliothek; unter Windows wird die UI-DLL
+neben der Anwendung ausgeliefert. Linux baut die festgelegte UI-Bibliothek aus
+Quelle mit Cargo/Rust ab 1.87 und einer Korrektur von zwei Cache-Signalaufrufen.
+Die Toolchain ist nur zum Bauen dieser UI-Abhängigkeit erforderlich.
+
+Die C-Binding-Quelle ist Commit 8b6ed37c20ed4c59390e253407983333053662ba
+(0.23.1), Archiv-SHA-256 f15581c841eed0f2f6cec6a6f9b7fd4ca9d34a654546efa22ae29351efa06568.
+Der Linux-Adapter ist accesskit_unix 0.24.0, Crate-SHA-256
+202f24df034a7476d07b7f74284de84f6d62aabd858dbe7ee9cad3b7ad6f8f9d.
+Seine AddAccessible-/RemoveAccessible-Strukturen werden als einzelnes D-Bus-
+Argument übergeben; vorher fehlte die äußere Ebene. CMake prüft den Original-
+bzw. korrigierten Quellhash, bevor die Anpassung erfolgt. Cargo verwendet die
+festgelegte Lockdatei mit unverändertem Abhängigkeitsgraph; nur diese UI-Quelle
+wird lokal ersetzt. Die C-Regression liest tatsächliche Signale und GetItems.
+Die ursprünglichen Lizenz-/Autorenhinweise bleiben im Paket.
 Der Kern bleibt unabhängig und ohne externe Bibliotheken baubar.
 
 Die eigene macOS-C-Anbindung gleicht die vom Adapter gelieferte Heading-Rolle an

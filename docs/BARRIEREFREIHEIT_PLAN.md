@@ -220,3 +220,11 @@ Add-/Remove-Signaturen, tatsächliches Auftreten beider Signale und die nicht le
 GetItems-Sammelantwort werden geprüft. Der neue Test wird zuerst gegen die
 unveränderte UI-Bibliothek ausgeführt, anschließend gegen die Korrektur.
 Die lokale macOS-Providerregression besteht; Linux-Ergebnisse folgen aus der CI.
+
+
+Der [unveränderte Adapter mit neuer Regression](https://github.com/Lulus792/SecondBrain/actions/runs/37520951162)
+weist auf Linux Release 46 Add- und 41 Remove-Signale mit 87 falschen Signaturen
+auf; GetItems ist gültig. Damit bestätigt die C-Protokollbeobachtung den Fehler
+unabhängig von den früheren Cachewarnungen. Die tatsächliche korrigierte Linux-
+UI-Bibliothek wird jetzt aus festgelegter Quelle gebaut. Quellpatch, Hashschutz,
+Wiederholbarkeit und Cargo-Lockgraph sind lokal geprüft; native Linux-Abnahme folgt.

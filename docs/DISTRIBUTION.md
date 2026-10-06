@@ -70,3 +70,12 @@ werden noch nicht ausgewertet. Die Glasdarstellung ist ein eigener C-Effekt und
 verwendet keine native macOS-26-Materialkomponente. Reduzierte Transparenz lässt
 sich in der App aktivieren. Kamera und Scrollen verwenden kurze Übergänge;
 „Bewegung reduzieren“ schaltet sie ab. Es gibt keine automatische Rotation.
+
+
+## Linux-UI-Abhängigkeit bauen
+
+Ab 0.5.2 wird die AccessKit-Linux-Bibliothek aus festgelegter Quelle gebaut, um
+ihre AT-SPI-Cache-Signale zu korrigieren. Entwickler benötigen dafür zusätzlich
+Cargo/Rust ab 1.87. Der Anwendungscode und fachliche Kern bleiben C. Ein Kernbuild
+mit SB_BUILD_UI=OFF benötigt keine Rust-Toolchain; fertige Pakete ebenfalls nicht.
+Quellen, Hashes und Umfang stehen in [third_party](../third_party/README.md).

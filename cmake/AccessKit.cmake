@@ -12,6 +12,8 @@ include("${sb_accesskit_SOURCE_DIR}/accesskit-config.cmake")
 # Keep allocators on their respective side of the C ABI and package the UI DLL.
 if(WIN32)
     set(SB_ACCESSKIT_TARGET accesskit-shared)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    include("${CMAKE_CURRENT_LIST_DIR}/AccessKitLinux.cmake")
 else()
     set(SB_ACCESSKIT_TARGET accesskit-static)
 endif()
