@@ -129,3 +129,36 @@ VoiceOver/NVDA/Orca-Abnahme. Passive Dialog-/Hilfetexte, graphemgenaue Textläuf
 Zeilengeometrie, zurückhaltende Fortschrittsansagen und große animierte Dokumente
 bleiben offen. Ebenso OS-Vorgaben, Schrift-Fallback und übrige Release-Aufgaben.
 Die Produktversion bleibt 0.5.0; 1.0 bleibt bis zur Nutzerfreigabe gesperrt.
+
+
+## 0.5.1: Dialogtitel und Erklärungstexte
+
+Die sichtbaren statischen Dialog-/Hilfetexte werden beim Zeichnen in denselben
+nativen Baum übernommen: Einführung, leere Listen, Sicherungshinweise, Vorschau,
+Fehler, Tastaturhilfe und Entwurfswarnung. Eine modale Aufgabe entfernt Hintergrund-
+texte und -aktionen. Ihr eigener Titel benennt den nativen Dialog. Texte und
+Bedienelemente folgen innerhalb ihrer UI-Gruppe der Zeichnungsreihenfolge;
+passive Texte erhalten keine Fokus-/Klick-Aktionen. Beschriftungen werden vollständig
+kopiert und nicht mehr an der Projektname-Grenze abgeschnitten. Eingabefeldnamen
+werden direkt am Feld geführt, ohne doppelte statische Beschriftung.
+
+Die Kontextkennung gehört zum tatsächlich gezeichneten Zustand. Ein während des
+Zeichnens gewechseltes Formular kann alte Aktionen nicht als neue Bedienelemente
+übernehmen. Author-IDs ergänzen die stabilen nativen Kennungen zur Identifizierung.
+
+Grundlage: [Apple Accessibility](https://developer.apple.com/design/human-interface-guidelines/accessibility),
+am 6. Oktober 2026 erneut über den offiziellen DocC-Inhalt gelesen: Oberfläche und
+Inhalt für VoiceOver beschreiben. Die konkrete C-Snapshot-Anbindung ist eigene
+Umsetzung. Dialogtitel werden als Heading/Level 1 modelliert. Unter lokalem
+macOS 14.6.1 liefert der Adapter die native Rolle `Heading`; die erwartete wörtliche
+Zeichenfolge `AXHeading` war eine falsche Testannahme. Falls die Systemkonstante
+NSAccessibilityHeadingRole vorhanden ist, vergleicht die Prüfung mit ihr.
+Der ältere lokale AppKit-Stand besitzt diese Konstante nicht; sein Adapterwert
+belegt allein keine VoiceOver-Überschriftennavigation.
+
+Die lokale Providerprüfung umfasst vollständige Hilfezeile, Dialogtitel/Identifier,
+Modalabschirmung, Warnung zu ungespeicherten Änderungen und Rückkehr. Zusätzlich
+prüft der gemeinsame Vertrag 700 Zeichen lange Beschriftungen und abgelehnte
+Aktionen auf reinem Text. Gesamt-/Plattformnachweise folgen nach Prüfung.
+Markdown-Dokumentstruktur, Grapheme/Zeilen, Fortschrittsansagen und menschliche
+assistive Navigation bleiben weitere Arbeiten.

@@ -139,8 +139,38 @@ static SBTarget *target_add(SBDesktop *d, const char *id, struct nk_rect rect, S
     SBTarget *item = &d->targets[d->target_count++];
     snprintf(item->id,sizeof(item->id),"%s",id);
     snprintf(item->label,sizeof(item->label),"%s",id);
-    item->bounds = rect; item->kind = kind; item->group = group;
+    item->bounds = rect; item->kind = kind; item->group = group; item->order=d->semantic_order++;
     return item;
+}
+static void passive_clear(SBDesktop *d) {
+    for (size_t i=0;i<d->passive_count;++i) free(d->passive[i].text);
+    d->passive_count=0;
+}
+static void passive_add(SBDesktop *d,const char *id,const char *text,accesskit_role role,struct nk_rect bounds) {
+    if (!text || !*text) return;
+    if (d->passive_count==d->passive_capacity) {
+        size_t capacity=d->passive_capacity ? d->passive_capacity*2 : 32;
+        SBPassiveText *next=realloc(d->passive,capacity*sizeof(*next)); if (!next) return;
+        d->passive=next; d->passive_capacity=capacity;
+    }
+    size_t length=strlen(text); char *copy=malloc(length+1); if (!copy) return;
+    memcpy(copy,text,length+1);
+    while (length && !sb_utf8_valid(copy,length)) copy[--length]=0;
+    SBPassiveText *p=&d->passive[d->passive_count]; memset(p,0,sizeof(*p));
+    if (id) snprintf(p->id,sizeof(p->id),"%s",id); else snprintf(p->id,sizeof(p->id),"caption:%zu",d->passive_count);
+    p->text=copy; p->role=role; p->order=d->semantic_order++; p->group=d->focus_group;
+    struct nk_rect clip=d->ui.ctx->current->layout->clip;
+    float left=fmaxf(bounds.x,clip.x),top=fmaxf(bounds.y,clip.y);
+    p->bounds=nk_rect(left,top,fmaxf(0,fminf(bounds.x+bounds.w,clip.x+clip.w)-left),fmaxf(0,fminf(bounds.y+bounds.h,clip.y+clip.h)-top));
+    ++d->passive_count;
+}
+static void native_wrap(SBDesktop *d,const char *text) {
+    passive_add(d,NULL,text,ACCESSKIT_ROLE_LABEL,nk_widget_bounds(d->ui.ctx));
+    nk_label_wrap(d->ui.ctx,text);
+}
+static void native_label(SBDesktop *d,const char *text,nk_flags alignment) {
+    passive_add(d,NULL,text,ACCESSKIT_ROLE_LABEL,nk_widget_bounds(d->ui.ctx));
+    nk_label(d->ui.ctx,text,alignment);
 }
 static void target(SBDesktop *d, const char *id) {
     SBTarget *item = target_add(d,id,nk_widget_bounds(d->ui.ctx),SB_FOCUS_BUTTON,d->focus_group);
@@ -367,7 +397,7 @@ void sb_desktop_free(SBDesktop *d) {
     sb_backup_job_free(d->backup);
     sb_dialogs_free(d->dialogs);
     if (d->text_edit_ready) nk_textedit_free(&d->text_edit);
-    free(d->targets);
+    free(d->targets); passive_clear(d); free(d->passive);
     sb_graph_free(&d->graph);
     sb_notes_free(&d->hits); free(d->context); sb_app_free(&d->model);
     sb_ui_shutdown(&d->ui); memset(d, 0, sizeof(*d));
@@ -572,9 +602,11 @@ static void accessible_publish(SBDesktop *d) {
     if (!d->accessibility) return;
     bool modal=d->form!=SB_FORM_NONE || d->model.guard;
     size_t stars=modal ? 0 : d->model.notes.count;
-    size_t count=d->target_count+stars;
+    size_t controls=d->target_count+d->passive_count;
+    size_t count=controls+stars;
     SBAccessibleItem *items=calloc(count,sizeof(*items)); char (*ids)[100]=stars ? calloc(stars,sizeof(*ids)) : NULL;
-    if ((count && !items) || (stars && !ids)) { free(items); free(ids); return; }
+    uint64_t *order=controls ? calloc(controls,sizeof(*order)) : NULL;
+    if ((count && !items) || (stars && !ids) || (controls && !order)) { free(items); free(ids); free(order); return; }
     for (size_t i=0;i<d->target_count;++i) {
         SBTarget *t=&d->targets[i]; SBAccessibleItem *v=&items[i]; v->id=t->id; v->label=t->label; v->bounds=t->bounds;
         v->role=t->kind==SB_FOCUS_TEXT ? !strcmp(t->id,"editor") ? ACCESSKIT_ROLE_MULTILINE_TEXT_INPUT : !strcmp(t->id,"search") ? ACCESSKIT_ROLE_SEARCH_INPUT : ACCESSKIT_ROLE_TEXT_INPUT :
@@ -584,9 +616,20 @@ static void accessible_publish(SBDesktop *d) {
             if (!strcmp(t->id,"editor") && d->text_edit_ready) { v->anchor=(size_t)d->text_edit.select_start; v->caret=(size_t)d->text_edit.select_end; }
         } else if (t->kind==SB_FOCUS_READER) v->value=d->form==SB_FORM_CONTEXT ? d->context : d->model.source ? d->model.source : d->model.editor;
         if (!strcmp(t->id,"galaxy")) v->label="Dokumente in der Sternkarte";
+        order[i]=((uint64_t)t->group<<32)|t->order;
+    }
+    for (size_t i=0;i<d->passive_count;++i) {
+        SBPassiveText *p=&d->passive[i]; SBAccessibleItem *v=&items[d->target_count+i];
+        v->id=p->id; v->label=p->text; v->bounds=p->bounds; v->role=p->role;
+        order[d->target_count+i]=((uint64_t)p->group<<32)|p->order;
+    }
+    for (size_t i=1;i<controls;++i) {
+        SBAccessibleItem item=items[i]; uint64_t key=order[i]; size_t j=i;
+        while (j && order[j-1]>key) { items[j]=items[j-1]; order[j]=order[j-1]; --j; }
+        items[j]=item; order[j]=key;
     }
     for (size_t i=0;i<stars;++i) {
-        snprintf(ids[i],100,"star:%zu",i); SBAccessibleItem *v=&items[d->target_count+i];
+        snprintf(ids[i],100,"star:%zu",i); SBAccessibleItem *v=&items[controls+i];
         v->id=ids[i]; v->label=d->model.notes.items[i].title; v->role=ACCESSKIT_ROLE_LIST_BOX_OPTION;
         v->selected=!strcmp(d->model.path,d->model.notes.items[i].path);
         if (i<d->ui.space.count && d->ui.space.points[i].visible) {
@@ -599,8 +642,8 @@ static void accessible_publish(SBDesktop *d) {
     if (d->backup) { snprintf(progress,sizeof(progress),"Sicherung: %zu von %zu Einträgen, %llu Bytes",d->backup_state.entries,d->backup_state.total,(unsigned long long)d->backup_state.bytes); status=progress; }
     char native_focus[100]; snprintf(native_focus,sizeof(native_focus),"%s",d->focus);
     if (!strcmp(d->focus,"galaxy") && d->star<stars) snprintf(native_focus,sizeof(native_focus),"star:%zu",d->star);
-    sb_accessibility_update(d->accessibility,title,native_focus,items,count,status,modal,accessible_context(d));
-    free(items); free(ids);
+    sb_accessibility_update(d->accessibility,title,native_focus,items,count,status,modal,d->semantic_context);
+    free(items); free(ids); free(order);
 }
 static void focus_step(SBDesktop *d, int direction) {
     if (!d->target_count) return;
@@ -824,6 +867,7 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
 }
 
 static void muted(SBDesktop *d, const char *text) {
+    passive_add(d,NULL,text,ACCESSKIT_ROLE_LABEL,nk_widget_bounds(d->ui.ctx));
     nk_label_colored(d->ui.ctx, text, NK_TEXT_LEFT,
                      d->ui.dark ? nk_rgb(164, 169, 181) : nk_rgb(99, 108, 123));
 }
@@ -980,7 +1024,7 @@ static void document_list(SBDesktop *d, struct nk_rect rect, nk_flags flags) {
             if (selectable(d, tag, title, &selected)) { d->card = true; request(d, SB_ACT_NOTE, notes->items[i].path); }
             if (nk_widget_is_hovered(ctx)) tooltip(d,notes->items[i].path);
         }
-        if (!count) { nk_layout_row_dynamic(ctx, 70 * s, 1); nk_label_wrap(ctx, "Keine Dokumente in diesem Bereich. Ändere Suche oder Bereich."); }
+        if (!count) { nk_layout_row_dynamic(ctx, 70 * s, 1); native_wrap(d, "Keine Dokumente in diesem Bereich. Ändere Suche oder Bereich."); }
         if (count > per_page) {
             nk_layout_row_dynamic(ctx, 26 * s, 2);
             if (button(d, "page-prev", "Zurück")) d->page = d->page ? d->page - 1 : (count - 1) / per_page;
@@ -1182,7 +1226,7 @@ static void detail(SBDesktop *d, float x, float y, float width, float height, nk
         else {
             nk_layout_row_dynamic(ctx,body_height,1);
             if (nk_group_begin(ctx,"Welcome",NK_WINDOW_NO_SCROLLBAR)) {
-                nk_layout_row_dynamic(ctx,72*s,1); nk_label_wrap(ctx,"Lege dein erstes Projekt an. Danach kannst du Ziele festhalten, Notizen sammeln und Quellen verbinden.");
+                nk_layout_row_dynamic(ctx,72*s,1); native_wrap(d,"Lege dein erstes Projekt an. Danach kannst du Ziele festhalten, Notizen sammeln und Quellen verbinden.");
                 nk_layout_row_dynamic(ctx,38*s,1);
                 if (button(d,"new-project-detail","Neues Projekt")) command(d,SB_CMD_NEW_PROJECT);
                 if (button(d,"workspace-detail","Arbeitsordner öffnen")) command(d,SB_CMD_WORKSPACE);
@@ -1205,15 +1249,16 @@ static void popup(SBDesktop *d, int width, int height) {
         glass(d, nk_rect((width-w)/2, (height-h)/2, w, h), 28);
         if (nk_begin(ctx, "Änderungen erhalten", nk_rect((width - w) / 2, (height - h) / 2, w, h),
                      NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
+            passive_add(d,"modal-title","Änderungen erhalten",ACCESSKIT_ROLE_HEADING,nk_rect((width-w)/2,(height-h)/2,w,32*s));
             nk_layout_row_dynamic(ctx, 76 * s, 1);
-            nk_label_wrap(ctx, "Dieses Dokument enthält ungespeicherte Änderungen. Speichere sie vor dem Wechsel oder behalte die Bearbeitung bei.");
+            native_wrap(d, "Dieses Dokument enthält ungespeicherte Änderungen. Speichere sie vor dem Wechsel oder behalte die Bearbeitung bei.");
             nk_layout_row_dynamic(ctx, 36 * s, 1);
             if (button(d, "guard-save", "Speichern und weiter")) command(d, SB_CMD_GUARD_SAVE);
             if (button(d, "guard-discard", "Änderungen verwerfen")) command(d, SB_CMD_GUARD_DISCARD);
             if (button(d, "guard-cancel", "Weiter bearbeiten")) command(d, SB_CMD_GUARD_CANCEL);
             if (d->message.code == SB_CONFLICT)
                 if (button(d, "guard-copy", "Eigene Fassung als neue Notiz sichern")) command(d, SB_CMD_COPY);
-            nk_layout_row_dynamic(ctx, 60 * s, 1); nk_label_wrap(ctx, d->message.message);
+            nk_layout_row_dynamic(ctx, 60 * s, 1); native_wrap(d, d->message.message);
         }
         nk_end(ctx); return;
     }
@@ -1230,7 +1275,7 @@ static void popup(SBDesktop *d, int width, int height) {
     if (nk_begin(ctx,title,nk_rect((width-w)/2,(height-h)/2,w,h),NK_WINDOW_NO_SCROLLBAR)) {
         float available=ctx->current->layout->bounds.w;
         nk_layout_row_begin(ctx,NK_STATIC,32*s,2);
-        nk_layout_row_push(ctx,available-32*s-ctx->style.window.spacing.x); nk_label(ctx,title,NK_TEXT_LEFT);
+        nk_layout_row_push(ctx,available-32*s-ctx->style.window.spacing.x); passive_add(d,"modal-title",title,ACCESSKIT_ROLE_HEADING,nk_widget_bounds(ctx)); nk_label(ctx,title,NK_TEXT_LEFT);
         nk_layout_row_push(ctx,32*s); if (button(d,"cancel","Schließen")) command(d,SB_CMD_CANCEL);
         nk_layout_row_end(ctx);
         bool form=!d->backup && (d->form==SB_FORM_PROJECT || d->form==SB_FORM_NOTE || d->form==SB_FORM_WORKSPACE || d->form==SB_FORM_BACKUP || d->form==SB_FORM_RESTORE);
@@ -1243,7 +1288,7 @@ static void popup(SBDesktop *d, int width, int height) {
         if (d->backup) {
             static const char *phases[]={"Dateien erfassen","Sicherung schreiben","Sicherung prüfen","Projekt wiederherstellen","Abschließen","Projekt erneut prüfen"};
             SBBackupJobState *state=&d->backup_state;
-            nk_layout_row_dynamic(ctx,42*s,1); nk_label(ctx,state->cancel_requested ? "Abbruch wird abgeschlossen …" : phases[state->phase],NK_TEXT_LEFT);
+            nk_layout_row_dynamic(ctx,42*s,1); native_label(d,state->cancel_requested ? "Abbruch wird abgeschlossen …" : phases[state->phase],NK_TEXT_LEFT);
             nk_layout_row_dynamic(ctx,20*s,1);
             bool known=state->total && state->phase!=SB_BACKUP_SCAN;
             if (known) {
@@ -1260,23 +1305,23 @@ static void popup(SBDesktop *d, int width, int height) {
             char info[150];
             if (known) snprintf(info,sizeof(info),"%zu von %zu Einträgen · %llu von %llu KiB",state->entries,state->total,(unsigned long long)(state->bytes/1024),(unsigned long long)(state->bytes_total/1024));
             else snprintf(info,sizeof(info),"%zu Einträge erfasst",state->entries);
-            nk_layout_row_dynamic(ctx,60*s,1); nk_label_wrap(ctx,info);
+            nk_layout_row_dynamic(ctx,60*s,1); native_wrap(d,info);
             char shown[SB_NAME_CAP]; compact_label(d,state->path,shown,sizeof(shown),w-70);
-            nk_layout_row_dynamic(ctx,32*s,1); nk_label(ctx,shown,NK_TEXT_LEFT);
+            nk_layout_row_dynamic(ctx,32*s,1); native_label(d,shown,NK_TEXT_LEFT);
         } else if (d->form==SB_FORM_BACKUP || d->form==SB_FORM_RESTORE) {
             bool save=d->form==SB_FORM_BACKUP;
             if (d->message.code!=SB_OK && d->message.message[0]) {
                 const struct nk_user_font *font=ctx->style.font;
                 float measured=font->width(font->userdata,font->height,d->message.message,(int)strlen(d->message.message));
                 float rows=ceilf(measured/fmaxf(80,ctx->current->layout->bounds.w-20))+1;
-                nk_layout_row_dynamic(ctx,rows*(font->height+5),1); nk_label_wrap(ctx,d->message.message);
+                nk_layout_row_dynamic(ctx,rows*(font->height+5),1); native_wrap(d,d->message.message);
                 nk_layout_row_dynamic(ctx,36*s,1);
                 if (button(d,"backup-copy-error",d->backup_error_copied ? "Meldung kopiert" : "Meldung kopieren")) {
                     d->backup_error_copied=SDL_SetClipboardText(d->message.message); d->backup_clipboard_failed=!d->backup_error_copied;
                 }
-                if (d->backup_clipboard_failed) { nk_layout_row_dynamic(ctx,36*s,1); nk_label_wrap(ctx,"Die Zwischenablage ist nicht erreichbar."); }
+                if (d->backup_clipboard_failed) { nk_layout_row_dynamic(ctx,36*s,1); native_wrap(d,"Die Zwischenablage ist nicht erreichbar."); }
             }
-            nk_layout_row_dynamic(ctx,48*s,1); nk_label_wrap(ctx,save ? "Sichere Notizen und Anhänge. Offene Änderungen werden vorher gespeichert." : "Stelle das Projekt in einem neuen Ordner wieder her.");
+            nk_layout_row_dynamic(ctx,48*s,1); native_wrap(d,save ? "Sichere Notizen und Anhänge. Offene Änderungen werden vorher gespeichert." : "Stelle das Projekt in einem neuen Ordner wieder her.");
             field(d,"backup-path","Sicherungsdatei",d->backup_path,sizeof(d->backup_path),1);
             if (strcmp(d->checked_backup,d->backup_path)) d->restore_checked=false;
             nk_layout_row_dynamic(ctx,36*s,1);
@@ -1285,13 +1330,13 @@ static void popup(SBDesktop *d, int width, int height) {
                 if (!d->dialog_serial) d->message=sb_error(SB_IO,"Dateiauswahl konnte nicht gestartet werden.");
             }
             if (!save && d->restore_checked) {
-                nk_layout_row_dynamic(ctx,32*s,1); nk_label(ctx,d->restore_info.name,NK_TEXT_LEFT);
+                nk_layout_row_dynamic(ctx,32*s,1); native_label(d,d->restore_info.name,NK_TEXT_LEFT);
                 char info[150]; snprintf(info,sizeof(info),"%zu Dateien · %zu Ordner · %llu KiB",d->restore_info.files,d->restore_info.directories,(unsigned long long)(d->restore_info.bytes/1024));
-                nk_layout_row_dynamic(ctx,36*s,1); nk_label_wrap(ctx,info);
+                nk_layout_row_dynamic(ctx,36*s,1); native_wrap(d,info);
                 field(d,"restore-id","Neuer Projektordner",d->restore_id,sizeof(d->restore_id),2);
                 nk_layout_row_dynamic(ctx,36*s,1); if (button(d,"backup-recheck","Sicherung erneut prüfen")) command(d,SB_CMD_INSPECT);
             }
-            nk_layout_row_dynamic(ctx,32*s,1); nk_label_wrap(ctx,save ? "Vorhandene Sicherungen werden nicht ersetzt." : "Vorhandene Projektordner bleiben erhalten.");
+            nk_layout_row_dynamic(ctx,32*s,1); native_wrap(d,save ? "Vorhandene Sicherungen werden nicht ersetzt." : "Vorhandene Projektordner bleiben erhalten.");
         } else if (d->form == SB_FORM_PROJECT || d->form == SB_FORM_NOTE) {
             char previous_id[65];
             field(d, "form-name", d->form == SB_FORM_PROJECT ? "Projektname" : "Titel", d->name, sizeof(d->name), 1);
@@ -1300,17 +1345,17 @@ static void popup(SBDesktop *d, int width, int height) {
             field(d, "form-id", d->form == SB_FORM_PROJECT ? "Ordnername" : "Dateiname", d->id, sizeof(d->id), 2);
             if (strcmp(previous_id, d->id)) d->id_manual = true;
             nk_layout_row_dynamic(ctx, 44 * s, 1);
-            nk_label_wrap(ctx, "Kleinbuchstaben, Zahlen und Bindestriche. Vorhandene Projekte und Notizen bleiben erhalten.");
+            native_wrap(d, "Kleinbuchstaben, Zahlen und Bindestriche. Vorhandene Projekte und Notizen bleiben erhalten.");
             if (d->form == SB_FORM_PROJECT)
                 field(d, "form-repo", "Projektordner verknüpfen (optional)", d->repository, sizeof(d->repository), 3);
             else {
-                nk_layout_row_dynamic(ctx, 24 * s, 1); nk_label(ctx, "Wissensbereich", NK_TEXT_LEFT);
+                nk_layout_row_dynamic(ctx, 24 * s, 1); native_label(d, "Wissensbereich", NK_TEXT_LEFT);
                 nk_layout_row_dynamic(ctx, 34 * s, 1);
                 if (button(d, "section-choice", new_names[d->note_section])) d->note_section = (d->note_section + 1) % 3;
             }
         } else if (d->form == SB_FORM_WORKSPACE) {
             nk_layout_row_dynamic(ctx, 48 * s, 1);
-            nk_label_wrap(ctx, "Wähle den Ordner mit deinen Projektgedächtnissen.");
+            native_wrap(d, "Wähle den Ordner mit deinen Projektgedächtnissen.");
             field(d, "form-folder", "Arbeitsordner", d->folder, sizeof(d->folder), 1);
             nk_layout_row_dynamic(ctx,36*s,1);
             if (button(d,"choose-folder","Ordner auswählen")) {
@@ -1342,13 +1387,13 @@ static void popup(SBDesktop *d, int width, int height) {
             if (button(d, "settings-actions", "Darstellung")) d->form = SB_FORM_SETTINGS;
             if (button(d, "help-actions", "Tastaturhilfe")) d->form = SB_FORM_HELP;
         } else if (d->form == SB_FORM_SETTINGS) {
-            nk_layout_row_dynamic(ctx, 24 * s, 1); nk_label(ctx, "Projekte", NK_TEXT_LEFT);
+            nk_layout_row_dynamic(ctx, 24 * s, 1); native_label(d, "Projekte", NK_TEXT_LEFT);
             if (button(d, "project-settings", "Projekt wählen")) d->form = SB_FORM_PROJECTS;
             nk_layout_row_dynamic(ctx, 36 * s, 1);
             if (button(d, "workspace-settings", "Arbeitsordner öffnen")) command(d, SB_CMD_WORKSPACE);
             nk_layout_row_dynamic(ctx, 36 * s, 1);
             if (button(d, "new-project-settings", "Neues Projekt")) command(d, SB_CMD_NEW_PROJECT);
-            nk_layout_row_dynamic(ctx, 32 * s, 1); nk_label(ctx, "Darstellung", NK_TEXT_LEFT);
+            nk_layout_row_dynamic(ctx, 32 * s, 1); native_label(d, "Darstellung", NK_TEXT_LEFT);
             nk_layout_row_dynamic(ctx, 36 * s, 1);
             if (button(d, "theme", d->ui.dark ? "Helle Darstellung" : "Dunkle Darstellung")) command(d, SB_CMD_THEME);
             nk_layout_row_dynamic(ctx, 36 * s, 2);
@@ -1376,11 +1421,11 @@ static void popup(SBDesktop *d, int width, int height) {
                 "Bild auf/ab: Lesen scrollen · Escape: zurück/schließen",
                 "Im Editor: A/C/V/X/Z · Y oder Umschalt+Z · Ctrl+I: Tabulator einfügen"};
             for (size_t i = 0; i < sizeof(help) / sizeof(*help); ++i) {
-                nk_layout_row_dynamic(ctx, 40 * s, 1); nk_label_wrap(ctx, help[i]);
+                nk_layout_row_dynamic(ctx, 40 * s, 1); native_wrap(d, help[i]);
             }
         }
         if (d->message.message[0] && d->form!=SB_FORM_ACTIONS && d->form!=SB_FORM_FILTER && d->form!=SB_FORM_CONTEXT && d->form!=SB_FORM_BACKUP && d->form!=SB_FORM_RESTORE) {
-            nk_layout_row_dynamic(ctx,52*s,1); nk_label_wrap(ctx,d->message.message);
+            nk_layout_row_dynamic(ctx,52*s,1); native_wrap(d,d->message.message);
         }
         scroll_measure(d,3); nk_group_end(ctx);
         }
@@ -1521,6 +1566,7 @@ static void camera_tools(SBDesktop *d, int width, int height, float available, n
 void sb_desktop_frame(SBDesktop *d) {
     int width, height; SDL_GetWindowSize(d->ui.window,&width,&height);
     synchronize(d);
+    passive_clear(d); d->semantic_order=0;
     for (unsigned i=0;i<4;++i) d->scrolling[i].used=false;
     if (d->search[0] && strcmp(d->search,d->searched)) { d->browser=true; d->expanded=false; }
     search_refresh(d); graph_refresh(d);
@@ -1554,7 +1600,8 @@ void sb_desktop_frame(SBDesktop *d) {
         detail(d,card.x,card.y,card.w,card.h,flags);
     }
     if (!d->browser && !(d->card && (d->editing || d->expanded))) camera_tools(d,width,height,d->card ? card.x-36 : width-36.0f,flags);
-    if (modal) { d->target_count = 0; d->focus_group = 3; }
+    if (d->form!=SB_FORM_NONE || d->model.guard) { d->target_count = 0; passive_clear(d); d->focus_group = 3; }
+    d->semantic_context=accessible_context(d);
     struct nk_style_item old_background = d->ui.ctx->style.window.fixed_background;
     d->ui.ctx->style.window.fixed_background = nk_style_item_color(d->ui.dark ? nk_rgba(17,29,47,245) : nk_rgba(237,245,255,245));
     popup(d,width,height);

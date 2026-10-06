@@ -16,7 +16,8 @@ typedef enum {
     SB_CMD_BACKUP,SB_CMD_RESTORE,SB_CMD_INSPECT
 } SBCommand;
 typedef enum { SB_FOCUS_BUTTON, SB_FOCUS_TEXT, SB_FOCUS_MAP, SB_FOCUS_READER } SBFocusKind;
-typedef struct { char id[100], label[SB_NAME_CAP]; struct nk_rect bounds; SBFocusKind kind; int group; } SBTarget;
+typedef struct { char id[100], label[SB_NAME_CAP]; struct nk_rect bounds; SBFocusKind kind; int group; unsigned order; } SBTarget;
+typedef struct { char id[100]; char *text; struct nk_rect bounds; accesskit_role role; unsigned order; int group; } SBPassiveText;
 typedef struct {
     float position, destination, pending, maximum, elastic;
     nk_uint applied;
@@ -53,6 +54,10 @@ typedef struct {
     float next_scale;
     SBTarget *targets;
     size_t target_count, target_capacity;
+    SBPassiveText *passive;
+    size_t passive_count,passive_capacity;
+    unsigned semantic_order;
+    uint64_t semantic_context;
     bool test;
     SBGraph graph;
     struct nk_text_edit text_edit;

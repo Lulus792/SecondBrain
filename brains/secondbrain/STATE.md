@@ -56,6 +56,11 @@ UIA und AT-SPI werden tatsächlich für Namen/Rollen, Unicode-Eingabe, Notizerst
 Editor und Speichern benutzt. Menschliche Screenreader-Abnahme und vollständige
 Text-/Dialogsemantik bleiben offen. [Umfang und Grenzen](../../docs/BARRIEREFREIHEIT_PLAN.md).
 
+Die Erweiterung 0.5.1 übernimmt sichtbare Dialog-/Hilfetexte und Entwurfswarnungen
+in den nativen Baum. Die lokale Providerprüfung besteht; Gesamt-/Plattform-/
+Sanitizerabnahme läuft noch. Vollständige Dokumentstruktur, Unicode-Textnavigation,
+Fortschrittsansagen und menschliche assistive Bedienung bleiben offen.
+
 ## Auftrag und verbleibende Abnahmen
 
 Das vollständige [Ziel vor 1.0](../../docs/RELEASE.md) bleibt aktiv: Sicherungs-UI,

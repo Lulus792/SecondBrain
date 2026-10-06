@@ -7,7 +7,7 @@
 #endif
 typedef struct { char id[100]; accesskit_node_id node; uint64_t context; } Identity;
 typedef struct {
-    char id[100],label[SB_NAME_CAP]; char *value;
+    char id[100]; char *label,*value;
     accesskit_node_id node; struct nk_rect bounds; accesskit_role role;
     bool editable,selected; size_t anchor,caret;
 } Item;
@@ -37,7 +37,7 @@ static accesskit_node_id run_id(accesskit_node_id node) { return UINT64_C(0x8000
 static size_t characters(const char *s) { size_t n=0; for (;s && *s;++s) if (((unsigned char)*s&0xc0)!=0x80) ++n; return n; }
 static bool permits(const Item *v,accesskit_action action) {
     switch (action) {
-    case ACCESSKIT_ACTION_FOCUS: case ACCESSKIT_ACTION_SCROLL_INTO_VIEW: return true;
+    case ACCESSKIT_ACTION_FOCUS: case ACCESSKIT_ACTION_SCROLL_INTO_VIEW: return v->role!=ACCESSKIT_ROLE_LABEL && v->role!=ACCESSKIT_ROLE_HEADING;
     case ACCESSKIT_ACTION_CLICK: return v->role==ACCESSKIT_ROLE_BUTTON || v->role==ACCESSKIT_ROLE_LINK || v->role==ACCESSKIT_ROLE_LIST_BOX_OPTION;
     case ACCESSKIT_ACTION_SET_VALUE: return v->editable;
     case ACCESSKIT_ACTION_REPLACE_SELECTED_TEXT: case ACCESSKIT_ACTION_SET_TEXT_SELECTION:
@@ -55,13 +55,18 @@ static accesskit_tree_update *build_locked(SBAccessibility *a) {
     accesskit_node *root=accesskit_node_new(ACCESSKIT_ROLE_WINDOW); accesskit_node_set_label(root,a->title);
     accesskit_node *container=accesskit_node_new(a->modal ? ACCESSKIT_ROLE_DIALOG : ACCESSKIT_ROLE_GROUP);
     if (a->modal) accesskit_node_set_modal(container);
-    accesskit_node_set_label(container,a->modal ? "Aktuelle Aufgabe" : "Projektarbeitsfläche"); accesskit_node_push_child(root,2);
+    const char *region=a->modal ? "Aktuelle Aufgabe" : "Projektarbeitsfläche";
+    if (a->modal) for (size_t i=0;i<a->count;++i) if (!strcmp(a->items[i].id,"modal-title")) region=a->items[i].label;
+    accesskit_node_set_label(container,region); accesskit_node_push_child(root,2);
     accesskit_node *documents=NULL;
     for (size_t i=0;i<a->count;++i) {
         Item *v=&a->items[i]; accesskit_node *node=accesskit_node_new(v->role);
         accesskit_node_set_label(node,v->label);
+        accesskit_node_set_author_id(node,v->id);
+        if (v->role==ACCESSKIT_ROLE_HEADING) accesskit_node_set_level(node,1);
         accesskit_rect rect={v->bounds.x,v->bounds.y,v->bounds.x+v->bounds.w,v->bounds.y+v->bounds.h}; accesskit_node_set_bounds(node,rect);
-        accesskit_node_add_action(node,ACCESSKIT_ACTION_FOCUS); accesskit_node_add_action(node,ACCESSKIT_ACTION_SCROLL_INTO_VIEW);
+        if (permits(v,ACCESSKIT_ACTION_FOCUS)) accesskit_node_add_action(node,ACCESSKIT_ACTION_FOCUS);
+        if (permits(v,ACCESSKIT_ACTION_SCROLL_INTO_VIEW)) accesskit_node_add_action(node,ACCESSKIT_ACTION_SCROLL_INTO_VIEW);
         if (v->role==ACCESSKIT_ROLE_BUTTON || v->role==ACCESSKIT_ROLE_LINK || v->role==ACCESSKIT_ROLE_LIST_BOX_OPTION) accesskit_node_add_action(node,ACCESSKIT_ACTION_CLICK);
         if (v->role==ACCESSKIT_ROLE_LIST_BOX_OPTION) accesskit_node_set_selected(node,v->selected);
         if (v->value) {
@@ -161,7 +166,7 @@ SBAccessibility *sb_accessibility_new(SDL_Window *window) {
 #endif
     return a;
 }
-static void clear_items(SBAccessibility *a) { for (size_t i=0;i<a->count;++i) free(a->items[i].value); free(a->items); a->items=NULL; a->count=0; }
+static void clear_items(SBAccessibility *a) { for (size_t i=0;i<a->count;++i) { free(a->items[i].label); free(a->items[i].value); } free(a->items); a->items=NULL; a->count=0; }
 void sb_accessibility_update(SBAccessibility *a,const char *title,const char *focus,const SBAccessibleItem *items,size_t count,const char *message,bool modal,uint64_t context) {
     if (!a) return;
     uint64_t signature=sb_hash(title,strlen(title))^sb_hash(focus,strlen(focus))^sb_hash(message,strlen(message))^(uint64_t)modal;
@@ -174,12 +179,12 @@ void sb_accessibility_update(SBAccessibility *a,const char *title,const char *fo
         if (count && !next) { SDL_UnlockMutex(a->mutex); return; }
         bool complete=true;
         for (size_t i=0;i<count;++i) {
-            snprintf(next[i].id,sizeof(next[i].id),"%s",items[i].id); snprintf(next[i].label,sizeof(next[i].label),"%s",items[i].label);
+            snprintf(next[i].id,sizeof(next[i].id),"%s",items[i].id); next[i].label=copy(items[i].label); if (!next[i].label) complete=false;
             next[i].value=copy(items[i].value); if (items[i].value && !next[i].value) complete=false;
             next[i].node=identify(a,items[i].id,context); if (!next[i].node) complete=false;
             next[i].bounds=items[i].bounds; next[i].role=items[i].role; next[i].editable=items[i].editable; next[i].selected=items[i].selected; next[i].anchor=items[i].anchor; next[i].caret=items[i].caret;
         }
-        if (!complete) { for (size_t i=0;i<count;++i) free(next[i].value); free(next); SDL_UnlockMutex(a->mutex); return; }
+        if (!complete) { for (size_t i=0;i<count;++i) { free(next[i].label); free(next[i].value); } free(next); SDL_UnlockMutex(a->mutex); return; }
         bool controls=context!=a->context || count!=a->count;
         if (!controls) for (size_t i=0;i<count;++i) if (strcmp(a->items[i].id,next[i].id)) { controls=true; break; }
         clear_items(a); a->items=next; a->count=count; a->signature=signature; a->context=context;

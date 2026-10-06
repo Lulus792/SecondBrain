@@ -8,6 +8,7 @@
 #ifdef __APPLE__
 #include <objc/runtime.h>
 #include <objc/message.h>
+#include <dlfcn.h>
 static void *send(void *object,const char *selector) {
     SEL method=sel_registerName(selector);
     if (!object || !((BOOL(*)(void *,SEL,SEL))objc_msgSend)(object,sel_registerName("respondsToSelector:"),method)) return NULL;
@@ -21,6 +22,8 @@ static void *native_find(void *object,const char *label,unsigned depth) {
     if (name && !strcmp(name,label)) return object;
     name=utf8(send(object,"accessibilityTitle")); if (name && !strcmp(name,label)) return object;
     name=utf8(send(object,"accessibilityDescription")); if (name && !strcmp(name,label)) return object;
+    name=utf8(send(object,"accessibilityIdentifier")); if (name && !strcmp(name,label)) return object;
+    name=utf8(send(object,"accessibilityValue")); if (name && !strcmp(name,label)) return object;
     void *children=send(object,"accessibilityChildren");
     size_t count=children ? ((size_t(*)(void *,SEL))objc_msgSend)(children,sel_registerName("count")) : 0;
     for (size_t i=0;i<count;++i) {
@@ -88,6 +91,25 @@ int main(int argc,char **argv) {
 #elif !defined(__APPLE__)
     printf("Native AT-SPI client probe unavailable in this build; only snapshot/queue contract tested.\n");
 #endif
+    const char *help_line="Tab / Umschalt+Tab: Fokus · Enter/Leertaste: aktivieren";
+    d.form=SB_FORM_HELP; frame(&d); frame(&d);
+    text=dump(&d); CHECK(strstr(text,help_line) && strstr(text,"Tastaturhilfe") && !strstr(text,"Lesbarer Inhalt")); accesskit_string_free(text);
+#ifdef __APPLE__
+    void *help_heading=native_find(view,"modal-title",0); CHECK(help_heading);
+    void **heading_role=dlsym(RTLD_DEFAULT,"NSAccessibilityHeadingRole");
+    const char *actual_role=utf8(send(help_heading,"accessibilityRole")); CHECK(actual_role);
+    if (heading_role) CHECK(!strcmp(actual_role,utf8(*heading_role)));
+    else CHECK(!strcmp(actual_role,"Heading")); /* Older AppKit: observe adapter role, no assistive heading claim. */
+    CHECK(native_find(view,help_line,0));
+#elif defined(_WIN32) || defined(SB_ATSPI_TEST)
+    CHECK(sb_native_probe(d.ui.window,help_line,NULL,SB_NATIVE_READ_NAME,native_value,sizeof(native_value),pump,&d)); CHECK(!strcmp(native_value,help_line));
+#endif
+    d.form=SB_FORM_NONE; frame(&d); frame(&d);
+    text=dump(&d); CHECK(!strstr(text,help_line)); accesskit_string_free(text);
+    strcpy(d.model.editor,"Ungespeicherter Entwurf");
+    OK(sb_app_request(&d.model,SB_ACT_NOTE,"STATE.md")); CHECK(d.model.guard); frame(&d);
+    text=dump(&d); CHECK(strstr(text,"Änderungen erhalten") && strstr(text,"Dieses Dokument enthält ungespeicherte Änderungen"));
+    CHECK(!strstr(text,"Projektdokumente")); accesskit_string_free(text);
     sb_desktop_free(&d);
     /* Snapshot/queue contract is tested on every OS, independently of the native client. */
     CHECK(SDL_Init(SDL_INIT_VIDEO));
@@ -112,6 +134,13 @@ int main(int argc,char **argv) {
     CHECK(!sb_accessibility_submit(a,18,ACCESSKIT_ACTION_FOCUS,NULL,0,0));
     unsigned drained=0; while (sb_accessibility_next_action(a,&pending)) { ++drained; sb_accessibility_action_free(&pending); }
     CHECK(drained==64); CHECK(sb_accessibility_submit(a,18,ACCESSKIT_ACTION_FOCUS,NULL,0,0));
+    char caption[701]; memset(caption,'x',sizeof(caption)-1); caption[700]=0;
+    item.id="caption"; item.label=caption; item.value=NULL; item.role=ACCESSKIT_ROLE_LABEL;
+    sb_accessibility_update(a,"Test","",&item,1,"",false,3);
+    accesskit_tree_update *caption_tree=sb_accessibility_tree(a); text=accesskit_tree_update_debug(caption_tree); CHECK(strstr(text,caption));
+    accesskit_string_free(text); accesskit_tree_update_free(caption_tree);
+    CHECK(!sb_accessibility_submit(a,19,ACCESSKIT_ACTION_FOCUS,NULL,0,0));
+    CHECK(!sb_accessibility_submit(a,19,ACCESSKIT_ACTION_CLICK,NULL,0,0));
     sb_accessibility_free(a); SDL_DestroyWindow(test_window); SDL_Quit();
     printf("%u accessibility assertions passed.\n",checks); return 0;
 }

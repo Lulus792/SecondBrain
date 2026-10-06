@@ -43,6 +43,10 @@ static bool query(Probe *p) {
         if (FAILED(hr) || role!=UIA_ButtonControlTypeId) goto done;
         hr=IUIAutomationElement_GetCurrentPatternAs(element,UIA_InvokePatternId,&IID_IUIAutomationInvokePattern,(void **)&invoke);
         if (SUCCEEDED(hr) && invoke) success=SUCCEEDED(IUIAutomationInvokePattern_Invoke(invoke));
+    } else if (p->operation==SB_NATIVE_READ_NAME) {
+        BSTR text=NULL; hr=IUIAutomationElement_get_CurrentName(element,&text);
+        if (SUCCEEDED(hr) && text && p->capacity<=INT_MAX) success=WideCharToMultiByte(CP_UTF8,WC_ERR_INVALID_CHARS,text,-1,p->output,(int)p->capacity,NULL,NULL)>0;
+        SysFreeString(text);
     } else {
         hr=IUIAutomationElement_GetCurrentPatternAs(element,UIA_ValuePatternId,&IID_IUIAutomationValuePattern,(void **)&field);
         if (FAILED(hr) || !field) goto done;
@@ -109,6 +113,10 @@ static bool query(Probe *p) {
             AtspiEditableText *edit=atspi_accessible_get_editable_text_iface(element);
             if (edit) success=atspi_editable_text_set_text_contents(edit,p->value,&error);
             if (edit) g_object_unref(edit);
+        } else if (p->operation==SB_NATIVE_READ_NAME) {
+            char *name=atspi_accessible_get_name(element,&error);
+            if (name && strlen(name)<p->capacity) { strcpy(p->output,name); success=true; }
+            g_free(name);
         } else {
             AtspiText *text=atspi_accessible_get_text_iface(element);
             char *value=text ? atspi_text_get_text(text,0,-1,&error) : NULL;
