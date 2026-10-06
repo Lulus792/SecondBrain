@@ -294,3 +294,26 @@ nach dem versehentlichen Clipboard-Überlappungsversuch. Andere zwölf Prüfunge
 des vollständigen Sanitizer-Laufs bestanden bereits. Die gezielte Wiederholung
 prüft die betroffenen Pfade und letzte Layout-/Workeränderungen; ein neuer
 vollständiger ungestörter Sanitizer-Gesamtlauf wird damit nicht behauptet.
+
+
+## Abnahme 0.4.0
+
+Der [Lauf zu d2d9c2b](https://github.com/Lulus792/SecondBrain/actions/runs/37508856383) besteht mit allen 18 Jobs.
+Je 14 Desktopprüfungen bestehen in Debug/Release auf Windows x64, macOS ARM64
+und Linux x64. Alle drei tatsächlich entpackten Pakete bestehen 126 Maus-,
+105 Tastatur- und 75 Sicherungs-Bedienaussagen, Einstellungsneustart in getrennten
+Prozessen und den Produktions-CLI-Sicherungsablauf. Die neue UI-Prüfung verwendet
+eine 8-MiB-Datei; Kernintegrität umfasst 487 Aussagen und injizierte Schreibfehler 27.
+
+Lokal besteht das entpackte und verschobene Intel-macOS-Paket ebenfalls. Die App
+unter dist/SecondBrain/secondbrain.app ist aktualisiert. Alle 14 Release-Prüfungen
+und gezielte Nachprüfungen bestehen. Im Sanitizer-Gesamtlauf bestanden zwölf
+Prüfungen; die zwei durch einen versehentlichen Clipboard-Überlappungsversuch
+gestörten Wege bestehen in der anschließenden seriellen Wiederholung mit
+ASan/UBSan, einschließlich der letzten UI-/Workeränderungen. Neun Python-Tests bestehen.
+
+Die Tests verwenden SDL-Ereignisse und versteckte native Fenster mit
+Software-Renderer. Native OS-Dateidialoge, physisch volle Zielvolumes, harter
+Prozessabbruch, Screenreader und Geräte-/Langzeitabnahme bleiben offen.
+Die vollständige Release-Liste bleibt beauftragt; 1.0 bleibt bis zur
+Nutzerfreigabe gesperrt.

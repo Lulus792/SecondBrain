@@ -198,3 +198,28 @@ in Release und ASan/UBSan. Das tatsächliche neue Intel-Paket besteht 126 Maus-,
 105 Tastaturaussagen und getrennte Prozessneustarts. Kleine Bilder bei 150/200
 Prozent Schrift wurden betrachtet. Native OS-Dialoge und Screenreader wurden
 nicht interaktiv bedient; kein solcher Plattformnachweis wird daraus abgeleitet.
+
+
+## Version 0.4.0: Sicherung und Wiederherstellung in der App
+
+Der [Lauf zu d2d9c2b](https://github.com/Lulus792/SecondBrain/actions/runs/37508856383) besteht am 6. Oktober 2026
+mit allen 18 Jobs. Artefaktnamen bestätigen Windows X64, macOS ARM64 und Linux X64.
+
+| Plattform | Desktop Debug, 14 Tests | Desktop Release, 14 Tests | Entpacktes Paket |
+| --- | --- | --- | --- |
+| Windows x64 | bestanden | bestanden | Maus/Tastatur/Sicherung, Neustart und CLI bestanden |
+| macOS ARM64 | bestanden | bestanden | Maus/Tastatur/Sicherung, Neustart und CLI bestanden |
+| Ubuntu Linux x64, X11/Xvfb | bestanden | bestanden | Maus/Tastatur/Sicherung, Neustart und CLI bestanden |
+
+Neu enthalten sind 487 Integritätsaussagen, 27 injizierte Schreibfehleraussagen,
+Produktions-CLI-Prozesse und 75 Sicherungs-Bedienaussagen mit 8-MiB-Anhang.
+Der UI-Ablauf prüft Vorschau-Bindung, erhaltene Entwürfe, belegte Namen,
+Save-Konflikt, falsche/späte Auswahlantworten, Abbruch und Beenden. Dateidialog-
+Rückgaben werden simuliert; die tatsächlich nativen OS-Dialoge wurden nicht bedient.
+
+Lokal bestehen entpacktes Intel-Paket, 14 Releaseprüfungen und gezielte Nachprüfungen.
+Zwölf Prüfungen des Sanitizer-Gesamtlaufs bestanden; zwei durch parallel gestartete
+Clipboard-Tests gestörte Wege bestehen seriell wiederholt mit ASan/UBSan.
+Kleine Darstellungen bei 200 Prozent Schrift und echte Hintergrundarbeit wurden
+als Softwarebilder betrachtet. Fehler-Injektion ist ausdrücklich kein physisch
+volles Volume. Native Screenreader, reale GPU-/Display- und Langzeitnachweise fehlen.

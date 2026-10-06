@@ -108,3 +108,18 @@ Die eigene Lizenz ist auf direkte Nutzerentscheidung MIT. Apple-Developer-Konto
 und Windows-Code-Signing-Zertifikat sind noch nicht vorhanden. Signierungswege
 werden vorbereitet; tatsächliche Herausgeber-Signierung wird erst mit den nötigen
 Konten und Zertifikaten belegt. [Release-Liste](../../docs/RELEASE.md).
+
+
+## D12: Inhaltsarchive und neue Wiederherstellungsziele
+
+Der vollständige Release-Auftrag wird mit eigener C-Sicherung umgesetzt.
+Versionierte Archive enthalten gespeicherte reguläre Projektdateien einschließlich
+Anhängen und leerer Ordner; verknüpfte externe Repositories bleiben außerhalb.
+SHA-256 prüft Inhalte und bindet die UI-Vorschau an die importierte Datei.
+Wiederherstellen veröffentlicht ausschließlich einen neuen freien Projektordner.
+Bestehende Projekte und Sicherungen werden nicht ersetzt. Die gewählte neue
+Ordnerkennung wird im Metadaten-id angepasst; andere Inhalte bleiben erhalten.
+
+Die UI arbeitet im Hintergrund, wahrt Save-Konflikte und erhält andere offene
+Entwürfe. Abbruch und Beenden haben explizite Zustände. Quelle: Nutzerauftrag
+vor 1.0, ursprüngliche Release-Liste und [Sicherungsvertrag](../../docs/SICHERUNG.md).

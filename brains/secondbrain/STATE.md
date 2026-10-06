@@ -37,7 +37,11 @@ simulierten vollen Datenträger. Produktions-CLI wird separat über Prozesse gep
 Die Desktop-Anbindung ist in 0.4.0 umgesetzt: Aktionen/Projekte bieten Sichern
 und Wiederherstellen, Hintergrundarbeit mit Abbruch, prüfbare Vorschau und
 erhaltene Entwürfe. Der Tastaturdurchlauf umfasst 75 Aussagen und eine
-8-MiB-Datei. Der neue Plattformnachweis folgt erst nach ausgeführten Jobs.
+8-MiB-Datei. Die [0.4.0-Abnahme zu d2d9c2b](https://github.com/Lulus792/SecondBrain/actions/runs/37508856383) besteht mit 18 Jobs:
+14 Desktoptests je Debug/Release auf Windows x64, macOS ARM64 und Linux x64.
+Alle entpackten Pakete bestehen Sicherungs-UI, beide bisherigen Bedienwege,
+Einstellungsneustart und Produktions-CLI. Lokal bestehen Paket und gezielte
+Sanitizer-Nachprüfung nach dem korrigierten Clipboard-Prüfbetrieb.
 
 ## Auftrag und verbleibende Abnahmen
 

@@ -155,3 +155,10 @@ Tests über einen Resource Lock innerhalb desselben Laufs. Getrennte CTest-Proze
 auf demselben Desktop müssen ebenfalls nacheinander laufen. Ein versehentlicher
 lokaler Überlappungsversuch erzeugte falsche eingefügte Pfade; diese Prüfung ist
 kein Produktbefund und wird nach der serialisierten Nachprüfung getrennt vermerkt.
+
+
+Der [0.4.0-Lauf zu d2d9c2b](https://github.com/Lulus792/SecondBrain/actions/runs/37508856383) besteht mit allen 18 Jobs.
+14 Desktopprüfungen je Debug/Release und tatsächliche Paketrundreise bestehen auf
+Windows x64, macOS ARM64 und Linux x64. Der endgültige Bedienlauf enthält 75,
+Integrität 487 und injizierter Schreibfehler 27 Aussagen. Die lokalen Nachprüfungen
+und verbleibenden Grenzen stehen in STATUS.md und PLATTFORMEN.md.
