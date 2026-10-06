@@ -107,3 +107,17 @@ macOS-/Vertragsprüfung bestehen; diese bestätigt vollständigen Text über
 6.000 Zeichen, native Scroll-Anfragen und 2.000 stabile Absatzkennungen.
 [Umfang und offene Semantik](../../docs/DOKUMENTSTRUKTUR.md). Das Intel-Paket und gezieltes ASan/UBSan (149 Aussagen) bestehen.
 Neue native Plattformabnahme folgt; der vollständige Auftrag vor 1.0 bleibt aktiv.
+
+## Fehlerszenarien und Linux-Ebenen 0.9.2
+
+15 lokale Debug-Kerntests und fünf Release-Nachprüfungen bestehen.
+Sechs echte Prozess-Kills erhalten Originale und erlauben sichere neue
+Versuche. Zwei echte ENOSPC-Fälle auf einem entbehrlichen HFS+-Volume
+bestehen nach Teilfortschritt; das Volume ist getrennt.
+
+0.9.1 besteht in 18 nativen Jobs; Linux scheitert an einem fehlenden
+AT-SPI-Ebenenattribut. Die neue gehashte UI-Quellkorrektur ist typgeprüft
+und idempotent; native Linux-Wiederholungsabnahme folgt. Originale:
+[Umsetzungsstand](../../docs/STATUS.md), [Sicherungsvertrag](../../docs/SICHERUNG.md)
+und [UI-Abhängigkeiten](../../third_party/README.md). Lokale App bleibt auf
+dem geprüften 0.9.1-Paket; 1.0 und tatsächliche assistive Abnahme sind offen.

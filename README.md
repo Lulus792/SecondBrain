@@ -65,6 +65,8 @@ der eigene Anwendungscode ist C17.
 Unter Linux benötigt der UI-Build zusätzlich Cargo mit Rust ab 1.87, um die
 festgelegte Zugänglichkeitsbibliothek mit ihrer Cache-Korrektur zu bauen.
 Die fertige Anwendung benötigt keine Rust-Toolchain.
+Die automatisierten Prozessprüfungen benötigen beim Bauen zusätzlich Python 3;
+für einen reinen Anwendungsbuild kann `-DBUILD_TESTING=OFF` gesetzt werden.
 [Plattformdetails](docs/DISTRIBUTION.md).
 
 ```sh

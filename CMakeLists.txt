@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-project(SecondBrain VERSION 0.9.1 LANGUAGES C)
+project(SecondBrain VERSION 0.9.2 LANGUAGES C)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
@@ -275,6 +275,26 @@ elseif(MINGW)
 endif()
 
 if(BUILD_TESTING)
+    find_package(Python3 COMPONENTS Interpreter REQUIRED)
+    add_executable(secondbrain-backup-crash-worker tests/backup_crash_worker.c)
+    target_link_libraries(secondbrain-backup-crash-worker PRIVATE sb_core)
+    if(MSVC)
+        target_compile_options(secondbrain-backup-crash-worker PRIVATE /utf-8)
+    elseif(MINGW)
+        target_link_options(secondbrain-backup-crash-worker PRIVATE -municode)
+    endif()
+    add_test(NAME backup-process-kill COMMAND "${Python3_EXECUTABLE}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_backup_crash.py"
+        "$<TARGET_FILE:secondbrain-backup-crash-worker>" "$<TARGET_FILE:secondbrain-cli>"
+        "${CMAKE_CURRENT_BINARY_DIR}/backup-crash-data")
+    set_tests_properties(backup-process-kill PROPERTIES TIMEOUT 240)
+    if(APPLE)
+        add_test(NAME backup-real-volume COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_backup_volume_macos.py"
+            "$<TARGET_FILE:secondbrain-backup-crash-worker>" "$<TARGET_FILE:secondbrain-cli>"
+            "${CMAKE_CURRENT_BINARY_DIR}/volume-test-data")
+        set_tests_properties(backup-real-volume PROPERTIES TIMEOUT 180 RESOURCE_LOCK secondbrain_clipboard)
+    endif()
     add_executable(secondbrain-backup-tests tests/test_backup.c)
     target_link_libraries(secondbrain-backup-tests PRIVATE sb_core)
     if(MSVC)

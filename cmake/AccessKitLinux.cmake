@@ -13,9 +13,14 @@ FetchContent_Declare(sb_accesskit_unix_source
     URL https://static.crates.io/crates/accesskit_unix/accesskit_unix-0.24.0.crate
     URL_HASH SHA256=202f24df034a7476d07b7f74284de84f6d62aabd858dbe7ee9cad3b7ad6f8f9d
     SOURCE_SUBDIR source-only)
-FetchContent_MakeAvailable(sb_accesskit_c_source sb_accesskit_unix_source)
+FetchContent_Declare(sb_accesskit_atspi_source
+    URL https://static.crates.io/crates/accesskit_atspi_common/accesskit_atspi_common-0.21.0.crate
+    URL_HASH SHA256=52c182f9c282ac9c5638d876d551d15e5f7d397ec263349a0c6a2b61595dd5e4
+    SOURCE_SUBDIR source-only)
+FetchContent_MakeAvailable(sb_accesskit_c_source sb_accesskit_unix_source sb_accesskit_atspi_source)
 set(SB_C_SOURCE "${sb_accesskit_c_source_SOURCE_DIR}")
 set(SB_UNIX_SOURCE "${sb_accesskit_unix_source_SOURCE_DIR}")
+set(SB_ATSPI_SOURCE "${sb_accesskit_atspi_source_SOURCE_DIR}")
 include("${CMAKE_CURRENT_LIST_DIR}/PrepareAccessKitLinux.cmake")
 set(SB_ACCESSKIT_CARGO_TARGET "${CMAKE_CURRENT_BINARY_DIR}/accesskit-linux-build")
 ExternalProject_Add(sb_accesskit_linux_build

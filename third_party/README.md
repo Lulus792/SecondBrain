@@ -134,3 +134,20 @@ Schreibrichtungs-/Editorabnahme bleiben eigene Arbeiten.
 - NotoSansDevanagari-Regular.ttf: `385e78e6359a9d88a0f243d53b1209d7548361ba2194e2b9ec779bcaa7e8949d`.
 - NotoSansSymbols2-Regular.ttf: `882d142b9a1ef3fd7fa4225dbe95c10fab6664206eb4964c8ff705a4f6d02988`.
 - NotoSansCJKjp-Regular.otf: `68a3fc98800b2a27b371f2fb79991daf3633bd89309d4ffaa6946fd587f375b5`.
+
+## AT-SPI-Ebenen in 0.9.2
+
+Der 0.9.1-Lauf findet im nativen Linux-Test die fehlende `level`-Eigenschaft.
+accesskit_atspi_common 0.21.0 übernimmt sie noch nicht aus der gemeinsamen
+Schema-Eigenschaft. Die eigene vorbereitete UI-Korrektur ergänzt den
+AT-SPI-Attributwert mit natürlicher Ebenenzählung (`level + 1`, geprüft auf
+Überlauf). Crate-SHA-256:
+`52c182f9c282ac9c5638d876d551d15e5f7d397ec263349a0c6a2b61595dd5e4`.
+Originaldatei src/node.rs SHA-256:
+`8fafcc4f13a061cc46ea070a7b4e240027487f8f5507d75c449253c95136e4cf`;
+korrigiert: `32f8e038ed152668c190a3acd672485b60e0e9c9abd017fc746bf3d502c47dd1`.
+Unbekannte Quellen werden abgewiesen, erneute Vorbereitung ist bytegleich.
+Cargo behält Versionen und Abhängigkeitsgraph der bestehenden Lockdatei;
+nur diese weitere UI-Quelle wird lokal ersetzt. Lizenzen und Autoren bleiben
+erhalten. Typprüfung des korrigierten Crates besteht lokal; native Linux-
+Wiederholungsabnahme folgt und bleibt eine eigenständige Prüfung.

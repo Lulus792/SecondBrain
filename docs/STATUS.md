@@ -849,3 +849,29 @@ Desktop-Anbindung und die Providerprüfung besteht mit 149 Aussagen. Externe
 Bibliotheken sind uninstrumentiert; LeakSanitizer ist nicht Teil dieser Prüfung.
 Das geprüfte Paket ist lokal nach dist/SecondBrain übernommen; Version und
 Standbild mit dem eigenen Projektgedächtnis bestehen.
+
+## Prozessabbruch, Speicherfehler und AT-SPI-Ebenen in 0.9.2
+
+Alle 15 lokalen Debug-Kerntests bestehen (10,54 Sekunden). Sie enthalten
+sechs echte Prozess-Kills in Sicherung/Wiederherstellung mit bytegleichen
+Originalen, erhaltenen temporären Resten, sicheren Wiederholungen und
+geprüfter manueller Wiederherstellung eines vollständigen temporären Archivs.
+Auf einem separat erstellten 32-MiB-HFS+-Volume bestehen zusätzlich echte
+ENOSPC-Fehler nach Teilfortschritt in beiden Abläufen und erfolgreiche
+Wiederholungen nach Platzfreigabe; das Volume wurde getrennt. Keine
+Stromausfall-/Hardwarepersistenz daraus abgeleitet.
+
+Fünf lokale Release-Nachprüfungen bestehen (15,16 Sekunden): native
+Zugänglichkeit, Prozess-Kill, echtes Volume und beide Versionsausgaben.
+Die neuen Kindprozesse/Orchestrierungen sind reine Testwerkzeuge und werden
+nicht in Runtime-Pakete aufgenommen. Normale App-/CLI-Nutzung benötigt
+kein Python; beim Bauen mit Tests wird Python 3 benötigt.
+
+Der 0.9.1-Lauf37547431405 zu ad49f03 besteht in 18 Jobs einschließlich
+Windows, macOS ARM64/Intel und deren Paketen; beide Linux-Desktopjobs
+scheitern am fehlenden nativen AT-SPI-Ebenenattribut. Der Originalquelltext
+von accesskit_atspi_common 0.21.0 gibt die gemeinsame level-Eigenschaft
+nicht aus. 0.9.2 ergänzt sie mit natürlicher Zählung in einer gehashten
+UI-Quellkorrektur. Cargo-Typprüfung besteht (30,83 Sekunden). Die
+Vorbereitung ist bytegleich wiederholbar und weist unbekannte Quellen ab.
+Neue native AT-SPI-, Prozess- und Volume-Abnahmen folgen im Plattformlauf.

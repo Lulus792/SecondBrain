@@ -162,3 +162,36 @@ Der [0.4.0-Lauf zu d2d9c2b](https://github.com/Lulus792/SecondBrain/actions/runs
 Windows x64, macOS ARM64 und Linux x64. Der endgültige Bedienlauf enthält 75,
 Integrität 487 und injizierter Schreibfehler 27 Aussagen. Die lokalen Nachprüfungen
 und verbleibenden Grenzen stehen in STATUS.md und PLATTFORMEN.md.
+
+## Prozessabbruch und tatsächlich volles Volume, 7. Oktober 2026
+
+`backup-process-kill` startet echte C-Kindprozesse mit dem unveränderten
+Produktionskern und friert sie ausschließlich über dessen Fortschrittscallback
+ein. Der Elternprozess beendet sie unter POSIX mit SIGKILL, unter Windows
+mit TerminateProcess. Geprüfte Kontrollpunkte: Schreiben, Quellnachprüfung,
+Sicherungsprüfung und unmittelbar vor Veröffentlichung; Wiederherstellung
+nach Teilfortschritt und unmittelbar vor Veröffentlichung.
+
+Nach jedem Abbruch bleiben Originalprojekt und vorhandene Sicherung bytegleich.
+Es existiert kein veröffentlichtes Teilziel. Temporäre Reste bleiben erhalten;
+ein erneuter vollständiger Versuch benutzt einen neuen temporären Pfad und
+verändert die Reste nicht. Verborgene Wiederherstellungsreste erscheinen nicht
+als Projekte. Eine vollständig geschriebene temporäre Sicherung unmittelbar
+vor Veröffentlichung wird zusätzlich ausdrücklich geprüft und unter einem
+neuen Namen wiederhergestellt. Das ist keine automatische Absturzbereinigung
+oder Fortsetzung einer unvollständigen Datei.
+
+`backup-real-volume` erzeugt auf macOS ein begrenztes, entbehrliches 32-MiB-
+HFS+-Diskimage. Es prüft den tatsächlichen Mountpunkt und die Volumegröße,
+bevor es das Volume bis zum echten ENOSPC füllt. Sicherung und Wiederherstellung
+fehlschlagen nach bestätigtem Teilfortschritt; Teilziele werden nicht
+veröffentlicht, temporäre Daten werden kontrolliert entfernt, vorhandene
+Projekte bleiben bytegleich. Nach Freigabe des Platzes gelingen beide
+Versuche. Das Image wird abschließend getrennt.
+
+Lokal bestehen alle sechs Prozessabbruchfälle und beide HFS+-Speicherfehler.
+Diese Testorchestrierung verwendet Python-Standardbibliothek und das Apple-
+Werkzeug hdiutil; sie ist kein Bestandteil der normalen App. Windows-/Linux-
+Prozessabnahme sowie weitere echte Dateisysteme werden erst nach ausgeführten
+Prüfungen genannt. Ein beendeter Prozess ist kein Stromausfall: Persistenz
+bei Hardware-, Kernel- oder Geräteausfall bleibt gesondert abzunehmen.

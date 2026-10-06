@@ -72,3 +72,11 @@ Listen-/Tabellensemantik, vollständige Markdown-Regeln, graphemgenaue Text-
 geometrie, gemischte Schreibrichtungen, IME und reale Screenreader-Bedienung
 bleiben weitere Arbeiten. Blockrechtecke sind noch keine Zeichenrechtecke.
 Eine korrekte Baumstruktur allein belegt keine vollständige assistive Abnahme.
+
+## Linux-Nachprüfung
+
+Der erste native 0.9.1-Lauf scheitert am fehlenden AT-SPI-`level`-Attribut
+des vorhandenen Adapters. 0.9.2 bereitet eine gehashte UI-Quellkorrektur in
+accesskit_atspi_common 0.21.0 vor; Typprüfung und idempotente Vorbereitung
+bestehen lokal. Die tatsächliche AT-SPI-Abfrage wird anschließend erneut
+geprüft; der bisherige Linux-Lauf gilt nicht als bestanden.

@@ -22,7 +22,10 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   Atomisches Speichern ersetzt keine Sicherung oder Versionshistorie.
   In 0.4.0 implementiert: eigene Inhaltsarchive, prüfbare Vorschau, Wiederherstellung
   und Abbruch in der App. Noch offen: native Dialogabnahme, tatsächliche volle
-  Zielvolumes und Wiederherstellung nach hartem Prozessabbruch.
+  Zielvolumes und Wiederherstellung nach hartem Prozessabbruch. Ab 0.9.2
+  bestehen lokal sechs echte Prozessabbruch-/Neustartfälle und zwei
+  ENOSPC-Fälle auf einem begrenzten HFS+-Volume. Native Prozessabnahme auf
+  Windows/Linux und weitere Dateisysteme bleiben gesonderte Nachweise.
 - [ ] **Alltagskomfort vervollständigen:** Einstellungen und letzten Arbeitsordner
   dauerhaft speichern, native Ordnerauswahl, verständlicher erster Start.
   Speicherung und native Ordnerwahl sind in 0.3.1 implementiert; Systemvorgaben
