@@ -69,3 +69,13 @@ Systembewegung sowie ein fertiger erster Start bleiben Release-Aufgaben.
 - [SDL3: SDL_ShowOpenFolderDialog](https://wiki.libsdl.org/SDL3/SDL_ShowOpenFolderDialog),
   gelesen am 6. Oktober 2026: asynchrone Rückgabe, Abbruch/Fehler, möglicher fremder
   Callback-Thread und Linux-Portalabhängigkeit. Die App pumpt weiter SDL-Ereignisse.
+
+## Asynchrone Fenstergrößen
+
+SDL kann Größenänderungen asynchron ausführen. Wiederherstellung und Speicherung
+warten daher mit SDL_SyncWindow auf den Abschluss, bevor sie die tatsächliche
+Größe verwenden. Ein fehlgeschlagener Größenwechsel wird gemeldet und ersetzt
+keine gespeicherte Konfiguration. Die gezielte Prüfung wartet ebenfalls auf den
+Größenwechsel; eine bloße Anfrage ist kein Beleg für eine bereits geänderte Größe.
+[SDL_SyncWindow](https://wiki.libsdl.org/SDL3/SDL_SyncWindow), Originaldokumentation
+und SDL3-3.2.30-Quellcode am 6. Oktober 2026 gelesen.

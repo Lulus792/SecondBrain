@@ -271,7 +271,11 @@ SBStatus sb_desktop_preferences(SBDesktop *d, const char *path, bool explicit_wo
     sb_ui_theme(&d->ui,s.dark); d->solid=s.solid; d->reduced_motion=s.reduced_motion;
     status=sb_ui_fonts(&d->ui,s.font_percent/100.0f);
     if (status.code!=SB_OK) { d->message=status; return status; }
-    SDL_SetWindowSize(d->ui.window,(int)s.width,(int)s.height);
+    if (!SDL_SetWindowSize(d->ui.window,(int)s.width,(int)s.height) || !SDL_SyncWindow(d->ui.window)) {
+        d->settings_enabled=false;
+        d->message=sb_error(SB_IO,"Fenstergröße konnte nicht wiederhergestellt werden: %s",SDL_GetError());
+        return d->message;
+    }
     if (!explicit_workspace && s.workspace[0]) {
         if (sb_fs_kind(s.workspace)!=2) {
             d->settings_enabled=false;
@@ -296,7 +300,11 @@ SBStatus sb_desktop_store_preferences(SBDesktop *d) {
         snprintf(s.project,sizeof(s.project),"%s",d->model.project.id);
         snprintf(s.note,sizeof(s.note),"%s",d->model.path);
     }
-    int width,height; SDL_GetWindowSize(d->ui.window,&width,&height);
+    int width,height;
+    if (!SDL_SyncWindow(d->ui.window) || !SDL_GetWindowSize(d->ui.window,&width,&height)) {
+        d->message=sb_error(SB_IO,"Fenstergröße konnte nicht gespeichert werden: %s",SDL_GetError());
+        return d->message;
+    }
     s.width=(unsigned)fmaxf(780,fminf(8192,(float)width)); s.height=(unsigned)fmaxf(520,fminf(8192,(float)height));
     s.font_percent=(unsigned)roundf(d->ui.scale*100); s.dark=d->ui.dark; s.solid=d->solid; s.reduced_motion=d->reduced_motion;
     SBStatus status=sb_settings_save(d->settings_path,&s,d->settings_revision,&d->settings_revision);

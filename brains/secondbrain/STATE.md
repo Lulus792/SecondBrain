@@ -103,7 +103,15 @@ implementiert. Konfiguration wird bei beschädigten Daten oder erkannten paralle
 verspätete Dialogantworten verändern kein neues Formular. [Details](../../docs/EINSTELLUNGEN.md).
 Zehn lokale Release-Prüfungen und der vollständige Sanitizer-Lauf bestehen,
 zusätzlich die drei betroffenen Prüfungen nach der letzten kleinen Korrektur.
-50 neue UI-Aussagen und zwei getrennte App-Prozesse prüfen die Einstellungen.
+51 neue UI-Aussagen und zwei getrennte App-Prozesse prüfen die Einstellungen.
 Plattformnachweise für diesen Stand folgen erst nach ausgeführten CI-Jobs.
 Sicherung, native Zugänglichkeit, erster Start, OS-Vorgaben, Leistungsprüfung und
 Distribution bleiben Arbeiten des aktiven Ziels. Version 1.0 bleibt gesperrt.
+
+
+Die erste Crossplatform-Prüfung zu 66760a3 scheitert in den beiden Linux-Desktop-
+Jobs, während der C-Kern auf allen drei Systemen besteht. Fehlende öffentlich
+zugängliche Detailprotokolle werden durch neue CI-Fehlerannotationen ergänzt.
+Zusätzlich wartet die Einstellungsanbindung nun mit SDL_SyncWindow auf asynchrone
+Fenstergrößen. Die drei betroffenen Prüfungen bestehen lokal in Release und mit
+ASan/UBSan. Der erneute Linux-Nachweis folgt erst nach tatsächlich bestandenem Lauf.

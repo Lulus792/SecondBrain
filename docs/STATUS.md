@@ -223,6 +223,14 @@ getrennte App-Prozesse mit isolierter Konfiguration. Screenshots des kleinen
 Lokal bestehen alle zehn Release-Prüfungen, ein vollständiger Zehn-Test-Lauf mit
 AddressSanitizer/UndefinedBehaviorSanitizer sowie die gezielte Nachprüfung der
 drei Einstellungsprüfungen nach der letzten Hinweis-/Fehlerfallkorrektur.
-Die neue UI-Prüfung enthält 50 Aussagen; neun Python-Prüfungen bestehen.
+Die neue UI-Prüfung enthält 51 Aussagen; neun Python-Prüfungen bestehen.
 Crossplatform- und Paketnachweise für diesen Stand folgen erst nach Ausführung.
 Die vollständige Release-Liste bleibt offen.
+
+
+Die erste Crossplatform-Prüfung zu 66760a3 scheitert in den beiden Linux-Desktop-
+Jobs, während der C-Kern auf allen drei Systemen besteht. Fehlende öffentlich
+zugängliche Detailprotokolle werden durch neue CI-Fehlerannotationen ergänzt.
+Zusätzlich wartet die Einstellungsanbindung nun mit SDL_SyncWindow auf asynchrone
+Fenstergrößen. Die drei betroffenen Prüfungen bestehen lokal in Release und mit
+ASan/UBSan. Der erneute Linux-Nachweis folgt erst nach tatsächlich bestandenem Lauf.

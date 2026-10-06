@@ -23,7 +23,7 @@ int main(int argc,char **argv) {
     OK(sb_app_new_note(&d.model,"knowledge","notiz","Notiz"));
     strcpy(d.model.editor,"# Notiz\n\nBleibt erhalten.\n"); OK(sb_app_save(&d.model));
     sb_ui_theme(&d.ui,false); OK(sb_ui_fonts(&d.ui,1.5f)); d.solid=true; d.reduced_motion=true;
-    SDL_SetWindowSize(d.ui.window,780,560); frame(&d);
+    CHECK(SDL_SetWindowSize(d.ui.window,780,560) && SDL_SyncWindow(d.ui.window)); frame(&d);
     OK(sb_desktop_store_preferences(&d)); OK(sb_fs_absolute(workspace,absolute,sizeof(absolute)));
     sb_desktop_free(&d);
     OK(sb_desktop_init(&d,alternative,argv[1],true));
