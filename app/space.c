@@ -22,8 +22,19 @@ static void line(SBSpace *s, SBPoint a, SBPoint b) {
     float dx = b.x - a.x, dy = b.y - a.y;
     int steps = (int)fmaxf(fabsf(dx), fabsf(dy));
     if (steps > s->width + s->height || steps < 1) return;
-    const unsigned char color[] = {112,154,197};
-    for (int i = 0; i <= steps; ++i) blend(s, (int)(a.x + dx * i / steps), (int)(a.y + dy * i / steps), color, 0.19f);
+    const unsigned char accent[] = {112,154,197};
+    unsigned char ink[3];
+    memset(ink, s->dark ? 170 : 85, sizeof(ink));
+    const unsigned char *color = s->contrast ? ink : accent;
+    for (int i = 0; i <= steps; ++i) {
+        int x = (int)(a.x + dx * i / steps), y = (int)(a.y + dy * i / steps);
+        blend(s, x, y, color, s->contrast ? 1 : 0.19f);
+        if (s->contrast) {
+            /* Preserve a visible stroke after the logical raster is scaled. */
+            if (fabsf(dx) >= fabsf(dy)) blend(s, x, y + 1, color, 1);
+            else blend(s, x + 1, y, color, 1);
+        }
+    }
 }
 static bool resize(SBSpace *s, SDL_Renderer *r, int width, int height) {
     if (s->width == width && s->height == height && s->texture) return true;
@@ -105,6 +116,14 @@ bool sb_space_draw(SBSpace *s, SDL_Renderer *renderer, int width, int height) {
         SBPoint p = s->points[i];
         const unsigned char *c = colors[p.group % 5];
         float x = p.x * scale, y = p.y * scale, radius = (p.selected ? 4.5f : 2.8f) * scale * clamp(p.depth,0.65f,1.6f);
+        if (s->contrast) {
+            unsigned char ink[3]; memset(ink, s->dark ? 255 : 0, sizeof(ink));
+            radius = fmaxf(radius, 2);
+            int r = (int)ceilf(radius);
+            for (int yy=-r; yy<=r; ++yy) for (int xx=-r; xx<=r; ++xx)
+                if (xx*xx+yy*yy <= radius*radius) blend(s,(int)x+xx,(int)y+yy,ink,1);
+            continue;
+        }
         glow(s, x, y, (p.selected ? 24 : 15) * scale, c, 0.17f);
         glow(s, x, y, radius, c, 1);
         { const unsigned char white[] = {232,247,255}; blend(s, (int)x, (int)y, white, 1); }

@@ -36,7 +36,8 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   Die Cache-Signalstruktur ist in 0.5.2 korrigiert und mit echtem Linux-Clientcache
   geprüft; weitere Eventtypen bleiben gesonderte Abnahmen. Systemvorgaben bestehen
   in 0.6.0 auf allen drei CI-Systemen; reale Einstellungswechsel, Windows-Custom-
-  High-Contrast-Paletten und vollständige Kontrastmessung bleiben offen.
+  High-Contrast-Paletten und vollständige Kontrastmessung bleiben offen. In 0.6.1
+  werden funktionale Sternkerne und Kanten mit Rastermessung nachgeprüft.
 - [ ] **Leistung und Stabilität im Alltag prüfen:** große reale Wissensbasen,
   schnelle Eingabefolgen, lange Sitzungen, mehrere Displays, Skalierung und
   GPU-Treiber auf allen Zielsystemen. Die bisherigen Tests verwenden versteckte

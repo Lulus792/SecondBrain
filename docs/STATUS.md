@@ -510,3 +510,34 @@ ablauf in Unicode-Pfaden. dist/SecondBrain ist auf 0.6.0 aktualisiert; der Start
 mit dem eigenen Projektgedächtnis und das tatsächliche Bild sind geprüft.
 Archiv-SHA-256: `897c24cea9a2bea02575c60afd7697d6ed73dce7da07d9a16fe43d84c50f173e`.
 Die Pakete bleiben Entwicklungspakete ohne Herausgeberzertifikat. 1.0 bleibt gesperrt.
+
+
+## 0.6.1: Kontrast der funktionalen Sternkarte
+
+Nicht ausgewählte Sterne und Verbindungen waren auf hellen Kontrastflächen
+zu blass. Der Kontrastmodus zeichnet Sternkerne jetzt deckend und Verbindungen
+mit klarer Graustufe und breiterem Strich. Beschriftungen verwenden die
+Kontrasttextfarbe und verdecken Linien unter ihrem Textfeld. Die normale
+Lumen-Darstellung behält ihre Akzentfarben und ihr Glühen. Systemdarstellung
+und Kontrastwahl erhalten außerdem ein Icon aus dem eigenen Satz.
+
+Die Regression misst tatsächliche Rasterpixel für ungewählte Sterne und Kanten
+auf Schwarz und Weiß, einschließlich der verkleinerten Rasterdarstellung bei
+2560 logischen Pixeln. Die Mindestanforderung 3:1 ist eine eigene Übertragung
+von [W3C Nicht-Text-Kontrast](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html),
+gelesen am 6. Oktober 2026. Dünne Rasterlinien werden zusätzlich verbreitert.
+Die Prüfung ist keine vollständige Kontrastfreigabe aller App-Zustände.
+
+
+Der lokale Gesamtprüflauf besteht mit allen 16 Tests (158,93 Sekunden). Eine
+anschließende Ergänzung prüft Tastatur-Reichweite der Kontrastoption bei 200 Prozent
+Schriftgröße. Die Bildkontrolle zeigte dabei einen unzureichend unterscheidbaren
+Fokusring; der Kontrastmodus erhält einen getrennten inneren Ring. Die abschließende
+Nachprüfung und Plattformresultate werden gesondert ergänzt.
+
+
+Abschließende lokale Nachprüfung: system-appearance mit 51 Aussagen und der
+vollständige Tastaturablauf bestehen (62,22 Sekunden). ASan/UBSan bestehen für
+system-appearance und ui-rendering-editor (26,03 Sekunden). Die tatsächlichen
+hellen/dunklen Bilder und der fokussierte Einstellungsdialog bei 200 Prozent
+Schrift wurden betrachtet. Die native CI-Abnahme zu diesem Schritt steht noch aus.

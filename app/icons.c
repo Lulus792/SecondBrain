@@ -92,7 +92,7 @@ SBIcon sb_icon_for(const char *id) {
     if (!strcmp(id,"settings") || !strcmp(id,"settings-actions")) return SB_ICON_SETTINGS;
     if (!strcmp(id,"help") || !strcmp(id,"help-actions")) return SB_ICON_HELP;
     if (!strcmp(id,"context")) return SB_ICON_CONTEXT;
-    if (!strcmp(id,"theme")) return SB_ICON_PALETTE;
+    if (!strcmp(id,"theme") || !strcmp(id,"system-theme") || !strcmp(id,"contrast")) return SB_ICON_PALETTE;
     if (!strcmp(id,"motion")) return SB_ICON_MOTION;
     if (!strcmp(id,"font-minus") || !strcmp(id,"font-plus")) return SB_ICON_FONT;
     if (!strcmp(id,"transparency")) return SB_ICON_GLASS;

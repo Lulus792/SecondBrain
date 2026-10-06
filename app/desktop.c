@@ -220,8 +220,16 @@ static void tooltip(SBDesktop *d, const char *text) {
 }
 static bool focused(SBDesktop *d, const char *id) { return d->keyboard && !strcmp(d->focus, id); }
 static void ring(SBDesktop *d, const char *id) {
-    if (focused(d, id) && d->target_count && !strcmp(d->targets[d->target_count-1].id,id)) nk_stroke_rect(nk_window_get_canvas(d->ui.ctx),
-        d->targets[d->target_count - 1].bounds, 9, 2, d->ui.contrast ? d->ui.ctx->style.text.color : nk_rgb(142,191,255));
+    if (focused(d, id) && d->target_count && !strcmp(d->targets[d->target_count-1].id,id)) {
+        struct nk_rect bounds=d->targets[d->target_count-1].bounds;
+        if (d->ui.contrast) {
+            /* A separate inner ring remains distinct from the normal border. */
+            float inset=4*d->ui.scale;
+            bounds.x+=inset; bounds.y+=inset; bounds.w-=2*inset; bounds.h-=2*inset;
+        }
+        nk_stroke_rect(nk_window_get_canvas(d->ui.ctx),bounds,9,2,
+            d->ui.contrast ? d->ui.ctx->style.text.color : nk_rgb(142,191,255));
+    }
 }
 static bool activation(SBDesktop *d, const char *id) {
     if (strcmp(d->activate, id)) return false;
@@ -1555,8 +1563,10 @@ static void galaxy(SBDesktop *d, int width, int height, struct nk_rect card, str
             bool collision = false;
             for (unsigned j = 0; j < label_count; ++j) if (r.x < labels[j].x+labels[j].w && r.x+r.w > labels[j].x && r.y < labels[j].y+labels[j].h && r.y+r.h > labels[j].y) collision = true;
             if ((!collision && label_count < 80) || p.selected || p.focused) {
+                if (d->ui.contrast)
+                    nk_fill_rect(canvas,r,0,d->ui.dark ? nk_rgb(0,0,0) : nk_rgb(255,255,255));
                 nk_draw_text(canvas,r,title,(int)strlen(title),&d->ui.normal->handle,nk_rgba(0,0,0,0),
-                    d->ui.dark ? nk_rgb(220,233,251) : nk_rgb(40,61,89));
+                    d->ui.contrast ? ctx->style.text.color : d->ui.dark ? nk_rgb(220,233,251) : nk_rgb(40,61,89));
                 if (label_count < 80) labels[label_count++] = r;
             }
         }
