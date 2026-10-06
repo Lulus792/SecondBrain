@@ -10,14 +10,28 @@ Windows, macOS und Linux; externe Bibliotheken ausschließlich für die UI;
 UI-Recherche vor dem Entwurf und Gestaltung nach Apples Human Interface Guidelines.
 Die normale Nutzung soll vollständig in der eigenen Anwendung möglich sein.
 
-Aktuell ist dieser Plan festgehalten. Eine C-Anwendung und eine eigene Oberfläche
-sind noch nicht implementiert. Vorhanden sind recherchierte Wissensgrundlagen,
-Markdown-Vorlagen, ein Physim-Beispiel und ein Python-Generator als Strukturprototyp.
+Die Umsetzung läuft. UI-Recherche und Oberflächenentwurf sind dokumentiert;
+ein unabhängiger C17-Kern und ein natives Entwicklungswerkzeug sind implementiert.
+Die eigene Oberfläche und die vollständige App-Abnahme stehen noch aus.
+Der aktuelle Nachweis steht im [Umsetzungsstand](docs/STATUS.md).
 
 [GitHub Repository](https://github.com/Lulus792/SecondBrain) ·
 [Automatisierte Plattformprüfungen](https://github.com/Lulus792/SecondBrain/actions)
 
 ## Vorhandener Strukturprototyp
+
+Der C-Kern lässt sich bereits unabhängig von UI-Bibliotheken bauen:
+
+```sh
+cmake -S . -B build/core -DCMAKE_BUILD_TYPE=Debug
+cmake --build build/core --config Debug
+ctest --test-dir build/core -C Debug --output-on-failure
+```
+
+Das native Entwicklungswerkzeug `secondbrain-cli` liegt im Buildordner, unter
+Windows bei Visual-Studio-Builds im Unterordner `Debug`. Es unterstützt `new`,
+`list`, `search` und `context`; Aufruf ohne Argumente zeigt die Syntax.
+Zur Laufzeit benötigt es kein Python.
 
 Die folgenden Befehle betreffen den vorhandenen Python-Prototyp. Für ihn genügt
 Python 3.10 oder neuer; er hat keine zusätzlichen Paketabhängigkeiten. Das Datum
