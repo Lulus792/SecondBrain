@@ -52,7 +52,9 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   0.9.4 erweitert die gemeinsamen [Blockregeln](MARKDOWN.md); vollständige
   Container-/Inline-Regeln und Listensemantik bleiben offen. 0.9.11 ergänzt
   gemeinsame [Hervorhebungen](INLINE_STILE.md); 0.9.14 ergänzt
-  [Zeichenreferenzen und Mathematikglyphen](ENTITIES.md). 0.9.12 bindet
+  [Zeichenreferenzen und Mathematikglyphen](ENTITIES.md); 0.9.15 ergänzt
+  [E-Mail-Autolinks](AUTOLINKS.md). [Referenzlink-Integration](REFERENZLINKS_RECHERCHE.md)
+  bleibt geplant. 0.9.12 bindet
   [native Textstile](NATIVE_TEXTSTILE.md) an. Die neuen Plattformnachweise und
   die dokumentierten weiteren Textregeln bleiben offen. 0.9.6 ergänzt
   [Tabellen](TABELLEN.md); native UIA-/AT-SPI-Matrixschnittstellen und die

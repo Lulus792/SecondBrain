@@ -2,7 +2,7 @@
 
 Stand: 7. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Der aktuelle Entwicklungsschritt 0.9.14 ergänzt Zeichenreferenzen und Mathematikglyphen.
+Der aktuelle Entwicklungsschritt 0.9.15 ergänzt E-Mail-Autolinks und korrigiert Linkvorrang.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
 ## Abgeschlossene Grundlagen
@@ -1596,3 +1596,32 @@ Umfang nachgeprüft. Bidi, Textgeometrie, IME, vollständige Markdown-Container,
 native Tabellenmatrixschnittstellen, menschliche assistive Bedienung und die
 übrigen Release-Aufgaben bleiben offen. Der Gesamtauftrag bleibt aktiv;
 die Versionsnummer 1.0 wurde nicht gesetzt.
+
+
+## E-Mail-Autolinks und Linkvorrang 0.9.15
+
+Der eigene C-Leser ergänzt [E-Mail-Autolinks](AUTOLINKS.md) mit wörtlicher
+Beschriftung und mailto-Zielen. Die UI kodiert automatisierte Empfänger vor
+der OS-Übergabe; Sonderzeichen werden keine zusätzlichen Mailfelder. Code und
+Maskierungen bleiben literal. Ein innerer Autolink verdrängt einen äußeren
+Link, statt dessen falsches Ziel zu aktivieren; DEL ist aus URI-Autolinks ausgeschlossen.
+Referenzlinks sind [recherchiert](REFERENZLINKS_RECHERCHE.md), noch nicht implementiert.
+
+Alle 37 lokalen Intel/macOS-Release-Tests bestehen (236,00 s), darunter 401
+native, 91 Text- und 111 Editorassertions. Fünf Vorprüfungen bestehen (21,56 s).
+19 unveränderte Originalfälle vergleichen echte C-Texte/Stile/Ziele; 1.000
+eigene Adressfälle bestehen gegen separaten Regex. Gezielte eigene Kern-
+ASan/UBSan besteht mit 1.194.616 Assertions und 5.000 begrenzten Quellfällen;
+native eigene Teilinstrumentierung mit 401 Assertions. Leakprüfung ist auf
+diesem macOS nicht verfügbar und deaktiviert; übriger Kern/externe UI-Bibliotheken
+sind nicht vollständig instrumentiert.
+
+Vorheriger Parser scheitert an E-Mail-Ausgabe und liefert bei verschachteltem
+URI das falsche äußere Ziel. Actual Reader-Absätze/Zellen, zwei Enter-Aktionen
+mit aufgezeichnetem URL-Adapter, unveränderte Quelle und Raster sind geprüft.
+Es wurde keine tatsächliche Mail-App gestartet oder bedient. Logs:
+build/autolinks-{targeted,full,oracle}-check.log, autolinks-sanitize/result.log,
+autolinks-ui-sanitize/result.log und autolinks-regression/{result,nested}.log.
+UI-Bericht SBUI-050/051: /Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-07_17-08-19/UI_REVIEW.md.
+Neue Paket-/Plattformabnahme folgt nach dem Quellpush; dist bleibt bis dahin
+beim geprüften 0.9.14. Der vollständige Auftrag bleibt aktiv, 1.0 unverändert offen.

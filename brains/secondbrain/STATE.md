@@ -14,7 +14,7 @@ Entwürfe und erkannte Konflikte bleiben geschützt. Sicherung/Wiederherstellung
 Einstellungen, eigener Markdown-Blockleser und vollständige Graphem-Eingaben
 gehören zum bisherigen geprüften Umfang. [Verträge und Quellen](SOURCES.md).
 
-## Aktueller Arbeitsschritt 0.9.14
+## Geprüfter Paketstand 0.9.14
 
 [Zeichenreferenzen](../../docs/ENTITIES.md) sind im eigenen C-Leser implementiert:
 2.125 festgelegte Namen, numerische Angaben, stabile Ausgabestile, erhaltene
@@ -33,6 +33,15 @@ vollständig abgeschlossen; daraus keine ARM64-Gesamtabnahme ableiten.
 Vorherige Windows-/Linux-Abnahme 37631991014 zu 9c38604 besteht in zwölf Jobs,
 einschließlich Debug/Release und Release-Paketen. Neue Mac-CI separat übernehmen;
 keinen Plattformnachweis der neuen 0.9.14 daraus ableiten.
+
+## Neue Parserarbeit 0.9.15
+
+E-Mail-Autolinks und innerer Linkvorrang sind implementiert; automatische
+Empfänger werden vor OS-Übergabe kodiert. 37 Release-Tests, 19 Originalfälle,
+1.000 Adressfälle, 1.194.616 eigene Kern- und 401 native Sanitizerassertions
+bestehen lokal; Raster betrachtet. UI-Bericht SBUI-050/051. Reale Mail-App
+nicht bedient. Paket-/Plattformabnahme folgt; dist bleibt bis dahin 0.9.14.
+Referenzlinks sind recherchiert, die dokumentweite C-Umgebung bleibt nächste Arbeit.
 
 ## Nächste Arbeit und Grenzen
 

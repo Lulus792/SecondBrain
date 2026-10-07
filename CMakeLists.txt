@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-project(SecondBrain VERSION 0.9.14 LANGUAGES C)
+project(SecondBrain VERSION 0.9.15 LANGUAGES C)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
@@ -368,6 +368,8 @@ if(BUILD_TESTING)
         "$<TARGET_FILE:secondbrain-inline-probe>" "${CMAKE_CURRENT_SOURCE_DIR}/tests/data/commonmark-0.31.2/entities.json")
     add_test(NAME markdown-entity-data COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_entities_data.py"
         "$<TARGET_FILE:secondbrain-inline-probe>" "${CMAKE_CURRENT_SOURCE_DIR}/third_party/whatwg/2026-10-07/entities.json")
+    add_test(NAME markdown-autolink-spec COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_autolinks_spec.py"
+        "$<TARGET_FILE:secondbrain-inline-probe>" "${CMAKE_CURRENT_SOURCE_DIR}/tests/data/commonmark-0.31.2/autolinks.json")
     add_executable(secondbrain-markdown-tests tests/test_markdown.c)
     target_link_libraries(secondbrain-markdown-tests PRIVATE sb_core)
     if(MSVC)

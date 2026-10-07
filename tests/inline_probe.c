@@ -5,12 +5,25 @@
 #include <stdlib.h>
 #include <string.h>
 int main(int argc,char **argv) {
- if(argc!=2)return 2;
+ bool links=argc==3 && !strcmp(argv[2],"--links");
+ if(argc!=2 && !links)return 2;
  char *source=NULL;size_t length=0;
  if(sb_fs_read(argv[1],&source,&length).code!=SB_OK)return 3;
  SBMarkdown md;SBMarkdownBlock b;sb_markdown_init(&md,source,length,false);
  while(sb_markdown_next(&md,&b)) {
   if(b.kind==SB_MD_BLANK||b.kind==SB_MD_FENCE||b.kind==SB_MD_RULE)continue;
+  if(links) {
+   if(b.kind==SB_MD_CODE)continue;
+   SBInline r;SBStatus status=sb_inline_init(&r,source+b.content,b.length);
+   if(status.code!=SB_OK){sb_inline_free(&r);free(source);return 4;}
+   SBInlineToken token;
+   while(sb_inline_next(&r,&token)) if(token.kind==SB_INLINE_LINK||token.kind==SB_INLINE_AUTOLINK) {
+    char destination[SB_PATH_CAP];status=sb_inline_destination(&r,&token,destination,sizeof(destination));
+    if(status.code!=SB_OK){sb_inline_free(&r);free(source);return 5;}
+    printf("L ");for(size_t i=0;destination[i];++i)printf("%02x",(unsigned char)destination[i]);puts("");
+   }
+   sb_inline_free(&r);continue;
+  }
   SBInline r;SBStyledText out={0};
   if(b.kind==SB_MD_CODE){
    out.text=malloc(b.length+1);out.spans=malloc(sizeof(SBTextSpan));

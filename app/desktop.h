@@ -68,6 +68,8 @@ typedef struct {
     unsigned semantic_order;
     uint64_t semantic_context;
     bool test;
+    /* Optional platform URL opener; NULL uses SDL_OpenURL. */
+    bool (*open_url)(const char *url);
     SBGraph graph;
     struct nk_text_edit text_edit;
     bool text_edit_ready;

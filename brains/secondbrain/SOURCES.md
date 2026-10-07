@@ -81,3 +81,6 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Zeichenreferenzen-Recherche](../../docs/ENTITIES_RECHERCHE.md): Grundlagen, Originaldaten, Lizenz und Ausgabegrenzen; die Umsetzung steht im folgenden Vertrag.
 
 - [Zeichenreferenzen](../../docs/ENTITIES.md): eigene C-Verarbeitung, Ausgabegrenzen, echte UI-/Graphprüfungen und Daten-/Fontlizenzen.
+
+- [Autolinks](../../docs/AUTOLINKS.md): gemeinsame Adressregeln, URI-Übergabe und Prüfgrenzen.
+- [Referenzlink-Recherche](../../docs/REFERENZLINKS_RECHERCHE.md): geplanter dokumentweiter Definitions-/Unicode-Vertrag.

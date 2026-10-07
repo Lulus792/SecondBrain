@@ -18,3 +18,8 @@ Entity-Auswahl: 15 unveränderte Beispiele 25–41; Referenzlinkfall 33 und
 Listenfall 38 bleiben bis zur jeweiligen Container-/Referenzimplementierung
 offen. Fall 31 verwendet die dokumentierte wörtliche HTML-Anzeige. Die
 ursprünglichen Beispiele und ihre Lizenz bleiben erhalten.
+
+Autolinks: alle 19 unveränderten Beispiele 594–612 aus demselben Original.
+Text, Stile und tatsächlich gelesene Ziele werden mit der HTML-Ausgabe
+verglichen. Keine angepasste Erwartung für diese Auswahl. Ergänzende eigene
+E-Mail-Grenzfälle verwenden einen unabhängigen Regex-Vergleich.

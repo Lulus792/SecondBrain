@@ -30,11 +30,13 @@ Ab 0.9.6 werden [Tabellen](TABELLEN.md) als eigener Block erkannt und gelesen.
 mit passender nativer Semantik dargestellt. Zeilen mit tatsächlichen Listenmarkern
 oder Zitaten werden noch getrennt dargestellt. Normale Zahlen am Absatzanfang lösen keine
 Trennung mehr aus. Die vollständigen Container-Regeln, geschachtelte Listen,
-Tabellen in geschachtelten Containern, Inline-Regeln, Entities, Referenzlinks und HTML-Blöcke sind
+Tabellen in geschachtelten Containern, Inline-Regeln, Referenzlinks und HTML-Blöcke sind
 noch nicht vollständig umgesetzt. Die Anwendung führt kein HTML aus. Ab 0.9.5 verwenden Leseansicht, Titel und
 Sternkarte gemeinsame [Inline-/Linkregeln](INLINE_LINKS.md); die dort benannten
 weiteren Regeln bleiben offen. Ab 0.9.11 stehen gemeinsame
 [Hervorhebungen und Inline-Code](INLINE_STILE.md) zur Verfügung.
+0.9.14 ergänzt [Zeichenreferenzen](ENTITIES.md), 0.9.15
+[E-Mail- und URI-Autolinks](AUTOLINKS.md).
 Dies ist weiterhin eine begrenzte Markdown-Leseansicht, keine vollständige
 CommonMark- oder GFM-Implementierung. Der Auftrag für die vollständige
 Release-Abnahme bleibt damit offen.

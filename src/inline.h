@@ -9,6 +9,7 @@ typedef struct { char *text; SBTextSpan *spans; size_t count,capacity; } SBStyle
 typedef struct {
     SBInlineKind kind;
     size_t offset,length,content,content_length,destination,destination_length;
+    bool email;
 } SBInlineToken;
 struct SBInlineRun; struct SBInlinePair; struct SBInlineMark;
 typedef struct {

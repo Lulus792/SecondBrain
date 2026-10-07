@@ -1187,6 +1187,33 @@ static bool web_reference(const char *destination) {
     }
     return false;
 }
+static bool mail_reference(const char *destination) {
+    const char *scheme="mailto:";
+    for (size_t i=0;scheme[i];++i) {
+        unsigned char c=(unsigned char)destination[i];
+        if (c>='A' && c<='Z') c=(unsigned char)(c-'A'+'a');
+        if (c!=(unsigned char)scheme[i]) return false;
+    }
+    return true;
+}
+static SBStatus email_uri(const char *destination,char *out,size_t capacity) {
+    /* The parser returns the literal CommonMark destination. Escape recipient
+       punctuation before handing it to the OS, so '?' and '#' stay in the
+       address rather than becoming mail headers or a URI fragment. */
+    size_t used=0; const char *hex="0123456789ABCDEF";
+    if (capacity<=7) return sb_error(SB_LIMIT,"Die E-Mail-Adresse ist zu lang.");
+    memcpy(out,"mailto:",7); used=7;
+    for (size_t i=7;destination[i];++i) {
+        unsigned char c=(unsigned char)destination[i];
+        bool plain=(c>='A' && c<='Z') || (c>='a' && c<='z') || (c>='0' && c<='9') ||
+            c=='-' || c=='.' || c=='_' || c=='~' || c=='@';
+        size_t count=plain ? 1 : 3;
+        if (count>=capacity-used) { *out=0; return sb_error(SB_LIMIT,"Die E-Mail-Adresse ist zu lang."); }
+        if (plain) out[used++]=(char)c;
+        else { out[used++]='%'; out[used++]=hex[c>>4]; out[used++]=hex[c&15]; }
+    }
+    out[used]=0; return sb_ok();
+}
 static void document_links(SBDesktop *d,SBInline *inline_reader,unsigned *link_number,const char *parent,struct nk_rect *placement) {
     struct nk_context *ctx=d->ui.ctx;
     SBInlineToken link;
@@ -1208,8 +1235,16 @@ static void document_links(SBDesktop *d,SBInline *inline_reader,unsigned *link_n
         bool pressed=button(d,tag,label);
         if (d->target_count>before && parent) snprintf(d->targets[d->target_count-1].parent,sizeof(d->targets[0].parent),"%s",parent);
         if (pressed) {
-            if (web_reference(destination))
-                result(d,SDL_OpenURL(destination) ? sb_ok() : sb_error(SB_IO,"%s",SDL_GetError()),"Webquelle im Browser geöffnet.");
+            if (web_reference(destination) || mail_reference(destination)) {
+                char url[SB_PATH_CAP]; const char *opened=destination;
+                if (link.email) {
+                    status=email_uri(destination,url,sizeof(url)); opened=url;
+                    if (status.code!=SB_OK) { d->message=status; continue; }
+                }
+                bool success=d->open_url ? d->open_url(opened) : SDL_OpenURL(opened);
+                result(d,success ? sb_ok() : sb_error(SB_IO,"%s",SDL_GetError()),
+                    mail_reference(destination) ? "E-Mail-App geöffnet." : "Webquelle im Browser geöffnet.");
+            }
             else { strcpy(d->command_value,destination); command(d,SB_CMD_SOURCE); }
         }
     }

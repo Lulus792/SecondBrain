@@ -3,6 +3,26 @@ static bool ascii_letter(char c) { return (c>='a' && c<='z') || (c>='A' && c<='Z
 static bool raw_space(char c) { return whitespace(c) || c=='\f'; }
 static bool name_start(char c) { return ascii_letter(c) || c=='_' || c==':'; }
 static bool name_rest(char c) { return name_start(c) || (c>='0' && c<='9') || c=='.' || c=='-'; }
+static bool email_alnum(char c) { return ascii_letter(c) || (c>='0' && c<='9'); }
+static bool email_local(char c) {
+    return email_alnum(c) || (c && strchr(".!#$%&'*+/=?^_`{|}~-",c));
+}
+static size_t email_end(const SBInline *r,size_t p,size_t *budget) {
+    const char *t=r->text; size_t n=r->length,start=p;
+    while (p<n && email_local(t[p])) { if (!spend(budget)) return 0; ++p; }
+    if (p==start || p==n || t[p++]!='@') return 0;
+    for (;;) {
+        start=p;
+        if (p==n || !email_alnum(t[p])) return 0;
+        while (p<n && (email_alnum(t[p]) || t[p]=='-')) {
+            if (!spend(budget) || p-start==63) return 0;
+            ++p;
+        }
+        if (!email_alnum(t[p-1]) || p==n) return 0;
+        if (t[p]=='>') return p+1;
+        if (t[p++]!='.') return 0;
+    }
+}
 static size_t angle_end(const SBInline *r,size_t p,size_t *budget,SBInlineKind *kind) {
     const char *t=r->text; size_t n=r->length; ++p;
     if (p>=n) return 0;
@@ -12,10 +32,12 @@ static size_t angle_end(const SBInline *r,size_t p,size_t *budget,SBInlineKind *
         while (q<n && q-p<32 && (ascii_letter(t[q]) || (t[q]>='0' && t[q]<='9') || t[q]=='+' || t[q]=='.' || t[q]=='-')) ++q;
         if (q-p>=2 && q<n && t[q]==':') {
             ++q;
-            while (q<n && t[q]!='>') { if (!spend(budget) || (unsigned char)t[q]<=32 || t[q]=='<') break; ++q; }
+            while (q<n && t[q]!='>') { if (!spend(budget) || (unsigned char)t[q]<=32 || t[q]==127 || t[q]=='<') break; ++q; }
             if (q<n && t[q]=='>') { *kind=SB_INLINE_AUTOLINK; return q+1; }
         }
     }
+    size_t email=email_end(r,p,budget);
+    if (email) { *kind=SB_INLINE_AUTOLINK; return email; }
     if (t[p]=='!' || t[p]=='?') {
         const char *ending=NULL; size_t ending_length=0;
         if (n-p>=3 && !memcmp(t+p,"!--",3)) { p+=3; ending="-->"; ending_length=3; }
@@ -79,6 +101,10 @@ static SBStatus opaque_init(SBInline *r) {
         r->opaque[r->opaque_count++]=(SBInlineToken){.kind=kind,.offset=p,.length=end-p,
             .content=kind==SB_INLINE_RAW ? p : p+1,.content_length=kind==SB_INLINE_RAW ? end-p : end-p-2,
             .destination=kind==SB_INLINE_AUTOLINK ? p+1 : 0,.destination_length=kind==SB_INLINE_AUTOLINK ? end-p-2 : 0};
+        if (kind==SB_INLINE_AUTOLINK) {
+            /* URI schemes contain ':'. The email grammar permits no colon. */
+            r->opaque[r->opaque_count-1].email=memchr(r->text+p+1,':',end-p-2)==NULL;
+        }
         p=end;
     }
     return sb_ok();

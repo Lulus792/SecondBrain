@@ -5,6 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+static char opened_url[SB_PATH_CAP];
+static unsigned opened_urls;
+static bool capture_url(const char *url) {
+    snprintf(opened_url,sizeof(opened_url),"%s",url); ++opened_urls; return true;
+}
 #ifdef __APPLE__
 #include <objc/runtime.h>
 #include <objc/message.h>
@@ -405,6 +410,25 @@ int main(int argc,char **argv) {
     CHECK(d.model.source && strstr(d.model.source_path,"/knowledge/föö.md"));
     link_key.key.key=SDLK_ESCAPE;sb_desktop_event(&d,&link_key);frame(&d);frame(&d);
     CHECK(!d.model.source && !strcmp(d.model.editor,entity_source));
+    const char *mail_source="# Kontakt\n\n<foo&copy?x#y%z@example.com>\n\n`<code@example.com>`\n\n| Kontakt |\n| --- |\n| <table+tag@example.com> |\n";
+    strcpy(d.model.editor,mail_source);OK(sb_app_save(&d.model));d.reset_reader=true;frame(&d);frame(&d);
+    unsigned mail_actions=0; bool mail_body=false,mail_cell=false;
+    for (size_t i=0;i<d.passive_count;++i) {
+        SBPassiveText *p=&d.passive[i];
+        mail_body|=p->role==ACCESSKIT_ROLE_PARAGRAPH && !strcmp(p->text,"foo&copy?x#y%z@example.com");
+        mail_cell|=p->role==ACCESSKIT_ROLE_CELL && !strcmp(p->text,"table+tag@example.com");
+    }
+    for (size_t i=0;i<d.target_count;++i) if (!strncmp(d.targets[i].id,"link:",5)) ++mail_actions;
+    CHECK(mail_body && mail_cell && mail_actions==2);
+    d.open_url=capture_url;
+    strcpy(d.focus,"link:0");link_key.key.key=SDLK_RETURN;sb_desktop_event(&d,&link_key);frame(&d);frame(&d);
+    CHECK(opened_urls==1 && !strcmp(opened_url,"mailto:foo%26copy%3Fx%23y%25z@example.com"));
+    CHECK(!d.model.source && !strcmp(d.model.editor,mail_source));
+    strcpy(d.focus,"link:1");sb_desktop_event(&d,&link_key);frame(&d);frame(&d);
+    CHECK(opened_urls==2 && !strcmp(opened_url,"mailto:table%2Btag@example.com"));
+    CHECK(!d.model.source && !strcmp(d.model.editor,mail_source));
+    d.open_url=NULL;
+    OK(sb_path_join(dump_path,sizeof(dump_path),root,"autolinks.bmp"));CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
     char *previous_context=d.context; d.context=malloc(80); CHECK(d.context);
     strcpy(d.context,"# Sichtbarer Projektname\n\nKontext zum Lesen.\n");
     d.form=SB_FORM_CONTEXT; frame(&d); frame(&d); bool context_heading=false;

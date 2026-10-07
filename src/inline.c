@@ -145,7 +145,10 @@ SBStatus sb_inline_init(SBInline *r,const char *text,size_t length) {
     size_t parent=SIZE_MAX;
     for (size_t p=0;p<length;) {
         if (text[p]=='\\' && p+1<length && punctuation((unsigned char)text[p+1])) { p+=2; continue; }
-        SBInlineToken *opaque=opaque_at(r,p); if (opaque) { p+=opaque->length; continue; }
+        SBInlineToken *opaque=opaque_at(r,p); if (opaque) {
+            if (opaque->kind==SB_INLINE_AUTOLINK && parent!=SIZE_MAX) r->pairs[parent].has_link=true;
+            p+=opaque->length; continue;
+        }
         size_t width=0,close=SIZE_MAX;
         if (text[p]=='`' && code_at(r,p,&width,&close)) { p=close!=SIZE_MAX ? close+width : p+width; continue; }
         if (text[p]=='[') {
@@ -299,6 +302,10 @@ SBStatus sb_inline_destination(const SBInline *r,const SBInlineToken *t,char *ou
     if (!r || !t || !out || !capacity || (t->kind!=SB_INLINE_LINK && t->kind!=SB_INLINE_IMAGE && t->kind!=SB_INLINE_AUTOLINK) ||
         t->destination>r->length || t->destination_length>r->length-t->destination) return sb_error(SB_INVALID,"Markdown-Linkziel ist ungültig.");
     size_t used=0;
+    if (t->kind==SB_INLINE_AUTOLINK && t->email) {
+        if (capacity<=7) { *out=0; return sb_error(SB_LIMIT,"Markdown-Linkziel ist zu lang."); }
+        memcpy(out,"mailto:",7); used=7;
+    }
     for (size_t i=0;i<t->destination_length;) {
         char c=r->text[t->destination+i];
         if (t->kind!=SB_INLINE_AUTOLINK && c=='\\' && i+1<t->destination_length && punctuation((unsigned char)r->text[t->destination+i+1])) {
