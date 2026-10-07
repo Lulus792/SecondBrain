@@ -12,6 +12,8 @@
 #define MOD SDL_KMOD_CTRL
 #endif
 static struct { Uint64 layout,render; unsigned frames,drawn; } timing;
+static bool observe_copy;
+static char *copied_result;
 static void frame_run(SBDesktop *d,bool draw) {
     Uint64 start=SDL_GetPerformanceCounter();
     SDL_Event event;
@@ -37,14 +39,24 @@ static void key(SBDesktop *d, SDL_Keycode code, SDL_Keymod mod) {
     /* Both phases update real input, layout, native snapshot and model. The
        completed key-up state is rasterized; intermediate commands are discarded. */
     SDL_PushEvent(&e); frame_run(d,false);
+    if (observe_copy) { SDL_free(copied_result); copied_result=SDL_GetClipboardText(); observe_copy=false; }
     e.type = SDL_EVENT_KEY_UP; e.key.down = false; SDL_PushEvent(&e); frame(d);
 }
 static void type(SBDesktop *d, const char *text) {
-    SDL_Event e = {0}; e.type = SDL_EVENT_TEXT_INPUT; e.text.text = text;
-    e.text.windowID = SDL_GetWindowID(d->ui.window); SDL_PushEvent(&e); frame(d); frame(d);
+    size_t remaining=strlen(text);
+    while (remaining) {
+        char chunk[NK_INPUT_MAX]; size_t bytes=remaining<NK_INPUT_MAX-1 ? remaining : NK_INPUT_MAX-1;
+        while (bytes && ((unsigned char)text[bytes]&0xc0)==0x80) --bytes;
+        if (!bytes) return;
+        memcpy(chunk,text,bytes); chunk[bytes]=0;
+        SDL_Event e={0}; e.type=SDL_EVENT_TEXT_INPUT; e.text.text=chunk;
+        e.text.windowID=SDL_GetWindowID(d->ui.window); SDL_PushEvent(&e); frame(d); frame(d);
+        text+=bytes; remaining-=bytes;
+    }
 }
 static void replace(SBDesktop *d, const char *text) {
-    SDL_SetClipboardText(text); key(d, SDLK_A, MOD); key(d, SDLK_V, MOD);
+    key(d,SDLK_A,MOD);
+    if (*text) type(d,text); else key(d,SDLK_BACKSPACE,0);
 }
 static bool reach(SBDesktop *d, const char *id) {
     for (size_t i = 0; i <= d->target_count + 1; ++i) {
@@ -55,8 +67,10 @@ static bool reach(SBDesktop *d, const char *id) {
 }
 static bool activate(SBDesktop *d, const char *id) {
     if (!reach(d,id)) return false;
+    observe_copy=!strncmp(id,"copy-",5);
     key(d,SDLK_RETURN,0); return true;
 }
+static char *take_copy(void) { char *text=copied_result;copied_result=NULL;return text; }
 static bool same_clipboard_text(const char *actual, const char *expected) {
     if (!actual) return false;
     while (*expected) {
@@ -192,7 +206,7 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
     key(d,SDLK_PAGEDOWN,0);
     key(d,SDLK_C,MOD|SDL_KMOD_SHIFT); CHECK(d->form == SB_FORM_CONTEXT);
     CHECK(activate(d,"copy-context"));
-    text = SDL_GetClipboardText(); CHECK(text && strstr(text,"Tastatur ü")); SDL_free(text); text = NULL;
+    text = take_copy(); CHECK(text && strstr(text,"Tastatur ü")); SDL_free(text); text = NULL;
     key(d,SDLK_ESCAPE,0); CHECK(d->form == SB_FORM_NONE);
     SDL_SetWindowSize(d->ui.window,780,560); frame(d); frame(d);
     key(d,SDLK_COMMA,MOD); CHECK(d->form == SB_FORM_SETTINGS);
@@ -200,7 +214,7 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
     CHECK(activate(d,"transparency") && d->solid);
     CHECK(activate(d,"about") && d->form == SB_FORM_ABOUT);
     CHECK(activate(d,"copy-version"));
-    text=SDL_GetClipboardText(); CHECK(text && same_clipboard_text(text,sb_build_info()) && !strstr(text,d->model.project.root)); SDL_free(text); text=NULL;
+    text=take_copy(); CHECK(text && same_clipboard_text(text,sb_build_info()) && !strstr(text,d->model.project.root)); SDL_free(text); text=NULL;
     CHECK(sb_path_join(path,sizeof(path),directory,"about-small.bmp").code == SB_OK);
     CHECK(sb_ui_capture(&d->ui,path).code == SB_OK);
     CHECK(activate(d,"notice-list") && d->form==SB_FORM_NOTICE_LIST);
@@ -212,7 +226,7 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
         CHECK(activate(d,notice_id) && d->form==SB_FORM_NOTICE_TEXT && d->notice_index==i);
         CHECK(d->notice && strlen(d->notice)>20);
         CHECK(activate(d,"copy-notice"));
-        text=SDL_GetClipboardText(); CHECK(same_clipboard_text(text,d->notice)); SDL_free(text); text=NULL;
+        text=take_copy(); CHECK(same_clipboard_text(text,d->notice)); SDL_free(text); text=NULL;
         CHECK(reach(d,"reader"));
         key(d,SDLK_PAGEDOWN,0);
         CHECK(d->scrolling[2].maximum==0 || d->scrolling[2].destination>0);

@@ -41,3 +41,12 @@ Microsoft USE sowie AccessKit einschließlich Chromium-Anteilen und Autoren.
 Die sichtbare Übersicht ersetzt keine vollständige Prüfung aller transitiven
 UI-Abhängigkeiten oder die noch offene Support- und Sicherheitsmeldestruktur.
 Plattformprüfungen und ihre Grenzen stehen im [Umsetzungsstand](STATUS.md).
+
+
+## Unicode-Daten ab 0.9.8
+
+Die Übersicht umfasst nun 18 Texte, einschließlich Unicode License V3 für die
+festgelegten Eigenschaftsdaten und abgeleiteten Graphemtabellen. Die eigene
+Segmentierung bleibt C-Code unter der Projektlizenz. Der Unicode-Lizenztext
+liegt in den lokalen UI-Ressourcen und jedem Paket; der Pakettest verlangt ihn.
+Die Ressourcennachprüfung mit 18 Originalen besteht lokal. [Herkunft und Hashes](../third_party/unicode/README.md).

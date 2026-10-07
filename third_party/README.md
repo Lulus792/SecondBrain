@@ -156,3 +156,16 @@ Cargo behält Versionen und Abhängigkeitsgraph der bestehenden Lockdatei;
 nur diese weitere UI-Quelle wird lokal ersetzt. Lizenzen und Autoren bleiben
 erhalten. Typprüfung des korrigierten Crates besteht lokal; native Linux-
 Wiederholungsabnahme folgt und bleibt eine eigenständige Prüfung.
+
+
+## Unicode-Daten
+
+Ab 0.9.8 implementiert eigener C-Code die erweiterten Graphemgrenzen nach UAX #29,
+Unicode 18.0.0. Die festgelegten Eigenschafts- und Testdaten liegen unter
+[unicode](unicode/README.md); Hashes, Herkunft und Erzeugung stehen dort.
+Es wird keine externe fachliche Bibliothek eingebunden. Abgeleitete Tabellen
+und Originaldaten stehen unter der mitgelieferten Unicode License V3; der eigene
+Algorithmus unter der Projektlizenz. Der Lizenztext ist auch in der App lesbar.
+Nuklear erhält optionale eigene C-Hooks für Cursorgrenzen, vollständige Auswahl
+und atomisches Texteingeben; diese Anpassungen sind bei einem Update zu erhalten
+oder anhand der Unicode- und Editorprüfungen erneut zu ersetzen.

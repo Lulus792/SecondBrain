@@ -40,7 +40,7 @@ foreach(SB_RESOURCE IN ITEMS "${SB_EXECUTABLE}" "${SB_ASSETS}/fonts/NotoSans-Reg
     "${SB_ASSETS}/fonts/NotoSansCJKjp-Regular.otf" "${SB_ROOT}/licenses/Noto-CJK.txt"
     "${SB_ROOT}/licenses/SDL_ttf.txt" "${SB_ROOT}/licenses/FreeType-LICENSE.txt"
     "${SB_ROOT}/licenses/FreeType-FTL.txt" "${SB_ROOT}/licenses/HarfBuzz.txt"
-    "${SB_ASSETS}/licenses/LICENSE" "${SB_ASSETS}/licenses/Nuklear-LICENSE"
+    "${SB_ASSETS}/licenses/Unicode.txt" "${SB_ASSETS}/licenses/LICENSE" "${SB_ASSETS}/licenses/Nuklear-LICENSE"
     "${SB_ASSETS}/licenses/SDL_ttf.txt" "${SB_ASSETS}/licenses/FreeType-FTL.txt"
     "${SB_ASSETS}/licenses/HarfBuzz-MS-USE.txt" "${SB_ASSETS}/licenses/OFL-CJK.txt" "${SB_ROOT}/licenses/SDL3.txt"
     "${SB_ROOT}/licenses/Nuklear.txt" "${SB_ROOT}/licenses/Noto.txt" "${SB_ROOT}/QUICKSTART.txt" "${SB_ROOT}/LICENSE")

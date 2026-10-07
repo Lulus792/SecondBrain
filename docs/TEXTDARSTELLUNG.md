@@ -62,3 +62,17 @@ von HarfBuzz allein belegt diese Abläufe nicht. Unbekannte Glyphen können
 weiterhin als Ersatzzeichen erscheinen; die gespeicherten UTF-8-Dateien
 bleiben dabei vollständig erhalten. Menschliche Screenreader- und reale
 Eingabeabnahme auf allen drei Systemen bleiben offen.
+
+
+## Graphemgrenzen ab 0.9.8
+
+Eigener C-Code verwendet die festgelegten Unicode 18.0-Daten für vollständige
+Zeichen beim Bewegen, Auswählen und Löschen. Eine Texteingabe bildet einen
+Undo-Vorgang; Kapazitätsfehler erhalten Inhalt und Auswahl. Alle Eingabefelder
+verwenden dieselben Nuklear-Hooks; native Editor-Auswahl wird ebenfalls
+begrenzt. [Vertrag, Quellen und Nachweise](GRAPHEME.md).
+
+Die logische Einheit schließt gemischte Schreibrichtungen, kontextuelle
+Wortgrenzen, exakte Maus-/Caret-Pixelgeometrie, IME-Kandidatenpositionen und
+native Zeichenrechtecke noch nicht ab. Emoji-Fontabdeckung ist eine eigene
+Aufgabe; eine korrekt erhaltene Sequenz belegt keine passende Glyphenanzeige.

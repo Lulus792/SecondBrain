@@ -4,10 +4,34 @@
 #include <string.h>
 
 static unsigned checks;
+static const char *expected_line;
+static bool complete_line;
 #define CHECK(x) do { ++checks; if (!(x)) { fprintf(stderr, "FAIL %d: %s\n", __LINE__, #x); return 1; } } while (0)
 static bool equal(struct nk_text_edit *edit, const char *text) {
     int length = nk_str_len_char(&edit->string);
     return (size_t)length == strlen(text) && !memcmp(nk_str_get_const(&edit->string), text, (size_t)length);
+}
+static void editor_frame(SBUi *ui,struct nk_text_edit *edit,enum nk_keys key,bool down,bool shift,const char *text) {
+    nk_input_begin(ui->ctx);
+    nk_input_key(ui->ctx,NK_KEY_SHIFT,shift); if (key!=NK_KEY_NONE) nk_input_key(ui->ctx,key,down);
+    if (text) { SDL_Event event={0}; event.type=SDL_EVENT_TEXT_INPUT; event.text.text=text; event.text.windowID=SDL_GetWindowID(ui->window); sb_ui_event(ui,&event); }
+    nk_input_end(ui->ctx);
+    if (nk_begin(ui->ctx,"Grapheme",nk_rect(0,0,1000,720),NK_WINDOW_NO_SCROLLBAR)) {
+        nk_layout_row_dynamic(ui->ctx,400,1); nk_edit_focus(ui->ctx,NK_EDIT_BOX);
+        nk_edit_buffer(ui->ctx,NK_EDIT_BOX,edit,nk_filter_default);
+    }
+    nk_end(ui->ctx);
+    if (expected_line) {
+        const struct nk_command *command; complete_line=false;
+        nk_foreach(command,ui->ctx) if (command->type==NK_COMMAND_TEXT) {
+            const struct nk_command_text *drawn=(const struct nk_command_text *)command;
+            if ((size_t)drawn->length==strlen(expected_line) && !memcmp(drawn->string,expected_line,strlen(expected_line))) complete_line=true;
+        }
+    }
+    sb_ui_draw(ui); SDL_RenderPresent(ui->renderer);
+}
+static void editor_key(SBUi *ui,struct nk_text_edit *edit,enum nk_keys key,bool shift) {
+    editor_frame(ui,edit,key,true,shift,NULL); editor_frame(ui,edit,key,false,false,NULL);
 }
 int main(int argc, char **argv) {
     SBUi ui;
@@ -81,6 +105,44 @@ int main(int argc, char **argv) {
     CHECK(!nk_textedit_paste(&edit, "too-much-new-content", 20));
     CHECK(equal(&edit, "1234567890"));
     CHECK(edit.select_start == 1 && edit.select_end == 2);
+    nk_textedit_free(&edit);
+
+    const char *clusters[]={"e\xcc\x81","👩‍💻","🇩🇪","👍🏽","क्ष","각"};
+    for (size_t i=0;i<sizeof(clusters)/sizeof(*clusters);++i) {
+        nk_textedit_init_default(&edit); edit.mode=NK_TEXT_EDIT_MODE_INSERT;
+        editor_frame(&ui,&edit,NK_KEY_NONE,false,false,NULL);
+        CHECK(nk_textedit_paste(&edit,clusters[i],(int)strlen(clusters[i])));
+        int scalars=edit.string.len; CHECK(scalars>1);
+        editor_key(&ui,&edit,NK_KEY_LEFT,false); CHECK(edit.cursor==0);
+        editor_key(&ui,&edit,NK_KEY_RIGHT,false); CHECK(edit.cursor==scalars);
+        editor_key(&ui,&edit,NK_KEY_LEFT,true); CHECK(edit.select_start==scalars && edit.select_end==0);
+        editor_key(&ui,&edit,NK_KEY_BACKSPACE,false); CHECK(equal(&edit,""));
+        nk_textedit_undo(&edit); CHECK(equal(&edit,clusters[i]));
+        edit.cursor=edit.select_start=edit.select_end=0;
+        editor_key(&ui,&edit,NK_KEY_DEL,false); CHECK(equal(&edit,""));
+        nk_textedit_undo(&edit); CHECK(equal(&edit,clusters[i]));
+        edit.select_start=1; edit.select_end=2; sb_ui_grapheme_clamp(&edit);
+        CHECK(edit.select_start==0 && edit.select_end==scalars);
+        nk_textedit_free(&edit);
+    }
+    nk_textedit_init_default(&edit); edit.mode=NK_TEXT_EDIT_MODE_INSERT;
+    editor_frame(&ui,&edit,NK_KEY_NONE,false,false,NULL);
+    editor_frame(&ui,&edit,NK_KEY_NONE,false,false,"e\xcc\x81"); CHECK(equal(&edit,"e\xcc\x81"));
+    nk_textedit_undo(&edit); CHECK(equal(&edit,"")); nk_textedit_redo(&edit); CHECK(equal(&edit,"e\xcc\x81"));
+    edit.mode=NK_TEXT_EDIT_MODE_REPLACE; edit.cursor=edit.select_start=edit.select_end=0;
+    nk_textedit_text(&edit,"Q",1); CHECK(equal(&edit,"Q")); nk_textedit_undo(&edit); CHECK(equal(&edit,"e\xcc\x81"));
+    nk_textedit_free(&edit);
+    nk_textedit_init_default(&edit); edit.mode=NK_TEXT_EDIT_MODE_INSERT;
+    editor_frame(&ui,&edit,NK_KEY_NONE,false,false,NULL);
+    const char *lines[]={"Hangul: 각","Verbindung: क्ष","Emoji: 👩‍💻 🇩🇪 👍🏽","Ligatur: لا","Akzent: e\xcc\x81"};
+    for (size_t i=0;i<sizeof(lines)/sizeof(*lines);++i) {
+        nk_textedit_select_all(&edit); CHECK(nk_textedit_paste(&edit,lines[i],(int)strlen(lines[i])));
+        expected_line=lines[i]; editor_frame(&ui,&edit,NK_KEY_NONE,false,false,NULL); CHECK(complete_line);
+    }
+    expected_line=NULL; nk_textedit_free(&edit);
+    char tiny[4]={0}; nk_textedit_init_fixed(&edit,tiny,sizeof(tiny)); edit.mode=NK_TEXT_EDIT_MODE_INSERT;
+    CHECK(nk_textedit_paste(&edit,"e\xcc\x81",3)); edit.select_start=1;edit.select_end=2;
+    CHECK(!nk_textedit_paste(&edit,"long",4)); CHECK(equal(&edit,"e\xcc\x81") && edit.select_start==1 && edit.select_end==2);
     nk_textedit_free(&edit);
 
     nk_input_begin(ui.ctx); nk_input_end(ui.ctx);

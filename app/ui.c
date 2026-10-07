@@ -1,3 +1,11 @@
+#include "grapheme.h"
+struct nk_text_edit;
+static int sb_ui_grapheme_index(struct nk_text_edit *,int,int);
+void sb_ui_grapheme_clamp(struct nk_text_edit *);
+static void sb_ui_grapheme_text(struct nk_text_edit *,const char *,int);
+#define NK_TEXTEDIT_GRAPHEME_INDEX sb_ui_grapheme_index
+#define NK_TEXTEDIT_GRAPHEME_CLAMP sb_ui_grapheme_clamp
+#define NK_TEXTEDIT_TEXT_CUSTOM sb_ui_grapheme_text
 struct nk_draw_list;
 struct nk_command_text;
 void sb_ui_text_draw(struct nk_draw_list *, const struct nk_command_text *);
@@ -11,6 +19,51 @@ void sb_ui_text_draw(struct nk_draw_list *, const struct nk_command_text *);
 #include "platform.h"
 #include <stdlib.h>
 #include <string.h>
+
+static int sb_ui_grapheme_index(struct nk_text_edit *edit,int index,int direction) {
+    SBGraphemePosition p; index=NK_CLAMP(0,index,edit->string.len);
+    if (!sb_grapheme_position(nk_str_get_const(&edit->string),(size_t)nk_str_len_char(&edit->string),(size_t)index,&p)) return index;
+    return (int)(direction==-1 ? p.previous : direction==1 ? p.next : direction==-2 ? p.floor : p.ceil);
+}
+void sb_ui_grapheme_clamp(struct nk_text_edit *edit) {
+    if (!edit) return;
+    if (edit->select_start==edit->select_end) {
+        edit->cursor=sb_ui_grapheme_index(edit,edit->cursor,2);
+        edit->select_start=edit->select_end=edit->cursor;
+    } else {
+        bool forward=edit->select_start<edit->select_end;
+        int lo=sb_ui_grapheme_index(edit,NK_MIN(edit->select_start,edit->select_end),-2);
+        int hi=sb_ui_grapheme_index(edit,NK_MAX(edit->select_start,edit->select_end),2);
+        edit->select_start=forward ? lo : hi; edit->select_end=forward ? hi : lo;
+        edit->cursor=edit->select_end;
+    }
+}
+
+static void sb_ui_grapheme_text(struct nk_text_edit *edit,const char *text,int length) {
+    if (!edit || !text || length<=0 || (size_t)length>SB_TEXT_LIMIT || edit->mode==NK_TEXT_EDIT_MODE_VIEW || !sb_utf8_valid(text,(size_t)length)) return;
+    char *filtered=malloc((size_t)length); if (!filtered) return;
+    int used=0;
+    for (int at=0;at<length;) {
+        nk_rune rune; int bytes=nk_utf_decode(text+at,&rune,length-at);
+        if (rune!=127 && !(rune=='\n' && edit->single_line) && (!edit->filter || edit->filter(edit,rune))) {
+            memcpy(filtered+used,text+at,(size_t)bytes); used+=bytes;
+        }
+        at+=bytes;
+    }
+    if (!used) { free(filtered); return; }
+    int cursor=edit->cursor,start=edit->select_start,end=edit->select_end;
+    sb_ui_grapheme_clamp(edit);
+    if (edit->mode==NK_TEXT_EDIT_MODE_REPLACE && edit->select_start==edit->select_end) {
+        SBGrapheme input,existing; SBGraphemeBoundary b; size_t clusters=0;
+        sb_grapheme_init(&input,filtered,(size_t)used);
+        while (sb_grapheme_next(&input,&b)) if (b.characters) ++clusters;
+        edit->select_start=edit->cursor;
+        sb_grapheme_init(&existing,nk_str_get_const(&edit->string),(size_t)nk_str_len_char(&edit->string));
+        while (clusters && sb_grapheme_next(&existing,&b)) if (b.characters>(size_t)edit->cursor) { edit->select_end=(int)b.characters; --clusters; }
+    }
+    if (!nk_textedit_paste(edit,filtered,used)) { edit->cursor=cursor; edit->select_start=start; edit->select_end=end; }
+    free(filtered);
+}
 
 float sb_ui_wrap_height(struct nk_context *ctx,const struct nk_user_font *font,const char *text,size_t length,float width) {
     struct nk_vec2 padding=ctx->style.text.padding;

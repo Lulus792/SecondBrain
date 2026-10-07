@@ -18,6 +18,7 @@
 #include "sb.h"
 #include "space.h"
 
+void sb_ui_grapheme_clamp(struct nk_text_edit *edit);
 typedef struct SBTextSystem SBTextSystem;
 typedef struct {
     SBTextSystem *text;

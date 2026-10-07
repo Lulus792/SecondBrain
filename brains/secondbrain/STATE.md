@@ -36,18 +36,22 @@ und CLI besteht; dist/SecondBrain enthält inzwischen das geprüfte 0.9.7-Paket.
 UIA GridPattern und AT-SPI Table fehlen in den festgelegten Providern; die
 separate native Kinderprüfung ersetzt keine vollständige Tabellenbedienung.
 
-## Weiterarbeiten
+## Laufender Schritt 0.9.8
 
-0.9.7 ist als 2edb2bf gepusht: schmale Tabellen beginnen mit beschrifteten Werten;
-Kopfzeilenlinks und native Struktur bleiben erhalten. Fünf passende lokale
-Prüfungen und abschließende 270 native Assertions bestehen; Regression mit
-vorherigem Renderer scheitert. Der 0.9.6-Lauf hat einen Windows-Debug-Timeout
-bei native-accessibility. Die Prüfrasterarbeit ist reduziert, Zustände und
-Endbilder bleiben geprüft. Neuer nativer Nachweis ist dafür erforderlich.
-Das entpackte Intel-Paket einschließlich Desktop, Tastatur, Sicherung, Neustart
-und CLI besteht. Die [neue native Abnahme](https://github.com/Lulus792/SecondBrain/actions/runs/37596496154)
-besteht inzwischen für Windows und Linux in beiden Buildprofilen; der native
-Windows-Debug-Timeout ist nachgeprüft behoben. Restliche Mac-Jobs noch abnehmen.
+Die [0.9.7-Abnahme](https://github.com/Lulus792/SecondBrain/actions/runs/37596496154)
+besteht jetzt mit allen 20 Jobs und vier Paketen. 0.9.8 ist unveröffentlicht:
+eigene C-Grapheme nach Unicode 18.0, ganze Zeichen in Eingaben, atomischer Undo-
+Vorgang, native Teilmarkierungen und vollständige geformte Editorzeilen. 19 Kern-
+prüfungen, 33 erste Release-Tests und sechs abschließende Prüfungen bestehen;
+853 Normfälle, 111 Editor- und 273 native Assertions sind geprüft. Eigene Bereiche
+werden unter ASan/UBSan geprüft; vorherige Navigation scheitert am Akzentfall.
+Ein früherer Paketlauf scheitert an gewechselter Zwischenablage im Pfadfixture;
+Testeingaben verwenden jetzt UTF-8-sichere SDL-Abschnitte; Kopierwerte werden
+sofort nach der Aktion geprüft. Desktop 126 und Tastatur 142 bestehen nochmals.
+Der Quellstand wird gepusht; abschließendes Paket neu erzeugen und native
+Plattformabnahme ausführen.
+[Vertrag](../../docs/GRAPHEME.md), [Nachweise](../../docs/STATUS.md).
+
 Danach verbleibende Container-/Inline-/Listenregeln,
 Unicode-Textgeometrie/IME, Support-/Lizenzzuordnung und übrige Release-Aufgaben.
 Tatsächliche native Dialog- und menschliche VoiceOver/NVDA/Orca-Bedienung,

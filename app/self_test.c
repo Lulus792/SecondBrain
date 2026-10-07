@@ -43,10 +43,15 @@ static void key(SBDesktop *d, SDL_Keycode key, SDL_Keymod modifiers) {
     SDL_PushEvent(&event); frame(d);
 }
 static void type(SBDesktop *d, const char *text) {
-    SDL_Event event = {0};
-    event.type = SDL_EVENT_TEXT_INPUT; event.text.windowID = SDL_GetWindowID(d->ui.window);
-    event.text.text = text;
-    SDL_PushEvent(&event); frame(d); frame(d);
+    size_t remaining=strlen(text);
+    while (remaining) {
+        char chunk[NK_INPUT_MAX]; size_t bytes=remaining<NK_INPUT_MAX-1 ? remaining : NK_INPUT_MAX-1;
+        while (bytes && ((unsigned char)text[bytes]&0xc0)==0x80) --bytes;
+        if (!bytes) return;
+        memcpy(chunk,text,bytes); chunk[bytes]=0;
+        SDL_Event event={0}; event.type=SDL_EVENT_TEXT_INPUT; event.text.windowID=SDL_GetWindowID(d->ui.window); event.text.text=chunk;
+        SDL_PushEvent(&event); frame(d); frame(d); text+=bytes; remaining-=bytes;
+    }
 }
 static bool replace(SBDesktop *d, const char *id, const char *text) {
 #ifdef __APPLE__
@@ -54,8 +59,9 @@ static bool replace(SBDesktop *d, const char *id, const char *text) {
 #else
     SDL_Keymod modifier = SDL_KMOD_CTRL;
 #endif
-    if (!click(d, id) || !SDL_SetClipboardText(text)) return false;
-    key(d, SDLK_A, modifier); key(d, *text ? SDLK_V : SDLK_BACKSPACE, *text ? modifier : 0);
+    if (!click(d,id)) return false;
+    key(d,SDLK_A,modifier);
+    if (*text) type(d,text); else key(d,SDLK_BACKSPACE,0);
     return true;
 }
 static bool capture(SBDesktop *d, const char *directory, const char *name) {

@@ -559,3 +559,20 @@ inzwischen für Windows und Linux in Debug und Release, einschließlich der
 nativen Prüfung und der jeweiligen entpackten Release-Pakete. Windows Debug
 ist damit nach dem vorherigen nativen Timeout wieder vollständig erfolgreich.
 Die noch laufenden/ausstehenden Mac-Jobs werden separat nach Abschluss bewertet.
+
+
+## Graphemarbeit 0.9.8 und abgeschlossene Vorversion
+
+[0.9.7 zu 2edb2bf](https://github.com/Lulus792/SecondBrain/actions/runs/37596496154)
+besteht mit allen 20 Jobs und vier entpackten Paketen für Windows x64, Linux x64,
+macOS ARM64 und Intel einschließlich des zuvor fehlgeschlagenen Windows Debug.
+
+0.9.8 besteht lokal mit 19 Debug-Kernprüfungen, allen 853 offiziellen Graphemfällen,
+ASan/UBSan für den Segmentierer,33 ersten Release-Tests und sechs abschließenden
+passenden UI-/Kernprüfungen. 273 native Assertions umfassen eine tatsächliche macOS-
+Teilmarkierung, die auf den vollständigen Akzent erweitert wird; 111 Editor-
+Assertions prüfen Zeicheneinheiten und vollständige Textläufe. Ein früherer
+Intel-Paketlauf scheitert an fremdem Zwischenablageinhalt im Pfadfixture; der
+korrigierte Sicherungsablauf besteht lokal, das neu erzeugte Paket wird geprüft.
+Neue native Windows-/Linux-/ARM64-Nachweise werden nach tatsächlichem Abschluss
+übernommen. [Genauer Umfang und Grenzen](GRAPHEME.md).

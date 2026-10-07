@@ -89,3 +89,13 @@ adapter veröffentlicht die gemeinsame logische Struktur mit Indizes; zulässige
 Elternbeziehungen werden vor der Veröffentlichung aufgelöst. Die UI-Bibliothek
 bleibt allein für Darstellung und native Zugänglichkeit zuständig.
 [Umfang und Schnittstellengrenzen](TABELLEN.md).
+
+
+## Eigene Unicode-Zeichengrenzen ab 0.9.8
+
+src/grapheme.c segmentiert UTF-8 in erweiterte Grapheme mit einem begrenzten,
+allokationsfreien Iterator. Festgelegte Unicode-Eigenschaften werden als eigene
+C-Tabellen kompiliert; der Kern linkt keine externe Unicode-Bibliothek.
+app/ui.c verwendet sie über optionale Nuklear-Hooks in allen Eingaben.
+Skalarindizes bleiben für die vorhandene native ABI erhalten. Datenquelle,
+Lizenz, Erzeugung und aktueller Umfang stehen im [Graphemvertrag](GRAPHEME.md).

@@ -652,7 +652,7 @@ static void accessible_actions(SBDesktop *d) {
                 struct nk_text_edit *edit=&d->text_edit;
                 size_t total=(size_t)nk_utf_len(d->model.editor,(int)strlen(d->model.editor));
                 if (action.action==ACCESSKIT_ACTION_SET_TEXT_SELECTION && action.anchor<=total && action.caret<=total) {
-                    edit->select_start=(int)action.anchor; edit->select_end=edit->cursor=(int)action.caret; focus_set(d,"editor");
+                    edit->select_start=(int)action.anchor; edit->select_end=edit->cursor=(int)action.caret; sb_ui_grapheme_clamp(edit); focus_set(d,"editor");
                 } else if ((action.action==ACCESSKIT_ACTION_SET_VALUE || action.action==ACCESSKIT_ACTION_REPLACE_SELECTED_TEXT) && action.value && sb_utf8_valid(action.value,strlen(action.value))) {
                     size_t n=strlen(action.value);
                     if (n<SB_TEXT_LIMIT) {

@@ -31,6 +31,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Markdown-Blockregeln](../../docs/MARKDOWN.md): gemeinsame C-Erkennung, Originalbytes und verbleibender Umfang.
 - [Tabellen](../../docs/TABELLEN.md): eigene C-Regeln, adaptive Leseansicht und native Schnittstellengrenzen.
 - [Dokumentstruktur](../../docs/DOKUMENTSTRUKTUR.md): native Blockstruktur, Überschriften und Abschnittssprünge.
+- [Grapheme](../../docs/GRAPHEME.md): eigener C-Algorithmus, Zeicheneinheiten, Unicode-Daten und Prüfgrenzen.
 - [Textdarstellung](../../docs/TEXTDARSTELLUNG.md): UI-Schriftrollen, geformte Textläufe, Fallback und verbleibende Textarbeit.
 - [Lizenzansicht](../../docs/LIZENZEN.md): Originaltexte in der App, Bedienwege und Prüfgrenzen.
 - [MIT-Lizenz](../../LICENSE): gewählte Lizenz des eigenen Codes.

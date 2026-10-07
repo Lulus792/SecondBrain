@@ -7946,7 +7946,7 @@ nk_text_calculate_text_bounds(const struct nk_user_font *font,
     float glyph_width;
     int glyph_len = 0;
     nk_rune unicode = 0;
-    int text_len = 0;
+    int text_len = 0, line_begin = 0;
     if (!begin || byte_len <= 0 || !font)
         return nk_vec2(0,row_height);
 
@@ -7957,6 +7957,9 @@ nk_text_calculate_text_bounds(const struct nk_user_font *font,
     *glyphs = 0;
     while ((text_len < byte_len) && glyph_len) {
         if (unicode == '\n') {
+#ifdef NK_DRAW_TEXT_CUSTOM
+            line_width=font->width(font->userdata,font->height,begin+line_begin,text_len-line_begin);
+#endif
             text_size.x = NK_MAX(text_size.x, line_width);
             text_size.y += line_height;
             line_width = 0;
@@ -7964,7 +7967,7 @@ nk_text_calculate_text_bounds(const struct nk_user_font *font,
             if (op == NK_STOP_ON_NEW_LINE)
                 break;
 
-            text_len++;
+            text_len++; line_begin=text_len;
             glyph_len = nk_utf_decode(begin + text_len, &unicode, byte_len-text_len);
             continue;
         }
@@ -7984,6 +7987,9 @@ nk_text_calculate_text_bounds(const struct nk_user_font *font,
         continue;
     }
 
+#ifdef NK_DRAW_TEXT_CUSTOM
+    line_width=font->width(font->userdata,font->height,begin+line_begin,text_len-line_begin);
+#endif
     if (text_size.x < line_width)
         text_size.x = line_width;
     if (out_offset)
@@ -27497,6 +27503,9 @@ nk_textedit_click(struct nk_text_edit *state, float x, float y,
     /* API click: on mouse down, move the cursor to the clicked location,
      * and reset the selection */
     state->cursor = nk_textedit_locate_coord(state, x, y, font, row_height);
+#ifdef NK_TEXTEDIT_GRAPHEME_INDEX
+    state->cursor = NK_TEXTEDIT_GRAPHEME_INDEX(state,state->cursor,-2);
+#endif
     state->select_start = state->cursor;
     state->select_end = state->cursor;
     state->has_preferred_x = 0;
@@ -27510,6 +27519,9 @@ nk_textedit_drag(struct nk_text_edit *state, float x, float y,
     int p = nk_textedit_locate_coord(state, x, y, font, row_height);
     if (state->select_start == state->select_end)
         state->select_start = state->cursor;
+#ifdef NK_TEXTEDIT_GRAPHEME_INDEX
+    p = NK_TEXTEDIT_GRAPHEME_INDEX(state,p,p<state->select_start ? -2 : 2);
+#endif
     state->cursor = state->select_end = p;
 }
 NK_INTERN void
@@ -27582,6 +27594,9 @@ nk_textedit_clamp(struct nk_text_edit *state)
             state->cursor = state->select_start;
     }
     if (state->cursor > n) state->cursor = n;
+#ifdef NK_TEXTEDIT_GRAPHEME_CLAMP
+    NK_TEXTEDIT_GRAPHEME_CLAMP(state);
+#endif
 }
 NK_API void
 nk_textedit_delete(struct nk_text_edit *state, int where, int len)
@@ -27732,6 +27747,12 @@ nk_textedit_paste(struct nk_text_edit *state, char const *ctext, int len)
     }
     first = NK_CLAMP(0, NK_MIN(state->select_start, state->select_end), state->string.len);
     last = NK_CLAMP(0, NK_MAX(state->select_start, state->select_end), state->string.len);
+#ifdef NK_TEXTEDIT_GRAPHEME_INDEX
+    if (first!=last) {
+        first=NK_TEXTEDIT_GRAPHEME_INDEX(state,first,-2);
+        last=NK_TEXTEDIT_GRAPHEME_INDEX(state,last,2);
+    }
+#endif
     if (first != last) {
         const char *begin = nk_str_at_rune(&state->string, first, &rune, &unused);
         const char *end = nk_str_at_rune(&state->string, last, &rune, &unused);
@@ -27769,6 +27790,9 @@ nk_textedit_paste(struct nk_text_edit *state, char const *ctext, int len)
         state->cursor += glyphs;
         state->select_start = state->select_end = state->cursor;
         state->has_preferred_x = 0;
+#ifdef NK_TEXTEDIT_GRAPHEME_CLAMP
+        NK_TEXTEDIT_GRAPHEME_CLAMP(state);
+#endif
         return 1;
     }
     return 0;
@@ -27776,6 +27800,10 @@ nk_textedit_paste(struct nk_text_edit *state, char const *ctext, int len)
 NK_API void
 nk_textedit_text(struct nk_text_edit *state, const char *text, int total_len)
 {
+#ifdef NK_TEXTEDIT_TEXT_CUSTOM
+    NK_TEXTEDIT_TEXT_CUSTOM(state,text,total_len);
+    return;
+#endif
     nk_rune unicode;
     int glyph_len;
     int text_len = 0;
@@ -27783,6 +27811,7 @@ nk_textedit_text(struct nk_text_edit *state, const char *text, int total_len)
     NK_ASSERT(state);
     NK_ASSERT(text);
     if (!text || !total_len || state->mode == NK_TEXT_EDIT_MODE_VIEW) return;
+    nk_textedit_clamp(state);
 
     glyph_len = nk_utf_decode(text, &unicode, total_len);
     while ((text_len < total_len) && glyph_len)
@@ -27821,6 +27850,9 @@ nk_textedit_text(struct nk_text_edit *state, const char *text, int total_len)
         text_len += glyph_len;
         glyph_len = nk_utf_decode(text + text_len, &unicode, total_len-text_len);
     }
+#ifdef NK_TEXTEDIT_GRAPHEME_CLAMP
+    NK_TEXTEDIT_GRAPHEME_CLAMP(state);
+#endif
 }
 NK_LIB void
 nk_textedit_key(struct nk_text_edit *state, enum nk_keys key, int shift_mod,
@@ -27870,7 +27902,11 @@ retry:
             nk_textedit_prep_selection_at_cursor(state);
             /* move selection left */
             if (state->select_end > 0)
+#ifdef NK_TEXTEDIT_GRAPHEME_INDEX
+                state->select_end=NK_TEXTEDIT_GRAPHEME_INDEX(state,state->select_end,-1);
+#else
                 --state->select_end;
+#endif
             state->cursor = state->select_end;
             state->has_preferred_x = 0;
         } else {
@@ -27879,7 +27915,11 @@ retry:
             if (NK_TEXT_HAS_SELECTION(state))
                 nk_textedit_move_to_first(state);
             else if (state->cursor > 0)
+#ifdef NK_TEXTEDIT_GRAPHEME_INDEX
+               state->cursor=NK_TEXTEDIT_GRAPHEME_INDEX(state,state->cursor,-1);
+#else
                --state->cursor;
+#endif
             state->has_preferred_x = 0;
         } break;
 
@@ -27887,7 +27927,11 @@ retry:
         if (shift_mod) {
             nk_textedit_prep_selection_at_cursor(state);
             /* move selection right */
+#ifdef NK_TEXTEDIT_GRAPHEME_INDEX
+            state->select_end=NK_TEXTEDIT_GRAPHEME_INDEX(state,state->select_end,1);
+#else
             ++state->select_end;
+#endif
             nk_textedit_clamp(state);
             state->cursor = state->select_end;
             state->has_preferred_x = 0;
@@ -27896,7 +27940,13 @@ retry:
              * move cursor to end of selection */
             if (NK_TEXT_HAS_SELECTION(state))
                 nk_textedit_move_to_last(state);
-            else ++state->cursor;
+            else {
+#ifdef NK_TEXTEDIT_GRAPHEME_INDEX
+                state->cursor=NK_TEXTEDIT_GRAPHEME_INDEX(state,state->cursor,1);
+#else
+                ++state->cursor;
+#endif
+            }
             nk_textedit_clamp(state);
             state->has_preferred_x = 0;
         } break;
@@ -28034,8 +28084,14 @@ retry:
             nk_textedit_delete_selection(state);
         else {
             int n = state->string.len;
-            if (state->cursor < n)
+            if (state->cursor < n) {
+#ifdef NK_TEXTEDIT_GRAPHEME_INDEX
+                int end=NK_TEXTEDIT_GRAPHEME_INDEX(state,state->cursor,1);
+                nk_textedit_delete(state,state->cursor,end-state->cursor);
+#else
                 nk_textedit_delete(state, state->cursor, 1);
+#endif
+            }
          }
          state->has_preferred_x = 0;
          break;
@@ -28048,8 +28104,13 @@ retry:
         else {
             nk_textedit_clamp(state);
             if (state->cursor > 0) {
+#ifdef NK_TEXTEDIT_GRAPHEME_INDEX
+                int start=NK_TEXTEDIT_GRAPHEME_INDEX(state,state->cursor,-1);
+                nk_textedit_delete(state,start,state->cursor-start); state->cursor=start;
+#else
                 nk_textedit_delete(state, state->cursor-1, 1);
                 --state->cursor;
+#endif
             }
          }
          state->has_preferred_x = 0;
@@ -28127,6 +28188,9 @@ retry:
                 --state->cursor;
         }} break;
     }
+#ifdef NK_TEXTEDIT_GRAPHEME_CLAMP
+    NK_TEXTEDIT_GRAPHEME_CLAMP(state);
+#endif
 }
 NK_INTERN void
 nk_textedit_flush_redo(struct nk_text_undo_state *state)
@@ -28298,6 +28362,9 @@ nk_textedit_undo(struct nk_text_edit *state)
     }
     state->cursor = u.where + u.insert_length;
     state->select_start = state->select_end = state->cursor;
+#ifdef NK_TEXTEDIT_GRAPHEME_CLAMP
+    NK_TEXTEDIT_GRAPHEME_CLAMP(state);
+#endif
 
     s->undo_point--;
     s->redo_point--;
@@ -28348,6 +28415,9 @@ nk_textedit_redo(struct nk_text_edit *state)
     }
     state->cursor = r.where + r.insert_length;
     state->select_start = state->select_end = state->cursor;
+#ifdef NK_TEXTEDIT_GRAPHEME_CLAMP
+    NK_TEXTEDIT_GRAPHEME_CLAMP(state);
+#endif
 
     s->undo_point++;
     s->redo_point++;
@@ -28553,6 +28623,9 @@ nk_edit_draw_text(struct nk_command_buffer *out,
             struct nk_rect label;
             label.y = pos_y + line_offset;
             label.h = row_height;
+#ifdef NK_DRAW_TEXT_CUSTOM
+            line_width=font->width(font->userdata,font->height,line,(int)((text+text_len)-line));
+#endif
             label.w = line_width;
             label.x = pos_x;
             if (!line_count)
@@ -28560,8 +28633,14 @@ nk_edit_draw_text(struct nk_command_buffer *out,
 
             if (is_selected) /* selection needs to draw different background color */
                 nk_fill_rect(out, label, 0, background);
+#ifdef NK_DRAW_TEXT_CUSTOM
+            /* Complete shaped runs can be narrower than an intermediate
+               prefix. Clip geometrically, without shortening the UTF-8 run. */
+            nk_draw_text(out,nk_rect(label.x,label.y+(label.h-font->height)/2,label.w,font->height),line,(int)((text+text_len)-line),font,background,foreground);
+#else
             nk_widget_text(out, label, line, (int)((text + text_len) - line),
                 &txt, NK_TEXT_CENTERED, font);
+#endif
 
             text_len++;
             line_count++;
@@ -28582,6 +28661,9 @@ nk_edit_draw_text(struct nk_command_buffer *out,
         glyph_len = nk_utf_decode(text + text_len, &unicode, byte_len-text_len);
         continue;
     }
+#ifdef NK_DRAW_TEXT_CUSTOM
+    line_width=font->width(font->userdata,font->height,line,(int)((text+text_len)-line));
+#endif
     if (line_width > 0) {
         /* draw last line */
         struct nk_rect label;
@@ -28594,8 +28676,12 @@ nk_edit_draw_text(struct nk_command_buffer *out,
 
         if (is_selected)
             nk_fill_rect(out, label, 0, background);
+#ifdef NK_DRAW_TEXT_CUSTOM
+        nk_draw_text(out,nk_rect(label.x,label.y+(label.h-font->height)/2,label.w,font->height),line,(int)((text+text_len)-line),font,background,foreground);
+#else
         nk_widget_text(out, label, line, (int)((text + text_len) - line),
             &txt, NK_TEXT_LEFT, font);
+#endif
     }}
 }
 NK_LIB nk_flags
@@ -28883,6 +28969,9 @@ nk_do_edit(nk_flags *state, struct nk_command_buffer *out,
                     select_end_ptr = text + text_len;
                 }
                 if (unicode == '\n') {
+#ifdef NK_DRAW_TEXT_CUSTOM
+                    line_width=font->width(font->userdata,font->height,text+row_begin,text_len-row_begin);
+#endif
                     text_size.x = NK_MAX(text_size.x, line_width);
                     total_lines++;
                     line_width = 0;
@@ -28903,6 +28992,10 @@ nk_do_edit(nk_flags *state, struct nk_command_buffer *out,
                     text+text_len, glyph_len);
                 continue;
             }
+#ifdef NK_DRAW_TEXT_CUSTOM
+            line_width=font->width(font->userdata,font->height,text+row_begin,text_len-row_begin);
+#endif
+            text_size.x=NK_MAX(text_size.x,line_width);
             text_size.y = (float)total_lines * row_height;
 
             /* handle case when cursor is at end of text buffer */

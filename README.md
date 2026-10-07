@@ -113,7 +113,9 @@ build/app/secondbrain --workspace brains --project secondbrain
 | Zurück oder abbrechen / Hilfe | Escape / F1 |
 
 Command gilt auf macOS, Control auf Windows und Linux. Tab verlässt auch den
-Editor; Ctrl+I fügt dort einen Tabulator ein. Mit der Maus: Ziehen dreht die
+Editor; Ctrl+I fügt dort einen Tabulator ein.
+Zusammengesetzte Zeichen werden beim Bewegen, Auswählen und Löschen als Einheit
+behandelt. [Eingabevertrag und Grenzen](docs/GRAPHEME.md). Mit der Maus: Ziehen dreht die
 Sternkarte, Umschalt+Ziehen verschiebt sie, das Mausrad zoomt. Über einer Karte
 scrollt es den Inhalt. Weitere Kürzel stehen in der eingebauten Hilfe und im
 [Tastaturvertrag](docs/UI_TASTATUR.md).

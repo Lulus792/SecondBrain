@@ -24,8 +24,12 @@ static bool reach(SBDesktop *d,const char *id) {
 }
 static bool activate(SBDesktop *d,const char *id) { if (!reach(d,id)) return false; key(d,SDLK_RETURN,0); return true; }
 static bool replace(SBDesktop *d,const char *id,const char *text) {
-    if (!reach(d,id) || !SDL_SetClipboardText(text)) return false;
-    key(d,SDLK_A,MOD); key(d,SDLK_V,MOD); return true;
+    if (!reach(d,id) || strlen(text)>=NK_INPUT_MAX) return false;
+    key(d,SDLK_A,MOD);
+    SDL_Event event={0}; event.type=SDL_EVENT_TEXT_INPUT;
+    event.text.windowID=SDL_GetWindowID(d->ui.window); event.text.text=text;
+    if (!SDL_PushEvent(&event)) return false;
+    frame(d); frame(d); return true;
 }
 static bool wait_job(SBDesktop *d) {
     Uint64 until=SDL_GetTicks()+30000;

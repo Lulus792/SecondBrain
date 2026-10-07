@@ -2,7 +2,7 @@
 
 Stand: 7. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Der aktuelle Entwicklungsschritt 0.9.7 verfeinert schmale Dokumenttabellen.
+Der aktuelle Entwicklungsschritt 0.9.8 ergänzt eigene Unicode-Zeichengrenzen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
 ## Abgeschlossene Grundlagen
@@ -1100,3 +1100,62 @@ inzwischen für Windows und Linux in Debug und Release, einschließlich der
 nativen Prüfung und der jeweiligen entpackten Release-Pakete. Windows Debug
 ist damit nach dem vorherigen nativen Timeout wieder vollständig erfolgreich.
 Die noch laufenden/ausstehenden Mac-Jobs werden separat nach Abschluss bewertet.
+
+
+## Unicode-Zeichengrenzen und Editorläufe in 0.9.8
+
+Am 7. Oktober werden Unicode 18.0.0 und UAX #29 Revision 49 als festgelegte Grundlage
+für eigene erweiterte Graphemgrenzen verwendet. Eigener C-Code und abgeleitete
+Eigenschaftstabellen behandeln Akzente, Flaggen, Emoji-Verbindungen, Hangul und
+indische Verbindungszeichen. Alle Nuklear-Eingaben benutzen dieselben Hooks für
+Cursor, Auswahl und Löschen. Intern bleiben Skalarindizes erhalten. Ein
+Texteingabeereignis wird atomisch und als ein Undo-Vorgang verarbeitet; auch
+Überschreiben ersetzt vollständige Grapheme. Native Editor-Teilmarkierungen
+werden auf vollständige Zeichen erweitert. [Vertrag und Quellen](GRAPHEME.md).
+
+Die Rasterprüfung deckte unvollständige Editorzeilen auf. Addierte Einzelglyph-
+breiten passten nicht zum geformten Textlauf; die Ausgabe wurde dadurch gekürzt.
+Die Editorzeilen werden nun als vollständige Läufe gemessen und geometrisch
+begrenzt. Kommandoprüfungen verlangen vollständige UTF-8-Zeilen für Hangul,
+Devanagari, Emoji, Ligatur und Akzent. Emoji-Fontabdeckung, komplexe Bidi-/Maus-
+geometrie, IME-Position und native Zeichenrechtecke bleiben eigene Release-Aufgaben.
+
+19 Debug-Kernprüfungen bestehen (35,13 s). Der Segmentierer besteht 18.764 Assertions
+gegen alle 853 offiziellen Unicode 18-Fälle, ungültige/leere Eingaben und eine
+100.001 Byte lange Kombination. ASan/UBSan besteht. Datenerzeugung reproduziert
+bytegleich die festgelegte C-Tabelle. Erster vollständiger Release-Lauf: 33 Tests
+bestehen (270,67 s). Nach den letzten Raster-/Pfadtestkorrekturen bestehen sechs
+passende Tests (100,34 s), darunter 111 Editor-, 273 native und 75 Sicherungsassertions.
+Die eigene UI-Implementierung wird ebenfalls unter ASan/UBSan nachgeprüft; UI-
+Abhängigkeiten sind dabei nicht vollständig instrumentiert. Ohne die neuen
+Graphemhaken scheitert die Cursorregression am Akzent. Logs: build/grapheme-core-
+full-check.log, grapheme-sanitize.log, grapheme-ui-full-check.log, grapheme-final-
+check.log, grapheme-regression/result.log und grapheme-ui-sanitize/final.log.
+
+Die 18 Lizenzressourcen bestehen lokal, einschließlich des mitgelieferten Unicode-
+Originals. Ein früherer Paketdurchlauf scheitert durch eine zwischenzeitlich
+geänderte Systemzwischenablage während einer Testpfadeingabe. Pfadfixtures der
+Sicherungsprüfung werden nun über echte SDL-Texteingaben gesetzt; Kopieren wird
+weiter geprüft. Dieser fehlgeschlagene Lauf bleibt als Fehler dokumentiert.
+Das abschließende Paket wird neu erzeugt und entpackt geprüft; dist/SecondBrain
+bleibt bis dahin bei 0.9.7. Neue native Plattformabnahme folgt nach Push.
+
+Die [0.9.7-Abnahme zu 2edb2bf](https://github.com/Lulus792/SecondBrain/actions/runs/37596496154)
+steht inzwischen mit allen 20 Jobs und vier entpackten Paketen. Das ist der
+Nachweis der vorherigen Version, keine Abnahme der noch unveröffentlichten 0.9.8.
+
+
+Ein weiterer 0.9.8-Paketversuch scheitert im Lizenz-Kopiertest nach zusätzlichen
+Zeichenframes. Testeingaben sind nun vom Systemclipboard entkoppelt und die
+Kopierergebnisse werden direkt nach der tatsächlichen SDL-Aktion gelesen.
+Desktop-/Tastaturnachprüfung und abschließende Paketwiederholung folgen.
+UI-Bericht SBUI-038–040: /Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-07_11-50-23/UI_REVIEW.md.
+
+
+Die letzten Testeingabe-Anpassungen bestehen im Desktopablauf mit 126 Assertions
+und nach UTF-8-sicherer Abschnittszufuhr im Tastaturablauf mit 142 Assertions
+(53,65 s). Kopierprüfungen lesen echte SDL-Zwischenablagewerte unmittelbar nach
+der Aktion. Lange Fixtures werden in vollständigen UTF-8-Abschnitten innerhalb
+des vorhandenen Ereignislimits zugeführt; zuvor fehlte bei einer Einzelzufuhr
+der Rest eines langen Linkfixtures. Die normalen App-Eingaben und Kopieraktionen
+bleiben unverändert. Das abschließende Paket wird erneut erzeugt.
