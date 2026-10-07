@@ -25,7 +25,9 @@ Nachprüfungen bestehen. Neue Windows-Kompilierung und native Abnahme folgen.
 Erster Quellbuild 37628165496 stoppt unter Windows schon bei Konfiguration;
 Ursache inzwischen belegt: native CRLF-Ausgabe statt festgelegter LF-Bytes.
 Vorbereitung erzwingt nun LF und erhält strenge Hashprüfung; vier Quellenfälle
-bestehen lokal. Neue tatsächliche Windows-Abnahme folgt. Intel-Paket 0.9.13 besteht; kein Windows-Nachweis.
+bestehen lokal. Windows-Konfiguration besteht nun. Zwei vom Windows-Compiler gemeldete falsche
+API-Aufrufe sind nach den Originalquellen korrigiert; neue Kompilierung und native
+Clientprüfung folgen. Intel-Paket 0.9.13 besteht; kein Windows-Nachweis.
 Keine bestätigte Windows-Behebung vorwegnehmen. UI-Bericht SBUI-047.
 Dist enthält weiter geprüftes 0.9.12, Build 4c4a51054334.
 

@@ -6,7 +6,7 @@
         ignore_case: BOOL,
     ) -> Result<ITextRangeProvider> {
         use windows::Win32::Globalization::{FindStringOrdinal, FIND_FROMEND, FIND_FROMSTART};
-        let needle = text.as_wide();
+        let needle: &[u16] = text;
         if needle.is_empty() || needle.len() > i32::MAX as usize
             || String::from_utf16(needle).is_err()
         {
@@ -21,7 +21,7 @@
             let offset = unsafe { FindStringOrdinal(flags, &source, needle, ignore_case.as_bool()) };
             if offset < 0 {
                 if unsafe { windows::Win32::Foundation::GetLastError() }.0 != 0 {
-                    return Err(Error::from_win32());
+                    return Err(Error::from_thread());
                 }
                 return Err(Error::empty());
             }
