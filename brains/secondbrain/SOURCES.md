@@ -78,6 +78,6 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 
 - [Windows-UIA-Textsuche](../../docs/UIA_TEXTSUCHE.md): bestätigter Adapterbefund, feste Quellkorrektur und native Prüfgrenzen.
 
-- [Zeichenreferenzen-Recherche](../../docs/ENTITIES_RECHERCHE.md): nächste C-Parserarbeit, Originaldaten, Lizenz und Ausgabegrenzen; noch keine Implementierung.
+- [Zeichenreferenzen-Recherche](../../docs/ENTITIES_RECHERCHE.md): Grundlagen, Originaldaten, Lizenz und Ausgabegrenzen; die Umsetzung steht im folgenden Vertrag.
 
 - [Zeichenreferenzen](../../docs/ENTITIES.md): eigene C-Verarbeitung, Ausgabegrenzen, echte UI-/Graphprüfungen und Daten-/Fontlizenzen.

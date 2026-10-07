@@ -23,8 +23,12 @@ beziehungen. Math-Fallback ersetzt bestätigte Kästchen; Originaldaten/-fonts
 und Lizenzen sind zugeordnet. 36 Release-Tests, abschließende Kern-/native
 Nachprüfungen und neun Python-Strukturtests bestehen lokal. Eigene Kern-
 ASan/UBSan mit 1.194.343 Assertions besteht; letzte native Sanitizer-Nachprüfung
-besteht mit 393 Assertions. UI-Bericht SBUI-048/049. Neue Paket-/Plattformabnahme folgt.
-Dist enthält bis dahin geprüftes 0.9.13, Build cade9ea34b95.
+besteht mit 393 Assertions. UI-Bericht SBUI-048/049. Neues Intel/macOS-Paket besteht einschließlich
+Desktop/Tastatur/Sicherung/Neustart/CLI; dist enthält 0.9.14, Build ddd2186d2ab9.
+Das eigene Gedächtnis wurde geladen und die Darstellung betrachtet.
+Lauf 37639562794 zu ddd2186 besteht in allen zwölf Windows-/Linux-Jobs
+einschließlich Debug/Release und entpackter Pakete. Neue Mac-CI noch nicht
+vollständig abgeschlossen; daraus keine ARM64-Gesamtabnahme ableiten.
 
 Vorherige Windows-/Linux-Abnahme 37631991014 zu 9c38604 besteht in zwölf Jobs,
 einschließlich Debug/Release und Release-Paketen. Neue Mac-CI separat übernehmen;
@@ -32,7 +36,7 @@ keinen Plattformnachweis der neuen 0.9.14 daraus ableiten.
 
 ## Nächste Arbeit und Grenzen
 
-Neue Paket-/Plattformnachweise übernehmen. Danach verbleibende Container-/
+Verbleibende macOS-CI-Nachweise übernehmen. Danach Container-/
 Inline-/Listenregeln, Bidi, visuelle/native Textgeometrie und IME, native Tabellen-
 Matrixschnittstellen sowie übrige Release-Aufgaben umsetzen und abnehmen.
 Support-/Beitrags-/Issue-Vorlagen und Updateablauf sind veröffentlicht; vertraulicher

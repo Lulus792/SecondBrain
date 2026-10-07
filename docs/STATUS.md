@@ -1566,3 +1566,33 @@ Neue Paket-/Plattformabnahme folgt nach Quellpush. Bidi, exakte visuelle/native
 Textgeometrie, IME, Referenzlinks, volle Listen/Container, weitere Glyphenabdeckung
 und menschliche assistive Bedienung bleiben offene Release-Arbeiten.
 1.0 ist nicht freigegeben; vorhandene Arbeitskopie bleibt bis zum neuen Paketnachweis.
+
+
+## Paket- und Plattformnachprüfung 0.9.14
+
+Am 7. Oktober 2026 besteht das neue lokale Intel/macOS-Paket zu ddd2186:
+126 Desktop-, 142 Tastatur- und 75 Sicherungsassertions, zwei isolierte
+Einstellungs-Neustartprozesse sowie die produktive Sicherungs-/Prüf-/
+Wiederherstellungs-CLI. App und CLI melden 0.9.14, Build ddd2186d2ab9.
+Log: build/entities-package-check.log. Archiv-SHA-256:
+`0d1e05c6593b972e8643a5cf3035d27b8be141341c77f3ece55064a8e431b0ce`.
+Neue Math-Schrift und Original-Lizenztexte sind im Archiv anhand ihrer
+festgelegten Prüfsummen nachgeprüft, einschließlich der Kopien im App-Bundle.
+
+Die Arbeitskopie unter dist/SecondBrain enthält dieses Paket. Vorherige App
+bleibt unter /Users/lulus/Projects/SecondBrain/build/entities-previous-dist-20261007-165530 erhalten. Das eigene Projektgedächtnis wurde mit dem
+installierten Paket geladen; build/entities-own-brain.bmp und
+dist/SecondBrain/preview.png wurden erzeugt, die PNG-Darstellung betrachtet.
+
+[Lauf 37639562794](https://github.com/Lulus792/SecondBrain/actions/runs/37639562794)
+zu ddd2186 besteht in allen zwölf Windows-/Linux-Jobs: Python, C17 und Desktop
+je Debug/Release, einschließlich tatsächlich entpackter Release-Pakete. Die
+neuen macOS-CI-Jobs sind beim dokumentierten Zwischenstand noch nicht vollständig
+abgeschlossen. Der lokale Intel-Test ist deshalb der hier abgeschlossene
+macOS-Paketnachweis; eine neue ARM64-Gesamtabnahme bleibt offen.
+
+SBUI-048/049 sind im genannten lokalen sowie automatisierten Windows-/Linux-
+Umfang nachgeprüft. Bidi, Textgeometrie, IME, vollständige Markdown-Container,
+native Tabellenmatrixschnittstellen, menschliche assistive Bedienung und die
+übrigen Release-Aufgaben bleiben offen. Der Gesamtauftrag bleibt aktiv;
+die Versionsnummer 1.0 wurde nicht gesetzt.
