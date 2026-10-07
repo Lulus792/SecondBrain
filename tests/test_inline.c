@@ -10,13 +10,24 @@ static void example(const char *source,const char *plain,unsigned links,const ch
     unsigned found=0; SBInlineToken t; size_t cursor=0;
     while (sb_inline_next(&r,&t)) {
         CHECK(r.cursor>cursor && t.offset==cursor && t.length<=r.length-cursor); cursor=r.cursor;
-        if (t.kind==SB_INLINE_LINK) {
+        if (t.kind==SB_INLINE_LINK || t.kind==SB_INLINE_AUTOLINK) {
             CHECK(found<links); char path[SB_PATH_CAP];
             CHECK(sb_inline_destination(&r,&t,path,sizeof(path)).code==SB_OK);
             CHECK(!strcmp(path,destinations[found++]));
         }
     }
     CHECK(cursor==strlen(source) && found==links); sb_inline_free(&r);
+}
+static void styled(const char *source,const char *plain,const unsigned char *styles) {
+    SBInline reader; CHECK(sb_inline_init(&reader,source,strlen(source)).code==SB_OK);
+    SBStyledText out; CHECK(sb_inline_styled(&reader,0,strlen(source),&out).code==SB_OK);
+    CHECK(!strcmp(out.text,plain)); size_t end=0;
+    for (size_t i=0;i<out.count;++i) {
+        SBTextSpan span=out.spans[i]; CHECK(span.offset==end && span.length && span.length<=strlen(plain)-end);
+        for (size_t p=span.offset;p<span.offset+span.length;++p) CHECK(span.style==styles[p]);
+        end+=span.length;
+    }
+    CHECK(end==strlen(plain)); sb_styled_free(&out); sb_inline_free(&reader);
 }
 int main(void) {
     const char *one[]={"../STATE.md"},*two[]={"../STATE.md","../DECISIONS.md"};
@@ -34,6 +45,26 @@ int main(void) {
     const char *punct[]={"../name(teil).md","../mit Leerzeichen.md","../a)b.md"};
     example("[Eins](../name(teil).md 'Text') [Zwei](<../mit Leerzeichen.md>) [Drei](../a\\)b.md)","Eins Zwei Drei",3,punct);
     example("**betont** und **unfertig", "betont und **unfertig",0,NULL);
+    styled("*ab* __cd__", "ab cd",(const unsigned char[]){1,1,0,2,2});
+    styled("***ab***", "ab",(const unsigned char[]){3,3});
+    styled("**a *b* c**", "a b c",(const unsigned char[]){2,2,3,2,2});
+    styled("*a **b** c*", "a b c",(const unsigned char[]){1,1,3,1,1});
+    styled("a_b_c", "a_b_c",(const unsigned char[]){0,0,0,0,0});
+    styled("a*b*c", "abc",(const unsigned char[]){0,1,0});
+    styled("**`ab`**", "ab",(const unsigned char[]){6,6});
+    styled("`*ab*`", "*ab*",(const unsigned char[]){4,4,4,4});
+    styled("\\*ab*", "*ab*",(const unsigned char[]){0,0,0,0});
+    styled("*[a*](x)", "*a*",(const unsigned char[]){0,0,0});
+    styled("*[ab](x)*", "ab",(const unsigned char[]){1,1});
+    styled("[**ab**](x)", "ab",(const unsigned char[]){2,2});
+    example("*unfertig und __auch", "*unfertig und __auch",0,NULL);
+    example("ä_wort_ü", "ä_wort_ü",0,NULL);
+    example("«_Wort_»", "«Wort»",0,NULL);
+    example("*\u00a0Wort*", "*\u00a0Wort*",0,NULL);
+    styled("*<img title=\"*\"/>", "*<img title=\"*\"/>",(const unsigned char[17]){0});
+    const char *url[]={"https://foo.bar/?q=**"};
+    example("**a<https://foo.bar/?q=**>","**ahttps://foo.bar/?q=**",1,url);
+    example("<a title=\"[Kein](../STATE.md)\">", "<a title=\"[Kein](../STATE.md)\">",0,NULL);
     example("``\r\n code \\* **literal** \r\n``"," code \\* **literal** ",0,NULL);
     example("`   `", "   ",0,NULL);
     example("eins\r\nzwei\rdrei\nvier", "eins zwei drei vier",0,NULL);

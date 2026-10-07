@@ -14,6 +14,7 @@ void sb_ui_text_draw(struct nk_draw_list *, const struct nk_command_text *);
 #define NK_SDL3_RENDERER_IMPLEMENTATION
 #include "ui.h"
 #include "text.h"
+#include "styled_text.inc"
 #define SDL_MAIN_HANDLED
 #include <SDL3/SDL_main.h>
 #include "platform.h"

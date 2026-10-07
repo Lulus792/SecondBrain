@@ -9,6 +9,7 @@
 #define SB_TEXT_CACHE_ENTRIES 1024
 #define SB_TEXT_CACHE_BYTES (32u * 1024u * 1024u)
 #define SB_FALLBACK_COUNT 6
+#define SB_TEXT_FACES 32
 
 typedef struct {
     struct nk_font nk;
@@ -26,7 +27,7 @@ typedef struct {
 struct SBTextSystem {
     SDL_Renderer *renderer;
     float density;
-    SBTextFace faces[4];
+    SBTextFace faces[SB_TEXT_FACES];
     SBTextCache cache[SB_TEXT_CACHE_ENTRIES];
     size_t bytes;
     uint64_t frame;
@@ -39,7 +40,7 @@ static void cache_free(SBTextSystem *text, SBTextCache *entry) {
 static void system_free(SBTextSystem *text) {
     if (!text) return;
     for (unsigned i=0;i<SB_TEXT_CACHE_ENTRIES;++i) cache_free(text,&text->cache[i]);
-    for (unsigned i=0;i<4;++i) {
+    for (unsigned i=0;i<SB_TEXT_FACES;++i) {
         TTF_CloseFont(text->faces[i].font);
         for (unsigned j=0;j<SB_FALLBACK_COUNT;++j) TTF_CloseFont(text->faces[i].fallback[j]);
     }
@@ -120,7 +121,7 @@ SBStatus sb_ui_text_fonts(SBUi *ui, float scale, float density) {
     if (slash) *slash=0;
     else snprintf(folder,sizeof(folder),".");
     for (unsigned i=0;i<4;++i) {
-        SBTextFace *face=&next->faces[i]; face->owner=next;
+        SBTextFace *face=&next->faces[i*8]; face->owner=next;
         if (i==3) { if (sb_path_join(path,sizeof(path),folder,"NotoSansMono-Regular.ttf").code!=SB_OK) goto failed; }
         else snprintf(path,sizeof(path),"%s",ui->font_path);
         face->font=open_font(path,heights[i]*scale,density);
@@ -135,8 +136,8 @@ SBStatus sb_ui_text_fonts(SBUi *ui, float scale, float density) {
         face->nk.handle.width=width;
     }
     system_free(ui->text); ui->text=next;
-    ui->normal=&next->faces[0].nk; ui->body=&next->faces[1].nk;
-    ui->heading=&next->faces[2].nk; ui->code=&next->faces[3].nk;
+    ui->normal=&next->faces[0].nk; ui->body=&next->faces[8].nk;
+    ui->heading=&next->faces[16].nk; ui->code=&next->faces[24].nk;
     ui->scale=scale; ui->density=density;
     nk_style_set_font(ui->ctx,&ui->normal->handle);
     return sb_ok();
@@ -144,6 +145,60 @@ failed: {
     SBStatus error=sb_error(SB_IO,"Schrift konnte nicht geladen werden: %s",SDL_GetError());
     system_free(next); if (first) TTF_Quit(); return error;
 }}
+
+const struct nk_user_font *sb_ui_text_style(SBUi *ui,const struct nk_user_font *base,unsigned style) {
+    SBTextFace *original=base->userdata.ptr;
+    if (!original || original->owner!=ui->text) return base;
+    unsigned flags=style&7,role=(unsigned)(original-ui->text->faces)/8;
+    if (role==3) flags&=3;
+    SBTextFace *source=&ui->text->faces[role*8],*face=&ui->text->faces[role*8+flags];
+    if (!flags) return &source->nk.handle;
+    if (!face->font) {
+        face->owner=ui->text; face->nk.handle=source->nk.handle; face->nk.handle.userdata=nk_handle_ptr(face);
+        face->font=TTF_CopyFont(flags&SB_TEXT_CODE ? ui->text->faces[24].font : source->font);
+        if (!face->font) return &source->nk.handle;
+        if ((flags&SB_TEXT_CODE) && !TTF_SetFontSize(face->font,TTF_GetFontSize(source->font))) {
+            TTF_CloseFont(face->font); face->font=NULL; return &source->nk.handle;
+        }
+        TTF_FontStyleFlags ttf=(flags&SB_TEXT_BOLD ? TTF_STYLE_BOLD : 0)|(flags&SB_TEXT_ITALIC ? TTF_STYLE_ITALIC : 0);
+        TTF_SetFontStyle(face->font,ttf);
+        for (unsigned j=0;j<SB_FALLBACK_COUNT;++j) {
+            face->fallback[j]=TTF_CopyFont(source->fallback[j]);
+            if (!face->fallback[j]) {
+                TTF_CloseFont(face->font); face->font=NULL;
+                for (unsigned k=0;k<SB_FALLBACK_COUNT;++k) { TTF_CloseFont(face->fallback[k]); face->fallback[k]=NULL; }
+                return &source->nk.handle;
+            }
+            TTF_SetFontStyle(face->fallback[j],ttf);
+        }
+    }
+    return &face->nk.handle;
+}
+size_t sb_ui_text_fit(const struct nk_user_font *font,const char *value,size_t length,float available,float *measured) {
+    SBTextFace *face=font->userdata.ptr; SBFontRuns runs; SBFontRun run;
+    if (measured) *measured=0;
+    if (!face || !measured || available<=0 || !runs_init(&runs,face,value,length)) return 0;
+    int maximum=(int)fminf(8192,floorf(available*face->owner->density)),total=0; size_t fitting=0;
+    while (total<maximum && run_next(&runs,&run)) {
+        size_t fit=0; int w=0;
+        if (!TTF_MeasureString(run.font,value+run.start,run.end-run.start,maximum-total,&w,&fit)) return 0;
+        fitting=run.start+fit; total+=w;
+        if (fit<run.end-run.start) break;
+    }
+    SBGrapheme reader; SBGraphemeBoundary boundary; size_t whole=0;
+    if (!sb_grapheme_init(&reader,value,length)) return 0;
+    while (sb_grapheme_next(&reader,&boundary) && boundary.byte<=fitting) whole=boundary.byte;
+    *measured=font->width(font->userdata,font->height,value,(int)whole); return whole;
+}
+bool sb_ui_text_metrics(const struct nk_user_font *font,const char *value,size_t length,float *ascent,float *descent) {
+    SBTextFace *face=font->userdata.ptr; SBFontRuns runs; SBFontRun run;
+    if (!face || !ascent || !descent || !runs_init(&runs,face,value,length)) return false;
+    int above=TTF_GetFontAscent(face->font),below=-TTF_GetFontDescent(face->font);
+    while (run_next(&runs,&run)) {
+        above=SDL_max(above,TTF_GetFontAscent(run.font)); below=SDL_max(below,-TTF_GetFontDescent(run.font));
+    }
+    *ascent=above/face->owner->density; *descent=below/face->owner->density; return true;
+}
 
 void sb_ui_text_draw(struct nk_draw_list *list, const struct nk_command_text *command) {
     if (!command->font || command->length<=0 || !command->foreground.a) return;

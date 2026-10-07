@@ -1185,7 +1185,7 @@ static void document_links(SBDesktop *d,SBInline *inline_reader,unsigned *link_n
     struct nk_context *ctx=d->ui.ctx;
     SBInlineToken link;
     while (sb_inline_next(inline_reader,&link)) {
-        if (link.kind!=SB_INLINE_LINK || !link.destination_length) continue;
+        if ((link.kind!=SB_INLINE_LINK && link.kind!=SB_INLINE_AUTOLINK) || !link.destination_length) continue;
         char destination[SB_PATH_CAP],label[SB_NAME_CAP],tag[100]; char *full_label=NULL;
         SBStatus status=sb_inline_destination(inline_reader,&link,destination,sizeof(destination));
         if (status.code==SB_OK) status=sb_inline_text(inline_reader,link.content,link.content_length,&full_label);
@@ -1209,7 +1209,7 @@ static void document_links(SBDesktop *d,SBInline *inline_reader,unsigned *link_n
     }
 
 }
-typedef struct { SBInline inline_reader; char *raw,*plain; size_t row_offset; unsigned links; float height; } SBTableViewCell;
+typedef struct { SBInline inline_reader; SBStyledText styled; char *raw,*plain; size_t row_offset; unsigned links; float height; } SBTableViewCell;
 static void table_passive(SBDesktop *d,const char *id,const char *text,accesskit_role role,const char *parent,struct nk_rect bounds,float reader_top,unsigned slot,size_t row,size_t column,size_t rows,size_t columns) {
     size_t before=d->passive_count; passive_add(d,id,text,role,bounds);
     if (before==d->passive_count) return;
@@ -1232,9 +1232,9 @@ static bool document_table(SBDesktop *d,const char *text,size_t length,size_t of
             SBTableViewCell *cell=&cells[row_index*table.columns+c]; cell->row_offset=row.offset;
             status=sb_table_cell_text(&table,&row.cells[c],&cell->raw);
             if (status.code==SB_OK) status=sb_inline_init(&cell->inline_reader,cell->raw,strlen(cell->raw));
-            if (status.code==SB_OK) status=sb_inline_text(&cell->inline_reader,0,strlen(cell->raw),&cell->plain);
+            if (status.code==SB_OK) { status=sb_inline_styled(&cell->inline_reader,0,strlen(cell->raw),&cell->styled); cell->plain=cell->styled.text; }
             if (status.code!=SB_OK) goto cleanup;
-            SBInlineToken link; while (sb_inline_next(&cell->inline_reader,&link)) if (link.kind==SB_INLINE_LINK && link.destination_length) ++cell->links;
+            SBInlineToken link; while (sb_inline_next(&cell->inline_reader,&link)) if ((link.kind==SB_INLINE_LINK || link.kind==SB_INLINE_AUTOLINK) && link.destination_length) ++cell->links;
             cell->inline_reader.cursor=0;
         }
         ++row_index;
@@ -1268,8 +1268,8 @@ static bool document_table(SBDesktop *d,const char *text,size_t length,size_t of
         float height=0; unsigned widgets=0;
         for (size_t c=0;c<table.columns;++c) {
             SBTableViewCell *cell=&cells[r*table.columns+c];
-            cell->height=sb_ui_wrap_height(ctx,font,cell->plain,strlen(cell->plain),text_width)+cell->links*36*s;
-            if (stacked && r && *cells[c].plain) cell->height+=sb_ui_wrap_height(ctx,&d->ui.normal->handle,cells[c].plain,strlen(cells[c].plain),text_width);
+            cell->height=sb_ui_styled_height(&d->ui,font,&cell->styled,text_width)+cell->links*36*s;
+            if (stacked && r && *cells[c].plain) cell->height+=sb_ui_styled_height(&d->ui,&d->ui.normal->handle,&cells[c].styled,text_width);
             height=stacked ? height+cell->height+2*padding : fmaxf(height,cell->height+2*padding);
             widgets+=1+cell->links+(stacked && r && *cells[c].plain ? 1 : 0);
         }
@@ -1309,14 +1309,14 @@ static bool document_table(SBDesktop *d,const char *text,size_t length,size_t of
             float y=top+padding;
             if (stacked && r && *cells[c].plain) {
                 nk_style_set_font(ctx,&d->ui.normal->handle);
-                float h=sb_ui_wrap_height(ctx,&d->ui.normal->handle,cells[c].plain,strlen(cells[c].plain),text_width);
-                nk_layout_space_push(ctx,nk_rect(x+padding,y,column_width-2*padding,h)); sb_ui_text_aligned(ctx,cells[c].plain,strlen(cells[c].plain),NK_TEXT_LEFT); y+=h;
+                float h=sb_ui_styled_height(&d->ui,&d->ui.normal->handle,&cells[c].styled,text_width);
+                nk_layout_space_push(ctx,nk_rect(x+padding,y,column_width-2*padding,h)); sb_ui_styled_draw(&d->ui,&d->ui.normal->handle,&cells[c].styled); y+=h;
             }
             nk_style_set_font(ctx,font);
-            float h=sb_ui_wrap_height(ctx,font,cell->plain,strlen(cell->plain),text_width);
+            float h=sb_ui_styled_height(&d->ui,font,&cell->styled,text_width);
             nk_layout_space_push(ctx,nk_rect(x+padding,y,column_width-2*padding,h));
             nk_flags align=stacked ? NK_TEXT_LEFT : table.alignment[c]==SB_TABLE_RIGHT ? NK_TEXT_RIGHT : table.alignment[c]==SB_TABLE_CENTER ? NK_TEXT_CENTERED : NK_TEXT_LEFT;
-            sb_ui_text_aligned(ctx,cell->plain,strlen(cell->plain),align); y+=h;
+            sb_ui_styled_aligned(&d->ui,font,&cell->styled,align); y+=h;
             struct nk_rect placement=nk_rect(x+padding,y,column_width-2*padding,32*s);
             document_links(d,&cell->inline_reader,link_number,cell_id,&placement);
             if (stacked) top+=cell_height;
@@ -1325,7 +1325,7 @@ static bool document_table(SBDesktop *d,const char *text,size_t length,size_t of
 
     }
 cleanup:
-    for (size_t i=0;i<count;++i) { sb_inline_free(&cells[i].inline_reader); free(cells[i].raw); free(cells[i].plain); }
+    for (size_t i=0;i<count;++i) { sb_inline_free(&cells[i].inline_reader); free(cells[i].raw); sb_styled_free(&cells[i].styled); }
     free(cells);
     if (status.code!=SB_OK) { d->message=status; return false; }
     return true;
@@ -1371,14 +1371,15 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
         if (block.kind==SB_MD_FENCE) continue;
         if (block.kind==SB_MD_BLANK || (!length && !heading)) { nk_layout_row_dynamic(ctx,9*d->ui.scale,1); nk_spacer(ctx); }
         else {
-            SBInline inline_reader={0}; SBStatus inline_status=sb_ok(); char *plain=NULL;
+            SBInline inline_reader={0}; SBStyledText styled={0}; SBStatus inline_status=sb_ok(); char *plain=NULL;
             if (!code) {
                 inline_status=sb_inline_init(&inline_reader,content,length);
-                if (inline_status.code==SB_OK) inline_status=sb_inline_text(&inline_reader,0,length,&plain);
+                if (inline_status.code==SB_OK) { inline_status=sb_inline_styled(&inline_reader,0,length,&styled); plain=styled.text; }
                 if (inline_status.code!=SB_OK) d->message=inline_status;
             }
             const char *caption=d->model.source ? d->model.source_title : d->model.title;
-            bool fixed_title=first_heading && heading==1 && d->form==SB_FORM_NONE && plain && !strcmp(plain,caption);
+            bool fixed_title=first_heading && heading==1 && d->form==SB_FORM_NONE && plain &&
+                styled.count==1 && !styled.spans[0].style && !strcmp(plain,caption);
             if (fixed_title) document_span(d,plain,strlen(plain),block.offset,ACCESSKIT_ROLE_HEADING,1,d->reader_title_bounds,slot,true);
             first_heading=false;
             if (!fixed_title) {
@@ -1389,11 +1390,12 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
             float available = fmaxf(60, width - 55);
             float measured = font->width(font->userdata, font->height, shown, (int)shown_length);
             float lines = measured < available * 0.92f ? 1 : ceilf(measured / available) + 1;
-            nk_layout_row_dynamic(ctx, lines * (font->height + 4) + (heading ? 10 : 0), 1);
+            float text_height=plain ? sb_ui_styled_height(&d->ui,font,&styled,ctx->current->layout->bounds.w) : lines*(font->height+4);
+            nk_layout_row_dynamic(ctx,text_height+(heading ? 10 : 0),1);
             document_span(d,shown,shown_length,block.offset,heading ? ACCESSKIT_ROLE_HEADING : code ? ACCESSKIT_ROLE_CODE : ACCESSKIT_ROLE_PARAGRAPH,heading,nk_widget_bounds(ctx),slot,false);
-            nk_text_wrap(ctx, shown, (int)shown_length);
+            if (plain) sb_ui_styled_draw(&d->ui,font,&styled); else nk_text_wrap(ctx, shown, (int)shown_length);
             }
-            free(plain);
+            sb_styled_free(&styled);
             if (!code && inline_status.code==SB_OK) document_links(d,&inline_reader,&link_number,"reader",NULL);
             sb_inline_free(&inline_reader);
         }

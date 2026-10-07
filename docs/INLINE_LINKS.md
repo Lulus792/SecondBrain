@@ -18,10 +18,12 @@ Linkbeschriftung, Ziel und optionaler Titel werden getrennt erkannt.
 Klammern und maskierte Zeichen im Ziel sowie Ziele in Winkelklammern werden
 berücksichtigt. Verschachtelte Links aktivieren den inneren Link; Bilder erzeugen
 keine Linkaktion oder Sternkartenbeziehung. Ihre Alternativtexte werden angezeigt,
-die Bilder selbst noch nicht gerendert. Referenzlinks, Autolinks, Entities,
-HTML- und vollständige Emphasis-/Container-Regeln bleiben offen. Inline-Code
-wird im vorhandenen Absatztext als Literal gezeigt; eigene Schriftläufe für
-verschiedene Inline-Stile sind noch keine vollständig abgenommene Funktion.
+die Bilder selbst noch nicht gerendert. Referenzlinks, Entities,
+E-Mail-Autolinks und vollständige Container-Regeln bleiben offen. Winkel-URLs
+werden ab 0.9.11 als Autolinks erkannt. Ab 0.9.11
+werden [Hervorhebungen und Inline-Code](INLINE_STILE.md) als eigene Stilbereiche
+verarbeitet und dargestellt; rohe HTML-Tags bleiben Literaltext. Die neue
+Plattform-/Paketabnahme folgt separat.
 
 Die Regeln wurden vor der Änderung an
 [CommonMark 0.31.2](https://spec.commonmark.org/0.31.2/#links) und

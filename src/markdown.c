@@ -74,6 +74,19 @@ static bool container(const SBMarkdown *r,Line l) {
     return digits>0 && digits<=9 && p<l.end && (t[p]=='.' || t[p]==')') &&
         (p+1==l.end || space(t[p+1]));
 }
+static bool interrupts(const SBMarkdown *r,Line l) {
+    if (!container(r,l)) return false;
+    size_t p=l.content;
+    if (r->text[p]=='>' || r->text[p]=='|') return true;
+    if (r->text[p]>='0' && r->text[p]<='9') {
+        unsigned number=0;
+        while (p<l.end && r->text[p]>='0' && r->text[p]<='9') number=number*10+(unsigned)(r->text[p++]-'0');
+        if (number!=1) return false;
+    }
+    ++p;
+    while (p<l.end && space(r->text[p])) ++p;
+    return p<l.end;
+}
 static bool opening(const SBMarkdown *r,Line l,char *marker,size_t *count) {
     size_t tail=0; *count=fence(r,l,marker,&tail);
     if (!*count) return false;
@@ -136,7 +149,7 @@ bool sb_markdown_next(SBMarkdown *r,SBMarkdownBlock *b) {
             b->kind=SB_MD_HEADING; b->level=level; r->cursor=next.next;
             break;
         }
-        if (heading(r,next,&probe) || opening(r,next,&marker,&count) || rule(r,next) || container(r,next)) break;
+        if (heading(r,next,&probe) || opening(r,next,&marker,&count) || rule(r,next) || interrupts(r,next)) break;
         end=next.end; r->cursor=next.next;
     }
     if (b->kind==SB_MD_HEADING) while (end>b->content && space(r->text[end-1])) --end;

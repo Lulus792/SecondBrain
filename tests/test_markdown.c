@@ -43,6 +43,8 @@ int main(void) {
     token(&r,SB_MD_TEXT,0,"1234567890. Kein Marker\nFortsetzung"); done(&r);
     START("Absatz\n    - kein neuer Block\n    > ebenfalls Fortsetzung\n");
     token(&r,SB_MD_TEXT,0,"Absatz\n    - kein neuer Block\n    > ebenfalls Fortsetzung"); done(&r);
+    START("Absatz\n*\n2. fortgesetzt\n1. neuer Eintrag\n");
+    token(&r,SB_MD_TEXT,0,"Absatz\n*\n2. fortgesetzt"); token(&r,SB_MD_TEXT,0,"1. neuer Eintrag"); done(&r);
     START("Abschnitt\n--\n\n---\n> Zitat\n| Spalte |\n**betont**\nweiter\n");
     token(&r,SB_MD_HEADING,2,"Abschnitt"); token(&r,SB_MD_BLANK,0,""); token(&r,SB_MD_RULE,0,"---");
     token(&r,SB_MD_TEXT,0,"> Zitat"); token(&r,SB_MD_TEXT,0,"| Spalte |");

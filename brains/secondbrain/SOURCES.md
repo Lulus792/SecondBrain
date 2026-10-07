@@ -71,3 +71,5 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Abhängigkeitswartung](../../docs/ABHAENGIGKEITEN_WARTUNG.md): feste Quellen und Updateablauf.
 
 - [Abschnittstrennungen](../../docs/TRENNLINIEN.md): eigene Blockregel, Gestaltung, native Semantik und Prüfgrenzen.
+
+- [Inline-Stile](../../docs/INLINE_STILE.md): gemeinsamer C-Leser, Unicode-Zeichengruppen, Darstellung und Grenzen.

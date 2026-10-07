@@ -17,6 +17,7 @@
 #include "nuklear_sdl3_renderer.h"
 #include "sb.h"
 #include "space.h"
+#include "inline.h"
 
 void sb_ui_grapheme_clamp(struct nk_text_edit *edit);
 typedef struct SBTextSystem SBTextSystem;
@@ -39,6 +40,9 @@ void sb_ui_event(SBUi *ui, const SDL_Event *event);
 void sb_ui_draw(SBUi *ui);
 void sb_ui_text_aligned(struct nk_context *ctx,const char *text,size_t length,nk_flags alignment);
 float sb_ui_wrap_height(struct nk_context *ctx,const struct nk_user_font *font,const char *text,size_t length,float width);
+float sb_ui_styled_height(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,float width);
+void sb_ui_styled_draw(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text);
+void sb_ui_styled_aligned(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,nk_flags alignment);
 SBStatus sb_ui_capture(SBUi *ui, const char *path);
 void sb_ui_shutdown(SBUi *ui);
 void sb_ui_reset_editor(SBUi *ui);

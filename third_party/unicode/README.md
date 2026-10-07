@@ -24,3 +24,14 @@ SHA-256 der Originale:
 - `DerivedCoreProperties.txt`: `09c928886a178fcafd93c29e4bd59073a058e5a100b716d425cb563ab50f68c9`
 - `emoji-data.txt`: `80d00f8e616a0ef27fd6b8de3b758c06383b5d917e2977709578e68baf733bf1`
 - `GraphemeBreakTest.txt`: `b0cf047ee94485bbdc846de2b902f5f8a815f6b674f9d04223cddadd91c9df31`
+
+
+## Zeichengruppen für Hervorhebungen
+
+DerivedGeneralCategory.txt aus Unicode 18.0.0, Originalquelle
+https://www.unicode.org/Public/18.0.0/ucd/extracted/DerivedGeneralCategory.txt,
+SHA-256 d6b151d2d40ee9b1876d26f417980f45ffae47b6055ccf7203cb31f07a030f94.
+Die Datei bleibt unverändert. tools/make_inline_unicode.py erzeugt daraus die
+C-Bereiche für P-/S-Kategorien nach Hashprüfung. Runtime/Build benötigen den
+Generator nicht. Daten und abgeleitete Tabelle fallen unter die bereits
+mitgelieferte Unicode License V3; eigener Leser bleibt MIT-lizenzierter C-Code.

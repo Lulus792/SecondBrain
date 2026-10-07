@@ -132,7 +132,8 @@ erhält bestehende Projekte. [Ablauf und Grenzen](docs/SICHERUNG.md).
 bleibt auch nach dem Öffnen eines Archivdokuments erreichbar.
 
 Die Leseansicht unterstützt eigene [Markdown-Blockregeln](docs/MARKDOWN.md)
-für Überschriften, Code, Absätze und [Tabellen](docs/TABELLEN.md). Den noch begrenzten Umfang dokumentiert
+für Überschriften, Code, Absätze und [Tabellen](docs/TABELLEN.md).
+[Hervorhebungen und Inline-Code](docs/INLINE_STILE.md) bleiben dabei sichtbar. Den noch begrenzten Umfang dokumentiert
 der Vertrag; der Editor erhält den Originaltext. [Gemeinsame Linkregeln](docs/INLINE_LINKS.md)
 verhindern falsche Aktionen und Sternkartenverbindungen aus Codebeispielen.
 

@@ -667,3 +667,16 @@ ist unter /Users/lulus/Projects/SecondBrain/build/rules-verified-previous-dist-2
 geladen und als Raster betrachtet. [Neue native Abnahme](https://github.com/Lulus792/SecondBrain/actions/runs/37613957814)
 läuft noch; insbesondere die früher fehlerhaften Kontrastfälle werden erst anhand
 ihrer tatsächlich abgeschlossenen neuen Ergebnisse abgenommen.
+
+
+Die [abschließende native 0.9.10-Abnahme zu f3a758e](https://github.com/Lulus792/SecondBrain/actions/runs/37613957814)
+ist am 7. Oktober vollständig erfolgreich: 20 Jobs einschließlich Windows/Linux
+Debug/Release, Intel-/ARM64-macOS und tatsächlich entpackter Release-Pakete.
+Die früher fehlerhaften Kontrastfälle bestehen in den neuen Desktopläufen.
+Dies bestätigt den automatisierten Umfang; keine menschliche assistive oder
+Geräteabnahme daraus ableiten.
+
+0.9.11 ist lokal auf Intel/macOS 14.6.1 geprüft: 34 erste Release-Tests und sieben
+abschließende betroffene Nachprüfungen bestehen, dazu eigene ASan/UBSan und neun
+Python-Strukturtests. Neue native Plattform-/Paketabnahme folgt nach Push.
+Einzelheiten und Grenzen im [Umsetzungsstand](STATUS.md#gemeinsame-hervorhebungen-in-0911).

@@ -1,0 +1,5 @@
+CommonMark specification examples, John MacFarlane.
+Licensed under Creative Commons Attribution-ShareAlike 4.0 International.
+License: https://creativecommons.org/licenses/by-sa/4.0/
+Original: https://spec.commonmark.org/0.31.2/
+The selected examples retain their original contents and example numbers.
