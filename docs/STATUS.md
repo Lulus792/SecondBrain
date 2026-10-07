@@ -1899,3 +1899,15 @@ Rasterprüfsummen/Höhen, 34 Graphinventurassertions. Eigene gezielte ASan/UBSan
 mit instrumentiertem Desktop, UI, Text- und Materialrenderer sowie Graph besteht
 mit denselben 95 und 34 Assertions ohne Diagnose. Weitere externe UI-Bibliotheken
 nicht vollständig instrumentiert, macOS-Leakprüfung deaktiviert. Paket folgt.
+
+
+Intel/macOS-Paket **0.9.19, Build 9ab187aec5f2** aus sauberem Commit besteht:
+126 Desktop-, 143 Tastatur- und 75 Sicherungsassertions, zwei Neustartprozesse
+und produktive CLI-Sicherung/Wiederherstellung aus entpacktem Unicode-Pfad.
+Versionstests 2/2. Archiv-SHA-256: `f48d59755aa637f83a20564d65f4fb80000d3133260c396ec85cf0d82ce01717`.
+Geprüfte App nach dist/SecondBrain installiert, eigenes Gedächtnis geladen und
+Raster mit direktem Sternkartenfokus betrachtet. Rückfallkopie: `build/previous-dist-0.9.18-20261007-222210`.
+Logs: build/navigation-{package-check,install,installed-brain}.log.
+Quellschritt 9ab187a ist nach origin gepusht;
+[CI 37680520037](https://github.com/Lulus792/SecondBrain/actions/runs/37680520037)
+war zuletzt queued. Neue Windows-/Linux-/ARM64-Nachweise zu 0.9.19 stehen aus.
