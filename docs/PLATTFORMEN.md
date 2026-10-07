@@ -500,3 +500,24 @@ berechnen weiterhin Eingabe, Layout, Animation, Modell und native Snapshots.
 Die normalen App-Frames und aufgenommenen Prüfbilder werden weiterhin vollständig
 gezeichnet. Die neue Windows-Debug-Abnahme steht aus; der Timeout wird nicht
 allein durch die lokale Verbesserung als behoben bezeichnet.
+
+Die [0.9.5-Abnahme zu 37dba58](https://github.com/Lulus792/SecondBrain/actions/runs/37556151012)
+besteht inzwischen mit allen 20 Jobs einschließlich Windows Debug und vier
+entpackten Paketen. Dieser Nachweis betrifft die geprüfte Version 0.9.5;
+die unveröffentlichte Tabellenarbeit 0.9.6 ist noch nicht abgenommen.
+
+
+## Entwicklungsschritt 0.9.6: lokale Tabellenabnahme
+
+7. Oktober, Intel-Mac/macOS 14.6.1: 18 Debug-Kernprüfungen, anschließend drei
+Markdown-Nachprüfungen und Tabellen-ASan/UBSan bestehen. Erster vollständiger
+Release-Lauf: 32 Tests in 470,15 s. Abschließende sechs passende Tests nach den
+Darstellungskorrekturen: 34,86 s, einschließlich 256 nativer Assertions.
+41 Graph-Assertions bestehen separat. Ausgeführte macOS-Provideraufrufe prüfen
+4×3 Tabellenrollen/Zellwerte und eine Scrollanfrage; Rasteransichten bei normaler
+und 200-%-Schrift wurden betrachtet. [Umfang und Grenzen](TABELLEN.md).
+
+Das neue entpackte Intel-Paket wird noch geprüft. Native Windows-/Linux-/ARM64-
+Läufe werden nach Veröffentlichung anhand ihrer tatsächlichen Ergebnisse
+nachgetragen. Die Windows-/Linux-Clientprüfungen für Tabellenkinder sind bisher
+nur vorbereitet; fehlende UIA-/AT-SPI-Matrixschnittstellen bleiben offen.

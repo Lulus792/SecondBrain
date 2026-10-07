@@ -70,6 +70,11 @@ Dateien der Bibliothek. Sie wird nur an der AccessKit-View-Klasse und an AccessK
 angebracht; ältere Systeme ohne die Konstante behalten den Adapterwert. Der
 native macOS-Test vergleicht mit der tatsächlichen Systemkonstante. Diese
 Versionsanpassung ist bei einer Änderung der UI-Abhängigkeit erneut zu prüfen.
+Ab 0.9.6 ergänzt dieselbe C-Anbindung `accessibilityRows` und die entsprechende
+Selektorfreigabe für native Dokumenttabellen anhand ihrer tatsächlichen Kinder.
+Diese Ergänzung wird auch ohne das neuere Überschriftenrollensymbol aktiviert.
+Die festgelegten Windows-/Linux-Provider bieten noch keine UIA-/AT-SPI-Matrix-
+schnittstelle; [Tabellenvertrag und Prüfgrenzen](../docs/TABELLEN.md).
 
 Unveränderte MIT-, Apache-2.0- und Chromium-BSD-Lizenztexte sowie AUTHORS liegen
 unter licenses/AccessKit-* und gehören zu jedem Anwendungspaket. Native Adapter

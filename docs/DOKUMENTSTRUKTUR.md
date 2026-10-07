@@ -22,7 +22,9 @@ Ansicht, keine vollständige CommonMark-Implementierung.
 ## Umsetzung
 
 Die Leseansicht veröffentlicht ihren tatsächlichen Inhalt als Dokument mit
-Überschriften, Absätzen, Codezeilen und Linkaktionen. Der Dokumenttitel gehört
+Überschriften, Absätzen, Codezeilen und Linkaktionen. Ab 0.9.6 liegen
+[Tabellen](TABELLEN.md), Zeilen und Spaltenköpfe/Zellen darunter; die native
+Matrixschnittstelle ist damit noch nicht auf allen Plattformen verfügbar. Der Dokumenttitel gehört
 als erste Überschrift zur Struktur, auch wenn er im festen Kartenkopf steht.
 Ebenen entsprechen den erkannten Markdown-Überschriften; sieben Hashzeichen
 werden als Text behandelt. Fenced- und eingerückter Code werden als Code ausgewiesen. Die Erkennung

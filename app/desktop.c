@@ -5,6 +5,7 @@
 #include "notices.h"
 #include "markdown.h"
 #include "inline.h"
+#include "table.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -163,6 +164,7 @@ static SBTarget *target_add(SBDesktop *d, const char *id, struct nk_rect rect, S
         d->targets = items; d->target_capacity = capacity;
     }
     SBTarget *item = &d->targets[d->target_count++];
+    memset(item,0,sizeof(*item));
     snprintf(item->id,sizeof(item->id),"%s",id);
     snprintf(item->label,sizeof(item->label),"%s",id);
     item->bounds = rect; item->kind = kind; item->group = group; item->order=d->semantic_order++;
@@ -173,7 +175,7 @@ static void passive_clear(SBDesktop *d) {
     d->passive_count=0;
 }
 static void passive_span(SBDesktop *d,const char *id,const char *text,size_t length,accesskit_role role,struct nk_rect bounds) {
-    if (!text || !length) return;
+    if (!text || (!length && role!=ACCESSKIT_ROLE_CELL && role!=ACCESSKIT_ROLE_COLUMN_HEADER)) return;
     if (d->passive_count==d->passive_capacity) {
         size_t capacity=d->passive_capacity ? d->passive_capacity*2 : 32;
         SBPassiveText *next=realloc(d->passive,capacity*sizeof(*next)); if (!next) return;
@@ -633,7 +635,7 @@ static void accessible_actions(SBDesktop *d) {
         if (!sb_accessibility_current(d->accessibility,&action,accessible_context(d))) { sb_accessibility_action_free(&action); continue; }
         SBTarget *target=NULL;
         for (size_t i=0;i<d->target_count;++i) if (!strcmp(d->targets[i].id,action.id)) { target=&d->targets[i]; break; }
-        if (!strncmp(action.id,"reader:block:",13) && action.action==ACCESSKIT_ACTION_SCROLL_INTO_VIEW) {
+        if ((!strncmp(action.id,"reader:block:",13) || !strncmp(action.id,"reader:table:",13)) && action.action==ACCESSKIT_ACTION_SCROLL_INTO_VIEW) {
             snprintf(d->reveal_document,sizeof(d->reveal_document),"%s",action.id); d->reveal_document_context=accessible_context(d);
         } else if (!strncmp(action.id,"star:",5) && d->form==SB_FORM_NONE && !d->model.guard) {
             char *end=NULL; unsigned long index=strtoul(action.id+5,&end,10);
@@ -700,11 +702,13 @@ static void accessible_publish(SBDesktop *d) {
         } else if (t->kind==SB_FOCUS_READER) v->value=d->form==SB_FORM_NOTICE_TEXT ? d->notice : d->form==SB_FORM_CONTEXT ? d->context : d->model.source ? d->model.source : d->model.editor;
         if (!strcmp(t->id,"galaxy")) v->label="Dokumente in der Sternkarte";
         v->order=((uint64_t)t->group<<32)|t->order;
-        if (!strncmp(t->id,"link:",5)) v->parent="reader";
+        if (t->parent[0]) v->parent=t->parent;
+        else if (!strncmp(t->id,"link:",5)) v->parent="reader";
     }
     for (size_t i=0;i<d->passive_count;++i) {
         SBPassiveText *p=&d->passive[i]; SBAccessibleItem *v=&items[d->target_count+i];
-        v->id=p->id; v->label=p->parent[0] && p->role!=ACCESSKIT_ROLE_HEADING ? "" : p->text; v->value=p->text; v->bounds=p->bounds; v->role=p->role;
+        v->id=p->id; v->label=p->role==ACCESSKIT_ROLE_TABLE || p->role==ACCESSKIT_ROLE_ROW || p->role==ACCESSKIT_ROLE_CELL || p->role==ACCESSKIT_ROLE_COLUMN_HEADER || !p->parent[0] || p->role==ACCESSKIT_ROLE_HEADING ? p->text : ""; v->value=p->role==ACCESSKIT_ROLE_TABLE || p->role==ACCESSKIT_ROLE_ROW ? NULL : p->text; v->bounds=p->bounds; v->role=p->role;
+        v->row=p->row; v->column=p->column; v->rows=p->rows; v->columns=p->columns;
         v->parent=p->parent; v->level=p->level; v->order=((uint64_t)p->group<<32)|p->order;
     }
     qsort(items,controls,sizeof(*items),accessible_order);
@@ -1177,6 +1181,138 @@ static bool web_reference(const char *destination) {
     }
     return false;
 }
+static void document_links(SBDesktop *d,SBInline *inline_reader,unsigned *link_number,const char *parent,struct nk_rect *placement) {
+    struct nk_context *ctx=d->ui.ctx;
+    SBInlineToken link;
+    while (sb_inline_next(inline_reader,&link)) {
+        if (link.kind!=SB_INLINE_LINK || !link.destination_length) continue;
+        char destination[SB_PATH_CAP],label[SB_NAME_CAP],tag[100]; char *full_label=NULL;
+        SBStatus status=sb_inline_destination(inline_reader,&link,destination,sizeof(destination));
+        if (status.code==SB_OK) status=sb_inline_text(inline_reader,link.content,link.content_length,&full_label);
+        if (status.code!=SB_OK) { d->message=status; free(full_label); continue; }
+        snprintf(label,sizeof(label),"%s",*full_label ? full_label : destination); free(full_label);
+        while (label[0] && !sb_utf8_valid(label,strlen(label))) label[strlen(label)-1]=0;
+        nk_style_set_font(ctx,&d->ui.normal->handle);
+        if (placement) {
+            nk_layout_space_push(ctx,nk_rect(placement->x,placement->y,placement->w,32*d->ui.scale));
+            placement->y+=36*d->ui.scale;
+        } else nk_layout_row_dynamic(ctx,32*d->ui.scale,1);
+        snprintf(tag,sizeof(tag),"link:%u",(*link_number)++);
+        size_t before=d->target_count;
+        bool pressed=button(d,tag,label);
+        if (d->target_count>before && parent) snprintf(d->targets[d->target_count-1].parent,sizeof(d->targets[0].parent),"%s",parent);
+        if (pressed) {
+            if (web_reference(destination))
+                result(d,SDL_OpenURL(destination) ? sb_ok() : sb_error(SB_IO,"%s",SDL_GetError()),"Webquelle im Browser geöffnet.");
+            else { strcpy(d->command_value,destination); command(d,SB_CMD_SOURCE); }
+        }
+    }
+
+}
+typedef struct { SBInline inline_reader; char *raw,*plain; size_t row_offset; unsigned links; float height; } SBTableViewCell;
+static void table_passive(SBDesktop *d,const char *id,const char *text,accesskit_role role,const char *parent,struct nk_rect bounds,float reader_top,unsigned slot,size_t row,size_t column,size_t rows,size_t columns) {
+    size_t before=d->passive_count; passive_add(d,id,text,role,bounds);
+    if (before==d->passive_count) return;
+    SBPassiveText *p=&d->passive[before]; snprintf(p->parent,sizeof(p->parent),"%s",parent);
+    p->row=row; p->column=column; p->rows=rows; p->columns=columns;
+    p->document_y=fmaxf(0,bounds.y-reader_top+d->scrolling[slot].applied);
+    if (!strcmp(d->reveal_document,id) && d->reveal_document_context==accessible_context(d)) {
+        d->scrolling[slot].destination=p->document_y; d->scrolling[slot].pending=d->scrolling[slot].elastic=0;
+        d->scrolling[slot].active=true; d->reveal_document[0]=0;
+    }
+}
+static bool document_table(SBDesktop *d,const char *text,size_t length,size_t offset,unsigned slot,unsigned *link_number) {
+    SBTable table; if (!sb_table_parse(text,length,offset,&table)) return false;
+    size_t count=table.rows*table.columns;
+    SBTableViewCell *cells=calloc(count,sizeof(*cells));
+    if (!cells) { d->message=sb_error(SB_MEMORY,"Tabelle benötigt mehr Speicher."); return false; }
+    size_t cursor=table.offset,row_index=0; SBTableRow row; SBStatus status=sb_ok();
+    while (sb_table_next(&table,&cursor,&row)) {
+        for (size_t c=0;c<table.columns;++c) {
+            SBTableViewCell *cell=&cells[row_index*table.columns+c]; cell->row_offset=row.offset;
+            status=sb_table_cell_text(&table,&row.cells[c],&cell->raw);
+            if (status.code==SB_OK) status=sb_inline_init(&cell->inline_reader,cell->raw,strlen(cell->raw));
+            if (status.code==SB_OK) status=sb_inline_text(&cell->inline_reader,0,strlen(cell->raw),&cell->plain);
+            if (status.code!=SB_OK) goto cleanup;
+            SBInlineToken link; while (sb_inline_next(&cell->inline_reader,&link)) if (link.kind==SB_INLINE_LINK && link.destination_length) ++cell->links;
+            cell->inline_reader.cursor=0;
+        }
+        ++row_index;
+    }
+    struct nk_context *ctx=d->ui.ctx; float s=d->ui.scale,reader_top=ctx->current->layout->clip.y;
+    float available=ctx->current->layout->bounds.w;
+    bool stacked=available/table.columns<130*s;
+    float column_width=stacked ? available : available/table.columns;
+    float padding=8*s,text_width=fmaxf(40,column_width-2*padding-4*s);
+    const struct nk_user_font *font=&d->ui.body->handle;
+    char table_id[100]; snprintf(table_id,sizeof(table_id),"reader:table:%zu",offset);
+    size_t table_passive_index=SIZE_MAX; bool table_visible=false;
+    for (size_t r=0;r<table.rows;++r) {
+        float height=0; unsigned widgets=0;
+        for (size_t c=0;c<table.columns;++c) {
+            SBTableViewCell *cell=&cells[r*table.columns+c];
+            cell->height=sb_ui_wrap_height(ctx,font,cell->plain,strlen(cell->plain),text_width)+cell->links*36*s;
+            if (stacked && r) cell->height+=sb_ui_wrap_height(ctx,&d->ui.normal->handle,cells[c].plain,strlen(cells[c].plain),text_width);
+            height=stacked ? height+cell->height+2*padding : fmaxf(height,cell->height+2*padding);
+            widgets+=1+cell->links+(stacked && r ? 1 : 0);
+        }
+        nk_layout_space_begin(ctx,NK_STATIC,height,(int)widgets);
+        struct nk_rect bounds=nk_layout_space_rect_to_screen(ctx,nk_rect(0,0,available,height));
+        if (!r) {
+            size_t before=d->passive_count;
+            table_passive(d,table_id,"Tabelle",ACCESSKIT_ROLE_TABLE,"reader",bounds,reader_top,slot,0,0,table.rows,table.columns);
+            table_passive_index=d->passive_count>before ? before : SIZE_MAX;
+        }
+        struct nk_color bg=d->ui.dark ? nk_rgba(140,167,202,r==0 ? 32 : r%2 ? 13 : 4) : nk_rgba(60,90,135,r==0 ? 22 : r%2 ? 12 : 4);
+        nk_fill_rect(nk_window_get_canvas(ctx),bounds,0,bg);
+        char row_id[100],row_label[40]; snprintf(row_id,sizeof(row_id),"reader:table:%zu:row:%zu",offset,cells[r*table.columns].row_offset);
+        snprintf(row_label,sizeof(row_label),"Zeile %zu",r+1);
+        size_t row_before=d->passive_count;
+        table_passive(d,row_id,row_label,ACCESSKIT_ROLE_ROW,table_id,bounds,reader_top,slot,r,0,0,0);
+        if (table_passive_index<d->passive_count && d->passive_count>row_before) {
+            struct nk_rect clipped=d->passive[row_before].bounds;
+            if (clipped.w>0 && clipped.h>0) {
+                SBPassiveText *parent=&d->passive[table_passive_index];
+                if (!table_visible) { parent->bounds=clipped; table_visible=true; }
+                else {
+                    float right=fmaxf(parent->bounds.x+parent->bounds.w,clipped.x+clipped.w);
+                    float bottom=fmaxf(parent->bounds.y+parent->bounds.h,clipped.y+clipped.h);
+                    parent->bounds.x=fminf(parent->bounds.x,clipped.x); parent->bounds.y=fminf(parent->bounds.y,clipped.y);
+                    parent->bounds.w=right-parent->bounds.x; parent->bounds.h=bottom-parent->bounds.y;
+                }
+            }
+        }
+        float top=0;
+        for (size_t c=0;c<table.columns;++c) {
+            SBTableViewCell *cell=&cells[r*table.columns+c]; float x=stacked ? 0 : c*column_width;
+            float cell_height=stacked ? cell->height+2*padding : height;
+            struct nk_rect cell_bounds=nk_rect(bounds.x+x,bounds.y+top,column_width,cell_height);
+            char cell_id[100]; snprintf(cell_id,sizeof(cell_id),"reader:table:%zu:row:%zu:cell:%zu",offset,cell->row_offset,c);
+            table_passive(d,cell_id,cell->plain,r ? ACCESSKIT_ROLE_CELL : ACCESSKIT_ROLE_COLUMN_HEADER,row_id,cell_bounds,reader_top,slot,r,c,0,0);
+            float y=top+padding;
+            if (stacked && r) {
+                nk_style_set_font(ctx,&d->ui.normal->handle);
+                float h=sb_ui_wrap_height(ctx,&d->ui.normal->handle,cells[c].plain,strlen(cells[c].plain),text_width);
+                nk_layout_space_push(ctx,nk_rect(x+padding,y,column_width-2*padding,h)); sb_ui_text_aligned(ctx,cells[c].plain,strlen(cells[c].plain),NK_TEXT_LEFT); y+=h;
+            }
+            nk_style_set_font(ctx,font);
+            float h=sb_ui_wrap_height(ctx,font,cell->plain,strlen(cell->plain),text_width);
+            nk_layout_space_push(ctx,nk_rect(x+padding,y,column_width-2*padding,h));
+            nk_flags align=stacked ? NK_TEXT_LEFT : table.alignment[c]==SB_TABLE_RIGHT ? NK_TEXT_RIGHT : table.alignment[c]==SB_TABLE_CENTER ? NK_TEXT_CENTERED : NK_TEXT_LEFT;
+            sb_ui_text_aligned(ctx,cell->plain,strlen(cell->plain),align); y+=h;
+            struct nk_rect placement=nk_rect(x+padding,y,column_width-2*padding,32*s);
+            document_links(d,&cell->inline_reader,link_number,cell_id,&placement);
+            if (stacked) top+=cell_height;
+        }
+        nk_layout_space_end(ctx);
+
+    }
+cleanup:
+    for (size_t i=0;i<count;++i) { sb_inline_free(&cells[i].inline_reader); free(cells[i].raw); free(cells[i].plain); }
+    free(cells);
+    if (status.code!=SB_OK) { d->message=status; return false; }
+    return true;
+}
 static void document(SBDesktop *d, const char *text, float width, float height) {
     struct nk_context *ctx = d->ui.ctx;
     const char *extension = d->model.source ? strrchr(d->model.source_path, '.') : NULL;
@@ -1193,6 +1329,7 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
     SBMarkdown reader; SBMarkdownBlock block;
     sb_markdown_init(&reader,text,strlen(text),whole_code);
     while (sb_markdown_next(&reader,&block)) {
+        if (block.kind==SB_MD_TABLE && document_table(d,text,strlen(text),block.offset,slot,&link_number)) { first_heading=false; continue; }
         const char *content=text+block.content;
         size_t length=block.length;
         unsigned heading=block.level;
@@ -1223,26 +1360,7 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
             nk_text_wrap(ctx, shown, (int)shown_length);
             }
             free(plain);
-            if (!code && inline_status.code==SB_OK) {
-                SBInlineToken link;
-                while (sb_inline_next(&inline_reader,&link)) {
-                    if (link.kind!=SB_INLINE_LINK || !link.destination_length) continue;
-                    char destination[SB_PATH_CAP],label[SB_NAME_CAP],tag[100]; char *full_label=NULL;
-                    SBStatus status=sb_inline_destination(&inline_reader,&link,destination,sizeof(destination));
-                    if (status.code==SB_OK) status=sb_inline_text(&inline_reader,link.content,link.content_length,&full_label);
-                    if (status.code!=SB_OK) { d->message=status; free(full_label); continue; }
-                    snprintf(label,sizeof(label),"%s",*full_label ? full_label : destination); free(full_label);
-                    while (label[0] && !sb_utf8_valid(label,strlen(label))) label[strlen(label)-1]=0;
-                    nk_style_set_font(ctx,&d->ui.normal->handle);
-                    nk_layout_row_dynamic(ctx,32*d->ui.scale,1);
-                    snprintf(tag,sizeof(tag),"link:%u",link_number++);
-                    if (button(d,tag,label)) {
-                        if (web_reference(destination))
-                            result(d,SDL_OpenURL(destination) ? sb_ok() : sb_error(SB_IO,"%s",SDL_GetError()),"Webquelle im Browser geöffnet.");
-                        else { strcpy(d->command_value,destination); command(d,SB_CMD_SOURCE); }
-                    }
-                }
-            }
+            if (!code && inline_status.code==SB_OK) document_links(d,&inline_reader,&link_number,"reader",NULL);
             sb_inline_free(&inline_reader);
         }
     }

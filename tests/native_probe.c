@@ -92,6 +92,34 @@ static bool query(Probe *p) {
         hr=IUIAutomationElement_GetCurrentPatternAs(element,UIA_ScrollItemPatternId,&IID_IUIAutomationScrollItemPattern,(void **)&pattern);
         if (SUCCEEDED(hr) && pattern) hr=IUIAutomationScrollItemPattern_ScrollIntoView(pattern);
         success=SUCCEEDED(hr); if (pattern) IUIAutomationScrollItemPattern_Release(pattern);
+    } else if (p->operation==SB_NATIVE_READ_TABLE_TREE) {
+        IUIAutomationCondition *all=NULL; IUIAutomationElementArray *rows=NULL;
+        CONTROLTYPEID role=0; int row_count=0,column_count=-1;
+        hr=IUIAutomationElement_get_CurrentControlType(element,&role);
+        if (SUCCEEDED(hr) && role==UIA_TableControlTypeId) hr=IUIAutomation_CreateTrueCondition(client,&all); else hr=E_FAIL;
+        if (SUCCEEDED(hr)) hr=IUIAutomationElement_FindAll(element,TreeScope_Children,all,&rows);
+        if (SUCCEEDED(hr) && rows) hr=IUIAutomationElementArray_get_Length(rows,&row_count);
+        for (int r=0;SUCCEEDED(hr) && r<row_count;++r) {
+            IUIAutomationElement *row=NULL; IUIAutomationElementArray *cells=NULL; int count=0;
+            hr=IUIAutomationElementArray_GetElement(rows,r,&row);
+            if (SUCCEEDED(hr)) hr=IUIAutomationElement_FindAll(row,TreeScope_Children,all,&cells);
+            if (SUCCEEDED(hr) && cells) hr=IUIAutomationElementArray_get_Length(cells,&count);
+            if (SUCCEEDED(hr) && (column_count<0 || column_count==count)) column_count=count; else hr=E_FAIL;
+            if (cells) IUIAutomationElementArray_Release(cells);
+            if (row) IUIAutomationElement_Release(row);
+        }
+        if (SUCCEEDED(hr) && row_count>0 && column_count>0 && p->capacity) {
+            snprintf(p->output,p->capacity,"%d:%d",row_count,column_count); success=true;
+        }
+        if (rows) IUIAutomationElementArray_Release(rows);
+        if (all) IUIAutomationCondition_Release(all);
+    } else if (p->operation==SB_NATIVE_READ_TABLE_SIZE) {
+        IUIAutomationGridPattern *pattern=NULL; int rows=0,columns=0;
+        hr=IUIAutomationElement_GetCurrentPatternAs(element,UIA_GridPatternId,&IID_IUIAutomationGridPattern,(void **)&pattern);
+        if (SUCCEEDED(hr) && pattern) hr=IUIAutomationGridPattern_get_CurrentRowCount(pattern,&rows);
+        if (SUCCEEDED(hr) && pattern) hr=IUIAutomationGridPattern_get_CurrentColumnCount(pattern,&columns);
+        if (SUCCEEDED(hr) && pattern && p->capacity) { snprintf(p->output,p->capacity,"%d:%d",rows,columns); success=true; }
+        if (pattern) IUIAutomationGridPattern_Release(pattern);
     } else if (p->operation==SB_NATIVE_READ_LEVEL) {
         VARIANT level; VariantInit(&level);
         hr=IUIAutomationElement_GetCurrentPropertyValue(element,UIA_LevelPropertyId,&level);
@@ -185,6 +213,25 @@ static bool query(Probe *p) {
             AtspiComponent *component=atspi_accessible_get_component_iface(element);
             if (component) success=atspi_component_scroll_to(component,ATSPI_SCROLL_ANYWHERE,&error);
             if (component) g_object_unref(component);
+        } else if (p->operation==SB_NATIVE_READ_TABLE_TREE) {
+            int rows=atspi_accessible_get_child_count(element,&error),columns=-1;
+            bool valid=!error && atspi_accessible_get_role(element,NULL)==ATSPI_ROLE_TABLE;
+            for (int r=0;valid && r<rows;++r) {
+                AtspiAccessible *row=atspi_accessible_get_child_at_index(element,r,&error);
+                int count=row ? atspi_accessible_get_child_count(row,&error) : 0;
+                valid=row && !error && atspi_accessible_get_role(row,NULL)==ATSPI_ROLE_TABLE_ROW && (columns<0 || columns==count);
+                columns=count; if (row) g_object_unref(row);
+            }
+            if (valid && rows>0 && columns>0 && p->capacity) {
+                snprintf(p->output,p->capacity,"%d:%d",rows,columns); success=true;
+            }
+        } else if (p->operation==SB_NATIVE_READ_TABLE_SIZE) {
+            AtspiTable *table=atspi_accessible_get_table_iface(element);
+            if (table) {
+                int rows=atspi_table_get_n_rows(table,&error),columns=error ? 0 : atspi_table_get_n_columns(table,&error);
+                if (!error && p->capacity) { snprintf(p->output,p->capacity,"%d:%d",rows,columns); success=true; }
+                g_object_unref(table);
+            }
         } else if (p->operation==SB_NATIVE_READ_LEVEL) {
             GHashTable *attributes=atspi_accessible_get_attributes(element,&error);
             const char *level=attributes ? g_hash_table_lookup(attributes,"level") : NULL;

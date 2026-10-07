@@ -212,6 +212,83 @@ int main(int argc,char **argv) {
     for (size_t i=0;i<d.passive_count;++i) if (!strcmp(d.passive[i].parent,"reader") && !strcmp(d.passive[i].text,"Sichtbarer Projektname"))
         context_heading=d.passive[i].role==ACCESSKIT_ROLE_HEADING && d.passive[i].bounds.h>0;
     CHECK(context_heading); d.form=SB_FORM_NONE; free(d.context); d.context=previous_context; frame(&d);
+    char table_source[2800];
+    snprintf(table_source,sizeof(table_source),"# Tabellenprüfung\n\n| Aktion | Kürzel | Wert |\n| :--- | :---: | ---: |\n| [Stand](%sSTATE.md) | `Ctrl+S` | 7 |\n| Lange Beschreibung mit Wissen ü und mehreren Wörtern zum kontrollierten Umbruch | F6 | 8 | ignoriert |\n| Leer |\n\nDanach.\n",prefix);
+    strcpy(d.model.editor,table_source); OK(sb_app_save(&d.model)); d.reset_reader=true; frame(&d); frame(&d);
+    unsigned tables=0,rows=0,headers=0,cells=0; char table_id[100]={0}; bool empty_cell=false;
+    for (size_t i=0;i<d.passive_count;++i) {
+        SBPassiveText *p=&d.passive[i];
+        if (p->role==ACCESSKIT_ROLE_TABLE) { ++tables; CHECK(p->rows==4 && p->columns==3); strcpy(table_id,p->id); }
+        if (p->role==ACCESSKIT_ROLE_ROW) ++rows;
+        if (p->role==ACCESSKIT_ROLE_COLUMN_HEADER) ++headers;
+        if (p->role==ACCESSKIT_ROLE_CELL) { ++cells; empty_cell|=p->row==3 && p->column==2 && !*p->text; CHECK(!strstr(p->text,"ignoriert")); }
+    }
+    CHECK(tables==1 && rows==4 && headers==3 && cells==9 && empty_cell);
+    float previous_row_y=-1;
+    for (size_t i=0;i<d.passive_count;++i) if (d.passive[i].role==ACCESSKIT_ROLE_ROW && d.passive[i].bounds.h>0) {
+        CHECK(d.passive[i].bounds.y>previous_row_y); previous_row_y=d.passive[i].bounds.y;
+    }
+    actual_links=0;
+    for (size_t i=0;i<d.target_count;++i) if (!strncmp(d.targets[i].id,"link:",5)) { ++actual_links; CHECK(strstr(d.targets[i].parent,"reader:table:") && !strcmp(d.targets[i].label,"Stand")); }
+    CHECK(actual_links==1 && !strcmp(d.model.editor,table_source) && !sb_app_dirty(&d.model));
+    text=dump(&d); CHECK(strstr(text,"role: Table") && strstr(text,"role: ColumnHeader") && strstr(text,"row_count: 4") && strstr(text,"column_count: 3")); accesskit_string_free(text);
+#ifdef __APPLE__
+    void *native_table=native_find(view,"Tabelle",0); CHECK(native_table);
+    printf("Native table role: %s\n",utf8(send(native_table,"accessibilityRole")));
+    const char *table_role=utf8(send(native_table,"accessibilityRole")); CHECK(table_role && !strcmp(table_role,"AXTable"));
+    void *native_rows=send(native_table,"accessibilityRows");
+    CHECK(native_rows && ((size_t(*)(void *,SEL))objc_msgSend)(native_rows,sel_registerName("count"))==4);
+    CHECK(((BOOL(*)(void *,SEL,SEL))objc_msgSend)(native_table,sel_registerName("isAccessibilitySelectorAllowed:"),sel_registerName("accessibilityRows")));
+    for (size_t r=0;r<4;++r) {
+        void *native_row=((void *(*)(void *,SEL,size_t))objc_msgSend)(native_rows,sel_registerName("objectAtIndex:"),r);
+        CHECK(!strcmp(utf8(send(native_row,"accessibilityRole")),"AXRow"));
+        void *native_cells=send(native_row,"accessibilityChildren");
+        CHECK(native_cells && ((size_t(*)(void *,SEL))objc_msgSend)(native_cells,sel_registerName("count"))==3);
+        for (size_t c=0;c<3;++c) {
+            void *native_cell=((void *(*)(void *,SEL,size_t))objc_msgSend)(native_cells,sel_registerName("objectAtIndex:"),c);
+            CHECK(!strcmp(utf8(send(native_cell,"accessibilityRole")),"AXCell"));
+            const char *cell_value=utf8(send(native_cell,"accessibilityValue"));
+            if (r==0) { const char *expected[]={"Aktion","Kürzel","Wert"}; CHECK(cell_value && !strcmp(cell_value,expected[c])); }
+            if (r==1 && c==1) CHECK(cell_value && !strcmp(cell_value,"Ctrl+S"));
+            if (r==3 && c>0) CHECK(!cell_value || !*cell_value);
+        }
+    }
+#elif defined(_WIN32) || defined(SB_ATSPI_TEST)
+    CHECK(sb_native_probe(d.ui.window,"Tabelle",NULL,SB_NATIVE_READ_TABLE_TREE,native_value,sizeof(native_value),pump,&d));
+    CHECK(!strcmp(native_value,"4:3"));
+    /* GridPattern / AT-SPI Table are absent in the pinned providers. Keep their
+       absence visible; tree traversal above is a separate, narrower contract. */
+    bool table_pattern=sb_native_probe(d.ui.window,"Tabelle",NULL,SB_NATIVE_READ_TABLE_SIZE,native_value,sizeof(native_value),pump,&d);
+    if (table_pattern) CHECK(!strcmp(native_value,"4:3"));
+    printf("Native table matrix interface: %s (tree checked separately).\n",table_pattern ? "available" : "unavailable; release gate open");
+#endif
+    OK(sb_path_join(dump_path,sizeof(dump_path),root,"table-grid.bmp")); CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    OK(sb_ui_fonts(&d.ui,2)); CHECK(SDL_SetWindowSize(d.ui.window,780,560)); frame(&d); frame(&d);
+    CHECK(!strcmp(d.model.editor,table_source));
+    for (size_t i=0;i<d.passive_count;++i) if (d.passive[i].role==ACCESSKIT_ROLE_TABLE) CHECK(!strcmp(d.passive[i].id,table_id));
+    OK(sb_path_join(dump_path,sizeof(dump_path),root,"table-stacked.bmp")); CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    char last_cell[100]={0};
+    for (size_t i=0;i<d.passive_count;++i) if (d.passive[i].role==ACCESSKIT_ROLE_CELL && d.passive[i].row==3 && d.passive[i].column==0) strcpy(last_cell,d.passive[i].id);
+    CHECK(last_cell[0]);
+#ifdef __APPLE__
+    void *native_last_cell=native_find(view,last_cell,0); CHECK(native_last_cell);
+    ((void(*)(void *,SEL,void *))objc_msgSend)(native_last_cell,sel_registerName("accessibilityPerformAction:"),string("AXScrollToVisible"));
+#elif defined(_WIN32) || defined(SB_ATSPI_TEST)
+    CHECK(sb_native_probe(d.ui.window,"Leer",NULL,SB_NATIVE_SCROLL_INTO_VIEW,NULL,0,pump,&d));
+#endif
+    for (unsigned i=0;i<40;++i) frame(&d);
+    bool last_cell_visible=false;
+    for (size_t i=0;i<d.passive_count;++i) if (!strcmp(d.passive[i].id,last_cell)) last_cell_visible=d.passive[i].bounds.h>0;
+    CHECK(last_cell_visible && !strcmp(d.model.editor,table_source));
+    OK(sb_path_join(dump_path,sizeof(dump_path),root,"table-stacked-end.bmp")); CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    d.expanded=true; d.reset_reader=true; frame(&d); frame(&d);
+    OK(sb_path_join(dump_path,sizeof(dump_path),root,"table-expanded.bmp")); CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    d.expanded=false;
+    OK(sb_ui_fonts(&d.ui,1)); CHECK(SDL_SetWindowSize(d.ui.window,1336,840)); frame(&d); frame(&d);
+    strcpy(d.focus,"link:0"); link_key.key.key=SDLK_RETURN; sb_desktop_event(&d,&link_key); frame(&d); frame(&d);
+    CHECK(d.model.source && strstr(d.model.source_path,"/STATE.md") && !sb_app_dirty(&d.model));
+    link_key.key.key=SDLK_ESCAPE; sb_desktop_event(&d,&link_key); frame(&d); frame(&d);
+    CHECK(!d.model.source && !strcmp(d.model.editor,table_source));
     snprintf(d.reveal_document,sizeof(d.reveal_document),"%s",last_id); d.reveal_document_context=d.semantic_context;
     d.form=SB_FORM_HELP; frame(&d); CHECK(!d.reveal_document[0]); text=dump(&d); CHECK(!strstr(text,"Erster Abschnitt") && !strstr(text,"Ende αΩ")); accesskit_string_free(text);
     d.form=SB_FORM_NONE; frame(&d);

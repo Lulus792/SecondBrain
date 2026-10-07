@@ -2,7 +2,7 @@
 
 Stand: 7. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Der aktuelle Entwicklungsschritt 0.9.0 ergänzt geformten Text und Ersatzschriften.
+Der aktuelle Entwicklungsschritt 0.9.6 ergänzt lesbare Dokumenttabellen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
 ## Abgeschlossene Grundlagen
@@ -990,3 +990,49 @@ Das endgültige entpackte Intel-Paket besteht mit 126 Desktop-, 142 Tastatur- un
 `c9cb71de396589fbed0b6a300d696b279f292011b872092cb8652c43241cbc13`. Das geprüfte Entwicklungspaket ist lokal unter
 dist/SecondBrain auf 0.9.5 übernommen; Version und eigenes Projekt-Standbild
 sind geprüft. Neue Plattformabnahme folgt nach dem Push.
+
+Die [0.9.5-Abnahme zu 37dba58](https://github.com/Lulus792/SecondBrain/actions/runs/37556151012)
+besteht inzwischen mit allen 20 Jobs einschließlich Windows Debug und vier
+entpackten Paketen. Dieser Nachweis betrifft die geprüfte Version 0.9.5;
+die unveröffentlichte Tabellenarbeit 0.9.6 ist noch nicht abgenommen.
+
+
+## Tabellenansicht und native Struktur in 0.9.6
+
+Am 7. Oktober ist der eigene C-Tabellenparser mit Kopf-/Trennzeile, Ausrichtung,
+maskierten Pipes, fehlenden und zusätzlichen Datenzellen umgesetzt. Die
+Leseansicht verwendet Spalten oder gestapelte Zeilen; die Sternkarte verwendet
+nur tatsächlich dargestellte Zellverweise. Originalbytes bleiben im Editor,
+in der Datei und in Sicherungen erhalten. [Vertrag und Grenzen](TABELLEN.md).
+
+Die native Struktur enthält Tabelle, Zeilen, Spaltenköpfe/Zellen, Text und
+Linkaktionen mit Indizes. Eine eigene C-Ergänzung veröffentlicht unter macOS
+die bisher fehlende Zeilenliste und aktiviert sie auch auf älteren Systemen
+unabhängig vom neueren Überschriftenrollensymbol. Tatsächliche Provideraufrufe
+prüfen vier Zeilen mit je drei Zellen, Werte, leere Zellen und die Scrollanfrage
+auf eine zunächst unsichtbare Datenzelle. Tabellenlinks öffnen sich per Tastatur.
+
+Lokal: 18 Debug-Kernprüfungen bestehen (22,59 s); nach ergänzten Grenzfällen
+bestehen drei Markdown-Nachprüfungen (2,80 s). ASan/UBSan besteht mit 5.644
+Tabellenassertions einschließlich 5.000 begrenzter Eingaben, 64/65 Spalten und
+65.536/65.537 Zellen. Der erste vollständige Release-Lauf besteht mit 32 Tests
+(470,15 s). Nach den letzten Geometrie-/Ausrichtungskorrekturen bestehen sechs
+passende Prüfungen (34,86 s), darunter 256 native Assertions; weitere 41
+Graph-Assertions bestehen. Die neue Zeilenprüfung scheitert beim Rücksetzen
+auf die vorherige Clip-Geometrie und besteht mit aktuellen Zeilenrechtecken.
+
+Tatsächliche Rasterbilder wurden bei 1336×840 und bei 780×560 mit 200-%-Schrift
+betrachtet, einschließlich Spaltenausrichtung, gestapelter Datenzeile nach
+nativer Scrollanfrage und großer Leseansicht. UI-Nachprüfung SBUI-034–036:
+/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-07_10-19-25/UI_REVIEW.md.
+Lokale Logs: build/table-core-check.log, table-core-final-check.log,
+table-sanitize-final.log, table-ui-full-check.log, table-ui-final-check.log,
+table-graph-final-check.log und table-regression/result.log.
+
+Das neue Intel-Paket wird gerade entpackt geprüft; bis zu dessen bestandenem
+Ablauf bleibt dist/SecondBrain bei 0.9.5. Neue Windows-/Linux-/ARM64-Abnahme folgt
+nach Push. UIA GridPattern und AT-SPI Table fehlen in den festgelegten Providern.
+Die vorbereitete Clientprüfung unterscheidet diese Lücke von zugänglichen
+Zeilenkindern. Menschliche Screenreader-Abnahme, volle GFM-Containerregeln und
+Leistung sehr großer Tabellen bleiben offen. Die gestapelte Kopfzeile soll bei
+wenig Höhe weiter verfeinert werden. Dies ist keine vollständige 1.0-Abnahme.

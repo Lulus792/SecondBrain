@@ -12,47 +12,40 @@ lesen, bearbeiten, suchen und archivieren; Quellen lesen und gespeicherten
 Projektkontext kopieren. Lumen-Sternkarte, eigene Glasdarstellung und Icons,
 direkte Pfeilnavigation, Raumfahrt, begrenztes weiches Scrollen und große
 Leseansicht sind implementiert. Entwürfe und erkannte Konflikte bleiben geschützt.
+Eigene Inhaltsarchive bieten Sicherung, Prüfung und Wiederherstellung;
+Einstellungen und Arbeitsstand bleiben gespeichert. [Verträge und Grenzen](SOURCES.md).
 
-Eigene Inhaltsarchive bieten Sicherung, Prüfung und Wiederherstellung in einen
-freien Projektordner. Einstellungen und Arbeitsstand bleiben gespeichert.
-Native Adapter, bekannte Systemvorgaben und Schrift-Fallback sind angebunden.
-[Verträge und Grenzen](SOURCES.md).
+Die [0.9.5-Abnahme zu 37dba58](https://github.com/Lulus792/SecondBrain/actions/runs/37556151012)
+besteht mit allen 20 Jobs einschließlich Windows Debug und vier entpackten
+Paketen für Windows x64, Linux x64, macOS ARM64 und Intel. Gemeinsame eigene
+C-Regeln verbinden Inline-Code, Maskierungen und Verweise in Titel, Leseansicht
+und Sternkarte. Das lokal geprüfte Intel-Paket liegt unter dist/SecondBrain.
+Öffentliche dauerhafte Vorabversion: [v0.7.3](https://github.com/Lulus792/SecondBrain/releases/tag/v0.7.3).
 
-Die [0.9.3-Abnahme zu 3f3d3a0](https://github.com/Lulus792/SecondBrain/actions/runs/37550880880)
-besteht mit 20 Jobs und vier entpackten Paketen für Windows x64, Linux x64,
-macOS ARM64 und Intel. Sie umfasst 17 lesbare Lizenzressourcen, Tastaturwege,
-Entwurfsschutz und bestehende native Provider-/Clientprüfungen. Lokal liegt
-das geprüfte Intel-Entwicklungspaket 0.9.5 unter dist/SecondBrain.
-Die öffentliche dauerhafte Vorabversion ist weiterhin
-[v0.7.3](https://github.com/Lulus792/SecondBrain/releases/tag/v0.7.3).
+## Laufender Schritt 0.9.6
 
-## Laufender Schritt 0.9.5
-
-Titel, Leseansicht und Sternkarte verwenden gemeinsame eigene C-Regeln für
-Inline-Code, Maskierungen und Verweise. Echte Ziele und optionale Titel bleiben
-getrennt. Überschriftenlinks sind bedienbar, Kontextüberschriften sichtbar.
-17 Kernprüfungen, erster Durchlauf mit 31 Release-Tests und abschließende
-Kern-/native-/Tastaturnachprüfungen bestehen; ASan/UBSan prüft eigene Bereiche.
-Regressionen scheitern mit vorheriger Leseansicht/Sternkarte. Das entpackte
-Intel-Paket einschließlich Desktop, Tastatur, Sicherung, Neustart und CLI besteht.
-[Vertrag](../../docs/INLINE_LINKS.md), [genaue Nachweise](../../docs/STATUS.md).
-
-Der 0.9.4-Lauf besteht in 19 Jobs und vier Paketen; Windows Debug erreicht den
-Tastatur-Timeout. Der Prüfwerkzeug-Renderer zeichnet nun den abgeschlossenen
-Key-up-Zustand, während beide Phasen sämtliche Zustände berechnen. Neue
-native Plattformabnahme ist erforderlich; der frühere Lauf gilt nicht als grün.
+[Tabellen](../../docs/TABELLEN.md) sind in eigenem C-Code implementiert:
+Spaltenausrichtung, gestapelte Zeilen bei schmaler Karte, erhaltene Originalbytes,
+gemeinsame Verweise und Dokument→Tabelle→Zeile→Zelle-Struktur. 18 Kernprüfungen
+bestehen; nach ergänzten Grenzfällen bestehen die drei Markdown-Nachprüfungen
+und ASan/UBSan mit 5.644 Assertions. Der native macOS-Basisdurchlauf besteht.
+32 erste Release-Tests und sechs abschließende Nachprüfungen mit 256 nativen
+Assertions bestehen; Geometrie, Zellenansprung und Rasteransichten sind geprüft.
+Das neue entpackte Intel-Paket wird noch geprüft. Die frühere Betriebssystem-Startblockade ist behoben.
+UIA GridPattern und AT-SPI Table fehlen in den festgelegten Providern; die
+separate native Kinderprüfung ersetzt keine vollständige Tabellenbedienung.
 
 ## Weiterarbeiten
 
-0.9.5 nativ abnehmen, insbesondere Windows Debug und die geänderte Tastaturprüfung.
-Danach vollständige Container-/Inline-Regeln und Listen-/Tabellensemantik,
-Unicode-Textgeometrie/IME, Support-/Lizenzzuordnung sowie übrige Release-Aufgaben
-weiter umsetzen. Tatsächliche native Dialog- und menschliche VoiceOver/NVDA/Orca-
-Bedienung, Geräte-/Langzeitprüfungen und weitere volle Dateisysteme bleiben offen.
+0.9.6 lokal und als Paket abschließend prüfen, committen/pushen und native
+Plattformabnahme ausführen. Danach verbleibende Container-/Inline-/Listenregeln,
+Unicode-Textgeometrie/IME, Support-/Lizenzzuordnung und übrige Release-Aufgaben.
+Tatsächliche native Dialog- und menschliche VoiceOver/NVDA/Orca-Bedienung,
+Geräte-/Langzeitprüfungen und weitere volle Dateisysteme bleiben offen.
 CI-Nachweise belegen keine vollständige menschliche oder physische Geräteabnahme.
 
 Der vollständige Auftrag vor 1.0 bleibt aktiv. Eigener Code: MIT.
 Apple-Developer-Konto und Windows-Signaturzertifikat fehlen.
 1.0 wird ausschließlich nach ausdrücklicher Nutzerfreigabe gesetzt.
-Die abschließende Bereinigung der Produkttexte folgt auf Nutzerwunsch erst,
-wenn das Produkt vollständig ist. Originalnachweise bleiben erhalten.
+Die abschließende Bereinigung der Produkttexte folgt erst, wenn das Produkt
+vollständig ist. Originalnachweise bleiben erhalten.

@@ -12,6 +12,36 @@ void sb_ui_text_draw(struct nk_draw_list *, const struct nk_command_text *);
 #include <stdlib.h>
 #include <string.h>
 
+float sb_ui_wrap_height(struct nk_context *ctx,const struct nk_user_font *font,const char *text,size_t length,float width) {
+    struct nk_vec2 padding=ctx->style.text.padding;
+    float available=width-2*padding.x; if (available<1) available=1;
+    int done=0,lines=0; nk_rune separator=' ';
+    while ((size_t)done<length) {
+        int glyphs=0; float measured=0;
+        int fitting=nk_text_clamp(font,text+done,(int)length-done,available,&glyphs,&measured,&separator,1);
+        if (fitting<=0) break;
+        done+=fitting; ++lines;
+    }
+    if (!lines) lines=1;
+    return lines*(font->height+2*padding.y)+3*padding.y+2;
+}
+void sb_ui_text_aligned(struct nk_context *ctx,const char *text,size_t length,nk_flags alignment) {
+    struct nk_rect bounds; nk_widget(&bounds,ctx);
+    const struct nk_user_font *font=ctx->style.font; struct nk_vec2 pad=ctx->style.text.padding;
+    float width=bounds.w-2*pad.x,y=bounds.y+pad.y; int done=0; nk_rune separator=' ';
+    if (width<1) return;
+    while ((size_t)done<length) {
+        int glyphs=0; float measured=0;
+        int fitting=nk_text_clamp(font,text+done,(int)length-done,width,&glyphs,&measured,&separator,1);
+        if (fitting<=0) break;
+        measured=font->width(font->userdata,font->height,text+done,fitting);
+        float x=bounds.x+pad.x;
+        if (alignment&NK_TEXT_ALIGN_RIGHT) x+=NK_MAX(0,width-measured);
+        else if (alignment&NK_TEXT_ALIGN_CENTERED) x+=NK_MAX(0,(width-measured)/2);
+        nk_draw_text(nk_window_get_canvas(ctx),nk_rect(x,y,width,font->height),text+done,fitting,font,nk_rgba(0,0,0,0),ctx->style.text.color);
+        done+=fitting; y+=font->height+2*pad.y;
+    }
+}
 static void paste(nk_handle user, struct nk_text_edit *edit) {
     char *text;
     size_t length;

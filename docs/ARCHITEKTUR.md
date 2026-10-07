@@ -77,3 +77,15 @@ und Zwischenablageereignissen. Die Paketprüfung führt beide Bedienprüfungen a
 Der [Datenvertrag](DATENVERTRAG.md) legt Metadaten, Textgrenzen und den
 Bestandsschutz beim Update fest. Metadatenliste und Sicherungsprüfung verwenden
 dieselbe eigene C-Prüfung; Textimporte lehnen NUL vor dem Editor ab.
+
+## Tabellen ab 0.9.6
+
+`src/table.c` erkennt Tabellen und gibt unveränderte Quellbereiche zurück.
+`src/markdown.c` nutzt diese Erkennung als Blockregel. Zellen werden für die
+Leseansicht und Linkerkennung gezielt dekodiert; zusätzliche Datenzellen verändern
+weder Datei noch Editor. `app/desktop.c` berechnet Zeilenhöhen und wählt anhand
+der verfügbaren Breite Spalten oder gestapelte Datenzeilen. Der Zugänglichkeits-
+adapter veröffentlicht die gemeinsame logische Struktur mit Indizes; zulässige
+Elternbeziehungen werden vor der Veröffentlichung aufgelöst. Die UI-Bibliothek
+bleibt allein für Darstellung und native Zugänglichkeit zuständig.
+[Umfang und Schnittstellengrenzen](TABELLEN.md).

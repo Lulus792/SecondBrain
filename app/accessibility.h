@@ -12,6 +12,7 @@ typedef struct {
     const char *parent;
     unsigned level;
     uint64_t order;
+    size_t row,column,rows,columns;
 } SBAccessibleItem;
 typedef struct {
     char id[100]; accesskit_action action;

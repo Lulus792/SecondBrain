@@ -9,13 +9,28 @@
 /* AccessKit 0.23.1 returns the literal "Heading". New AppKit exposes its actual
    heading role; preserve that native contract without changing the C tree role. */
 static SDL_SpinLock mac_role_lock;
-static IMP mac_children_original,mac_role_original;
+static IMP mac_children_original,mac_role_original,mac_rows_original,mac_allowed_original;
 static void *mac_heading_role;
 static void *mac_role(void *self,SEL selector) {
     SDL_LockSpinlock(&mac_role_lock); IMP original=mac_role_original; SDL_UnlockSpinlock(&mac_role_lock);
     void *role=((void *(*)(void *,SEL))original)(self,selector);
     const char *name=role ? ((const char *(*)(void *,SEL))objc_msgSend)(role,sel_registerName("UTF8String")) : NULL;
-    return name && !strcmp(name,"Heading") ? mac_heading_role : role;
+    return mac_heading_role && name && !strcmp(name,"Heading") ? mac_heading_role : role;
+}
+/* The pinned provider exposes Table/Row/Cell roles, but its rows selector
+   only handles selectable containers. Document rows are the table children. */
+static bool mac_table(void *self) {
+    void *role=((void *(*)(void *,SEL))objc_msgSend)(self,sel_registerName("accessibilityRole"));
+    const char *name=role ? ((const char *(*)(void *,SEL))objc_msgSend)(role,sel_registerName("UTF8String")) : NULL;
+    return name && !strcmp(name,"AXTable");
+}
+static void *mac_rows(void *self,SEL selector) {
+    if (mac_table(self)) return ((void *(*)(void *,SEL))objc_msgSend)(self,sel_registerName("accessibilityChildren"));
+    return ((void *(*)(void *,SEL))mac_rows_original)(self,selector);
+}
+static BOOL mac_allowed(void *self,SEL selector,SEL requested) {
+    if (requested==sel_registerName("accessibilityRows") && mac_table(self)) return YES;
+    return ((BOOL(*)(void *,SEL,SEL))mac_allowed_original)(self,selector,requested);
 }
 static void *mac_children(void *self,SEL selector) {
     SDL_LockSpinlock(&mac_role_lock); IMP original=mac_children_original; SDL_UnlockSpinlock(&mac_role_lock);
@@ -25,17 +40,23 @@ static void *mac_children(void *self,SEL selector) {
         Class node=objc_getClass("AccessKitNode");
         Method method=node ? class_getInstanceMethod(node,sel_registerName("accessibilityRole")) : NULL;
         if (method) { mac_role_original=method_getImplementation(method); method_setImplementation(method,(IMP)mac_role); }
+        Method rows=node ? class_getInstanceMethod(node,sel_registerName("accessibilityRows")) : NULL;
+        Method allowed=node ? class_getInstanceMethod(node,sel_registerName("isAccessibilitySelectorAllowed:")) : NULL;
+        if (rows && allowed) {
+            mac_rows_original=method_getImplementation(rows); mac_allowed_original=method_getImplementation(allowed);
+            method_setImplementation(rows,(IMP)mac_rows); method_setImplementation(allowed,(IMP)mac_allowed);
+        }
     }
     SDL_UnlockSpinlock(&mac_role_lock); return children;
 }
 static void mac_native_roles(void *window) {
-    void **role=dlsym(RTLD_DEFAULT,"NSAccessibilityHeadingRole"); if (!role || !*role) return;
+    void **role=dlsym(RTLD_DEFAULT,"NSAccessibilityHeadingRole");
     void *view=((void *(*)(void *,SEL))objc_msgSend)(window,sel_registerName("contentView"));
     Class view_class=object_getClass(view); SEL selector=sel_registerName("accessibilityChildren");
     Method method=class_getInstanceMethod(view_class,selector);
     SDL_LockSpinlock(&mac_role_lock);
     if (method && !mac_children_original) {
-        mac_heading_role=*role; mac_children_original=method_getImplementation(method);
+        mac_heading_role=role ? *role : NULL; mac_children_original=method_getImplementation(method);
         if (!class_addMethod(view_class,selector,(IMP)mac_children,method_getTypeEncoding(method))) method_setImplementation(method,(IMP)mac_children);
     }
     SDL_UnlockSpinlock(&mac_role_lock);
@@ -44,7 +65,7 @@ static void mac_native_roles(void *window) {
 typedef struct { char id[100]; accesskit_node_id node; uint64_t context; } Identity;
 typedef struct {
     char id[100],parent[100]; char *label,*value;
-    unsigned level;
+    unsigned level; size_t row,column,rows,columns;
     accesskit_node_id node; struct nk_rect bounds; accesskit_role role;
     bool editable,selected; size_t anchor,caret;
 } Item;
@@ -116,6 +137,21 @@ static bool permits(const Item *v,accesskit_action action) {
     default: return false;
     }
 }
+typedef struct { const char *id; size_t index; } ParentIndex;
+static int parent_order(const void *left,const void *right) {
+    const ParentIndex *a=left,*b=right; return strcmp(a->id,b->id);
+}
+static size_t parent_find(const ParentIndex *index,size_t count,const char *id) {
+    size_t lo=0,hi=count;
+    while (lo<hi) { size_t mid=lo+(hi-lo)/2; if (strcmp(index[mid].id,id)<0) lo=mid+1; else hi=mid; }
+    return lo<count && !strcmp(index[lo].id,id) ? index[lo].index : SIZE_MAX;
+}
+static bool parent_allowed(const Item *parent,const Item *child) {
+    if (parent->role==ACCESSKIT_ROLE_DOCUMENT && !parent->parent[0]) return true;
+    if (parent->role==ACCESSKIT_ROLE_TABLE && child->role==ACCESSKIT_ROLE_ROW) return true;
+    if (parent->role==ACCESSKIT_ROLE_ROW && (child->role==ACCESSKIT_ROLE_CELL || child->role==ACCESSKIT_ROLE_COLUMN_HEADER)) return true;
+    return (parent->role==ACCESSKIT_ROLE_CELL || parent->role==ACCESSKIT_ROLE_COLUMN_HEADER) && child->role==ACCESSKIT_ROLE_LINK;
+}
 static accesskit_tree_update *build_locked(SBAccessibility *a) {
     accesskit_node_id focus=1;
     for (size_t i=0;i<a->count;++i) if (!strcmp(a->items[i].id,a->focus)) focus=a->items[i].node;
@@ -129,15 +165,25 @@ static accesskit_tree_update *build_locked(SBAccessibility *a) {
     accesskit_node_set_label(container,region); accesskit_node_push_child(root,2);
     accesskit_node *documents=NULL;
     accesskit_node **nodes=a->count ? calloc(a->count,sizeof(*nodes)) : NULL;
-    if (a->count && !nodes) {
+    ParentIndex *parents=a->count ? malloc(a->count*sizeof(*parents)) : NULL;
+    if (a->count && (!nodes || !parents)) {
+        free(nodes); free(parents);
         accesskit_tree_update_set_focus(tree,1);
         accesskit_tree_update_push_node(tree,2,container); accesskit_tree_update_push_node(tree,1,root); return tree;
     }
+    for (size_t i=0;i<a->count;++i) parents[i]=(ParentIndex){a->items[i].id,i};
+    if (a->count) qsort(parents,a->count,sizeof(*parents),parent_order);
     for (size_t i=0;i<a->count;++i) {
         Item *v=&a->items[i]; accesskit_node *node=nodes[i]=accesskit_node_new(v->role);
         accesskit_node_set_label(node,v->label);
         accesskit_node_set_author_id(node,v->id);
         if (v->role==ACCESSKIT_ROLE_HEADING) accesskit_node_set_level(node,(v->level ? v->level : 1)-1);
+        if (v->role==ACCESSKIT_ROLE_TABLE) { accesskit_node_set_row_count(node,v->rows); accesskit_node_set_column_count(node,v->columns); }
+        if (v->role==ACCESSKIT_ROLE_ROW) accesskit_node_set_row_index(node,v->row);
+        if (v->role==ACCESSKIT_ROLE_CELL || v->role==ACCESSKIT_ROLE_COLUMN_HEADER) {
+            accesskit_node_set_row_index(node,v->row); accesskit_node_set_column_index(node,v->column);
+            accesskit_node_set_row_span(node,1); accesskit_node_set_column_span(node,1);
+        }
         if (v->parent[0]) accesskit_node_set_is_line_breaking_object(node);
         accesskit_rect rect={v->bounds.x,v->bounds.y,v->bounds.x+v->bounds.w,v->bounds.y+v->bounds.h}; accesskit_node_set_bounds(node,rect);
         if (permits(v,ACCESSKIT_ACTION_FOCUS)) accesskit_node_add_action(node,ACCESSKIT_ACTION_FOCUS);
@@ -179,11 +225,9 @@ static accesskit_tree_update *build_locked(SBAccessibility *a) {
     /* Parent nodes remain owned here until all child edges have been added. */
     for (size_t i=0;i<a->count;++i) {
         Item *v=&a->items[i]; bool nested=false;
-        if (v->parent[0]) for (size_t j=0;j<a->count;++j) {
-            Item *parent=&a->items[j];
-            if (i!=j && parent->role==ACCESSKIT_ROLE_DOCUMENT && !parent->parent[0] && !strcmp(parent->id,v->parent)) {
-                accesskit_node_push_child(nodes[j],v->node); nested=true; break;
-            }
+        if (v->parent[0]) {
+            size_t j=parent_find(parents,a->count,v->parent);
+            if (j!=SIZE_MAX && i!=j && parent_allowed(&a->items[j],v)) { accesskit_node_push_child(nodes[j],v->node); nested=true; }
         }
         if (!nested && !strncmp(v->id,"star:",5)) {
             if (!documents) { documents=accesskit_node_new(ACCESSKIT_ROLE_LIST_BOX); accesskit_node_set_label(documents,"Projektdokumente"); accesskit_node_push_child(container,4); }
@@ -191,7 +235,7 @@ static accesskit_tree_update *build_locked(SBAccessibility *a) {
         } else if (!nested) accesskit_node_push_child(container,v->node);
     }
     for (size_t i=0;i<a->count;++i) accesskit_tree_update_push_node(tree,a->items[i].node,nodes[i]);
-    free(nodes);
+    free(nodes); free(parents);
     if (documents) accesskit_tree_update_push_node(tree,4,documents);
     if (a->message[0]) {
         accesskit_node *status=accesskit_node_new(ACCESSKIT_ROLE_LABEL); accesskit_node_set_value(status,a->message); accesskit_node_set_live(status,ACCESSKIT_LIVE_POLITE);
@@ -262,7 +306,7 @@ static void clear_items(SBAccessibility *a) { for (size_t i=0;i<a->count;++i) { 
 void sb_accessibility_update(SBAccessibility *a,const char *title,const char *focus,const SBAccessibleItem *items,size_t count,const char *message,bool modal,uint64_t context) {
     if (!a) return;
     uint64_t signature=sb_hash(title,strlen(title))^sb_hash(focus,strlen(focus))^sb_hash(message,strlen(message))^(uint64_t)modal;
-    for (size_t i=0;i<count;++i) { signature=signature*1099511628211ULL^sb_hash(items[i].id,strlen(items[i].id))^sb_hash(items[i].label,strlen(items[i].label))^sb_hash((const char *)&items[i].bounds,sizeof(items[i].bounds))^items[i].role^items[i].anchor^(items[i].caret<<1)^(uint64_t)items[i].selected^((uint64_t)items[i].editable<<8); if (items[i].value) signature^=sb_hash(items[i].value,strlen(items[i].value)); if (items[i].parent) signature^=sb_hash(items[i].parent,strlen(items[i].parent)); signature^=(uint64_t)items[i].level<<16; }
+    for (size_t i=0;i<count;++i) { signature=signature*1099511628211ULL^sb_hash(items[i].id,strlen(items[i].id))^sb_hash(items[i].label,strlen(items[i].label))^sb_hash((const char *)&items[i].bounds,sizeof(items[i].bounds))^items[i].role^items[i].anchor^(items[i].caret<<1)^(uint64_t)items[i].selected^((uint64_t)items[i].editable<<8); if (items[i].value) signature^=sb_hash(items[i].value,strlen(items[i].value)); if (items[i].parent) signature^=sb_hash(items[i].parent,strlen(items[i].parent)); signature^=(uint64_t)items[i].level<<16; signature^=items[i].row^((uint64_t)items[i].column<<16)^((uint64_t)items[i].rows<<32)^((uint64_t)items[i].columns<<48); }
     SDL_LockMutex(a->mutex);
     bool changed=signature!=a->signature || context!=a->context;
     if (changed) {
@@ -275,6 +319,7 @@ void sb_accessibility_update(SBAccessibility *a,const char *title,const char *fo
             next[i].value=copy(items[i].value); if (items[i].value && !next[i].value) complete=false;
             next[i].node=identify(a,items[i].id,context); if (!next[i].node) complete=false;
             snprintf(next[i].parent,sizeof(next[i].parent),"%s",items[i].parent ? items[i].parent : ""); next[i].level=items[i].level;
+            next[i].row=items[i].row; next[i].column=items[i].column; next[i].rows=items[i].rows; next[i].columns=items[i].columns;
             next[i].bounds=items[i].bounds; next[i].role=items[i].role; next[i].editable=items[i].editable; next[i].selected=items[i].selected; next[i].anchor=items[i].anchor; next[i].caret=items[i].caret;
         }
         if (!complete) { for (size_t i=0;i<count;++i) { free(next[i].label); free(next[i].value); } free(next); SDL_UnlockMutex(a->mutex); return; }

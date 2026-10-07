@@ -48,7 +48,9 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   die Leseansicht strukturierte Blöcke und bietet Abschnittssprünge;
   [Dokumentstruktur](DOKUMENTSTRUKTUR.md) nennt Umfang und verbleibende Semantik.
   0.9.4 erweitert die gemeinsamen [Blockregeln](MARKDOWN.md); vollständige
-  Container-/Inline-Regeln und Listen-/Tabellensemantik bleiben offen.
+  Container-/Inline-Regeln und Listensemantik bleiben offen. 0.9.6 ergänzt
+  [Tabellen](TABELLEN.md); native UIA-/AT-SPI-Matrixschnittstellen und die
+  menschliche Tabellenbedienung bleiben offen.
   Die Cache-Signalstruktur ist in 0.5.2 korrigiert und mit echtem Linux-Clientcache
   geprüft; weitere Eventtypen bleiben gesonderte Abnahmen. Systemvorgaben bestehen
   in 0.6.0 auf allen drei CI-Systemen; reale Einstellungswechsel, Windows-Custom-

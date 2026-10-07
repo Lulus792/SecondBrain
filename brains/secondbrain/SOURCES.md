@@ -29,6 +29,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Native UI-Anbindung](../../docs/BARRIEREFREIHEIT_PLAN.md): integrierte Adapter, tatsächliche macOS-Provider-/UIA-/AT-SPI-Clientprüfungen und offene assistive Abnahme.
 - [Gemeinsame Inline-/Linkregeln](../../docs/INLINE_LINKS.md): echte Aktionen, Sternkartenbeziehungen und Grenzen.
 - [Markdown-Blockregeln](../../docs/MARKDOWN.md): gemeinsame C-Erkennung, Originalbytes und verbleibender Umfang.
+- [Tabellen](../../docs/TABELLEN.md): eigene C-Regeln, adaptive Leseansicht und native Schnittstellengrenzen.
 - [Dokumentstruktur](../../docs/DOKUMENTSTRUKTUR.md): native Blockstruktur, Überschriften und Abschnittssprünge.
 - [Textdarstellung](../../docs/TEXTDARSTELLUNG.md): UI-Schriftrollen, geformte Textläufe, Fallback und verbleibende Textarbeit.
 - [Lizenzansicht](../../docs/LIZENZEN.md): Originaltexte in der App, Bedienwege und Prüfgrenzen.

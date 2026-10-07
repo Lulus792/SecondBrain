@@ -51,6 +51,17 @@ int main(int argc, char **argv) {
     }
     CHECK(links==4);
     CHECK(sb_note_load(&project,note.path,&old,NULL).code==SB_OK && !strcmp(old,shared)); sb_text_free(old);
+    const char *table_links="# A\n\n| Quelle | Text |\n| --- | --- |\n| [Stand](../STATE.md) | `[Code](../PROJECT.md)` | [Überzählig](../SOURCES.md) |\n| [Fragen](../QUESTIONS.md) | Wert |\n";
+    CHECK(sb_note_load(&project,note.path,&old,&revision).code==SB_OK); sb_text_free(old);
+    CHECK(sb_note_save(&project,note.path,table_links,revision,NULL).code==SB_OK);
+    sb_notes_free(&notes); CHECK(sb_notes_list(&project,&notes).code==SB_OK);
+    CHECK(sb_graph_build(&project,&notes,&graph).code==SB_OK); index=0;links=0;
+    while (index<notes.count && strcmp(notes.items[index].path,note.path)) ++index;
+    CHECK(index<notes.count);
+    for (size_t i=0;i<graph.edge_count;++i) if (graph.edges[i].from==index) {
+        ++links; const char *to=notes.items[graph.edges[i].to].path; CHECK(!strcmp(to,"STATE.md") || !strcmp(to,"QUESTIONS.md"));
+    }
+    CHECK(links==2);
     sb_graph_free(&graph); sb_notes_free(&notes);
     printf("%u graph assertions passed.\n", checks);
     return 0;
