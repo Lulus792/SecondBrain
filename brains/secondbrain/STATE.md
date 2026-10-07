@@ -23,7 +23,7 @@ Historische Arbeitsabschnitte bleiben im [Journal](journal/2026-10-06.md).
 - [0.6.1-Abnahme zu b064bd5](https://github.com/Lulus792/SecondBrain/actions/runs/37529776082):
   18 erfolgreiche Jobs, 16 Desktoptests je Debug/Release auf Windows x64,
   macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Raster- und Fokuskontrast
-  sind gezielt nachgeprüft. dist/SecondBrain ist lokal auf 0.9.1 (geprüfter Entwicklungsbuild).
+  sind gezielt nachgeprüft. dist/SecondBrain ist lokal auf 0.9.3 (geprüfter Entwicklungsbuild).
 
 ## Abgenommener erster Start
 
@@ -140,3 +140,12 @@ Die Wiederholung von 0.9.2 zu 1358794 besteht nun mit allen 20 Jobs und vier
 entpackten Plattformpaketen. [Originalnachweis](../../docs/PLATTFORMEN.md).
 Der Nachweis umfasst die Linux-Ebenenkorrektur und beide Import-/Prozesswege;
 die neue Lizenzansicht 0.9.3 benötigt ihren eigenen Plattformlauf.
+
+Die letzte Intel-Paketwiederholung nach der Pfadkorrektur besteht: 126 Desktop-,
+142 Tastatur- und 75 Sicherungs-UI-Aussagen, gespeicherte Einstellungen über
+zwei Prozesse und CLI-Sicherung. Archiv-SHA-256:
+`5cf73ce1d180bd64fd9e2f1f3fdca35e95ff2c1a91d4e7e6ed4c14653e3a538c`.
+Das geprüfte Entwicklungspaket ist lokal nach dist/SecondBrain übernommen;
+Versionsausgabe und Standbild mit eigenem Projektgedächtnis bestehen.
+Die [neue 0.9.3-Abnahme zu 3f3d3a0](https://github.com/Lulus792/SecondBrain/actions/runs/37550880880)
+läuft noch; zwölf Kern-/Python-Jobs bestehen bereits.
