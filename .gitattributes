@@ -5,4 +5,5 @@
 *.yml text eol=lf
 third_party/licenses/AccessKit-transitive.txt text eol=lf
 third_party/licenses/UI-source-notices.txt text eol=lf
+third_party/licenses/Rust-runtime.txt -text
 third_party/ui/nuklear_sdl3_renderer.h whitespace=-blank-at-eof

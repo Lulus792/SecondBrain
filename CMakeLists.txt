@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-project(SecondBrain VERSION 0.9.21 LANGUAGES C)
+project(SecondBrain VERSION 0.9.22 LANGUAGES C)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
@@ -186,6 +186,7 @@ if(SB_BUILD_UI)
         third_party/licenses/AccessKit-AUTHORS.txt third_party/licenses/Unicode.txt third_party/licenses/OFL-Emoji.txt third_party/licenses/WHATWG.txt third_party/licenses/OFL-Math.txt DESTINATION licenses COMPONENT Runtime)
     install(FILES third_party/licenses/AccessKit-transitive.txt third_party/licenses/UI-source-notices.txt
         DESTINATION licenses COMPONENT Runtime)
+    install(FILES third_party/licenses/Rust-runtime.txt DESTINATION licenses COMPONENT Runtime)
     install(FILES docs/QUICKSTART.txt LICENSE DESTINATION . COMPONENT Runtime)
     if(BUILD_TESTING)
         add_executable(secondbrain-projects-ui-tests tests/test_projects_ui.c)
@@ -326,6 +327,8 @@ if(BUILD_TESTING)
     find_package(Python3 COMPONENTS Interpreter REQUIRED)
     add_test(NAME ui-license-inventory COMMAND "${Python3_EXECUTABLE}"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_ui_license_inventory.py")
+    add_test(NAME rust-runtime-inventory COMMAND "${Python3_EXECUTABLE}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_rust_runtime_inventory.py")
     add_test(NAME ci-test-entry COMMAND "${Python3_EXECUTABLE}"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_ci_entry.py")
     add_executable(secondbrain-backup-crash-worker tests/backup_crash_worker.c)

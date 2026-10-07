@@ -102,3 +102,8 @@ CI edfa86b bestätigt Windows-Debug; Release findet eine Marker-Lesesperre
 in der Abbruchprobe. Begrenzte Synchronisation korrigiert und lokal mit
 3 Prozessfällen, 6 Produktionsabbrüchen und 29 Python-Tests geprüft.
 Neue Windows-/Gesamtabnahme folgt; Rust-Sammlung ist noch in Arbeit.
+
+CI 82c2970 besteht in allen 20 Jobs, acht Desktop-Varianten und vier Paketen.
+Windows-/Linux-Cargo bestätigen 1.98.1/48a229c. 0.9.22 ergänzt Rust-Originale
+für zwei geprüfte Quellenstände; 36 Python-Prüfungen, Ressourcen und 157
+Tastaturassertions bestehen. Paket-/neue Plattformabnahme folgen vor Installation.

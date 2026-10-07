@@ -65,3 +65,9 @@ verlangt Schrift und Lizenz; ihren tatsächlichen Abschluss dokumentiert STATUS.
 von AccessKit und Quellenhinweise aus SDL3/HarfBuzz. Sammlungen behalten ihre
 Originaltexte und Attributionsangaben; die App liest sie als Literaltext.
 [Inventur, Wiederholung und offene Laufzeitanteile](LIZENZ_INVENTUR.md).
+
+## Rust-Laufzeit ab 0.9.22
+
+Der 24. Eintrag ergänzt Originale und Quellenhinweise der überprüften Rust-
+Standardbibliotheksstände. Zusammengesetzte Lizenzbedingungen bleiben erhalten.
+[Umfang und verbleibende Abnahme](RUST_RUNTIME_NACHWEIS.md).

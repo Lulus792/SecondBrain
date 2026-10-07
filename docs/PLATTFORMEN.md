@@ -839,3 +839,20 @@ Testlog. Ohne die anmeldepflichtigen Details bleibt die Ursache ungeklärt.
 Ab 0.9.20 schreibt der native Teststarter vor dem CMake-Aufruf ein Eintragslog;
 dieser Diagnoseschritt ist lokal mit echten CMake-/CTest-Prozessen geprüft.
 Er ersetzt weder die ausstehende Fehleranalyse noch eine neue Plattformabnahme.
+
+## 0.9.21: vollständige neue CI-Abnahme
+
+[Lauf 37695359274](https://github.com/Lulus792/SecondBrain/actions/runs/37695359274)
+zu 82c2970 besteht am 8. Oktober in allen 20 Jobs: acht Desktop-Jobs auf
+Windows, Linux und macOS ARM64/Intel, sechs C17-Jobs und sechs Python-Jobs.
+Alle vier Release-Jobs prüfen ihre tatsächlich entpackten Pakete erfolgreich.
+Damit sind kanonische Windows-TEMP-Pfade und die korrigierte Synchronisation
+der sechs Produktions-Abbruch-/Wiederanlaufpunkte im ausgeführten Umfang
+nachgeprüft. Windows-Testfixture verwendet einen echten exklusiven Handle;
+die zusätzliche Unix-Aliasprobe benötigt unter Windows keine Symlink-Rechte.
+
+Die Cargo-Compileraufzeichnung bestätigt in Windows-/Linux-Release jeweils
+1.98.1, Commit 48a229ceaefd4985c50990b14116b6d856af0985, LLVM 22.1.8,
+mit den entsprechenden nativen Hosts. Neue 0.9.22-Lizenzdaten benötigen ihren
+eigenen Plattform-/Paketnachweis. Menschliche assistive, Geräte-, Volumen- und
+weitere Release-Abnahmen bleiben offen.

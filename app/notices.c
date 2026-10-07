@@ -26,7 +26,8 @@ static const struct { const char *name,*file; } notices[]={
     {"WHATWG-Zeichenreferenzen · CC BY / BSD","WHATWG.txt"},
     {"Noto Math · SIL Open Font License","OFL-Math.txt"},
     {"AccessKit · Unterabhängigkeiten","AccessKit-transitive.txt"},
-    {"SDL3 und HarfBuzz · Quellenhinweise","UI-source-notices.txt"}
+    {"SDL3 und HarfBuzz · Quellenhinweise","UI-source-notices.txt"},
+    {"Rust · Laufzeit und Quellenhinweise","Rust-runtime.txt"}
 };
 size_t sb_notice_count(void) { return sizeof(notices)/sizeof(*notices); }
 const char *sb_notice_name(size_t index) { return index<sb_notice_count() ? notices[index].name : "Lizenzen"; }

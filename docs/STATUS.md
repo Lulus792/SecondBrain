@@ -2061,3 +2061,27 @@ verwendet sie einen exklusiven Handle. Lokal bestehen 3 Synchronisationsfälle,
 die 6 Produktions-Abbruch-/Wiederanlauffälle und 29 Python-Unittests.
 Logs: build/checkpoint-{wait-check,crash-check,python-check}.log.
 Die tatsächliche neue Windows-Handle-Probe und Gesamt-CI stehen aus.
+
+
+## 0.9.22: Rust-Laufzeitoriginale in App und Paket
+
+[Rust-Laufzeitnachweis](RUST_RUNTIME_NACHWEIS.md) und Manifest ordnen die
+geprüften Quellstände 1.98.1/1.99.0 vier unterstützten Zielarchitekturen zu.
+Konservative std-Closures mit allen Cargo-Features ergeben 20 Registry-Versionen
+über beide Stände, 103 Original-Payloads und 305 zusätzliche Quellrecords.
+compiler-builtins-AND-Bedingungen und LLVM-Ausnahme bleiben vollständig erhalten.
+Neue Lizenzdatei enthält 263891 Bytes; SHA-256:
+`0ed14c5615bbcb90c0717e20312397e606ff269029773779c959755c82f7a3cf`.
+
+Sieben Integritäts-/Fehlerprovokationsfälle und 36 Python-Prüfungen bestehen
+(3,03 s für die vollständige Python-Suite). Ressourcen/Tastatur bestehen
+2/2 in 110,89 s; 157 Tastaturassertions einschließlich aller drei großen
+Lizenzsammlungen. Nach letzten Assembly-Quellhinweisen erneute Ressourcenprüfung
+1/1 in 0,61 s. Git-autocrlf-Filter erhält exakte Bytes. Saubere Paketabnahme
+folgt; Dist bleibt bis dahin bei 0.9.21. Logs: build/runtime-{inventory-final,
+python-final,ui-check,final-resource-check}.log. Vollständige tatsächliche
+In-tree-/SDK-/Systemruntime-Abnahme und abweichende Toolchains bleiben offen.
+
+CI 37695359274 zu 82c2970 besteht in allen 20 Jobs einschließlich acht
+Desktop-Varianten und vier entpackten Release-Paketen. Die neuen 0.9.22-Daten
+sind davon getrennt; ihre Plattformabnahme folgt nach Veröffentlichung.

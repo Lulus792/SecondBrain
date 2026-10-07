@@ -207,3 +207,9 @@ halten Ursprung und Hashes fest. Dazu gehören weitere SDL3-/HarfBuzz-
 Copyrightblöcke, YUV-BSD und die gewählte HIDAPI-BSD-Alternative.
 Rust-Standardbibliothek/Compilerlaufzeit und Systemanteile bleiben gesonderte
 offene Abnahmen; die Sammlung ersetzt diese Prüfung nicht.
+
+Die [Rust-Laufzeitsammlung](../docs/RUST_RUNTIME_NACHWEIS.md) ergänzt ab 0.9.22
+20 zugeordnete Registry-Versionen, compiler-builtins, stdarch und Quellhinweise
+der beiden geprüften Compilerstände. Original-Archive und einzelne Payloads
+sind durch Hashes zugeordnet. Abweichende Toolchains und die vollständige
+Zuordnung tatsächlich gelinkter SDK-/Systemanteile bleiben offen.
