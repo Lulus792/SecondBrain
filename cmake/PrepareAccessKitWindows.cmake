@@ -19,7 +19,7 @@ elseif(NOT source_hash STREQUAL "0fd8cba2e66e5edcaed3fa8d35572e530b7a816a1a71670
 endif()
 file(SHA256 "${source}" patched_hash)
 if(NOT patched_hash STREQUAL "0fd8cba2e66e5edcaed3fa8d35572e530b7a816a1a716703e96867440709bae1")
-    message(FATAL_ERROR "Unexpected result of the AccessKit Windows text patch")
+    message(FATAL_ERROR "Unexpected result of the AccessKit Windows text patch: ${patched_hash}")
 endif()
 file(READ "${SB_C_SOURCE}/Cargo.toml" manifest)
 string(FIND "${manifest}" "[patch.crates-io]" section)
