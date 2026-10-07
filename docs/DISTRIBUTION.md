@@ -40,6 +40,9 @@ Der normale Zugang zu den Projektgedächtnissen ist die eigene Oberfläche.
 SDL wird statisch eingebunden. MSVC baut die C-Laufzeit statisch ein. Der eigene
 C-Kern verwendet ausschließlich C-Standardbibliothek und Betriebssystem-APIs.
 Bestehende Markdown-Instanzen werden beim Paketwechsel nicht überschrieben.
+Ab 0.9.23 wird auch die aus Rust gebaute MSVC-UI-DLL mit statischer CRT
+vorbereitet. Den tatsächlich bestätigten DLL-/Paketstand nennt der
+[Laufzeitnachweis](PAKET_LAUFZEIT.md); Konfiguration allein belegt die Verknüpfung nicht.
 
 ## Bezug und Grenzen
 

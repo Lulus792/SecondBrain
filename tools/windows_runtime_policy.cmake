@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.20)
+function(sb_windows_runtime_policy system_root excluded_var included_var)
+    string(REPLACE "\\" "/" normalized "${system_root}")
+    # Escape regex metacharacters before making both path separators valid.
+    string(REGEX REPLACE "([][+.*^$()?|])" "\\\\\\1" escaped "${normalized}")
+    string(REPLACE "/" [=[[/\\]]=] escaped "${escaped}")
+    set(excluded "^${escaped}[/\\\\]" [=[^[A-Za-z]:[/\\][wW][iI][nN][dD][oO][wW][sS][/\\]]=])
+    set(included [=[[/\\](vcruntime[0-9]+(_[0-9]+)?|msvcp[0-9]+(_[0-9]+)?|concrt[0-9]+|vccorlib[0-9]+|mfc[0-9]+[a-z]*)\.dll$]=])
+    set(${excluded_var} "${excluded}" PARENT_SCOPE)
+    set(${included_var} "${included}" PARENT_SCOPE)
+endfunction()

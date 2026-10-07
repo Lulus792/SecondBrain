@@ -25,6 +25,36 @@ target_link_libraries(runtime_fixture PRIVATE sb_runtime_fixture)
 
 @unittest.skipUnless(shutil.which('cmake'), 'CMake unavailable')
 class PackageRuntimeTests(unittest.TestCase):
+    def test_windows_os_boundary_retains_redistributables_with_both_path_separators(self):
+        policy = (ROOT / 'tools/windows_runtime_policy.cmake').as_posix()
+        script = '''include("POLICY")
+sb_windows_runtime_policy([=[C:\\Windows]=] excluded included)
+foreach(path IN ITEMS [=[C:\\Windows\\system32\\kernel32.dll]=] "C:/Windows/System32/kernel32.dll")
+ set(matches FALSE)
+ foreach(regex IN LISTS excluded)
+  if(path MATCHES "${regex}")
+   set(matches TRUE)
+  endif()
+ endforeach()
+ if(NOT matches)
+  message(FATAL_ERROR "OS boundary missed: ${path}")
+ endif()
+endforeach()
+foreach(path IN ITEMS [=[C:\\Windows\\system32\\vcruntime140.dll]=] "C:/Windows/System32/msvcp140.dll")
+ if(NOT path MATCHES "${included}")
+  message(FATAL_ERROR "Redistributable hidden: ${path}")
+ endif()
+endforeach()
+if("C:/Windows/System32/msvcp110_win.dll" MATCHES "${included}")
+ message(FATAL_ERROR "OS implementation CRT retained as redistributable")
+endif()
+'''.replace('POLICY', policy)
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / 'policy.cmake'
+            path.write_text(script, encoding='utf-8')
+            result = subprocess.run(['cmake', '-P', str(path)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            self.assertEqual(result.returncode, 0, result.stderr.decode(errors='replace'))
+
     @unittest.skipUnless(sys.platform == 'win32', 'Native Windows path classification')
     def test_visual_cpp_runtime_in_system_directory_requires_separate_distribution(self):
         import os

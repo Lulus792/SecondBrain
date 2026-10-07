@@ -15,18 +15,24 @@ set(SB_WINDOWS_SOURCE "${sb_accesskit_windows_source_SOURCE_DIR}")
 include("${CMAKE_CURRENT_LIST_DIR}/PrepareAccessKitWindows.cmake")
 set(SB_ACCESSKIT_CARGO_TARGET "${CMAKE_CURRENT_BINARY_DIR}/accesskit-windows-build")
 set(SB_ACCESSKIT_CARGO_ARGS "")
+set(SB_ACCESSKIT_CARGO_ENV "")
 set(SB_ACCESSKIT_OUTPUT "${SB_ACCESSKIT_CARGO_TARGET}/release")
 if(MINGW)
     set(SB_ACCESSKIT_CARGO_ARGS --target x86_64-pc-windows-gnu)
     set(SB_ACCESSKIT_OUTPUT "${SB_ACCESSKIT_CARGO_TARGET}/x86_64-pc-windows-gnu/release")
     set(SB_ACCESSKIT_IMPLIB "${SB_ACCESSKIT_OUTPUT}/libaccesskit.dll.a")
 else()
+    # Match the application's /MT runtime policy. Explicit target selection
+    # keeps host build scripts/proc macros separate from DLL target flags.
+    set(SB_ACCESSKIT_CARGO_ARGS --target x86_64-pc-windows-msvc)
+    set(SB_ACCESSKIT_CARGO_ENV "CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUSTFLAGS=-C target-feature=+crt-static")
+    set(SB_ACCESSKIT_OUTPUT "${SB_ACCESSKIT_CARGO_TARGET}/x86_64-pc-windows-msvc/release")
     set(SB_ACCESSKIT_IMPLIB "${SB_ACCESSKIT_OUTPUT}/accesskit.dll.lib")
 endif()
 ExternalProject_Add(sb_accesskit_windows_build
     SOURCE_DIR "${SB_C_SOURCE}"
     CONFIGURE_COMMAND ""
-    BUILD_COMMAND "${CMAKE_COMMAND}" -E env CARGO_PROFILE_RELEASE_DEBUG=0
+    BUILD_COMMAND "${CMAKE_COMMAND}" -E env CARGO_PROFILE_RELEASE_DEBUG=0 ${SB_ACCESSKIT_CARGO_ENV}
         "${SB_CARGO}" build --locked --release ${SB_ACCESSKIT_CARGO_ARGS}
         --manifest-path "${SB_C_SOURCE}/Cargo.toml" --target-dir "${SB_ACCESSKIT_CARGO_TARGET}"
     INSTALL_COMMAND ""

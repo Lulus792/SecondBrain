@@ -2144,3 +2144,19 @@ gebaute Windows-DLL. Der Scanner schreibt nun konkrete Problemnamen zusätzlich
 als direkte CI-Annotation und erhält auch frühe Inspektionsfehler. Das echte
 Shared-Library-Fixture prüft fehlende Bibliothek, Bericht und Annotation und
 besteht lokal. Neuer Windows-Paketnachweis folgt.
+
+
+## 0.9.23: MSVC-CRT und Windows-Systemgrenze
+
+CI e4feaf6 meldet jetzt konkrete Dateien: VCRUNTIME140 als echte externe
+Runtime sowie Azure-/Hvsi-/Sensor-Namen und OS-interne mfc42u/msvcp110_win
+aus zu weit verfolgten Windows-Systemimports. Resolver stoppt nun an der
+OS-Grenze und behält separat redistributable CRTs ausdrücklich im Bericht.
+CMake-Politikprüfung mit beiden Pfadtrennern besteht lokal; die MSVC-UI-DLL
+erhält explizites Ziel und +crt-static. DLL-/Allocator-/C-ABI-Grenzen bleiben
+erhalten. Tatsächliche neue Windows-Verknüpfung und Paketabnahme stehen aus.
+
+32/32 lokale Release-Kernprüfungen (24,93 s), 39 Python-Fälle (7,71 s;
+eine native Windows-Kategorieprobe lokal ausgelassen) und das echte Shared-
+Library-Fixture bestehen. Logs: build/static-crt-{policy-check,python-check,
+core-check}.log. Die installierte Mac-App bleibt 0.9.22; neue CI folgt.

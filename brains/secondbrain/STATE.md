@@ -52,3 +52,8 @@ abschließende Produkttext-Bereinigung nach den festgelegten Voraussetzungen.
 Neue CI b901333: Windows-App-Prüfungen bestehen, Release-Paketprüfung scheitert.
 Direkte Runtime-Fehlerannotation ergänzt/geprüft; aktuelle Ursache/Behebung
 und vollständiger Plattformnachweis bleiben ausstehend.
+
+0.9.23 vorbereitet: konkrete VCRUNTIME140-Abhängigkeit der UI-DLL aus CI
+e4feaf6. Statische MSVC-CRT und korrekte OS-Rekursionsgrenze implementiert;
+32 Kern-/39 Python-Fälle lokal geprüft. Windows-Verknüpfung/Paketabnahme
+bleiben ausstehend. Installierte Mac-App bleibt 0.9.22.

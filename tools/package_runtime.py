@@ -65,7 +65,8 @@ def main():
     programs = [root / name for name in names]
     if sys.platform == 'darwin':
         programs[0] = root / 'secondbrain.app/Contents/MacOS/secondbrain'
-    raw = {'resolved': [], 'unresolved': [], 'conflicts': [], 'excluded_os_contract_patterns': []}
+    raw = {'resolved': [], 'unresolved': [], 'conflicts': [], 'excluded_os_contract_patterns': [],
+           'os_recursion_boundary_patterns': [], 'retained_redistributable_patterns': []}
     program_scans = {}
     with tempfile.TemporaryDirectory(prefix='SecondBrain runtime ü ') as temporary:
         for number, path in enumerate(programs):

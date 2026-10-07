@@ -22,6 +22,11 @@ Dateien, Konflikte, nicht aufgelöste Namen und Kategorien der Abhängigkeiten.
   bekannte Visual-C++-Laufzeitnamen gelten auch aus System32 als separate
   Redistributable-Abhängigkeit. Ihre Verfügbarkeit auf einem Entwickler-Runner
   belegt keine saubere Nutzerinstallation.
+  Der Resolver stoppt an der Windows-Systemgrenze. Die internen Imports von
+  OS-Implementierungs-DLLs, etwa optionale Azure-/Hvsi-/Sensor-Komponenten,
+  gehören zur OS-Wartung. Bekannt separat redistributable CRT-Dateien bleiben
+  ausdrücklich von dieser Ausschlussregel ausgenommen. Beide Pfadtrenner sind
+  in der tatsächlichen CMake-Regel geprüft.
 - Linux-Bibliotheken unter den regulären lib-/usr-lib-Verzeichnissen gehören
   zum System-/Desktopbedarf. Die benötigten Dateien stehen im Bericht.
   Verfügbarkeit auf der zugesagten Distribution muss gesondert geprüft werden.
@@ -58,3 +63,19 @@ geprüfte Mindestversion für 1.0 wird daraus nicht vorweggenommen.
 Berichte: build/package-runtime-local.json und
 build/dependency-package-check/runtime-dependencies.json. Nachweise des
 vollständigen Paketablaufs stehen in [STATUS](STATUS.md).
+
+## MSVC-UI-DLL ab 0.9.23
+
+Die [Windows-Diagnose zu e4feaf6](https://github.com/Lulus792/SecondBrain/actions/runs/37701935703)
+beobachtet VCRUNTIME140 als externe Laufzeit der tatsächlich gebauten DLL.
+AccessKit erhält deshalb für MSVC ein explizites Ziel und das Ziel-Flag
+`-C target-feature=+crt-static`. Die UI-DLL bleibt eine separate DLL mit eigenem
+Allocator; die C-ABI-Grenze und ihre Freigabefunktionen bleiben erhalten.
+Die C/C++-App verwendet bereits /MT. Die MinGW-Konfiguration bleibt eine
+gesonderte Toolchain-Variante.
+
+Grundlagen: [Rust CRT-Verknüpfung](https://doc.rust-lang.org/reference/linkage.html#static-and-dynamic-c-runtimes)
+und [zielbezogene Cargo-Flags](https://doc.rust-lang.org/cargo/reference/config.html#targettriplerustflags).
+Ob die beabsichtigte Verknüpfung erreicht ist, bestätigt erst der gebaute
+Windows-Importbericht mit anschließender Paket-/UI-Abnahme. Der native Nachweis
+zu 0.9.23 steht aus; eine lokale Mac-Kompilierung belegt ihn nicht.

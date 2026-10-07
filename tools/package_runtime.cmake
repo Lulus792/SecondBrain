@@ -6,6 +6,8 @@ if(SB_RUNTIME_TOOL)
     set(CMAKE_GET_RUNTIME_DEPENDENCIES_COMMAND "${SB_RUNTIME_TOOL}")
 endif()
 set(excluded "")
+set(post_excluded "")
+set(post_included "")
 if(APPLE)
     set(app "${SB_PACKAGE_ROOT}/secondbrain.app/Contents/MacOS/secondbrain")
     set(cli "${SB_PACKAGE_ROOT}/secondbrain-cli")
@@ -16,6 +18,11 @@ elseif(WIN32)
     set(cli "${SB_PACKAGE_ROOT}/secondbrain-cli.exe")
     # API sets are OS loader contracts, not package files.
     set(excluded "^api-ms-" "^ext-ms-")
+    # Windows owns its internal dependency graph (including optional OS parts).
+    # Keep separately redistributable runtimes visible, but do not recursively
+    # require the package to supply dependencies of OS implementation DLLs.
+    include("${CMAKE_CURRENT_LIST_DIR}/windows_runtime_policy.cmake")
+    sb_windows_runtime_policy("$ENV{SystemRoot}" post_excluded post_included)
 else()
     set(app "${SB_PACKAGE_ROOT}/secondbrain")
     set(cli "${SB_PACKAGE_ROOT}/secondbrain-cli")
@@ -30,7 +37,8 @@ if(NOT SB_RUNTIME_BINARY OR (NOT SB_RUNTIME_BINARY STREQUAL app AND NOT SB_RUNTI
 endif()
 file(GET_RUNTIME_DEPENDENCIES EXECUTABLES "${SB_RUNTIME_BINARY}"
     RESOLVED_DEPENDENCIES_VAR resolved UNRESOLVED_DEPENDENCIES_VAR unresolved
-    CONFLICTING_DEPENDENCIES_PREFIX conflict PRE_EXCLUDE_REGEXES ${excluded})
+    CONFLICTING_DEPENDENCIES_PREFIX conflict PRE_EXCLUDE_REGEXES ${excluded}
+    POST_INCLUDE_REGEXES ${post_included} POST_EXCLUDE_REGEXES ${post_excluded})
 
 function(json_array output)
     set(result "[")
@@ -51,4 +59,6 @@ json_array(resolved_json ${resolved})
 json_array(unresolved_json ${unresolved})
 json_array(conflict_json ${conflict_FILENAMES})
 json_array(excluded_json ${excluded})
-file(WRITE "${SB_OUTPUT}" "{\"resolved\":${resolved_json},\"unresolved\":${unresolved_json},\"conflicts\":${conflict_json},\"excluded_os_contract_patterns\":${excluded_json}}\n")
+json_array(boundary_json ${post_excluded})
+json_array(included_json ${post_included})
+file(WRITE "${SB_OUTPUT}" "{\"resolved\":${resolved_json},\"unresolved\":${unresolved_json},\"conflicts\":${conflict_json},\"excluded_os_contract_patterns\":${excluded_json},\"os_recursion_boundary_patterns\":${boundary_json},\"retained_redistributable_patterns\":${included_json}}\n")
