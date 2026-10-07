@@ -142,6 +142,21 @@ bool sb_space_draw(SBSpace *s, SDL_Renderer *renderer, int width, int height) {
             float ax = fmaxf(qx, 0), ay = fmaxf(qy, 0), length = sqrtf(ax * ax + ay * ay);
             float distance = length + fminf(fmaxf(qx, qy), 0) - radius;
             unsigned char *p = s->pixels + ((size_t)y * w + x) * 4;
+            /* Away from the rim, refraction has zero bend and no highlight.
+               Preserve that exact result without evaluating edge lighting. */
+            if (distance<=-18*scale) {
+                if (s->contrast) p[0]=p[1]=p[2]=s->dark ? 0 : 255;
+                else {
+                    int sx=(int)clamp(cx+dx*0.982f,0,w-1),sy=(int)clamp(cy+dy*0.982f,0,h-1);
+                    const unsigned char *sample=s->base+((size_t)sy*w+sx)*4;
+                    const float tint[]={s->dark ? 49.0f : 235.0f,s->dark ? 67.0f : 243.0f,s->dark ? 93.0f : 252.0f};
+                    for (int k=0;k<3;++k) {
+                        float substrate=s->dark ? fminf(sample[k],74) : sample[k];
+                        p[k]=(unsigned char)(s->solid ? tint[k]*(s->dark ? 0.48f : 1) : substrate*0.73f+tint[k]*0.27f);
+                    }
+                }
+                continue;
+            }
             if (distance > 0) {
                 if (s->contrast) continue;
                 float shadow = fmaxf(0, 1 - distance / (12 * scale)) * 0.17f;

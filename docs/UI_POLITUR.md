@@ -84,3 +84,29 @@ Glaskarte und zeigt Entwicklungsstatus, Version und Build. Kopieren ist eine
 ausdrückliche Aktion; sie übernimmt ausschließlich Buildangaben, keine
 Projektinhalte oder Benutzerpfade. Schließen bleibt fest im Kopf; der Inhalt
 scrollt bei großem Text. Die native macOS-Menüleistenintegration bleibt offen.
+
+## Nachtrag: Reaktionszeit und passende Flächen, 7. Oktober 2026
+
+Der Nutzer meldet verzögerten Dokumentwechsel, ruckelndes Scrollen, unpassende
+Hover-Hinweise, Suchfeld-Löschung und zu große Dialoge mit schlecht ausgerichtetem
+Text. Sein Screenshot zeigt fehlenden Innenabstand und Leerfläche unter sechs
+Bereichszeilen. Apple Motion, Menus und Search fields wurden vor dem neuen
+Entwurf über offizielle DocC-Daten erneut gelesen: kurze, präzise Rückmeldung,
+keine Wartepflicht bis zum Animationsende, erkennbare Suche mit Löschfunktion.
+
+Eigene Übertragung: Ereignis/Bildtakt und sichtbaren Übergang gemeinsam planen.
+Ausgehender und eingehender Inhalt sollen sich mit der Kamera bewegen; neue
+Eingaben müssen laufende Bewegung unterbrechen können. Direkte Auswahl und
+Entwurfschutz bleiben erhalten. Scrollposition darf auch zwischen Ganzpixeln
+flüssig sein; Ziehen folgt unmittelbar dem Zeiger. Kleine Hinweise erhalten
+klare Innenabstände und zugehörige Kürzel. Dialoge werden anhand ihrer
+tatsächlichen Zeilen, Textmaße, Kopf-/Fußbereiche und Fenstergrenzen bemessen.
+Suchsymbol, Texteingabe und dezentes Löschsymbol teilen eine gemeinsame Fläche.
+
+Erste lokale Messung: Metal, 1336×840, eigenes Projektgedächtnis mit 15 Notizen,
+60 gemessene Bilder je Phase nach acht Aufwärmbildern. Median während Scrollen/
+Kamera/Wechsel rund 19–20 ms, p95 bis 28,87 ms. Der Messlauf enthält keinen
+Hauptschleifen-Wait. Codeanalyse bestätigt zusätzliche feste 16-ms-Wartezeit
+und möglichen 100-ms-Leerlauf vor noch nicht begonnener Fahrt. Die bisherigen
+720-ms-Quintik startet mit fast null sichtbarer Bewegung. Diese Zahlen sind
+konkrete Befunde dieser Umgebung, keine allgemeine Plattform-FPS-Zusage.

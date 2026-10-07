@@ -20,7 +20,7 @@ typedef enum { SB_FOCUS_BUTTON, SB_FOCUS_TEXT, SB_FOCUS_MAP, SB_FOCUS_READER } S
 typedef struct { char id[100], label[SB_NAME_CAP]; struct nk_rect bounds; SBFocusKind kind; int group; unsigned order; char parent[100]; } SBTarget;
 typedef struct { char id[100]; char *text; struct nk_rect bounds; accesskit_role role; unsigned order; int group; char parent[100]; unsigned level; float document_y; size_t row,column,rows,columns; SBTextSpan *styles; size_t style_count; float font_size; } SBPassiveText;
 typedef struct {
-    float position, destination, pending, maximum, elastic;
+    float position, destination, pending, maximum, elastic, fractional;
     nk_uint applied;
     bool active, ready, used, measured, dragging;
     float width,height,grab;
@@ -45,6 +45,14 @@ typedef struct {
     char backup_path[SB_PATH_CAP],checked_backup[SB_PATH_CAP],restore_id[65];
     bool restore_checked,quit_after_backup,backup_feedback_reset,backup_error_copied,backup_clipboard_failed;
     char search[256], searched[256], section[32];
+    char hover_label[SB_NAME_CAP];
+    struct nk_rect hover_bounds,tooltip_bounds;
+    Uint64 hover_started;
+    uint64_t hover_hash;
+    bool hover_claimed,modal_sizing,hint_visible;
+    char hint_text[SB_PATH_CAP];
+    struct nk_rect hint_anchor;
+    int hint_group;
     char name[SB_NAME_CAP], id[65], repository[SB_PATH_CAP], folder[SB_PATH_CAP];
     char command_value[SB_PATH_CAP];
     char *context,*notice;
@@ -55,6 +63,9 @@ typedef struct {
     struct nk_rect reader_title_bounds;
     SBStatus message;
     SBForm form;
+    SBForm measured_form;
+    float modal_content_height,modal_content_width,modal_content_scale;
+    struct nk_rect modal_bounds;
     SBCommand command;
     SBAction navigation;
     bool editing, sidebar, id_manual, focus_search, focus_editor, next_edit, reset_reader;

@@ -202,7 +202,9 @@ int sb_desktop_self_test(SBDesktop *d, const char *directory) {
             struct nk_rect r=d->targets[i].bounds;
             found=r.x>=bar->bounds.x && r.y>=bar->bounds.y && r.x+r.w<=bar->bounds.x+bar->bounds.w+0.5f && r.y+r.h<=bar->bounds.y+bar->bounds.h+0.5f;
         }
-        CHECK(found);
+        /* Empty search has no redundant clear action. All available toolbar
+           actions must still fit at the largest supported text size. */
+        CHECK(!strcmp(toolbar[k],"clear-search") && !d->search[0] ? !found : found);
     }
     CHECK(capture(d,directory,"small-200.bmp"));
     CHECK(sb_ui_fonts(&d->ui,1.5f).code==SB_OK); frame(d); frame(d);

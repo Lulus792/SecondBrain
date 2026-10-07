@@ -57,15 +57,18 @@ void sb_desktop_tick(SBDesktop *d, float seconds) {
     d->view_zoom = approach(d->view_zoom,d->zoom,factor,0.0001f);
     d->view_pan_x = approach(d->view_pan_x,d->pan_x,factor,0.05f);
     d->view_pan_y = approach(d->view_pan_y,d->pan_y,factor,0.05f);
-    d->flight=d->reduced_motion ? 1 : fminf(1,d->flight+d->seconds/0.72f);
-    float q=d->flight*d->flight*d->flight*(d->flight*(d->flight*6-15)+10);
+    sb_ui_transition_tick(&d->ui,d->seconds,d->reduced_motion);
+    d->flight=d->reduced_motion ? 1 : fminf(1,d->flight+d->seconds/0.42f);
+    float remaining=1-d->flight;float q=1-remaining*remaining*remaining;
     d->focus_x=d->flight_from[0]+(d->flight_to[0]-d->flight_from[0])*q;
     d->focus_y=d->flight_from[1]+(d->flight_to[1]-d->flight_from[1])*q;
-    d->focus_z=d->flight_from[2]+(d->flight_to[2]-d->flight_from[2])*q+(d->flight<1 ? 70*sinf(d->flight*3.14159265f) : 0);
+    d->focus_z=d->flight_from[2]+(d->flight_to[2]-d->flight_from[2])*q+(d->flight<1 ? 95*sinf(d->flight*3.14159265f) : 0);
 
 }
 bool sb_desktop_animating(const SBDesktop *d) {
-    if (d->backup) return true;
+    if (d->ui.transitioning || d->modal_sizing) return true;
+    if (d->hover_label[0] && SDL_GetTicksNS()-d->hover_started<350000000u) return true;
+    if (d->backup || d->follow_star || d->navigation.kind!=SB_ACT_NONE || d->generation!=d->model.generation) return true;
     if (d->view_yaw != d->yaw || d->view_pitch != d->pitch || d->view_zoom != d->zoom ||
         d->view_pan_x != d->pan_x || d->view_pan_y != d->pan_y) return true;
     if (d->flight<1 || (d->map_ready && (fabsf(d->map_cx-d->map_target_cx)>0.05f || fabsf(d->map_cy-d->map_target_cy)>0.05f || fabsf(d->map_unit-d->map_target_unit)>0.0001f))) return true;
@@ -91,7 +94,8 @@ static void smooth_scroll(SBDesktop *d, unsigned slot, nk_uint *offset) {
     *offset = s->applied = (nk_uint)roundf(s->position);
     s->active = s->position != s->destination;
     s->elastic=d->reduced_motion ? 0 : approach(s->elastic,0,1-expf(-d->seconds/0.11f),0.1f);
-    if (slot!=1) d->ui.ctx->current->layout->at_y-=s->elastic;
+    s->fractional=slot==1 ? 0 : s->position-s->applied;
+    if (slot!=1) d->ui.ctx->current->layout->at_y-=s->elastic+s->fractional;
 }
 static void scroll_gutter(SBDesktop *d) {
     /* Keep the overlay thumb and its pointer track out of content/focus rings.
@@ -102,7 +106,7 @@ static void scroll_gutter(SBDesktop *d) {
 static void scroll_measure(SBDesktop *d, unsigned slot) {
     struct nk_panel *p=d->ui.ctx->current->layout;
     SBScroll *s=&d->scrolling[slot];
-    p->at_y+=s->elastic;
+    p->at_y+=s->elastic+s->fractional;
     float maximum=floorf(fmaxf(0,p->at_y+p->row.height-p->bounds.y-p->bounds.h));
     /* Fractional rubber-band placement cannot change the content's size. */
     if (!s->measured || s->width!=p->bounds.w || s->height!=p->bounds.h || fabsf(maximum-s->maximum)>1)
@@ -114,7 +118,7 @@ static void scroll_measure(SBDesktop *d, unsigned slot) {
     float h=p->clip.h;
     float length=fmaxf(22*d->ui.scale,h*h/(h+s->maximum));
     length=fminf(h,length);
-    float y=p->clip.y+(h-length)*fminf(1,(float)*p->offset_y/s->maximum);
+    float y=p->clip.y+(h-length)*fminf(1,s->position/s->maximum);
     float squeeze=fminf(length/3,fabsf(s->elastic)*0.4f);
     if (s->elastic>0) y+=squeeze;
     s->track=nk_rect(p->clip.x+p->clip.w-10,p->clip.y,10,h);
@@ -126,9 +130,8 @@ static unsigned scroll_slot(SBDesktop *d, float x, float y, bool pointer) {
     if (d->model.guard) return 4;
     if (d->form != SB_FORM_NONE) {
         if (pointer) {
-            int w,h; SDL_GetWindowSize(d->ui.window,&w,&h);
-            float pw=fminf(w-40,580*d->ui.scale), ph=fminf(h-40,680*d->ui.scale);
-            if (x < (w-pw)/2 || x >= (w+pw)/2 || y < (h-ph)/2 || y >= (h+ph)/2) return 4;
+            struct nk_rect r=d->modal_bounds;
+            if (x<r.x || x>=r.x+r.w || y<r.y || y>=r.y+r.h) return 4;
         }
         return modal_reader(d) ? 2 : 3;
     }
@@ -215,7 +218,7 @@ static void document_span(SBDesktop *d,const char *text,size_t length,size_t off
     if (before==d->passive_count) return;
     SBPassiveText *p=&d->passive[before]; strcpy(p->parent,"reader"); p->level=level;
     if (title) p->bounds=bounds;
-    p->document_y=title ? 0 : fmaxf(0,bounds.y-d->ui.ctx->current->layout->clip.y+d->scrolling[slot].applied);
+    p->document_y=title ? 0 : fmaxf(0,bounds.y-d->ui.ctx->current->layout->clip.y+d->scrolling[slot].position+d->scrolling[slot].elastic);
     if (d->reveal_document[0] && d->reveal_document_context!=accessible_context(d)) d->reveal_document[0]=0;
     if (!strcmp(d->reveal_document,id)) {
         d->scrolling[slot].destination=p->document_y; d->scrolling[slot].pending=d->scrolling[slot].elastic=0;
@@ -269,14 +272,52 @@ static void target_label(SBDesktop *d, const char *label) {
     snprintf(out,SB_NAME_CAP,"%s",label);
     while (*out && !sb_utf8_valid(out,strlen(out))) out[strlen(out)-1]=0;
 }
-static void tooltip(SBDesktop *d, const char *text) {
+static void tooltip_at(SBDesktop *d,const char *text,struct nk_rect anchor) {
     struct nk_context *ctx=d->ui.ctx;
-    struct nk_style_item old=ctx->style.window.fixed_background;
-    float rounding=ctx->style.window.rounding;
-    ctx->style.window.fixed_background=nk_style_item_color(d->ui.dark ? nk_rgba(17,29,47,252) : nk_rgba(243,247,253,252));
-    ctx->style.window.rounding=6;
-    nk_tooltip(ctx,text);
-    ctx->style.window.fixed_background=old; ctx->style.window.rounding=rounding;
+    if ((ctx->current->flags|ctx->current->layout->flags)&NK_WINDOW_NO_INPUT) return;
+    d->hover_claimed=true; Uint64 now=SDL_GetTicksNS();
+    uint64_t hash=sb_hash(text,strlen(text));
+    if (d->hover_hash!=hash || !d->hover_label[0] || memcmp(&anchor,&d->hover_bounds,sizeof(anchor))) {
+        snprintf(d->hover_label,sizeof(d->hover_label),"%s",text);d->hover_bounds=anchor;d->hover_hash=hash;d->hover_started=now;return;
+    }
+    if (now-d->hover_started<350000000u) return;
+    snprintf(d->hint_text,sizeof(d->hint_text),"%s",text);d->hint_anchor=anchor;d->hint_group=d->focus_group;d->hint_visible=true;
+}
+static void draw_hint(SBDesktop *d) {
+    const char *text=d->hint_text;struct nk_rect anchor=d->hint_anchor;
+    const char *shortcut=NULL;
+#ifdef __APPLE__
+    const char *command_key="⌘";
+#else
+    const char *command_key="Ctrl+";
+#endif
+    char keys[32]={0};
+    if (!strcmp(text,"Darstellung")) snprintf(keys,sizeof(keys),"%s,",command_key);
+    else if (!strcmp(text,"Bearbeiten")) snprintf(keys,sizeof(keys),"%sE",command_key);
+    else if (!strcmp(text,"Speichern")) snprintf(keys,sizeof(keys),"%sS",command_key);
+    else if (!strcmp(text,"Notiz") || !strcmp(text,"Neue Notiz")) snprintf(keys,sizeof(keys),"%sN",command_key);
+    else if (!strcmp(text,"Schließen") || !strcmp(text,"Suche leeren")) strcpy(keys,"Esc");
+    else if (!strcmp(text,"Tastaturhilfe") || !strcmp(text,"Hilfe")) strcpy(keys,"F1");
+    else if (!strcmp(text,"Aktionen")) strcpy(keys,"⇧ F10");
+    if (*keys) shortcut=keys;
+    const struct nk_user_font *font=&d->ui.normal->handle;
+    float key_width=shortcut ? font->width(font->userdata,font->height,shortcut,(int)strlen(shortcut))+12*d->ui.scale : 0;
+    float text_width=font->width(font->userdata,font->height,text,(int)strlen(text));
+    int window_width,window_height;SDL_GetWindowSize(d->ui.window,&window_width,&window_height);
+    float inner=fminf(text_width+key_width+(shortcut ? 14*d->ui.scale : 0),fminf(420*d->ui.scale,window_width-60.0f));
+    float padding=10*d->ui.scale;
+    float label_width=inner-key_width-(shortcut ? 14*d->ui.scale : 0);
+    float height=sb_ui_hint_height(&d->ui,text,label_width);
+    float total_width=inner+2*padding;
+    float total_height=fminf(height+12*d->ui.scale,window_height-24.0f);
+    float x=fmaxf(12,fminf(window_width-total_width-12,anchor.x+anchor.w/2-total_width/2));
+    float y=anchor.y+anchor.h+8*d->ui.scale;
+    if (y+total_height>window_height-12) y=fmaxf(12,anchor.y-total_height-8*d->ui.scale);
+    d->tooltip_bounds=nk_rect(x,y,total_width,total_height);
+    sb_ui_hint_draw(&d->ui,d->tooltip_bounds,text,label_width,shortcut);
+}
+static void tooltip(SBDesktop *d,const char *text) {
+    struct nk_vec2 p=d->ui.ctx->input.mouse.pos;tooltip_at(d,text,nk_rect(p.x,p.y,0,0));
 }
 static bool focused(SBDesktop *d, const char *id) { return d->keyboard && !strcmp(d->focus, id); }
 static void ring(SBDesktop *d, const char *id) {
@@ -299,32 +340,43 @@ static bool button(SBDesktop *d, const char *id, const char *label) {
     struct nk_rect bounds = nk_widget_bounds(d->ui.ctx);
     target(d, id); target_label(d,!strcmp(id,"new-note") ? "Neue Notiz" : !strcmp(id,"new-project") ? "Neues Projekt" : !strcmp(id,"filter") ? "Wissensbereich wählen" : label);
     struct nk_rect clip = d->ui.ctx->current->layout->clip;
-    if (bounds.y >= clip.y && bounds.y+bounds.h <= clip.y+clip.h) glass(d,bounds,9);
+    bool clear=!strcmp(id,"clear-search");
+    if (!clear && bounds.y >= clip.y && bounds.y+bounds.h <= clip.y+clip.h) glass(d,bounds,9);
     SBIcon icon=sb_icon_for(id);
     if (icon==SB_ICON_EXPAND && d->expanded) icon=SB_ICON_COLLAPSE;
     bool only= !strcmp(id,"close-card") || !strcmp(id,"cancel") || !strcmp(id,"clear-search") ||
         !strcmp(id,"zoom-in") || !strcmp(id,"zoom-out") || !strncmp(id,"rotate-",7) || !strcmp(id,"camera-home") || !strcmp(id,"settings");
     only = only || (icon!=SB_ICON_NONE && bounds.w<70*d->ui.scale);
+    struct nk_style_button old_button=d->ui.ctx->style.button;
+    if (clear) {
+        d->ui.ctx->style.button.normal=nk_style_item_color(nk_rgba(0,0,0,0));
+        d->ui.ctx->style.button.hover=nk_style_item_color(d->ui.dark ? nk_rgba(180,198,220,28) : nk_rgba(50,75,110,20));
+        d->ui.ctx->style.button.active=d->ui.ctx->style.button.hover;d->ui.ctx->style.button.border=0;d->ui.ctx->style.button.rounding=14*d->ui.scale;
+    }
     bool clicked=nk_button_label(d->ui.ctx,"") != 0;
+    d->ui.ctx->style.button=old_button;
     struct nk_command_buffer *canvas=nk_window_get_canvas(d->ui.ctx);
     if (icon!=SB_ICON_NONE) {
-        float size=fminf(20*d->ui.scale,bounds.h-12);
-        sb_icon_draw(canvas,icon,nk_rect(only ? bounds.x+(bounds.w-size)/2 : bounds.x+10,bounds.y+(bounds.h-size)/2,size,size),d->ui.ctx->style.text.color);
+        float size=fminf(18*d->ui.scale,bounds.h-12);
+        sb_icon_draw(canvas,icon,nk_rect(only ? bounds.x+(bounds.w-size)/2 : bounds.x+12*d->ui.scale,bounds.y+(bounds.h-size)/2,size,size),d->ui.ctx->style.text.color);
     }
     if (!only) {
         char shown[SB_NAME_CAP];
-        float inset=icon==SB_ICON_NONE ? 10 : 36*d->ui.scale;
+        float inset=(icon==SB_ICON_NONE ? 16 : 40)*d->ui.scale;
         compact_label(d,label,shown,sizeof(shown),bounds.w-inset-12);
         struct nk_rect text=nk_rect(bounds.x+inset,bounds.y+(bounds.h-d->ui.normal->handle.height)/2,bounds.w-inset-10,d->ui.normal->handle.height);
         nk_draw_text(canvas,text,shown,(int)strlen(shown),&d->ui.normal->handle,nk_rgba(0,0,0,0),d->ui.ctx->style.text.color);
     }
-    if (nk_input_is_mouse_hovering_rect(&d->ui.ctx->input,bounds)) tooltip(d,label);
+    if (nk_input_is_mouse_hovering_rect(&d->ui.ctx->input,bounds)) tooltip_at(d,label,bounds);
     ring(d, id);
     return clicked || activation(d, id);
 }
 static bool selectable(SBDesktop *d, const char *id, const char *label, nk_bool *selected) {
     target(d, id); target_label(d,label);
+    struct nk_vec2 padding=d->ui.ctx->style.selectable.padding;
+    d->ui.ctx->style.selectable.padding=nk_vec2(16*d->ui.scale,6*d->ui.scale);
     bool clicked = nk_selectable_label(d->ui.ctx, label, NK_TEXT_LEFT, selected) != 0;
+    d->ui.ctx->style.selectable.padding=padding;
     ring(d, id);
     return clicked || activation(d, id);
 }
@@ -404,7 +456,10 @@ static void request(SBDesktop *d, SBActionKind kind, const char *value) {
         d->message = sb_error(SB_LIMIT, "Zielpfad zu lang."); return;
     }
     d->navigation.kind = kind;
-    if (kind == SB_ACT_NOTE && value && strcmp(value,d->model.path)) d->follow_star=true;
+    if (kind == SB_ACT_NOTE && value && strcmp(value,d->model.path)) {
+        d->follow_star=true;
+        if (!d->editing && !d->model.source && d->card && !d->model.guard && !d->reduced_motion) d->ui.capture_pending=true;
+    }
     if (value) strcpy(d->navigation.value, value);
     else d->navigation.value[0] = 0;
 }
@@ -513,6 +568,7 @@ static void editor_reset(SBDesktop *d) {
 }
 static void synchronize(SBDesktop *d) {
     if (d->generation != d->model.generation) {
+        if (strcmp(d->graph_project,d->model.project.root)) d->expanded=false;
         d->generation = d->model.generation;
         d->editing = d->next_edit; d->next_edit = false;
         d->focus_editor = d->editing;
@@ -616,7 +672,17 @@ void sb_desktop_apply(SBDesktop *d) {
     if (d->navigation.kind != SB_ACT_NONE) {
         SBAction action = d->navigation;
         memset(&d->navigation, 0, sizeof(d->navigation));
-        result(d, sb_app_request(&d->model, action.kind, action.value), NULL);
+        unsigned previous_generation=d->model.generation;
+        bool blend=action.kind==SB_ACT_NOTE && !d->editing && !d->model.source && d->card && !d->model.guard && !d->reduced_motion;
+        result(d,sb_app_request(&d->model,action.kind,action.value),NULL);
+        if (blend && d->message.code==SB_OK && !d->model.guard && d->model.generation!=previous_generation) sb_ui_transition_begin(&d->ui);
+        else if (!d->ui.transitioning) {SDL_DestroyTexture(d->ui.outgoing_texture);d->ui.outgoing_texture=NULL;}
+        if (action.kind==SB_ACT_NOTE && d->message.code==SB_OK && !d->model.guard && d->model.generation!=previous_generation && !strcmp(d->graph_project,d->model.project.root)) {
+            for(size_t i=0;i<d->model.notes.count && i<d->graph.count;++i) if(!strcmp(d->model.notes.items[i].path,d->model.path)) {
+                SBStar v=d->graph.stars[i];d->flight_from[0]=d->focus_x;d->flight_from[1]=d->focus_y;d->flight_from[2]=d->focus_z;
+                d->flight_to[0]=v.x;d->flight_to[1]=v.y;d->flight_to[2]=v.z;d->flight=0;d->pan_x=d->pan_y=0;d->follow_star=false;break;
+            }
+        }
         if (action.kind == SB_ACT_PROJECT && (d->form == SB_FORM_SETTINGS || d->form == SB_FORM_PROJECTS) && d->message.code == SB_OK)
             d->form = SB_FORM_NONE;
     }
@@ -785,6 +851,14 @@ static void star_step(SBDesktop *d, SDL_Keycode key) {
     d->star = found;
 }
 void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
+    if (d->ui.transitioning) {
+        bool arrow=event->type==SDL_EVENT_KEY_DOWN && !strcmp(d->focus,"galaxy") &&
+            (event->key.key==SDLK_LEFT || event->key.key==SDLK_RIGHT || event->key.key==SDLK_UP || event->key.key==SDLK_DOWN);
+        struct nk_rect card=nk_rect(d->ui.card_bounds.x,d->ui.card_bounds.y,d->ui.card_bounds.w,d->ui.card_bounds.h);
+        bool pointer=(event->type==SDL_EVENT_MOUSE_BUTTON_DOWN && inside(event->button.x,event->button.y,card)) ||
+            (event->type==SDL_EVENT_MOUSE_WHEEL && inside(event->wheel.mouse_x,event->wheel.mouse_y,card));
+        if (pointer || (event->type==SDL_EVENT_KEY_DOWN && !arrow)) sb_ui_transition_tick(&d->ui,1,true);
+    }
     if (d->dialogs && event->type==sb_dialogs_event(d->dialogs)) {
         SBDialogReply *reply=event->user.data1;
         bool folder=d->form==SB_FORM_WORKSPACE && reply && reply->kind==SB_DIALOG_FOLDER;
@@ -820,7 +894,7 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
             SBScroll *s=&d->scrolling[i];
             float range=fmaxf(1,s->track.h-s->thumb.h);
             s->position=s->destination=fmaxf(0,fminf(s->maximum,(event->motion.y-s->grab-s->track.y)/range*s->maximum));
-            s->elastic=0; return;
+            s->elastic=0;s->pending=0;s->active=false;return;
         }
     }
     if (event->type==SDL_EVENT_MOUSE_BUTTON_UP) {
@@ -1056,35 +1130,34 @@ static void glass(SBDesktop *d, struct nk_rect r, float radius) {
     if (space->glass_count < 64) space->glass[space->glass_count++] = (SBGlass){{r.x,r.y,r.w,r.h}, radius};
 }
 static void search_box(SBDesktop *d) {
-    struct nk_context *ctx=d->ui.ctx;
-    struct nk_rect box=nk_widget_bounds(ctx);
-    struct nk_vec2 padding=ctx->style.window.group_padding, spacing=ctx->style.window.spacing;
-    struct nk_style_item background=ctx->style.edit.normal, hover=ctx->style.edit.hover, active=ctx->style.edit.active;
-    float border=ctx->style.edit.border;
-    nk_fill_rect(nk_window_get_canvas(ctx),box,10,d->ui.dark ? nk_rgba(6,16,30,170) : nk_rgba(255,255,255,180));
-    nk_stroke_rect(nk_window_get_canvas(ctx),box,10,1,d->ui.dark ? nk_rgba(160,190,225,70) : nk_rgba(75,100,130,100));
-    ctx->style.window.group_padding=nk_vec2(8,0); ctx->style.window.spacing=nk_vec2(2,0);
-    ctx->style.edit.normal=ctx->style.edit.hover=ctx->style.edit.active=nk_style_item_color(nk_rgba(0,0,0,0)); ctx->style.edit.border=0;
+    struct nk_context *ctx=d->ui.ctx;float s=d->ui.scale;struct nk_rect box=nk_widget_bounds(ctx);
+    struct nk_vec2 padding=ctx->style.window.group_padding,spacing=ctx->style.window.spacing,edit_padding=ctx->style.edit.padding;
+    struct nk_style_item background=ctx->style.edit.normal,hover=ctx->style.edit.hover,active=ctx->style.edit.active;float border=ctx->style.edit.border;
+    nk_fill_rect(nk_window_get_canvas(ctx),box,10*s,d->ui.dark ? nk_rgba(6,16,30,170) : nk_rgba(255,255,255,180));
+    nk_stroke_rect(nk_window_get_canvas(ctx),box,10*s,1,d->ui.dark ? nk_rgba(160,190,225,70) : nk_rgba(75,100,130,100));
+    ctx->style.window.group_padding=nk_vec2(12*s,0);ctx->style.window.spacing=nk_vec2(8*s,0);
+    ctx->style.edit.normal=ctx->style.edit.hover=ctx->style.edit.active=nk_style_item_color(nk_rgba(0,0,0,0));ctx->style.edit.border=0;
+    ctx->style.edit.padding=nk_vec2(0,fmaxf(0,(box.h-d->ui.normal->handle.height)/2));
     if (nk_group_begin(ctx,"Search field",NK_WINDOW_NO_SCROLLBAR)) {
-        nk_layout_row_begin(ctx,NK_STATIC,box.h,3);
-        nk_layout_row_push(ctx,20*d->ui.scale);
-        struct nk_rect icon=nk_widget_bounds(ctx); nk_spacer(ctx);
-        sb_icon_draw(nk_window_get_canvas(ctx),SB_ICON_SEARCH,nk_rect(icon.x,icon.y+(icon.h-18*d->ui.scale)/2,18*d->ui.scale,18*d->ui.scale),ctx->style.text.color);
-        nk_layout_row_push(ctx,fmaxf(30,box.w-20*d->ui.scale-32*d->ui.scale-24));
-        text_target(d,"search"); target_label(d,"Suche im Projekt"); int length=(int)strlen(d->search);
-        nk_edit_string(ctx,NK_EDIT_FIELD,d->search,&length,sizeof(d->search),nk_filter_default); d->search[length]=0;
+        float available=ctx->current->layout->bounds.w-2*ctx->style.window.group_padding.x-2*ctx->style.window.spacing.x;
+        nk_layout_row_begin(ctx,NK_STATIC,box.h,3);nk_layout_row_push(ctx,18*s);
+        struct nk_rect icon=nk_widget_bounds(ctx);nk_spacer(ctx);
+        sb_icon_draw(nk_window_get_canvas(ctx),SB_ICON_SEARCH,nk_rect(icon.x,icon.y+(icon.h-16*s)/2,16*s,16*s),ctx->style.text.color);
+        nk_layout_row_push(ctx,fmaxf(24,available-18*s-24*s));
+        text_target(d,"search");target_label(d,"Suche im Projekt");int length=(int)strlen(d->search);
+        nk_edit_string(ctx,NK_EDIT_FIELD,d->search,&length,sizeof(d->search),nk_filter_default);d->search[length]=0;
         if (!length && !focused(d,"search")) {
-            struct nk_rect hint=d->targets[d->target_count-1].bounds;
-            hint.x+=10; hint.w-=20; hint.y+=(hint.h-d->ui.normal->handle.height)/2; hint.h=d->ui.normal->handle.height;
+            struct nk_rect hint=d->targets[d->target_count-1].bounds;hint.y+=(hint.h-d->ui.normal->handle.height)/2;hint.h=d->ui.normal->handle.height;
             nk_draw_text(nk_window_get_canvas(ctx),hint,"Suche im Projekt",16,&d->ui.normal->handle,nk_rgba(0,0,0,0),d->ui.dark ? nk_rgb(168,186,210) : nk_rgb(80,100,124));
         }
-        ring(d,"search"); nk_layout_row_push(ctx,28*d->ui.scale);
-        if (button(d,"clear-search","Suche leeren")) d->search[0]=0;
-        nk_layout_row_end(ctx); nk_group_end(ctx);
+        ring(d,"search");nk_layout_row_push(ctx,24*s);
+        if (length || focused(d,"clear-search")) { if(button(d,"clear-search","Suche leeren")) d->search[0]=0; } else nk_spacer(ctx);
+        nk_layout_row_end(ctx);nk_group_end(ctx);
     }
-    ctx->style.window.group_padding=padding; ctx->style.window.spacing=spacing;
-    ctx->style.edit.normal=background; ctx->style.edit.hover=hover; ctx->style.edit.active=active; ctx->style.edit.border=border;
+    ctx->style.window.group_padding=padding;ctx->style.window.spacing=spacing;ctx->style.edit.padding=edit_padding;
+    ctx->style.edit.normal=background;ctx->style.edit.hover=hover;ctx->style.edit.active=active;ctx->style.edit.border=border;
 }
+
 static void tools(SBDesktop *d, int width, float height, nk_flags flags) {
     struct nk_context *ctx=d->ui.ctx; float s=d->ui.scale;
     struct nk_rect rect=nk_rect(18,16,width-36.0f,height);
@@ -1263,7 +1336,7 @@ static void table_passive(SBDesktop *d,const char *id,const char *text,accesskit
     if (before==d->passive_count) return;
     SBPassiveText *p=&d->passive[before]; snprintf(p->parent,sizeof(p->parent),"%s",parent);
     p->row=row; p->column=column; p->rows=rows; p->columns=columns;
-    p->document_y=fmaxf(0,bounds.y-reader_top+d->scrolling[slot].applied);
+    p->document_y=fmaxf(0,bounds.y-reader_top+d->scrolling[slot].position+d->scrolling[slot].elastic);
     if (!strcmp(d->reveal_document,id) && d->reveal_document_context==accessible_context(d)) {
         d->scrolling[slot].destination=p->document_y; d->scrolling[slot].pending=d->scrolling[slot].elastic=0;
         d->scrolling[slot].active=true; d->reveal_document[0]=0;
@@ -1475,7 +1548,9 @@ static bool document_tree(SBDesktop *d,const SBDocument *document,const SBRefere
         char parent[100]; snprintf(parent,sizeof(parent),"%s",node->parent && layout[node->parent].passive<d->passive_count ? d->passive[layout[node->parent].passive].id : "reader");
         float inset=fminf(entry->inset,fmaxf(0,base_width-100*s));
         panel->at_x=base_x+inset; panel->bounds.w=base_width-inset;
-        struct nk_rect mark_bounds=nk_widget_bounds(ctx);
+        /* Containers can precede the first widget row. Do not peek into an
+           unset row; rendered leaves replace this fallback with their bounds. */
+        struct nk_rect mark_bounds=nk_rect(panel->at_x,panel->at_y,panel->bounds.w,0);
         if (node->kind==SB_DOC_LIST || node->kind==SB_DOC_ITEM || node->kind==SB_DOC_QUOTE) {
             char id[100]; snprintf(id,sizeof(id),"reader:container:%zu",i);
             const char *label=node->kind==SB_DOC_QUOTE ? "Zitat" : node->kind==SB_DOC_ITEM ? "Listeneintrag" : node->ordered ? "Nummerierte Liste" : "Liste";
@@ -1519,10 +1594,10 @@ static bool document_tree(SBDesktop *d,const SBDocument *document,const SBRefere
                     at=next<end ? next+1 : next;
                 }
             } else document_block(d,node->view.text,node->view.length,block,slot,links,references,&node->view,parent,first_heading);
-            if (d->passive_count>before) { mark_bounds=d->passive[before].bounds; mark_bounds.y=d->passive[before].document_y+panel->clip.y-d->scrolling[slot].applied; }
+            if (d->passive_count>before) { mark_bounds=d->passive[before].bounds; mark_bounds.y=d->passive[before].document_y+panel->clip.y-d->scrolling[slot].position-d->scrolling[slot].elastic; }
             for (size_t p=before;p<d->passive_count;++p) if (!strcmp(d->passive[p].parent,parent) && node->parent && layout[node->parent].passive<d->passive_count) document_union(&d->passive[layout[node->parent].passive],&d->passive[p]);
             for (size_t t=target_before;t<d->target_count;++t) if (node->parent && layout[node->parent].passive<d->passive_count) {
-                SBPassiveText child={.bounds=d->targets[t].bounds,.document_y=fmaxf(0,d->targets[t].bounds.y-panel->clip.y+d->scrolling[slot].applied)};
+                SBPassiveText child={.bounds=d->targets[t].bounds,.document_y=fmaxf(0,d->targets[t].bounds.y-panel->clip.y+d->scrolling[slot].position+d->scrolling[slot].elastic)};
                 struct nk_rect clip=panel->clip;float left=fmaxf(child.bounds.x,clip.x),top=fmaxf(child.bounds.y,clip.y);
                 child.bounds=nk_rect(left,top,fmaxf(0,fminf(child.bounds.x+child.bounds.w,clip.x+clip.w)-left),fmaxf(0,fminf(child.bounds.y+child.bounds.h,clip.y+clip.h)-top));
                 document_union(&d->passive[layout[node->parent].passive],&child);
@@ -1544,7 +1619,7 @@ static bool document_tree(SBDesktop *d,const SBDocument *document,const SBRefere
                 SBPassiveText *p=&d->passive[mark->marker]; struct nk_rect clip=panel->clip;
                 float left=fmaxf(rect.x,clip.x),top=fmaxf(rect.y,clip.y);
                 p->bounds=nk_rect(left,top,fmaxf(0,fminf(rect.x+rect.w,clip.x+clip.w)-left),fmaxf(0,fminf(rect.y+rect.h,clip.y+clip.h)-top));
-                p->document_y=fmaxf(0,rect.y-panel->clip.y+d->scrolling[slot].applied);document_union(&d->passive[mark->passive],p);
+                p->document_y=fmaxf(0,rect.y-panel->clip.y+d->scrolling[slot].position+d->scrolling[slot].elastic);document_union(&d->passive[mark->passive],p);
             }
         }
     }
@@ -1643,9 +1718,9 @@ static void detail(SBDesktop *d, float x, float y, float width, float height, nk
             nk_style_set_font(ctx,&d->ui.body->handle);
             nk_layout_row_dynamic(ctx,body_height,1); text_target(d,"editor"); target_label(d,"Dokument bearbeiten");
             if (d->focus_editor) { nk_edit_focus(ctx,NK_EDIT_ALWAYS_INSERT_MODE); d->focus_editor=false; }
-            nk_uint scroll=(nk_uint)d->text_edit.scrollbar.y; smooth_scroll(d,1,&scroll); d->text_edit.scrollbar.y=(float)scroll;
+            nk_uint scroll=(nk_uint)roundf(d->text_edit.scrollbar.y); smooth_scroll(d,1,&scroll); d->text_edit.scrollbar.y=d->scrolling[1].position;
             nk_edit_buffer(ctx,NK_EDIT_BOX,&d->text_edit,nk_filter_default);
-            if ((nk_uint)d->text_edit.scrollbar.y < d->scrolling[1].applied) {
+            if (d->text_edit.scrollbar.y+0.5f < d->scrolling[1].applied) {
                 d->scrolling[1].maximum=d->text_edit.scrollbar.y; d->scrolling[1].measured=true;
             }
             d->model.editor[d->text_edit.string.buffer.allocated]=0; ring(d,"editor");
@@ -1669,37 +1744,70 @@ static void detail(SBDesktop *d, float x, float y, float width, float height, nk
     }
     nk_end(ctx); ctx->style.window.spacing=spacing;
 }
+static float modal_estimate(SBDesktop *d,float width) {
+    float s=d->ui.scale,gap=d->ui.ctx->style.window.spacing.y,row=36*s+gap;
+    if (d->form==SB_FORM_FILTER) return 6*row;
+    if (d->form==SB_FORM_ACTIONS) return (7+(d->model.editor && strchr(d->model.path,'/') && strncmp(d->model.path,"archive/",8) ? 1 : 0))*row;
+    if (d->form==SB_FORM_NOTE) return 3*(24*s+36*s+2*gap);
+    if (d->form==SB_FORM_PROJECT) return 3*(24*s+36*s+2*gap);
+    if (d->form==SB_FORM_WORKSPACE) return 48*s+gap+24*s+36*s+2*gap+row;
+    if (d->form==SB_FORM_PROJECTS) return (float)(fmin(8,d->model.projects.count)+4)*row+48*s;
+    if (d->form==SB_FORM_ABOUT) return 48*s+gap+4*row+48*s+gap+3*row;
+    if (d->form==SB_FORM_BACKUP || d->form==SB_FORM_RESTORE) return (d->restore_checked ? 500 : 300)*s;
+    (void)width;return 800*s;
+}
+static float menu_width(SBDesktop *d,const char *const *labels,size_t count,float minimum) {
+    const struct nk_user_font *font=&d->ui.normal->handle;float width=minimum*d->ui.scale;
+    for(size_t i=0;i<count;++i) width=fmaxf(width,font->width(font->userdata,font->height,labels[i],(int)strlen(labels[i]))+80*d->ui.scale);
+    return width;
+}
 static void popup(SBDesktop *d, int width, int height) {
     struct nk_context *ctx = d->ui.ctx;
+    struct nk_style_window original_window=ctx->style.window;
+    ctx->style.window.padding=nk_vec2(14*d->ui.scale,12*d->ui.scale);
+    ctx->style.window.group_padding=nk_vec2(8*d->ui.scale,6*d->ui.scale);
+    ctx->style.window.spacing=nk_vec2(8*d->ui.scale,4*d->ui.scale);
     float s = d->ui.scale, w = fminf(width - 40.0f, 580 * s), h = fminf(height - 40.0f, 680 * s);
     if (d->model.guard) {
-        h = fminf(height - 40.0f, 430 * s);
+        const char *guard_text="Dieses Dokument enthält ungespeicherte Änderungen. Speichere sie vor dem Wechsel oder behalte die Bearbeitung bei.";
+        float text_width=w-2*ctx->style.window.padding.x;
+        float guard_height=sb_ui_wrap_height(ctx,&d->ui.normal->handle,guard_text,strlen(guard_text),text_width);
+        float error_height=d->message.message[0] ? sb_ui_wrap_height(ctx,&d->ui.normal->handle,d->message.message,strlen(d->message.message),text_width) : 0;
+        unsigned actions=d->message.code==SB_CONFLICT ? 4 : 3;
+        h=fminf(height-40.0f,guard_height+error_height+actions*(36*s+ctx->style.window.spacing.y)+2*ctx->style.window.padding.y+44*s+2*ctx->style.window.spacing.y);
+        d->modal_bounds=nk_rect((width-w)/2,(height-h)/2,w,h);
         glass(d, nk_rect((width-w)/2, (height-h)/2, w, h), 28);
         if (nk_begin(ctx, "Änderungen erhalten", nk_rect((width - w) / 2, (height - h) / 2, w, h),
                      NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
             passive_add(d,"modal-title","Änderungen erhalten",ACCESSKIT_ROLE_HEADING,nk_rect((width-w)/2,(height-h)/2,w,32*s));
-            nk_layout_row_dynamic(ctx, 76 * s, 1);
-            native_wrap(d, "Dieses Dokument enthält ungespeicherte Änderungen. Speichere sie vor dem Wechsel oder behalte die Bearbeitung bei.");
+            nk_layout_row_dynamic(ctx,guard_height,1);native_wrap(d,guard_text);
             nk_layout_row_dynamic(ctx, 36 * s, 1);
             if (button(d, "guard-save", "Speichern und weiter")) command(d, SB_CMD_GUARD_SAVE);
             if (button(d, "guard-discard", "Änderungen verwerfen")) command(d, SB_CMD_GUARD_DISCARD);
             if (button(d, "guard-cancel", "Weiter bearbeiten")) command(d, SB_CMD_GUARD_CANCEL);
             if (d->message.code == SB_CONFLICT)
                 if (button(d, "guard-copy", "Eigene Fassung als neue Notiz sichern")) command(d, SB_CMD_COPY);
-            nk_layout_row_dynamic(ctx, 60 * s, 1); native_wrap(d, d->message.message);
+            if(error_height>0) {nk_layout_row_dynamic(ctx,error_height,1);native_wrap(d,d->message.message);}
         }
-        nk_end(ctx); return;
+        nk_end(ctx);ctx->style.window=original_window;return;
     }
-    if (d->form == SB_FORM_NONE) return;
+    if (d->form == SB_FORM_NONE) {ctx->style.window=original_window;return;}
+    SBForm layout_form=d->form;
     const char *title = d->form == SB_FORM_PROJECT ? "Neues Projekt" : d->form == SB_FORM_NOTE ? "Neue Notiz" :
         d->form == SB_FORM_WORKSPACE ? "Arbeitsordner öffnen" : d->form == SB_FORM_SETTINGS ? "Projekte und Darstellung" :
         d->form == SB_FORM_CONTEXT ? "KI-Kontext" : d->form == SB_FORM_ACTIONS ? "Dokumentaktionen" :
         d->form == SB_FORM_PROJECTS ? "Projekt wählen" : d->form == SB_FORM_FILTER ? "Wissensbereich" :
         d->form==SB_FORM_BACKUP ? "Projekt sichern" : d->form==SB_FORM_RESTORE ? "Sicherung wiederherstellen" : d->form==SB_FORM_ABOUT ? "Über SecondBrain" : d->form==SB_FORM_NOTICE_LIST ? "Lizenzen" : d->form==SB_FORM_NOTICE_TEXT ? sb_notice_name(d->notice_index) : "Tastaturhilfe";
-    if (d->form==SB_FORM_ACTIONS || d->form==SB_FORM_FILTER) h=fminf(height-40,(6*42+80)*s+56);
-    if (d->form==SB_FORM_ABOUT) h=fminf(height-40,380*s+60);
-    if (d->form==SB_FORM_WORKSPACE) h=fminf(height-40,300*s+40);
-    if (d->form==SB_FORM_BACKUP || d->form==SB_FORM_RESTORE) h=fminf(height-40,(d->form==SB_FORM_RESTORE && d->restore_checked ? 520 : 340)*s+60);
+    if (d->form==SB_FORM_FILTER) w=fminf(width-40.0f,menu_width(d,section_names,6,260));
+    if (d->form==SB_FORM_ACTIONS) { const char *labels[]={"Als neue Notiz speichern","Sicherung wiederherstellen","Dokumentaktionen"};w=fminf(width-40.0f,menu_width(d,labels,3,320)); }
+    float gap=ctx->style.window.spacing.y;
+    bool has_footer=d->backup || d->form==SB_FORM_PROJECT || d->form==SB_FORM_NOTE || d->form==SB_FORM_WORKSPACE || d->form==SB_FORM_BACKUP || d->form==SB_FORM_RESTORE;
+    float shell=2*ctx->style.window.padding.y+32*s+2*gap+(has_footer ? 36*s+gap : 0);
+    float content_height=modal_estimate(d,w)+2*ctx->style.window.group_padding.y;
+    if (d->measured_form==d->form && d->modal_content_width==w && d->modal_content_scale==s && d->modal_content_height>0 && !modal_reader(d)) content_height=d->modal_content_height;
+    h=fminf(height-40.0f,shell+content_height);
+    if (modal_reader(d)) h=height-40.0f;
+    d->modal_bounds=nk_rect((width-w)/2,(height-h)/2,w,h);
     glass(d,nk_rect((width-w)/2,(height-h)/2,w,h),16);
     if (nk_begin(ctx,title,nk_rect((width-w)/2,(height-h)/2,w,h),NK_WINDOW_NO_SCROLLBAR)) {
         float available=ctx->current->layout->bounds.w;
@@ -1708,7 +1816,7 @@ static void popup(SBDesktop *d, int width, int height) {
         nk_layout_row_push(ctx,32*s); if (button(d,"cancel","Schließen")) command(d,SB_CMD_CANCEL);
         nk_layout_row_end(ctx);
         bool form=!d->backup && (d->form==SB_FORM_PROJECT || d->form==SB_FORM_NOTE || d->form==SB_FORM_WORKSPACE || d->form==SB_FORM_BACKUP || d->form==SB_FORM_RESTORE);
-        float contents=fmaxf(40,h-60-32*s-((form || d->backup) ? 48*s : 0));
+        float contents=fmaxf(40,h-shell);
         nk_layout_row_dynamic(ctx,contents,1);
         bool group=nk_group_begin(ctx,"Modal contents",NK_WINDOW_NO_SCROLLBAR);
         if (group) {
@@ -1908,6 +2016,12 @@ static void popup(SBDesktop *d, int width, int height) {
         if (d->message.message[0] && d->form!=SB_FORM_ACTIONS && d->form!=SB_FORM_FILTER && d->form!=SB_FORM_CONTEXT && d->form!=SB_FORM_NOTICE_TEXT && d->form!=SB_FORM_BACKUP && d->form!=SB_FORM_RESTORE && (d->form!=SB_FORM_ABOUT || d->message.code!=SB_OK)) {
             nk_layout_row_dynamic(ctx,52*s,1); native_wrap(d,d->message.message);
         }
+        struct nk_panel *body=ctx->current->layout;
+        if (!modal_reader(d)) {
+            d->modal_content_height=fmaxf(1,body->at_y+body->row.height-body->bounds.y+d->scrolling[3].elastic+d->scrolling[3].fractional)+2*ctx->style.window.group_padding.y;
+            d->modal_content_width=w;d->modal_content_scale=s;d->measured_form=layout_form;
+            d->modal_sizing=d->form!=layout_form || fabsf(fminf(height-40.0f,shell+d->modal_content_height)-h)>0.5f;
+        }
         scroll_measure(d,3); nk_group_end(ctx);
         }
         if (d->backup) {
@@ -1919,7 +2033,7 @@ static void popup(SBDesktop *d, int width, int height) {
             if (button(d,"submit",submit)) command(d,SB_CMD_SUBMIT);
         }
     }
-    nk_end(ctx);
+    nk_end(ctx);ctx->style.window=original_window;
 }
 static void graph_refresh(SBDesktop *d) {
     if (!d->graph_dirty) return;
@@ -2096,11 +2210,12 @@ void sb_desktop_frame(SBDesktop *d) {
         d->layout_width=width; d->layout_height=height; d->layout_scale=d->ui.scale;
     }
     synchronize(d);
-    passive_clear(d); d->semantic_order=0;
+    passive_clear(d); d->semantic_order=0;d->hover_claimed=false;d->modal_sizing=false;d->hint_visible=false;
     for (unsigned i=0;i<4;++i) d->scrolling[i].used=false;
     if (d->search[0] && strcmp(d->search,d->searched)) { d->browser=true; d->expanded=false; }
     search_refresh(d); graph_refresh(d);
     bool modal = d->form != SB_FORM_NONE || d->model.guard;
+    if (modal || !d->card || d->editing || d->model.source) sb_ui_transition_tick(&d->ui,1,true);
     bool before = d->focus_form != SB_FORM_NONE || d->focus_guard;
     bool enter = modal && (!before || d->form != d->focus_form || d->model.guard != d->focus_guard);
     if (enter) memset(d->scrolling,0,sizeof(d->scrolling));
@@ -2118,6 +2233,7 @@ void sb_desktop_frame(SBDesktop *d) {
     struct nk_rect card = nk_rect(width-card_width-18,top+body-card_height,card_width,card_height);
     struct nk_rect list = nk_rect(18,top,fminf(300*s,width*0.32f),body);
     if (d->browser && !d->expanded && card.x < list.x + list.w + 12) { card.x = list.x + list.w + 12; card.w = width-card.x-18; }
+    d->ui.card_bounds=(SDL_FRect){card.x,card.y,card.w,card.h};
     d->map_bounds = nk_rect(18,top,width-36.0f,body-70*s);
     d->target_count = 0; d->ui.space.glass_count = 0;
     d->ui.space.dark = d->ui.dark; d->ui.space.solid = d->solid; d->ui.space.contrast=d->ui.contrast;
@@ -2165,5 +2281,7 @@ void sb_desktop_frame(SBDesktop *d) {
     if (d->focus_scroll_frames) --d->focus_scroll_frames;
     nk_style_set_font(d->ui.ctx,&d->ui.normal->handle);
     nk_sdl_update_TextInput(d->ui.ctx);
+    if (!d->hover_claimed) d->hover_label[0]=0;
+    if (d->hint_visible && ((d->form==SB_FORM_NONE && !d->model.guard) || d->hint_group==3)) draw_hint(d);
     accessible_publish(d);
 }

@@ -240,18 +240,66 @@ void sb_ui_event(SBUi *ui, const SDL_Event *event) {
     nk_sdl_handle_event(ui->ctx, &copy);
 }
 
-void sb_ui_draw(SBUi *ui) {
-    int width, height;
-    SDL_GetWindowSize(ui->window, &width, &height);
-    SDL_SetRenderLogicalPresentation(ui->renderer, width, height, SDL_LOGICAL_PRESENTATION_STRETCH);
-    SDL_SetRenderDrawColor(ui->renderer, ui->dark ? 28 : 255, ui->dark ? 29 : 255, ui->dark ? 33 : 255, 255);
-    SDL_RenderClear(ui->renderer);
-    if (!sb_space_draw(&ui->space, ui->renderer, width, height)) {
-        SDL_SetRenderDrawColor(ui->renderer, 7, 14, 26, 255); SDL_RenderClear(ui->renderer);
-    }
-    nk_sdl_render(ui->ctx, NK_ANTI_ALIASING_ON);
-    sb_ui_text_frame_end(ui);
+static size_t hint_piece(SBUi *ui,const char *text,size_t length,float width) {
+    float measured=0;size_t count=sb_ui_text_fit(&ui->normal->handle,text,length,width,&measured);
+    if (!count && length) {SBGrapheme g;SBGraphemeBoundary boundary;sb_grapheme_init(&g,text,length);sb_grapheme_next(&g,&boundary);if(sb_grapheme_next(&g,&boundary))count=boundary.byte;}
+    if (count<length) {size_t space=0;for(size_t i=0;i<count;++i)if(text[i]==' ')space=i+1;if(space)count=space;}
+    return count;
 }
+float sb_ui_hint_height(SBUi *ui,const char *text,float width) {
+    size_t length=strlen(text),at=0;unsigned lines=0;
+    while(at<length){size_t n=hint_piece(ui,text+at,length-at,width);if(!n)break;at+=n;while(at<length && text[at]==' ')++at;++lines;}
+    return (lines ? lines : 1)*(ui->normal->handle.height+4*ui->scale);
+}
+void sb_ui_hint_draw(SBUi *ui,struct nk_rect bounds,const char *text,float text_width,const char *shortcut) {
+    struct nk_context *ctx=ui->ctx;struct nk_command_buffer *canvas=&ctx->overlay;float s=ui->scale;
+    nk_command_buffer_init(canvas,&ctx->memory,NK_CLIPPING_OFF);nk_start_buffer(ctx,canvas);
+    struct nk_color background=ui->dark ? nk_rgb(22,34,51) : nk_rgb(246,249,253);
+    nk_fill_rect(canvas,bounds,7*s,background);nk_stroke_rect(canvas,bounds,7*s,ui->contrast ? 2 : 1,ui->contrast ? ctx->style.text.color : ui->dark ? nk_rgba(165,187,216,130) : nk_rgba(80,100,130,120));
+    const struct nk_user_font *font=&ui->normal->handle;float y=bounds.y+6*s;size_t at=0,length=strlen(text);
+    while(at<length && y+font->height<=bounds.y+bounds.h-4*s) {
+        size_t n=hint_piece(ui,text+at,length-at,text_width);if(!n)break;
+        nk_draw_text(canvas,nk_rect(bounds.x+10*s,y,text_width,font->height),text+at,(int)n,font,nk_rgba(0,0,0,0),ctx->style.text.color);
+        at+=n;while(at<length && text[at]==' ')++at;y+=font->height+4*s;
+    }
+    if(shortcut) {
+        float width=font->width(font->userdata,font->height,shortcut,(int)strlen(shortcut))+12*s;
+        struct nk_rect badge=nk_rect(bounds.x+bounds.w-width-10*s,bounds.y+(bounds.h-font->height-4*s)/2,width,font->height+4*s);
+        nk_fill_rect(canvas,badge,4*s,ui->dark ? nk_rgba(170,190,220,35) : nk_rgba(60,85,120,22));
+        nk_draw_text(canvas,nk_rect(badge.x+6*s,badge.y+2*s,width-12*s,font->height),shortcut,(int)strlen(shortcut),font,nk_rgba(0,0,0,0),ctx->style.text.color);
+    }
+    nk_finish_buffer(ctx,canvas);
+}
+void sb_ui_transition_begin(SBUi *ui) {
+    if (!ui->outgoing_texture) return;
+    ui->transition=0;ui->transitioning=true;
+}
+void sb_ui_transition_tick(SBUi *ui,float seconds,bool reduced_motion) {
+    if (!ui->transitioning) return;
+    ui->transition=reduced_motion ? 1 : fminf(1,ui->transition+seconds/0.18f);
+    if (ui->transition>=1) {SDL_DestroyTexture(ui->outgoing_texture);ui->outgoing_texture=NULL;ui->transitioning=false;}
+}
+void sb_ui_draw(SBUi *ui) {
+    int width,height;SDL_GetWindowSize(ui->window,&width,&height);
+    SDL_SetRenderLogicalPresentation(ui->renderer,width,height,SDL_LOGICAL_PRESENTATION_STRETCH);
+    SDL_SetRenderDrawColor(ui->renderer,ui->dark ? 28 : 255,ui->dark ? 29 : 255,ui->dark ? 33 : 255,255);SDL_RenderClear(ui->renderer);
+    if (!sb_space_draw(&ui->space,ui->renderer,width,height)) {SDL_SetRenderDrawColor(ui->renderer,7,14,26,255);SDL_RenderClear(ui->renderer);}
+    nk_sdl_render(ui->ctx,NK_ANTI_ALIASING_ON);sb_ui_text_frame_end(ui);
+    if (ui->transitioning && ui->outgoing_texture) {
+        SDL_FRect dest=ui->outgoing_bounds,source={dest.x*ui->snapshot_width/width,dest.y*ui->snapshot_height/height,dest.w*ui->snapshot_width/width,dest.h*ui->snapshot_height/height};
+        float opacity=1-ui->transition;opacity=opacity*opacity;SDL_SetTextureAlphaModFloat(ui->outgoing_texture,opacity);
+        SDL_RenderTexture(ui->renderer,ui->outgoing_texture,&source,&dest);
+    }
+    if (ui->capture_pending) {
+        /* Capture only the outgoing change, before Present invalidates the
+           backbuffer. Normal frames keep their direct rendering path. */
+        ui->capture_pending=false;SDL_Surface *surface=SDL_RenderReadPixels(ui->renderer,NULL);
+        SDL_Texture *snapshot=surface ? SDL_CreateTextureFromSurface(ui->renderer,surface) : NULL;
+        if (snapshot) {SDL_DestroyTexture(ui->outgoing_texture);ui->outgoing_texture=snapshot;ui->snapshot_width=surface->w;ui->snapshot_height=surface->h;ui->outgoing_bounds=ui->card_bounds;SDL_SetTextureBlendMode(snapshot,SDL_BLENDMODE_BLEND);}
+        SDL_DestroySurface(surface);
+    }
+}
+
 void sb_ui_reset_editor(SBUi *ui) {
     nk_textedit_clear_state(&ui->ctx->text_edit, NK_TEXT_EDIT_MULTI_LINE, nk_filter_default);
     ui->ctx->text_edit.active = 0;
@@ -266,6 +314,7 @@ SBStatus sb_ui_capture(SBUi *ui, const char *path) {
     return ok ? sb_ok() : sb_error(SB_IO, "Bild konnte nicht gespeichert werden.");
 }
 void sb_ui_shutdown(SBUi *ui) {
+    SDL_DestroyTexture(ui->outgoing_texture);
     sb_space_free(&ui->space);
     sb_ui_text_free(ui);
     if (ui->ctx) nk_sdl_shutdown(ui->ctx);

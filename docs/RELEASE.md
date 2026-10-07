@@ -118,3 +118,12 @@ Konto und ein Windows-Code-Signing-Zertifikat sind noch nicht vorhanden. Der
 Signierungsweg wird vorbereitet; tatsächliche Herausgeber-Signierung und macOS-
 Notarisierung können erst mit den entsprechenden Konten und Zertifikaten geprüft
 werden. Entwicklungspakete werden bis dahin eindeutig als solche gekennzeichnet.
+
+## Ergänzende Nachprüfung vom 7. Oktober
+
+- [ ] Den letzten gültigen Desktop-Graph mit stabilen Dokumentkennungen und
+  zugehörigen Beschriftungen erhalten, wenn die aktuelle Notizinventur geändert
+  oder unlesbar ist. Der Kern erhält seinen Graph bereits; die Desktopdarstellung
+  darf keine alten Indizes auf neue Notizen anwenden.
+- [ ] Die neue [Interaktionspolitur](INTERAKTION.md) auf den tatsächlichen
+  Zielsystemen und mit menschlicher Bedienung/verschiedenen Geräten abnehmen.

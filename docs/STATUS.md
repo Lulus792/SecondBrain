@@ -1823,3 +1823,35 @@ Debug/Release und entpackter Pakete. Die acht macOS-Jobs warten noch. Der frühe
 Windows-Debug-Ausfall tritt in diesem Lauf nicht auf; seine Ursache wurde damit
 nicht bestimmt. Das ist eine Kernbaustein-Abnahme zu a45d7e2, keine neue
 Plattformabnahme der noch unveröffentlichten App-Integration.
+
+## 0.9.18: Reaktionszeit, Dialogformen und Hinweise
+
+7. Oktober 2026. Konkretes Nutzerfeedback mit Screenshot führt zu
+[erneuter Interaktionspolitur](INTERAKTION.md): gemeinsames Framebudget, früher
+Beginn, kurze unterbrechbare Kartenüberblendung, fraktionales Scrollen und
+unmittelbares Ziehen. Dialogmaße folgen tatsächlichem Inhalt; Zeilen haben
+skalierende Innenränder. Hinweise sind blickdicht, im Fenster begrenzt, mit
+eigener Kürzelplakette und ohne Eingabefenster. Die Suchleiste teilt ihre Fläche
+mit einer dezenten Löschaktion; ein leeres Feld hat keine unnötige Löschung.
+
+Erster vollständiger Release-Lauf: 44/44 in 292,10 s. Nach stärkerer Snapshot-/
+Wiederholungsprüfung und Hinweisänderungen fanden Nachprüfungen Transparenz-
+und Fokusfehler. Der endgültige Hinweis benutzt die vorhandene Nuklear-Overlay-
+Zeichnung und erzeugt keine eigene Eingabefläche. Der abschließende 44er-Lauf
+besteht in 289,12 s. Die zusätzliche Sanitizerprüfung fand danach eine Abfrage
+einer noch nicht angelegten Readerzeile und einen überlaufenden Probezeiger
+im UI-Puffer vor dessen Wachstum. Beide sind korrigiert; gezielte ASan/UBSan-Nachprüfung besteht mit 128 Assertions
+ohne Diagnose. Leakprüfung auf diesem macOS deaktiviert, weitere externe UI-
+Bibliotheken nicht vollständig instrumentiert. Endgültige Gesamt-Nachprüfung:
+44/44 in 287,66 s. Alle 395 lokalen Markdown-Verweise sind erreichbar.
+48 vollständige Materialraster stimmen exakt mit dem bisherigen Renderer
+überein. Lokale Metal-Messungen belegen keine pauschale 60-fps-Abnahme.
+
+Installierte App bleibt bis zum neuen Paket bei 0.9.16. Neue Sanitizer-/Paket-/
+Plattformnachweise folgen. UI-Bericht SBUI-057–061, Pfad in
+`build/interaction-review-path.txt`; keine menschliche assistive Abnahme.
+
+Präzisierung zum vorherigen Graph-Nachweis: Die C-Graphfunktion erhält ihren
+letzten gültigen Wert bei Fehlern. Der Desktop verwirft derzeit die Darstellung,
+da seine Labels/Aktionen aktuelle Notizindizes benutzen. Eine an stabile
+Dokumentkennungen gebundene vorherige Desktop-Sicht bleibt Release-Arbeit.

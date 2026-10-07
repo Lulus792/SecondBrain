@@ -27,6 +27,9 @@ Lokale Anpassungen des Nuklear-Headers:
   wurde aus einer vorhandenen MIT-lizenzierten UI-Anpassung übernommen.
 - Rückgängig und Wiederholen stellen eine zusammengefallene Auswahl am Cursor her.
 - Positionen und Einfügelängen jenseits des 16-Bit-Bereichs werden erhalten.
+- Bei rückwärts belegtem Zeichenpuffer entsteht vor einer nötigen Vergrößerung
+  kein überlaufender Probezeiger. Die Interaktionsprüfung führt diesen Wachstumspfad
+  mit ASan/UBSan aus.
 
 Das Undo-Protokoll bleibt begrenzt: 256 Operationen und 32.000 gespeicherte
 Unicode-Zeichen. Große Änderungen können ältere beziehungsweise zu große

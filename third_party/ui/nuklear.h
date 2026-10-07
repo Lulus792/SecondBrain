@@ -8720,7 +8720,9 @@ nk_buffer_alloc(struct nk_buffer *b, enum nk_buffer_allocation_type type,
     /* calculate total size with needed alignment + size */
     if (type == NK_BUFFER_FRONT)
         unaligned = nk_ptr_add(void, b->memory.ptr, b->allocated);
-    else unaligned = nk_ptr_add(void, b->memory.ptr, b->size - size);
+    /* SecondBrain: a back allocation may trigger growth. Keep the trial
+     * pointer within the existing buffer until that capacity check succeeds. */
+    else unaligned = nk_ptr_add(void, b->memory.ptr, b->size - NK_MIN(b->size, size));
     memory = nk_buffer_align(unaligned, align, &alignment, type);
 
     /* check if buffer has enough memory*/

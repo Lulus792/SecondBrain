@@ -24,23 +24,24 @@ Debug/Release und tatsächlich entpackter Pakete. Neue macOS-CI noch in der
 Warteschlange; daraus keine ARM64-Gesamtabnahme ableiten. Die vorher ausstehenden
 Commits sind normal nach GitHub gepusht; keine Historie wurde umgeschrieben.
 
-## Laufende Containerarbeit
+## Laufende Interaktionspolitur
 
-[Dokumentbaum](../../docs/DOKUMENTBAUM.md) in eigenem C: 307 Originalfälle und
-683.008 Assertions mit gezielter ASan/UBSan geprüft. Ab Arbeitsfassung 0.9.17
-verwenden Titel, Reader, Tabellen und Graph dieselben Projektionen/Referenzen.
-[UI](../../docs/CONTAINER_UI.md) ergänzt Listen, Nummern, Zitatlinie und native
-Container. Originalpositionen, Dateien und Entwürfe bleiben erhalten; gültige
-Dateien bleiben bei Parsergrenzen per Dateiname/Literalmodus erreichbar.
+0.9.17 bindet den eigenen [Dokumentbaum](../../docs/DOKUMENTBAUM.md) an
+Titel/Reader/Tabellen/Graph; Quell-/Datenprüfungen und lokale UI-Abnahme bestehen.
+Source 08b0911 ist gepusht; Dist bleibt 0.9.16 bis zur neuen Paketabnahme.
 
-Erster Release-Lauf 43/43 in 298,53 s; abschließend 29/29 Kern-Debug in 29,08 s.
-Abschließender Release-Lauf: 43/43 in 271,45 s. Eigene native ASan/UBSan: 552 Assertions; Paketabnahme läuft noch. Dist bleibt geprüftes 0.9.16.
-Nächster Schritt: Abschlussnachweise und neues Paket, danach weitere Markdown-/
-Textregeln und native Plattformabnahme. a45d7e2 ist jetzt gepusht;
-[CI 37656257074](https://github.com/Lulus792/SecondBrain/actions/runs/37656257074)
-besteht in allen zwölf Windows-/Linux-Jobs. Acht macOS-Jobs warten noch.
-Der frühere Windows-Debug-Ausfall tritt dort nicht auf; Ursache ungeklärt.
-Die neue App-Anbindung braucht ihre eigene Plattformabnahme.
+Neues Nutzerfeedback mit Screenshot priorisiert ab 0.9.18
+[Reaktionszeit und Inhaltsflächen](../../docs/INTERAKTION.md): frühe Fahrt, kurze
+Kartenüberblendung, genauer Scroll-/Zeigerpfad, passende Dialogmaße, gut lesbare
+Hinweise/Kürzel und Suchfeld. Overlay-Endstand besteht in 44 Tests; danach
+gefundene Reader-/UI-Pufferfehler sind korrigiert. Gezielte ASan/UBSan besteht
+mit 128 Assertions. Endgültig 44/44 Tests in 287,66 s bestanden. Der Materialvergleich besteht in 48 exakt gleichen Rastern.
+Keine pauschale FPS- oder menschliche assistive Abnahme.
+
+Nächster Schritt: Commit/Push, Paketabnahme und neue App
+installieren; danach weitere Release-Arbeiten. Die C-Graphfunktion erhält den
+letzten gültigen Graph. Die Desktop-Sicht benötigt dafür noch stabile Inventur-
+kennungen; alte Indizes dürfen keine neue Notizliste beschriften.
 
 ## Weitere offene Release-Arbeit
 

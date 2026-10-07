@@ -93,3 +93,6 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 
 - [Listen und Zitate](../../docs/CONTAINER_UI.md): vor Umsetzung erneut gelesene
   Apple-Grundlagen, gemeinsame Baum-Anbindung, Darstellung und native Grenzen.
+
+- [Reaktionszeit und Flächen](../../docs/INTERAKTION.md): gemeinsame Zeitplanung,
+  Kartenwechsel, Scrollen, Dialogmessung, Hinweise und Suchfläche ab 0.9.18.

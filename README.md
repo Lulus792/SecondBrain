@@ -27,7 +27,9 @@ Die Vorschau oben stammt aus der echten C-App.
 Die dunkle Lumen-Oberfläche verbindet leuchtende Sterne mit schwebenden
 Glaskarten. Schriftgröße, helle Darstellung, reduzierte Transparenz und reduzierte
 Bewegung lassen sich in den Einstellungen wählen. Die Glasdarstellung ist eine
-eigene Umsetzung nach Apple-Vorbild.
+eigene Umsetzung nach Apple-Vorbild. Ab 0.9.18 verbinden kurze
+[Übergänge](docs/INTERAKTION.md) die Kamera mit dem Dokumentwechsel; Hinweise
+zeigen passende Tastenkürzel.
 
 ## Starten
 

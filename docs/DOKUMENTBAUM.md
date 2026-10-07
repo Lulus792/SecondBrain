@@ -45,7 +45,8 @@ der Baum-/Referenznutzung geliehen und erhalten.
 
 Diese Bausteingrenzen sind geprüft; die abschließende gemeinsame App-/Daten-
 abnahme ist noch offen. Der spätere Renderer muss Fehler im Literalmodus zeigen
-und der Graph seinen letzten gültigen Stand behalten.
+und die C-Graphfunktion ihren letzten gültigen Stand behalten. Eine stabile
+vorherige Desktop-Inventur bleibt in [RELEASE](RELEASE.md) offen.
 
 ## Nachweise
 

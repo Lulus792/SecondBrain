@@ -31,6 +31,11 @@ typedef struct {
     float scale, density;
     bool dark, testing,contrast;
     SBSpace space;
+    SDL_Texture *outgoing_texture;
+    int snapshot_width,snapshot_height;
+    SDL_FRect card_bounds,outgoing_bounds;
+    float transition;
+    bool transitioning,capture_pending;
 } SBUi;
 
 SBStatus sb_ui_init(SBUi *ui, const char *font_path, int width, int height, bool testing);
@@ -38,6 +43,10 @@ SBStatus sb_ui_fonts(SBUi *ui, float scale);
 void sb_ui_theme(SBUi *ui, bool dark);
 void sb_ui_event(SBUi *ui, const SDL_Event *event);
 void sb_ui_draw(SBUi *ui);
+void sb_ui_transition_begin(SBUi *ui);
+void sb_ui_transition_tick(SBUi *ui,float seconds,bool reduced_motion);
+float sb_ui_hint_height(SBUi *ui,const char *text,float width);
+void sb_ui_hint_draw(SBUi *ui,struct nk_rect bounds,const char *text,float text_width,const char *shortcut);
 void sb_ui_text_aligned(struct nk_context *ctx,const char *text,size_t length,nk_flags alignment);
 float sb_ui_wrap_height(struct nk_context *ctx,const struct nk_user_font *font,const char *text,size_t length,float width);
 /* Returned spans are owned by the caller; text remains borrowed. */
