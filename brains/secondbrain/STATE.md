@@ -1,8 +1,9 @@
 # SecondBrain: aktueller Stand
 
-Stand: 7. Oktober 2026. Maßgeblich sind [STATUS](../../docs/STATUS.md),
+Stand: 8. Oktober 2026. Maßgeblich sind [STATUS](../../docs/STATUS.md),
 [Plattformnachweise](../../docs/PLATTFORMEN.md) und [Release-Aufgaben](../../docs/RELEASE.md).
-Frühere Arbeit und Rückfallkopien stehen im [Journal](journal/2026-10-07.md).
+Die [Übergabe vom 8. Oktober](journal/2026-10-08.md) hält die Fortsetzung fest.
+Frühere Arbeit und Rückfallkopien stehen im [Journal vom 7. Oktober](journal/2026-10-07.md).
 
 ## Produkt und geprüfte App
 

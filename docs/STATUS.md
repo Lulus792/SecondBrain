@@ -1,8 +1,9 @@
 # Umsetzungsstand von SecondBrain
 
-Stand: 7. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
+Stand: 8. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Der aktuelle Entwicklungsschritt 0.9.16 ergänzt Referenzlinks und korrigiert den Scroll-/Fokusabstand.
+Die installierte Intel/macOS-App ist 0.9.21. Aktuell werden die Windows-CI-
+Nachprüfung und die Lizenzanteile der Rust-UI-Laufzeit weitergeführt.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
 ## Abgeschlossene Grundlagen
