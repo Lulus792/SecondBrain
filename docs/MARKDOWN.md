@@ -1,6 +1,6 @@
 # Markdown in der Leseansicht
 
-Stand: 7. Oktober 2026, Entwicklungsschritte 0.9.4–0.9.10. Die Anwendung liest
+Stand: 7. Oktober 2026, Entwicklungsschritte 0.9.4–0.9.11. Die Anwendung liest
 Markdown selbst in C. Sie verändert die Quelldatei beim Anzeigen nicht.
 Editor und Sicherung behalten die Originalbytes; Anzeigen ist keine Migration.
 
@@ -33,7 +33,8 @@ Trennung mehr aus. Die vollständigen Container-Regeln, geschachtelte Listen,
 Tabellen in geschachtelten Containern, Inline-Regeln, Entities, Referenzlinks und HTML-Blöcke sind
 noch nicht vollständig umgesetzt. Die Anwendung führt kein HTML aus. Ab 0.9.5 verwenden Leseansicht, Titel und
 Sternkarte gemeinsame [Inline-/Linkregeln](INLINE_LINKS.md); die dort benannten
-weiteren Regeln und Formatierungen bleiben offen.
+weiteren Regeln bleiben offen. Ab 0.9.11 stehen gemeinsame
+[Hervorhebungen und Inline-Code](INLINE_STILE.md) zur Verfügung.
 Dies ist weiterhin eine begrenzte Markdown-Leseansicht, keine vollständige
 CommonMark- oder GFM-Implementierung. Der Auftrag für die vollständige
 Release-Abnahme bleibt damit offen.

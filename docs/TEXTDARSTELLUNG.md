@@ -101,3 +101,9 @@ vorbereitete Richtungsabschnitte. Eigene Folgerung: Schrift-Fallback allein kann
 diese Absatzaufgabe nicht lösen; native und visuelle Auswahl benötigen eine
 gemeinsame Abbildung zwischen logischen Indizes und dargestellten Läufen.
 Dies ist Recherche für die verbleibende Umsetzung, kein neuer Funktionsnachweis.
+
+
+Ab 0.9.11 verwenden [Inline-Stile](INLINE_STILE.md) getrennte Schriftkopien
+und gemeinsame Grundlinien. Grapheme über Formatgrenzen bleiben beim Zeichnen
+eine Einheit. Native Stilattribute und die oben genannten Bidi-/Geometriearbeiten
+bleiben offen.

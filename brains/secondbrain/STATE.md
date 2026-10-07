@@ -22,8 +22,10 @@ Stilgrenzen. 34 erste Release-Tests und sieben abschließende betroffene Prüfun
 bestehen lokal; 85 Text-, 352 native Assertions sowie 132 ausgewählte Normfälle.
 Eigene ASan/UBSan und neun Python-Strukturtests bestehen. Drei Raster betrachtet.
 Genauen Umfang und Grenzen nennen STATUS und der UI-Bericht SBUI-044/045.
-Neues Paket und neue Plattformprüfung folgen; dist enthält bis dahin geprüfte
-0.9.10, Build f3a758eb61d9.
+Das neue Intel-Paket besteht mit Desktop 126, Tastatur 142, Sicherung 75,
+Neustart und CLI. dist enthält 0.9.11, Build 54aa29fd7bc8; eigenes Gedächtnis
+geladen und Raster betrachtet. Neue Abnahme 37621658743 läuft: alle Kern-/
+Python-Jobs bestehen, Desktopjobs laufen oder warten noch.
 
 Die vorherige 0.9.10-Abnahme 37613957814 ist vollständig erfolgreich: 20 Jobs
 auf Windows, Linux, Intel-/ARM64-macOS einschließlich Release-Paketen. Kein neuer

@@ -49,6 +49,10 @@ Zeilen. Alle Zellen benutzen denselben vertikalen Lesebereich. Die native
 Struktur und Zellidentitäten bleiben beim Darstellungswechsel erhalten.
 Linkaktionen bleiben über die vorhandene Fokusnavigation erreichbar.
 
+Ab 0.9.11 verwenden Zellen und gestapelte Kopftexte dieselben
+[Inline-Stile](INLINE_STILE.md) wie Absätze und Überschriften. Messung, Ausrichtung
+und Umbruch erhalten die sichtbare Hervorhebung und ganze Grapheme.
+
 ## Native Schnittstellen
 
 AccessKit C 0.23.1 enthält Consumer 0.39.1 und macOS-Adapter 0.27.1.
