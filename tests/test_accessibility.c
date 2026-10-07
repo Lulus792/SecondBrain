@@ -375,6 +375,36 @@ int main(int argc,char **argv) {
 #endif
     frame(&d);frame(&d);checkpoint("native inline font attributes");
 #endif
+    char entity_target[SB_PATH_CAP];
+    OK(sb_path_join(entity_target,sizeof(entity_target),d.model.project.root,"knowledge/föö.md"));
+    OK(sb_fs_write_new(entity_target,"# Ziel &amp; Text\n",strlen("# Ziel &amp; Text\n")));
+    char entity_source[1800];
+    snprintf(entity_source,sizeof(entity_source),"# Entity &amp; Text\n\nText &nGt; &#x1F600; `&amp;`.\n[Ziel &amp; Datei](%sknowledge/f&ouml;&ouml;.md)\n\n| Name | Wert |\n| --- | --- |\n| **&copy;** | &nLt; |\n",prefix);
+    strcpy(d.model.editor,entity_source);OK(sb_app_save(&d.model));d.reset_reader=true;frame(&d);frame(&d);
+    CHECK(!strcmp(d.model.title,"Entity & Text") && !strcmp(d.model.editor,entity_source));
+    bool entity_paragraph=false,entity_cell=false; unsigned entity_actions=0;
+    for (size_t i=0;i<d.passive_count;++i) {
+        entity_paragraph|=d.passive[i].role==ACCESSKIT_ROLE_PARAGRAPH && !strcmp(d.passive[i].text,"Text ≫⃒ 😀 &amp;. Ziel & Datei");
+        entity_cell|=d.passive[i].role==ACCESSKIT_ROLE_CELL && !strcmp(d.passive[i].text,"©");
+    }
+    CHECK(entity_paragraph && entity_cell);
+    for (size_t i=0;i<d.target_count;++i) if (!strncmp(d.targets[i].id,"link:",5)) { ++entity_actions;CHECK(!strcmp(d.targets[i].label,"Ziel & Datei")); }
+    CHECK(entity_actions==1);
+#ifdef __APPLE__
+    void *entity_reader=native_find(view,d.model.title,0);CHECK(entity_reader);
+    size_t entity_characters=((size_t(*)(void *,SEL))objc_msgSend)(entity_reader,sel_registerName("accessibilityNumberOfCharacters"));
+    const char *entity_native=utf8(((void *(*)(void *,SEL,NativeRange))objc_msgSend)(entity_reader,sel_registerName("accessibilityStringForRange:"),(NativeRange){0,entity_characters}));
+    CHECK(entity_native && strstr(entity_native,"≫⃒") && strstr(entity_native,"©") && !strstr(entity_native,"&nGt;"));
+#elif defined(_WIN32) || defined(SB_ATSPI_TEST)
+    CHECK(sb_native_probe(d.ui.window,d.model.title,NULL,SB_NATIVE_READ_DOCUMENT_TEXT,native_value,sizeof(native_value),pump,&d));
+    CHECK(strstr(native_value,"≫⃒") && strstr(native_value,"©") && !strstr(native_value,"&nGt;"));
+#endif
+    OK(sb_path_join(dump_path,sizeof(dump_path),root,"entities.bmp"));CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    strcpy(d.focus,"link:0");link_key.key.key=SDLK_RETURN;sb_desktop_event(&d,&link_key);frame(&d);frame(&d);
+    if (!d.model.source) fprintf(stderr,"Entity link failed: %s; command=%s; focus=%s\n",d.message.message,d.command_value,d.focus);
+    CHECK(d.model.source && strstr(d.model.source_path,"/knowledge/föö.md"));
+    link_key.key.key=SDLK_ESCAPE;sb_desktop_event(&d,&link_key);frame(&d);frame(&d);
+    CHECK(!d.model.source && !strcmp(d.model.editor,entity_source));
     char *previous_context=d.context; d.context=malloc(80); CHECK(d.context);
     strcpy(d.context,"# Sichtbarer Projektname\n\nKontext zum Lesen.\n");
     d.form=SB_FORM_CONTEXT; frame(&d); frame(&d); bool context_heading=false;

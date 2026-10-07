@@ -14,23 +14,21 @@ Entwürfe und erkannte Konflikte bleiben geschützt. Sicherung/Wiederherstellung
 Einstellungen, eigener Markdown-Blockleser und vollständige Graphem-Eingaben
 gehören zum bisherigen geprüften Umfang. [Verträge und Quellen](SOURCES.md).
 
-## Aktueller Arbeitsschritt 0.9.13
+## Aktueller Arbeitsschritt 0.9.14
 
-[Windows-UIA-Textsuche](../../docs/UIA_TEXTSUCHE.md) ist tatsächlich nachgeprüft:
-Lauf 37631991014 zu 9c38604 besteht in allen zwölf Windows-/Linux-Jobs, einschließlich
-Debug/Release, nativen Stil-/FindText-Abfragen und entpackten Release-Paketen.
-Native Windows-Konfiguration erzwingt LF-Bytes; die UI-DLL verwendet den
-geprüften Patchhash 453fcaaa4faf52c87cc8f15fc50d4710540e35bc181bd6ac3daf28613ed7874a.
-Vier Quellenfälle und Fremdquellen-Abweisung bestehen lokal. UI-Bericht SBUI-047
-und vorherige Stilabnahme SBUI-046 sind im beschriebenen Windows-/Linux-Umfang
-nachgeprüft. Neue Mac-CI-Jobs warten noch; lokal 380 native, 85 Text- und 111
-Editorassertions sowie vier Nachprüfungen bestanden.
+[Zeichenreferenzen](../../docs/ENTITIES.md) sind im eigenen C-Leser implementiert:
+2.125 festgelegte Namen, numerische Angaben, stabile Ausgabestile, erhaltene
+Literalbereiche und Quellen, dekodierte lokale Ziele und richtige Sternkarten-
+beziehungen. Math-Fallback ersetzt bestätigte Kästchen; Originaldaten/-fonts
+und Lizenzen sind zugeordnet. 36 Release-Tests, abschließende Kern-/native
+Nachprüfungen und neun Python-Strukturtests bestehen lokal. Eigene Kern-
+ASan/UBSan mit 1.194.343 Assertions besteht; letzte native Sanitizer-Nachprüfung
+besteht mit 393 Assertions. UI-Bericht SBUI-048/049. Neue Paket-/Plattformabnahme folgt.
+Dist enthält bis dahin geprüftes 0.9.13, Build cade9ea34b95.
 
-Das abschließende Intel-Paket besteht mit Desktop 126, Tastatur 142, Sicherung
-75, Neustart und CLI. Dist enthält 0.9.13, Build cade9ea34b95; eigene Instanz
-geladen und Raster betrachtet, vorherige App erhalten. Die nächste C-Parserarbeit
-ist in [Zeichenreferenzen-Recherche](../../docs/ENTITIES_RECHERCHE.md) vorbereitet,
-noch nicht implementiert. Menschliche assistive und Geometrieabnahmen bleiben offen.
+Vorherige Windows-/Linux-Abnahme 37631991014 zu 9c38604 besteht in zwölf Jobs,
+einschließlich Debug/Release und Release-Paketen. Neue Mac-CI separat übernehmen;
+keinen Plattformnachweis der neuen 0.9.14 daraus ableiten.
 
 ## Nächste Arbeit und Grenzen
 

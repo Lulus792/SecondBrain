@@ -21,7 +21,9 @@ static const struct { const char *name,*file; } notices[]={
     {"AccessKit · Chromium BSD","AccessKit-LICENSE.chromium.txt"},
     {"AccessKit · Autoren","AccessKit-AUTHORS.txt"},
     {"Unicode-Daten · Unicode License V3","Unicode.txt"},
-    {"Noto Emoji · SIL Open Font License","OFL-Emoji.txt"}
+    {"Noto Emoji · SIL Open Font License","OFL-Emoji.txt"},
+    {"WHATWG-Zeichenreferenzen · CC BY / BSD","WHATWG.txt"},
+    {"Noto Math · SIL Open Font License","OFL-Math.txt"}
 };
 size_t sb_notice_count(void) { return sizeof(notices)/sizeof(*notices); }
 const char *sb_notice_name(size_t index) { return index<sb_notice_count() ? notices[index].name : "Lizenzen"; }

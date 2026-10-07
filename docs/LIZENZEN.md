@@ -54,7 +54,7 @@ Die Ressourcennachprüfung mit 18 Originalen besteht lokal. [Herkunft und Hashes
 
 ## Emoji-Schrift ab 0.9.9
 
-19 Originaltexte sind angebunden. Noto Emoji ergänzt die SIL-OFL-Ressource;
+21 Originaltexte sind angebunden. WHATWG und Noto Math ergänzen Daten-/Fontlizenzen. Noto Emoji ergänzt die SIL-OFL-Ressource;
 Quelle und unveränderte Schriftdatei sind im [Emoji-Vertrag](EMOJI.md) festgelegt.
 Die lokale Ressourcennachprüfung besteht mit 58 Assertions. Die neue Paketprüfung
 verlangt Schrift und Lizenz; ihren tatsächlichen Abschluss dokumentiert STATUS.md.

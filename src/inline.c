@@ -52,6 +52,7 @@ static SBStatus reserve(void **items,size_t *capacity,size_t count,size_t size) 
 }
 static bool spend(size_t *budget) { if (!*budget) return false; --*budget; return true; }
 #include "inline_raw.inc"
+#include "inline_entities.inc"
 #include "inline_emphasis.inc"
 static bool spaces(const SBInline *r,size_t *p,size_t *budget) {
     unsigned endings=0;
@@ -190,6 +191,10 @@ static bool at(const SBInline *r,size_t p,size_t limit,SBInlineToken *t) {
         }
         return true;
     }
+    if (c=='&' && !entity_opaque(r,p)) {
+        char decoded[8]; size_t bytes=0,consumed=entity_decode(r->text+p,limit-p,decoded,&bytes);
+        if (consumed) { t->kind=SB_INLINE_ENTITY; t->length=t->content_length=consumed; return true; }
+    }
     Pair *pair=c=='[' ? find_pair(r,p) : c=='!' && p+1<limit ? find_pair(r,p+1) : NULL;
     if (pair && pair->valid && pair->end<=limit && pair->image==(c=='!')) {
         t->kind=pair->image ? SB_INLINE_IMAGE : SB_INLINE_LINK;
@@ -215,6 +220,21 @@ static void normalized(const char *text,size_t length,char *out,size_t *used) {
         out[(*used)++]=(c=='\r' || c=='\n') ? ' ' : c;
     }
 }
+static size_t normalized_length(const char *text,size_t length) {
+    size_t result=length;
+    for (size_t i=0;i<length;++i) if (text[i]=='\r' && i+1<length && text[i+1]=='\n') { --result; ++i; }
+    return result;
+}
+static void code_range(const char **text,size_t *length) {
+    if (*length<2) return;
+    bool nonspace=false;
+    for (size_t i=0;i<*length;++i) if ((*text)[i]!=' ' && (*text)[i]!='\r' && (*text)[i]!='\n') { nonspace=true; break; }
+    char first=(*text)[0],last=(*text)[*length-1];
+    if (!nonspace || !(first==' ' || first=='\r' || first=='\n') || !(last==' ' || last=='\r' || last=='\n')) return;
+    size_t leading=first=='\r' && (*text)[1]=='\n' ? 2 : 1;
+    size_t trailing=last=='\n' && (*text)[*length-2]=='\r' ? 2 : 1;
+    *text+=leading; *length-=leading+trailing;
+}
 static SBStatus append_span(SBStyledText *out,size_t start,size_t length,unsigned style) {
     if (!length) return sb_ok();
     if (out->count && out->spans[out->count-1].style==style && out->spans[out->count-1].offset+out->spans[out->count-1].length==start) {
@@ -224,23 +244,33 @@ static SBStatus append_span(SBStyledText *out,size_t start,size_t length,unsigne
     if (status.code==SB_OK) out->spans[out->count++]=(SBTextSpan){start,length,style};
     return status;
 }
-static SBStatus write_range(const SBInline *r,size_t p,size_t end,SBStyledText *out,size_t *used,unsigned depth,size_t *budget) {
+static SBStatus output_space(SBStyledText *out,size_t used,size_t extra,size_t *capacity) {
+    if (used>SB_TEXT_LIMIT || extra>SB_TEXT_LIMIT-used) return sb_error(SB_LIMIT,"Der aufbereitete Markdown-Text überschreitet die Textgrenze.");
+    size_t needed=used+extra+1;
+    if (needed<=*capacity) return sb_ok();
+    size_t next=*capacity;
+    while (next<needed) next=next>(SB_TEXT_LIMIT+1)/2 ? SB_TEXT_LIMIT+1 : next*2;
+    char *text=realloc(out->text,next); if (!text) return sb_error(SB_MEMORY,"Markdown benötigt mehr Speicher.");
+    out->text=text; *capacity=next; return sb_ok();
+}
+static SBStatus write_range(const SBInline *r,size_t p,size_t end,SBStyledText *out,size_t *used,size_t *capacity,unsigned depth,size_t *budget) {
     if (depth>32) return sb_error(SB_LIMIT,"Markdown-Textstruktur ist zu tief.");
     while (p<end) {
         if (!spend(budget)) return sb_error(SB_LIMIT,"Markdown-Textstruktur ist zu komplex.");
         SBInlineToken t; at(r,p,end,&t); size_t begin=*used;
         Mark *mark=mark_at(r,p); unsigned style=mark ? mark->active : 0;
         if (t.kind==SB_INLINE_LINK || t.kind==SB_INLINE_IMAGE) {
-            SBStatus status=write_range(r,t.content,t.content+t.content_length,out,used,depth+1,budget);
+            SBStatus status=write_range(r,t.content,t.content+t.content_length,out,used,capacity,depth+1,budget);
             if (status.code!=SB_OK) return status;
-        } else if (t.kind==SB_INLINE_CODE) {
-            normalized(r->text+t.content,t.content_length,out->text,used); style|=SB_TEXT_CODE;
-            bool nonspace=false;
-            for (size_t i=begin;i<*used;++i) if (out->text[i]!=' ') { nonspace=true; break; }
-            if (*used>=begin+2 && nonspace && out->text[begin]==' ' && out->text[*used-1]==' ') {
-                memmove(out->text+begin,out->text+begin+1,*used-begin-2); *used-=2;
-            }
-        } else if (t.kind!=SB_INLINE_FORMAT) normalized(r->text+t.content,t.content_length,out->text,used);
+        } else {
+            char decoded[8]; size_t decoded_bytes=0;
+            const char *data=r->text+t.content; size_t data_length=t.content_length;
+            if (t.kind==SB_INLINE_ENTITY) { entity_decode(data,data_length,decoded,&decoded_bytes); data=decoded; data_length=decoded_bytes; }
+            else if (t.kind==SB_INLINE_CODE) { code_range(&data,&data_length); style|=SB_TEXT_CODE; }
+            size_t extra=t.kind==SB_INLINE_FORMAT ? 0 : normalized_length(data,data_length);
+            SBStatus space=output_space(out,*used,extra,capacity); if (space.code!=SB_OK) return space;
+            if (t.kind!=SB_INLINE_FORMAT) normalized(data,data_length,out->text,used);
+        }
         if (t.kind!=SB_INLINE_LINK && t.kind!=SB_INLINE_IMAGE) {
             SBStatus status=append_span(out,begin,*used-begin,style); if (status.code!=SB_OK) return status;
         }
@@ -253,8 +283,8 @@ SBStatus sb_inline_styled(const SBInline *r,size_t offset,size_t length,SBStyled
     if (out) *out=(SBStyledText){0};
     if (!r || !out || offset>r->length || length>r->length-offset) return sb_error(SB_INVALID,"Markdown-Textbereich ist ungültig.");
     out->text=malloc(length+1); if (!out->text) return sb_error(SB_MEMORY,"Markdown benötigt mehr Speicher.");
-    size_t used=0,budget=length*32+64;
-    SBStatus status=write_range(r,offset,offset+length,out,&used,0,&budget);
+    size_t used=0,capacity=length+1,budget=length*32+64;
+    SBStatus status=write_range(r,offset,offset+length,out,&used,&capacity,0,&budget);
     if (status.code!=SB_OK) { sb_styled_free(out); return status; }
     out->text[used]=0; return sb_ok();
 }
@@ -269,11 +299,19 @@ SBStatus sb_inline_destination(const SBInline *r,const SBInlineToken *t,char *ou
     if (!r || !t || !out || !capacity || (t->kind!=SB_INLINE_LINK && t->kind!=SB_INLINE_IMAGE && t->kind!=SB_INLINE_AUTOLINK) ||
         t->destination>r->length || t->destination_length>r->length-t->destination) return sb_error(SB_INVALID,"Markdown-Linkziel ist ungültig.");
     size_t used=0;
-    for (size_t i=0;i<t->destination_length;++i) {
+    for (size_t i=0;i<t->destination_length;) {
         char c=r->text[t->destination+i];
-        if (t->kind!=SB_INLINE_AUTOLINK && c=='\\' && i+1<t->destination_length && punctuation((unsigned char)r->text[t->destination+i+1])) c=r->text[t->destination+(++i)];
+        if (t->kind!=SB_INLINE_AUTOLINK && c=='\\' && i+1<t->destination_length && punctuation((unsigned char)r->text[t->destination+i+1])) {
+            c=r->text[t->destination+(++i)];
+        } else if (t->kind!=SB_INLINE_AUTOLINK && c=='&') {
+            char decoded[8]; size_t bytes=0,consumed=entity_decode(r->text+t->destination+i,t->destination_length-i,decoded,&bytes);
+            if (consumed) {
+                if (bytes>=capacity-used) { *out=0; return sb_error(SB_LIMIT,"Markdown-Linkziel ist zu lang."); }
+                memcpy(out+used,decoded,bytes); used+=bytes; i+=consumed; continue;
+            }
+        }
         if (used+1>=capacity) { *out=0; return sb_error(SB_LIMIT,"Markdown-Linkziel ist zu lang."); }
-        out[used++]=c;
+        out[used++]=c; ++i;
     }
     out[used]=0; return sb_ok();
 }

@@ -2,7 +2,7 @@
 
 Stand: 7. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Der aktuelle Entwicklungsschritt 0.9.13 ergänzt die Windows-UIA-Textsuche.
+Der aktuelle Entwicklungsschritt 0.9.14 ergänzt Zeichenreferenzen und Mathematikglyphen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
 ## Abgeschlossene Grundlagen
@@ -1524,3 +1524,45 @@ dieses geprüfte Paket; vorherige App unter /Users/lulus/Projects/SecondBrain/bu
 Projektgedächtnis geladen und Raster betrachtet. Die neue Mac-CI bleibt separat
 zu übernehmen; die beschriebenen Windows-/Linux-Abnahmen zu 9c38604 bestehen.
 1.0, menschliche assistive Bedienung und verbleibende Release-Arbeiten bleiben offen.
+
+
+## Zeichenreferenzen und Mathematikglyphen in 0.9.14
+
+Eigener C-Decoder verarbeitet alle 2.125 festgelegten Semikolon-Namen sowie
+numerische Unicode-Angaben. Titel, Leseansicht, native Texte, Tabellen, Inline-
+Linkziele und Sternkarten verwenden dieselbe Projektion. Code, Maskierungen,
+rohe HTML-Tags und Autolinks behalten ihren Literalvertrag; Originaldateien
+werden nicht verändert. Daten-/Fontlizenzen gehören zu App und Paket; die
+Lizenzansicht hat 21 Originaltexte. [Vertrag und Quellen](ENTITIES.md).
+
+Der unabhängige Datenvergleich besteht mit allen 2.125 Namen und allen Namen
+innerhalb von Code. 15 ausgewählte Original-Normfälle bestehen; Referenzlink-
+und Listenfälle bleiben separat offen, Roh-HTML und terminaler HTML-Code-
+Zeilenumbruch folgen dem ausdrücklich beschriebenen Anzeigevertrag.
+1.194.343 eigene Inlineassertions einschließlich 5.000 begrenzter Quellfälle,
+expandierender Ausgabe, exaktem Zielpuffer, Ausgabegrenze und großem CRLF-Code
+bestehen unter eigener ASan/UBSan-Instrumentierung.
+
+Nach ergänzter Noto-Math-Schrift bestehen alle 36 lokalen Intel/macOS-Release-
+Tests (242,73 s), darunter 393 native, 91 Text-, 111 Editor- und 62 Lizenz-
+assertions. Nach präziser Kapazitätskorrektur bestehen erneut vier Kern-/Norm-
+Nachprüfungen (9,91 s) und vier native/Text-/Graph-/Tabellen-Nachprüfungen
+(31,03 s). Neun Python-Strukturtests bestehen (0,390 s); Datengenerator erzeugt
+bytegenau dieselbe Tabelle. Vorheriger Inline-Leser scheitert an Referenzausgabe;
+vorheriger Fallback an Math-Kombinationsbreite. Bilder vor/nach betrachtet;
+Kombinationen werden nach der Fontkorrektur tatsächlich sichtbar.
+
+Die gezielte eigene UI-/Text-/Desktop-/Zugänglichkeits-/Graphem-/Inline-
+Instrumentierung besteht zunächst mit 393 nativen Assertions. Die letzte
+native Sanitizer-Nachprüfung nach der Kapazitätskorrektur besteht ebenfalls
+mit 393 Assertions. Andere
+Kernteile und externe UI-Bibliotheken sind dabei nicht vollständig instrumentiert;
+native Leakprüfung ist deaktiviert. Logs: build/entities-{core,math,final-full,
+capacity,final-native}-check.log, entities-sanitize/final-result.log,
+entities-ui-sanitize/{result,final-result}.log, entities-regression/{inline,text}.log
+und entities-final-python-check.log. UI-Bericht SBUI-048/049: /Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-07_16-43-55/UI_REVIEW.md.
+
+Neue Paket-/Plattformabnahme folgt nach Quellpush. Bidi, exakte visuelle/native
+Textgeometrie, IME, Referenzlinks, volle Listen/Container, weitere Glyphenabdeckung
+und menschliche assistive Bedienung bleiben offene Release-Arbeiten.
+1.0 ist nicht freigegeben; vorhandene Arbeitskopie bleibt bis zum neuen Paketnachweis.

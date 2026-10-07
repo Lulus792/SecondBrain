@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-project(SecondBrain VERSION 0.9.13 LANGUAGES C)
+project(SecondBrain VERSION 0.9.14 LANGUAGES C)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
@@ -171,7 +171,7 @@ if(SB_BUILD_UI)
         third_party/licenses/HarfBuzz.txt third_party/licenses/HarfBuzz-MS-USE.txt DESTINATION licenses COMPONENT Runtime)
     install(FILES third_party/licenses/AccessKit-LICENSE-MIT.txt
         third_party/licenses/AccessKit-LICENSE-APACHE.txt third_party/licenses/AccessKit-LICENSE.chromium.txt
-        third_party/licenses/AccessKit-AUTHORS.txt third_party/licenses/Unicode.txt third_party/licenses/OFL-Emoji.txt DESTINATION licenses COMPONENT Runtime)
+        third_party/licenses/AccessKit-AUTHORS.txt third_party/licenses/Unicode.txt third_party/licenses/OFL-Emoji.txt third_party/licenses/WHATWG.txt third_party/licenses/OFL-Math.txt DESTINATION licenses COMPONENT Runtime)
     install(FILES docs/QUICKSTART.txt LICENSE DESTINATION . COMPONENT Runtime)
     if(BUILD_TESTING)
         add_executable(secondbrain-projects-ui-tests tests/test_projects_ui.c)
@@ -364,6 +364,10 @@ if(BUILD_TESTING)
     target_link_libraries(secondbrain-inline-probe PRIVATE sb_core)
     add_test(NAME markdown-emphasis-spec COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_emphasis_spec.py"
         "$<TARGET_FILE:secondbrain-inline-probe>" "${CMAKE_CURRENT_SOURCE_DIR}/tests/data/commonmark-0.31.2/emphasis.json")
+    add_test(NAME markdown-entity-spec COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_entities_spec.py"
+        "$<TARGET_FILE:secondbrain-inline-probe>" "${CMAKE_CURRENT_SOURCE_DIR}/tests/data/commonmark-0.31.2/entities.json")
+    add_test(NAME markdown-entity-data COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_entities_data.py"
+        "$<TARGET_FILE:secondbrain-inline-probe>" "${CMAKE_CURRENT_SOURCE_DIR}/third_party/whatwg/2026-10-07/entities.json")
     add_executable(secondbrain-markdown-tests tests/test_markdown.c)
     target_link_libraries(secondbrain-markdown-tests PRIVATE sb_core)
     if(MSVC)

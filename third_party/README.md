@@ -179,3 +179,16 @@ Unveränderte variable Mono-Schrift aus Google Fonts, Commit
 Die originale SIL-OFL steht unter licenses/OFL-Emoji.txt und gehört in App und
 Paket. Quelle, Hashes und Anbindung: [Emoji-Vertrag](../docs/EMOJI.md).
 Die Schrift ergänzt die UI; Originalzeichen werden nicht in Bilder umgeschrieben.
+
+
+## Zeichenreferenzen und Mathematikschrift ab 0.9.14
+
+[WHATWG-Daten](whatwg/README.md) erzeugen eine eigene C-Tabelle; keine neue
+fachliche Bibliothek. Originalquelle, Hash und vollständige CC-BY/BSD-Lizenz
+sind zugeordnet; WHATWG.txt gehört in App und Paket. Noto Sans Math ergänzt
+vollständige Mathematik-Grapheme, unverändert aus Google-Fonts-Commit
+823468bd7825152bce2b8fd2cf740432ad2fce8d. Font-SHA-256:
+`3f495fe933c06786e4d5f6d86b8ee70b6753a68ee3b9d87528726de0f6e2c47d`.
+Original-OFL unter assets/fonts/OFL-Math.txt und licenses/OFL-Math.txt, SHA-256
+`403a95275b469061b7d4371c328e0ada3bc7d63328abe2e88aad5cd243b2fe21`.
+[Vertrag und Nachweise](../docs/ENTITIES.md).

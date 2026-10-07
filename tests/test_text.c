@@ -91,6 +91,12 @@ int main(int argc,char **argv) {
         CHECK(found_arabic && fabsf(latin_baseline-arabic_baseline)<=1);
         CHECK(complete_accent && complete_emoji);
         CHECK(sb_ui_text_style(&ui,&ui.heading->handle,SB_TEXT_CODE)->height==ui.heading->handle.height);
+        const char *compound[]={"≫⃒","≪⃒"},*base_symbols[]={"≫","≪"};
+        for (unsigned m=0;m<2;++m) {
+            float combined=ui.body->handle.width(ui.body->handle.userdata,ui.body->handle.height,compound[m],(int)strlen(compound[m]));
+            float base_width=ui.body->handle.width(ui.body->handle.userdata,ui.body->handle.height,base_symbols[m],(int)strlen(base_symbols[m]));
+            CHECK(combined>0 && fabsf(combined-base_width)<=2*scale);
+        }
         sb_ui_draw(&ui);
         if (size==2) CHECK(sb_ui_capture(&ui,argv[2]).code==SB_OK);
         SDL_RenderPresent(ui.renderer);

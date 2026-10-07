@@ -8,7 +8,7 @@
 
 #define SB_TEXT_CACHE_ENTRIES 1024
 #define SB_TEXT_CACHE_BYTES (32u * 1024u * 1024u)
-#define SB_FALLBACK_COUNT 6
+#define SB_FALLBACK_COUNT 7
 #define SB_TEXT_FACES 32
 
 typedef struct {
@@ -108,7 +108,7 @@ static TTF_Font *open_font(const char *path, float logical_height, float density
 }
 SBStatus sb_ui_text_fonts(SBUi *ui, float scale, float density) {
     static const char *fallbacks[]={"NotoSansArabic-Regular.ttf","NotoSansHebrew-Regular.ttf",
-        "NotoSansDevanagari-Regular.ttf","NotoEmoji-Variable.ttf","NotoSansSymbols2-Regular.ttf","NotoSansCJKjp-Regular.otf"};
+        "NotoSansDevanagari-Regular.ttf","NotoEmoji-Variable.ttf","NotoSansSymbols2-Regular.ttf","NotoSansMath-Regular.ttf","NotoSansCJKjp-Regular.otf"};
     const float heights[]={15,18,26,17};
     bool first=ui->text==NULL;
     if (first && !TTF_Init()) return sb_error(SB_IO,"Textdarstellung: %s",SDL_GetError());

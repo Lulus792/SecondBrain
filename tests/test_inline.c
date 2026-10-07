@@ -6,7 +6,7 @@ static unsigned checks;
 #define CHECK(x) do { ++checks; if (!(x)) { fprintf(stderr,"INLINE FAIL %d: %s\n",__LINE__,#x); exit(1); } } while (0)
 static void example(const char *source,const char *plain,unsigned links,const char *destinations[]) {
     SBInline r; CHECK(sb_inline_init(&r,source,strlen(source)).code==SB_OK);
-    char *text=NULL; CHECK(sb_inline_text(&r,0,strlen(source),&text).code==SB_OK); CHECK(!strcmp(text,plain)); free(text);
+    char *text=NULL; CHECK(sb_inline_text(&r,0,strlen(source),&text).code==SB_OK); if (strcmp(text,plain)) fprintf(stderr,"Source: %s\nActual: %s\nExpected: %s\n",source,text,plain); CHECK(!strcmp(text,plain)); free(text);
     unsigned found=0; SBInlineToken t; size_t cursor=0;
     while (sb_inline_next(&r,&t)) {
         CHECK(r.cursor>cursor && t.offset==cursor && t.length<=r.length-cursor); cursor=r.cursor;
@@ -69,18 +69,56 @@ int main(void) {
     example("`   `", "   ",0,NULL);
     example("eins\r\nzwei\rdrei\nvier", "eins zwei drei vier",0,NULL);
     example("[ungültig](ziel Leerraum) [Stand](../STATE.md)","[ungültig](ziel Leerraum) Stand",1,one);
+    example("&amp; &lt; &nGt; &nLt; &#x1f600; &#128;", "& < ≫⃒ ≪⃒ 😀 \xc2\x80",0,NULL);
+    example("&unknown; &amp &#; &#x; &#12345678; &#x1234567;", "&unknown; &amp &#; &#x; &#12345678; &#x1234567;",0,NULL);
+    example("&#0; &#xD800; &#1114112; &#x10FFFF;", "� � � \xf4\x8f\xbf\xbf",0,NULL);
+    example("\\&amp; `&amp;` &#42;ab&#42;", "&amp; &amp; *ab*",0,NULL);
+    styled("**&nGt;**", "≫⃒",(const unsigned char[]){2,2,2,2,2,2});
+    const char *entity_paths[]={"../föö.md","../a&amp;.md"};
+    example("[Titel &amp; Text](../f&ouml;&ouml;.md) [Maskiert](../a\\&amp;.md)","Titel & Text Maskiert",2,entity_paths);
+    const char *literal_url[]={"https://example.org/?q=&amp;"};
+    example("<https://example.org/?q=&amp;>","https://example.org/?q=&amp;",1,literal_url);
+    example("<a title=\"&amp;\">", "<a title=\"&amp;\">",0,NULL);
+    /* The shortest expanding named references must not overrun source-sized storage. */
+    example("&nGt;&nGt;&nGt;", "≫⃒≫⃒≫⃒",0,NULL);
     SBInline r; CHECK(sb_inline_init(&r,NULL,1).code==SB_INVALID); sb_inline_free(&r);
     CHECK(sb_inline_init(&r,"",0).code==SB_OK); char *text=NULL;
     CHECK(sb_inline_text(&r,1,0,&text).code==SB_INVALID && !text); sb_inline_free(&r);
     char *dense=malloc(2*(SB_INLINE_LIMIT+1)+1); CHECK(dense);
     for (size_t i=0;i<SB_INLINE_LIMIT+1;++i) { dense[2*i]='`'; dense[2*i+1]='a'; }
     CHECK(sb_inline_init(&r,dense,2*(SB_INLINE_LIMIT+1)).code==SB_LIMIT); sb_inline_free(&r); free(dense);
+    const char *short_source="[a](&nGt;)"; SBInlineToken short_link;
+    CHECK(sb_inline_init(&r,short_source,strlen(short_source)).code==SB_OK);
+    CHECK(sb_inline_next(&r,&short_link) && short_link.kind==SB_INLINE_LINK);
+    char exact[7],small[6];
+    CHECK(sb_inline_destination(&r,&short_link,exact,sizeof(exact)).code==SB_OK && !strcmp(exact,"≫⃒"));
+    CHECK(sb_inline_destination(&r,&short_link,small,sizeof(small)).code==SB_LIMIT && !*small);
+    sb_inline_free(&r);
+    size_t repeats=SB_TEXT_LIMIT/6+1,expanded_source_length=repeats*5;
+    char *expanded=malloc(expanded_source_length); CHECK(expanded);
+    for (size_t i=0;i<repeats;++i) memcpy(expanded+i*5,"&nGt;",5);
+    CHECK(sb_inline_init(&r,expanded,expanded_source_length).code==SB_OK);
+    text=NULL; CHECK(sb_inline_text(&r,0,expanded_source_length,&text).code==SB_LIMIT && !text);
+    CHECK(!memcmp(expanded,"&nGt;",5) && !memcmp(expanded+expanded_source_length-5,"&nGt;",5));
+    sb_inline_free(&r); free(expanded);
+    /* Capacity follows displayed bytes, not longer CRLF source bytes. */
+    size_t prefix_refs=(SB_TEXT_LIMIT/2)/5,prefix_length=prefix_refs*5;
+    size_t crlf_count=(SB_TEXT_LIMIT-prefix_length-2)/2;
+    size_t mixed_length=prefix_length+2+crlf_count*2;
+    char *mixed=malloc(mixed_length); CHECK(mixed);
+    for (size_t i=0;i<prefix_refs;++i) memcpy(mixed+i*5,"&nGt;",5);
+    mixed[prefix_length]='`';
+    for (size_t i=0;i<crlf_count;++i) memcpy(mixed+prefix_length+1+i*2,"\r\n",2);
+    mixed[mixed_length-1]='`';CHECK(sb_inline_init(&r,mixed,mixed_length).code==SB_OK);
+    text=NULL;CHECK(sb_inline_text(&r,0,mixed_length,&text).code==SB_OK);
+    CHECK(strlen(text)==prefix_refs*6+crlf_count && strlen(text)<SB_TEXT_LIMIT);
+    free(text);sb_inline_free(&r);free(mixed);
     uint32_t seed=0x3192;
     for (unsigned run=0;run<5000;++run) {
         char bytes[258],original[258]; size_t length=run%257;
         for (size_t i=0;i<length;++i) {
             seed=seed*1664525u+1013904223u;
-            static const char alphabet[]="[]()<>`\\!*\"'abc \t\r\n";
+            static const char alphabet[]="[]()<>`\\!*\"'abc&;#012x \t\r\n";
             bytes[i]=alphabet[(seed>>16)%(sizeof(alphabet)-1)];
         }
         memcpy(original,bytes,length); CHECK(sb_inline_init(&r,bytes,length).code==SB_OK);

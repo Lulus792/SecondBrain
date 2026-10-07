@@ -12,3 +12,9 @@ Tags als Literaltext und führt sie nicht aus; bei den drei reinen HTML-
 Interaktionsfällen ist dieser Anzeigevertrag ausdrücklich die erwartete Ausgabe.
 Andere Fälle behalten die originale Text-/Hervorhebungsstruktur. Dies ist
 keine vollständige CommonMark-/HTML-Konformitätssuite.
+
+
+Entity-Auswahl: 15 unveränderte Beispiele 25–41; Referenzlinkfall 33 und
+Listenfall 38 bleiben bis zur jeweiligen Container-/Referenzimplementierung
+offen. Fall 31 verwendet die dokumentierte wörtliche HTML-Anzeige. Die
+ursprünglichen Beispiele und ihre Lizenz bleiben erhalten.

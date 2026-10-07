@@ -2,7 +2,7 @@
 #define SB_INLINE_H
 #include "sb.h"
 #define SB_INLINE_LIMIT 65536u
-typedef enum { SB_INLINE_TEXT,SB_INLINE_ESCAPE,SB_INLINE_CODE,SB_INLINE_LINK,SB_INLINE_IMAGE,SB_INLINE_FORMAT,SB_INLINE_RAW,SB_INLINE_AUTOLINK } SBInlineKind;
+typedef enum { SB_INLINE_TEXT,SB_INLINE_ESCAPE,SB_INLINE_CODE,SB_INLINE_LINK,SB_INLINE_IMAGE,SB_INLINE_FORMAT,SB_INLINE_RAW,SB_INLINE_AUTOLINK,SB_INLINE_ENTITY } SBInlineKind;
 enum { SB_TEXT_ITALIC=1,SB_TEXT_BOLD=2,SB_TEXT_CODE=4 };
 typedef struct { size_t offset,length; unsigned style; } SBTextSpan;
 typedef struct { char *text; SBTextSpan *spans; size_t count,capacity; } SBStyledText;

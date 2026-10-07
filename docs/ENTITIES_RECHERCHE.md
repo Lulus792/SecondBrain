@@ -1,8 +1,7 @@
 # Zeichenreferenzen für den nächsten Markdown-Schritt
 
-Stand: 7. Oktober 2026. Recherche und Umsetzungsanforderungen; noch keine neue
-Parserfunktion. Die Windows-UIA-Korrektur bleibt bis zur tatsächlichen nativen
-Abnahme der aktuelle Implementierungsschritt.
+Stand: 7. Oktober 2026. Historische Recherche vor dem Implementierungsschritt.
+Die Umsetzung und aktuelle Nachweise stehen in [ENTITIES.md](ENTITIES.md).
 
 ## Geprüfte Grundlagen
 

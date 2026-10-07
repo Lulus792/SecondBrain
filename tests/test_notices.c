@@ -8,7 +8,7 @@ static unsigned checks;
 #define CHECK(x) do { ++checks; if (!(x)) { fprintf(stderr,"NOTICES FAIL %d: %s\n",__LINE__,#x); return 1; } } while (0)
 int main(int argc,char **argv) {
     CHECK(argc==3); char *text=NULL;
-    CHECK(sb_notice_count()==19);
+    CHECK(sb_notice_count()==21);
     for (size_t i=0;i<sb_notice_count();++i) {
         CHECK(sb_notice_read(argv[1],i,&text).code==SB_OK);
         CHECK(text && strlen(text)>20 && sb_text_valid(text,strlen(text)));

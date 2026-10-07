@@ -62,6 +62,21 @@ int main(int argc, char **argv) {
         ++links; const char *to=notes.items[graph.edges[i].to].path; CHECK(!strcmp(to,"STATE.md") || !strcmp(to,"QUESTIONS.md"));
     }
     CHECK(links==2);
+    CHECK(sb_path_join(named_path,sizeof(named_path),project.root,"knowledge/föö.md").code==SB_OK);
+    CHECK(sb_fs_write_new(named_path,"# Ziel &amp; Text\n",strlen("# Ziel &amp; Text\n")).code==SB_OK);
+    const char *entity_links="# A &amp; B\n\n[Ziel](f&ouml;&ouml;.md) &#91;falsch&#93;(../PROJECT.md)\n`[Code](f&ouml;&ouml;.md)`\n";
+    CHECK(sb_note_load(&project,note.path,&old,&revision).code==SB_OK);sb_text_free(old);
+    CHECK(sb_note_save(&project,note.path,entity_links,revision,NULL).code==SB_OK);
+    sb_notes_free(&notes);CHECK(sb_notes_list(&project,&notes).code==SB_OK);
+    CHECK(sb_graph_build(&project,&notes,&graph).code==SB_OK);index=0;links=0;
+    while (index<notes.count && strcmp(notes.items[index].path,note.path)) ++index;
+    CHECK(index<notes.count && !strcmp(notes.items[index].title,"A & B"));
+    for (size_t i=0;i<graph.edge_count;++i) if (graph.edges[i].from==index) {
+        ++links;CHECK(!strcmp(notes.items[graph.edges[i].to].path,"knowledge/föö.md"));
+        CHECK(!strcmp(notes.items[graph.edges[i].to].title,"Ziel & Text"));
+    }
+    CHECK(links==1);
+    CHECK(sb_note_load(&project,note.path,&old,NULL).code==SB_OK && !strcmp(old,entity_links));sb_text_free(old);
     sb_graph_free(&graph); sb_notes_free(&notes);
     printf("%u graph assertions passed.\n", checks);
     return 0;
