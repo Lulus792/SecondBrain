@@ -24,7 +24,10 @@ Tabellenzelle und 200-Prozent-Codegröße sind über echte AppKit-Abfragen gepr�
 Voriger Provider scheitert; erste eigene ASan/UBSan mit 376 Assertions besteht.
 Abschließende eigene ASan/UBSan mit 380 Assertions besteht; ohne Stilsignatur
 scheitert die reine Stil-Fixture. UI-Bericht SBUI-046.
-Neue Paket-/Plattformabnahme folgt; dist enthält bisher 0.9.11, Build 54aa29fd7bc8.
+Das neue Intel-Paket besteht mit Desktop 126, Tastatur 142, Sicherung 75,
+Neustart und CLI; eigenes Gedächtnis geladen und Raster betrachtet. dist enthält
+0.9.12, Build 4c4a51054334. Neue native Abnahme 37624868119 läuft: zwölf Jobs
+bereits erfolgreich, acht beim Zwischenstand in Arbeit.
 
 Die vorherige 0.9.11-Abnahme 37621658743 ist vollständig erfolgreich: 20 Jobs
 auf Windows, Linux, Intel-/ARM64-macOS einschließlich Release-Paketen. Daraus
