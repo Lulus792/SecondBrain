@@ -2,7 +2,7 @@
 
 Stand: 7. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Der aktuelle Entwicklungsschritt 0.9.6 ergänzt lesbare Dokumenttabellen.
+Der aktuelle Entwicklungsschritt 0.9.7 verfeinert schmale Dokumenttabellen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
 ## Abgeschlossene Grundlagen
@@ -1045,3 +1045,44 @@ Die vorbereitete Clientprüfung unterscheidet diese Lücke von zugänglichen
 Zeilenkindern. Menschliche Screenreader-Abnahme, volle GFM-Containerregeln und
 Leistung sehr großer Tabellen bleiben offen. Die gestapelte Kopfzeile soll bei
 wenig Höhe weiter verfeinert werden. Dies ist keine vollständige 1.0-Abnahme.
+
+
+## Schmale Tabellen und native Prüflaufkosten in 0.9.7
+
+Bei 200-%-Schrift im 780×560-Fenster beanspruchte eine zusätzliche gestapelte
+Kopfzeile den ersten Bildausschnitt. Die Ansicht beginnt nun bei Tabellen mit
+Datenzeilen direkt mit beschrifteten Werten. Logische native Spaltenköpfe und
+Zellidentitäten bleiben erhalten; ihre ausgeblendete Zeile hat kein sichtbares
+Rechteck. Kopfzeilen mit Links und Tabellen ohne Datenzeilen bleiben sichtbar.
+Leere Beschriftungen erzeugen keine zusätzliche Leerzeile.
+
+Fünf passende lokale UI-/Kernprüfungen bestehen (34,07 s); abschließend bestehen
+270 native Assertions (26,67 s), einschließlich unveränderter Tabellenstruktur,
+sofort sichtbarer erster Datenzelle, Scrollanfrage und Tab/Enter auf einem
+Kopfzeilenlink. Rasterbilder wurden betrachtet. Die neue Prüfung scheitert mit
+dem 0.9.6-Renderer an der weiterhin sichtbaren Kopfzeile. Originalbytes bleiben
+erhalten. Logs: build/compact-table-final-check.log, compact-table-pump-check.log
+und compact-table-regression/result.log.
+
+Der [0.9.6-Windows-Debug-Job](https://github.com/Lulus792/SecondBrain/actions/runs/37593650781/job/112700888022)
+endet bei native-accessibility nach 120 s mit Timeout; die übrigen 30 Tests
+bestehen. Dieser Lauf ist deshalb nicht vollständig grün. Das Prüfprogramm
+berechnet bei Clientpolling und den Zwischenphasen einer Scrollanfrage weiterhin
+Eingaben, Layout, native Veröffentlichung und Aktionen, zeichnet jedoch nur
+beobachtete Endzustände. Snapshot- und Zustandsprüfungen bleiben erhalten.
+Der normale Anwendungsrenderer ist unverändert. Vier Phasen-Checkpoints nennen
+die erreichten Abschnitte und ihre Dauer; die CTest-Fehlerannotation bewahrt sie
+auch bei langen Logs. Das wurde mit einem gezielt fehlschlagenden lokalen
+Diagnosefall geprüft. Die Ursache und Behebung des Windows-Timeouts werden erst
+nach einem neuen nativen Lauf als bestätigt geführt; kein Geräte-FPS-Nachweis.
+
+Das neue Intel-Paket wird entpackt geprüft. dist/SecondBrain bleibt bis zu dessen
+vollständig bestandenem Ablauf bei der geprüften 0.9.6. Neue native Plattform-
+prüfung und Paketnachweise stehen aus. Native Matrixschnittstellen, volle
+Containerregeln und menschliche assistive Bedienung bleiben Release-Aufgaben.
+
+
+Der 0.9.6-Lauf 37593650781 ist inzwischen abgeschlossen: 19 von 20 Jobs bestehen,
+einschließlich aller vier entpackten Release-Pakete. Einziger Fehler bleibt
+Windows Debug / native-accessibility / Timeout 120s. Die erfolgreichen Pakete
+belegen ihren konkreten Release-Ablauf, ersetzen aber keinen grünen Debug-Job.

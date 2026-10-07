@@ -1242,19 +1242,36 @@ static bool document_table(SBDesktop *d,const char *text,size_t length,size_t of
     struct nk_context *ctx=d->ui.ctx; float s=d->ui.scale,reader_top=ctx->current->layout->clip.y;
     float available=ctx->current->layout->bounds.w;
     bool stacked=available/table.columns<130*s;
+    bool compact_header=stacked && table.rows>1;
+    for (size_t c=0;c<table.columns;++c) if (cells[c].links) compact_header=false;
     float column_width=stacked ? available : available/table.columns;
     float padding=8*s,text_width=fmaxf(40,column_width-2*padding-4*s);
     const struct nk_user_font *font=&d->ui.body->handle;
     char table_id[100]; snprintf(table_id,sizeof(table_id),"reader:table:%zu",offset);
     size_t table_passive_index=SIZE_MAX; bool table_visible=false;
     for (size_t r=0;r<table.rows;++r) {
+        if (!r && compact_header) {
+            /* The repeated labels beside each value display the headers. Keep
+               logical column headers, without inventing visible rectangles. */
+            struct nk_rect bounds=nk_layout_space_rect_to_screen(ctx,nk_rect(0,ctx->current->layout->row.height,0,0));
+            size_t before=d->passive_count;
+            table_passive(d,table_id,"Tabelle",ACCESSKIT_ROLE_TABLE,"reader",bounds,reader_top,slot,0,0,table.rows,table.columns);
+            table_passive_index=d->passive_count>before ? before : SIZE_MAX;
+            char row_id[100]; snprintf(row_id,sizeof(row_id),"reader:table:%zu:row:%zu",offset,cells[0].row_offset);
+            table_passive(d,row_id,"Zeile 1",ACCESSKIT_ROLE_ROW,table_id,bounds,reader_top,slot,0,0,0,0);
+            for (size_t c=0;c<table.columns;++c) {
+                char cell_id[100]; snprintf(cell_id,sizeof(cell_id),"reader:table:%zu:row:%zu:cell:%zu",offset,cells[c].row_offset,c);
+                table_passive(d,cell_id,cells[c].plain,ACCESSKIT_ROLE_COLUMN_HEADER,row_id,bounds,reader_top,slot,0,c,0,0);
+            }
+            continue;
+        }
         float height=0; unsigned widgets=0;
         for (size_t c=0;c<table.columns;++c) {
             SBTableViewCell *cell=&cells[r*table.columns+c];
             cell->height=sb_ui_wrap_height(ctx,font,cell->plain,strlen(cell->plain),text_width)+cell->links*36*s;
-            if (stacked && r) cell->height+=sb_ui_wrap_height(ctx,&d->ui.normal->handle,cells[c].plain,strlen(cells[c].plain),text_width);
+            if (stacked && r && *cells[c].plain) cell->height+=sb_ui_wrap_height(ctx,&d->ui.normal->handle,cells[c].plain,strlen(cells[c].plain),text_width);
             height=stacked ? height+cell->height+2*padding : fmaxf(height,cell->height+2*padding);
-            widgets+=1+cell->links+(stacked && r ? 1 : 0);
+            widgets+=1+cell->links+(stacked && r && *cells[c].plain ? 1 : 0);
         }
         nk_layout_space_begin(ctx,NK_STATIC,height,(int)widgets);
         struct nk_rect bounds=nk_layout_space_rect_to_screen(ctx,nk_rect(0,0,available,height));
@@ -1290,7 +1307,7 @@ static bool document_table(SBDesktop *d,const char *text,size_t length,size_t of
             char cell_id[100]; snprintf(cell_id,sizeof(cell_id),"reader:table:%zu:row:%zu:cell:%zu",offset,cell->row_offset,c);
             table_passive(d,cell_id,cell->plain,r ? ACCESSKIT_ROLE_CELL : ACCESSKIT_ROLE_COLUMN_HEADER,row_id,cell_bounds,reader_top,slot,r,c,0,0);
             float y=top+padding;
-            if (stacked && r) {
+            if (stacked && r && *cells[c].plain) {
                 nk_style_set_font(ctx,&d->ui.normal->handle);
                 float h=sb_ui_wrap_height(ctx,&d->ui.normal->handle,cells[c].plain,strlen(cells[c].plain),text_width);
                 nk_layout_space_push(ctx,nk_rect(x+padding,y,column_width-2*padding,h)); sb_ui_text_aligned(ctx,cells[c].plain,strlen(cells[c].plain),NK_TEXT_LEFT); y+=h;

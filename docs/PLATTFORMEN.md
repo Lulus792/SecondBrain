@@ -526,3 +526,23 @@ Die geprüfte lokale Kopie liegt unter dist/SecondBrain. Der
 läuft noch. Native Windows-/Linux-/ARM64-Ergebnisse werden anhand des tatsächlich
 abgeschlossenen Laufs nachgetragen. Die Windows-/Linux-Clientprüfungen für Tabellenkinder sind bisher
 nur vorbereitet; fehlende UIA-/AT-SPI-Matrixschnittstellen bleiben offen.
+
+
+## Nachprüfung und laufender Schritt 0.9.7
+
+Der 0.9.6-Lauf zu 648a696 besitzt einen bestätigten Fehler: Windows Debug,
+native-accessibility, Timeout120s; übrige 30 UI-Tests dieses Jobs bestehen.
+[Öffentlicher Fehlernachweis](https://github.com/Lulus792/SecondBrain/actions/runs/37593650781/job/112700888022).
+Er darf nicht als vollständige Plattformabnahme gelten.
+
+0.9.7 verfeinert die schmale Tabellenansicht und verringert ausschließlich die
+Rasterarbeit im nativen Prüfprogramm. Fünf passende lokale Tests und die
+abschließende native Prüfung mit 270 Assertions bestehen. Der frühere Renderer
+scheitert an der Kopfzeilenregression; Rasterbilder mit 200 % wurden betrachtet.
+Das neue entpackte Intel-Paket und neue Windows-/Linux-/ARM64-Läufe stehen aus.
+
+
+Der 0.9.6-Lauf 37593650781 ist inzwischen abgeschlossen: 19 von 20 Jobs bestehen,
+einschließlich aller vier entpackten Release-Pakete. Einziger Fehler bleibt
+Windows Debug / native-accessibility / Timeout 120s. Die erfolgreichen Pakete
+belegen ihren konkreten Release-Ablauf, ersetzen aber keinen grünen Debug-Job.

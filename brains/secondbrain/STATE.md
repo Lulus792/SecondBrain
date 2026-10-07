@@ -22,7 +22,7 @@ C-Regeln verbinden Inline-Code, Maskierungen und Verweise in Titel, Leseansicht
 und Sternkarte. Das lokal geprüfte Intel-Paket liegt unter dist/SecondBrain.
 Öffentliche dauerhafte Vorabversion: [v0.7.3](https://github.com/Lulus792/SecondBrain/releases/tag/v0.7.3).
 
-## Laufender Schritt 0.9.6
+## Geprüfter lokaler Schritt 0.9.6
 
 [Tabellen](../../docs/TABELLEN.md) sind in eigenem C-Code implementiert:
 Spaltenausrichtung, gestapelte Zeilen bei schmaler Karte, erhaltene Originalbytes,
@@ -38,9 +38,14 @@ separate native Kinderprüfung ersetzt keine vollständige Tabellenbedienung.
 
 ## Weiterarbeiten
 
-Die geprüfte Umsetzung ist als 648a696 gepusht. Die
-[native 0.9.6-Abnahme](https://github.com/Lulus792/SecondBrain/actions/runs/37593650781)
-läuft noch; tatsächliche Ergebnisse übernehmen und offene Fehler beheben.
+0.9.7 ist unveröffentlicht: schmale Tabellen beginnen mit beschrifteten Werten;
+Kopfzeilenlinks und native Struktur bleiben erhalten. Fünf passende lokale
+Prüfungen und abschließende 270 native Assertions bestehen; Regression mit
+vorherigem Renderer scheitert. Der 0.9.6-Lauf hat einen Windows-Debug-Timeout
+bei native-accessibility. Die Prüfrasterarbeit ist reduziert, Zustände und
+Endbilder bleiben geprüft. Neuer nativer Nachweis ist dafür erforderlich.
+Das neue entpackte Intel-Paket wird geprüft; danach Schritt committen/pushen
+und CI anhand tatsächlicher Ergebnisse prüfen.
 Danach verbleibende Container-/Inline-/Listenregeln,
 Unicode-Textgeometrie/IME, Support-/Lizenzzuordnung und übrige Release-Aufgaben.
 Tatsächliche native Dialog- und menschliche VoiceOver/NVDA/Orca-Bedienung,

@@ -72,3 +72,30 @@ Lokale Kernprüfung: 18 Tests bestanden (22,59 s). ASan/UBSan: abschließend 5.6
 einschließlich 5.000 begrenzter Eingaben, bestanden. Die abschließenden UI-,
 Paket- und Plattformprüfungen werden nach ihrem tatsächlichen Abschluss im
 [Umsetzungsstand](STATUS.md) und den [Plattformnachweisen](PLATTFORMEN.md) ergänzt.
+
+
+## Schmale Karte ab 0.9.7
+
+Entwurf am 7. Oktober vor Umsetzung dokumentiert und anschließend implementiert:
+In gestapelten Tabellen mit Datenzeilen
+beginnt die Ansicht direkt mit den beschrifteten Werten. Eine zusätzliche reine
+Kopfzeile ist dort redundant und beansprucht bei großer Schrift den ersten
+Bildausschnitt. Die logischen Spaltenköpfe bleiben für native Leser erhalten;
+ihre eigene, ausgeblendete Zeile bekommt kein sichtbares Rechteck. Ein Ansprung
+führt zum Anfang der Daten und damit zu den wiederholten Beschriftungen.
+
+Enthält die Kopfzeile Linkaktionen oder besitzt die Tabelle nur eine Kopfzeile,
+bleibt sie sichtbar. Headerlinks müssen weiterhin über dieselben Tastaturwege
+erreichbar sein. Leere Spaltenbeschriftungen erzeugen in Datenzeilen keine
+zusätzliche Leerzeile. Dies ist eine eigene responsive Gestaltung; Apple schreibt
+keine solche konkrete Umwandlung vor. Abnahme: kleine Karte bei 200 %, erste
+Datenwerte sofort sichtbar, gleiche native Matrix und Identitäten, erhaltene
+Headerlinks und Originalbytes; Spaltendarstellung unverändert lesbar.
+
+
+Lokal bestehen fünf passende UI-/Kernprüfungen (34,07 s) sowie die nachfolgende
+native Tab-/Providerprüfung. Mit der abschließenden Prüfwerkzeug-Anpassung
+bestehen 270 native Assertions (26,67 s). Die Prüfung scheitert mit dem vorherigen
+0.9.6-Renderer an der weiterhin sichtbaren Kopfzeile. Rasterbilder zeigen die
+ersten Werte und den erhaltenen Kopfzeilenlink bei 780×560 und 200 %.
+Die neue Windows-/Linux-/ARM64-Abnahme folgt nach dem Commit.

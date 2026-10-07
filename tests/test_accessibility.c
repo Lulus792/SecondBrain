@@ -36,11 +36,29 @@ static void *native_find(void *object,const char *label,unsigned depth) {
 static unsigned checks;
 #define CHECK(x) do { ++checks; if (!(x)) { fprintf(stderr,"ACCESSIBILITY FAIL %d: %s\n",__LINE__,#x); return 1; } } while (0)
 #define OK(x) CHECK((x).code==SB_OK)
-static void frame(SBDesktop *d) { nk_input_begin(d->ui.ctx); SDL_Event e; while (SDL_PollEvent(&e)) sb_desktop_event(d,&e); sb_desktop_tick(d,1.0f/60); nk_input_end(d->ui.ctx); sb_desktop_frame(d); sb_ui_draw(&d->ui); SDL_RenderPresent(d->ui.renderer); sb_desktop_apply(d); }
-static void pump(void *context) { frame(context); }
+static void frame_run(SBDesktop *d,bool draw) {
+    nk_input_begin(d->ui.ctx); SDL_Event e;
+    while (SDL_PollEvent(&e)) sb_desktop_event(d,&e);
+    sb_desktop_tick(d,1.0f/60); nk_input_end(d->ui.ctx); sb_desktop_frame(d);
+    if (draw) { sb_ui_draw(&d->ui); SDL_RenderPresent(d->ui.renderer); }
+    else nk_clear(d->ui.ctx);
+    sb_desktop_apply(d);
+}
+static void frame(SBDesktop *d) { frame_run(d,true); }
+#if defined(_WIN32) || defined(SB_ATSPI_TEST)
+/* Polling the real client still processes input, layout, native updates and
+   actions. The next observed state is rasterized by frame()/capture. */
+static void pump(void *context) { frame_run(context,false); }
+#endif
+static Uint64 phase_start;
+static void checkpoint(const char *phase) {
+    Uint64 now=SDL_GetTicks();
+    printf("Native checkpoint: %s (%llu ms)\n",phase,(unsigned long long)(now-phase_start));
+    fflush(stdout); phase_start=now;
+}
 static char *dump(SBDesktop *d) { accesskit_tree_update *tree=sb_accessibility_tree(d->accessibility); char *text=accesskit_tree_update_debug(tree); accesskit_tree_update_free(tree); return text; }
 int main(int argc,char **argv) {
-    CHECK(argc==3); SBDesktop d; char root[SB_PATH_CAP],suffix[90];
+    phase_start=SDL_GetTicks(); CHECK(argc==3); SBDesktop d; char root[SB_PATH_CAP],suffix[90];
     snprintf(suffix,sizeof(suffix),"run-%lu-%lu",sb_process_id(),(unsigned long)time(NULL)); OK(sb_path_join(root,sizeof(root),argv[2],suffix));
     OK(sb_desktop_init(&d,root,argv[1],true)); CHECK(d.accessibility!=NULL);
     OK(sb_app_new_project(&d.model,"projekt","Projekt ü",NULL)); OK(sb_app_new_note(&d.model,"knowledge","notiz","Notiz"));
@@ -148,6 +166,7 @@ int main(int argc,char **argv) {
     CHECK(sb_native_probe(d.ui.window,"Letzter Abschnitt",NULL,SB_NATIVE_SCROLL_INTO_VIEW,NULL,0,pump,&d));
     frame(&d); frame(&d); CHECK(d.scrolling[0].destination>0);
 #endif
+    checkpoint("native document and heading queries");
     memset(&d.scrolling[0],0,sizeof(d.scrolling[0])); d.reset_reader=true; frame(&d); frame(&d);
     /* Keyboard heading jumps reuse the same offset and scroll path. */
     snprintf(d.focus,sizeof(d.focus),"reader");
@@ -157,7 +176,7 @@ int main(int argc,char **argv) {
     sb_desktop_event(&d,&heading_key); frame(&d); CHECK(strcmp(d.heading_cursor,first_id));
     for (unsigned i=0;i<4;++i) { sb_desktop_event(&d,&heading_key); frame(&d); }
     CHECK(!strcmp(d.heading_cursor,last_id));
-    for (unsigned i=0;i<40;++i) frame(&d);
+    for (unsigned i=0;i<40;++i) frame_run(&d,i==39);
     bool last_visible=false;
     for (size_t i=0;i<d.passive_count;++i) if (!strcmp(d.passive[i].id,last_id)) last_visible=d.passive[i].bounds.h>0;
     CHECK(last_visible && d.scrolling[0].position>0 && !sb_app_dirty(&d.model));
@@ -212,6 +231,7 @@ int main(int argc,char **argv) {
     for (size_t i=0;i<d.passive_count;++i) if (!strcmp(d.passive[i].parent,"reader") && !strcmp(d.passive[i].text,"Sichtbarer Projektname"))
         context_heading=d.passive[i].role==ACCESSKIT_ROLE_HEADING && d.passive[i].bounds.h>0;
     CHECK(context_heading); d.form=SB_FORM_NONE; free(d.context); d.context=previous_context; frame(&d);
+    checkpoint("block and inline contracts");
     char table_source[2800];
     snprintf(table_source,sizeof(table_source),"# Tabellenprüfung\n\n| Aktion | Kürzel | Wert |\n| :--- | :---: | ---: |\n| [Stand](%sSTATE.md) | `Ctrl+S` | 7 |\n| Lange Beschreibung mit Wissen ü und mehreren Wörtern zum kontrollierten Umbruch | F6 | 8 | ignoriert |\n| Leer |\n\nDanach.\n",prefix);
     strcpy(d.model.editor,table_source); OK(sb_app_save(&d.model)); d.reset_reader=true; frame(&d); frame(&d);
@@ -266,6 +286,22 @@ int main(int argc,char **argv) {
     OK(sb_ui_fonts(&d.ui,2)); CHECK(SDL_SetWindowSize(d.ui.window,780,560)); frame(&d); frame(&d);
     CHECK(!strcmp(d.model.editor,table_source));
     for (size_t i=0;i<d.passive_count;++i) if (d.passive[i].role==ACCESSKIT_ROLE_TABLE) CHECK(!strcmp(d.passive[i].id,table_id));
+    unsigned compact_headers=0; bool first_data_visible=false,hidden_header=false;
+    for (size_t i=0;i<d.passive_count;++i) {
+        SBPassiveText *p=&d.passive[i];
+        if (p->role==ACCESSKIT_ROLE_COLUMN_HEADER) { ++compact_headers; CHECK(p->bounds.h==0); }
+        if (p->role==ACCESSKIT_ROLE_ROW && p->row==0) hidden_header=p->bounds.h==0;
+        if (p->role==ACCESSKIT_ROLE_CELL && p->row==1 && p->column==0) first_data_visible=p->bounds.h>0 && !strcmp(p->text,"Stand");
+    }
+    CHECK(compact_headers==3 && hidden_header && first_data_visible);
+#ifdef __APPLE__
+    native_table=native_find(view,"Tabelle",0); CHECK(native_table);
+    native_rows=send(native_table,"accessibilityRows");
+    CHECK(native_rows && ((size_t(*)(void *,SEL))objc_msgSend)(native_rows,sel_registerName("count"))==4);
+#elif defined(_WIN32) || defined(SB_ATSPI_TEST)
+    CHECK(sb_native_probe(d.ui.window,"Tabelle",NULL,SB_NATIVE_READ_TABLE_TREE,native_value,sizeof(native_value),pump,&d));
+    CHECK(!strcmp(native_value,"4:3"));
+#endif
     OK(sb_path_join(dump_path,sizeof(dump_path),root,"table-stacked.bmp")); CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
     char last_cell[100]={0};
     for (size_t i=0;i<d.passive_count;++i) if (d.passive[i].role==ACCESSKIT_ROLE_CELL && d.passive[i].row==3 && d.passive[i].column==0) strcpy(last_cell,d.passive[i].id);
@@ -276,7 +312,7 @@ int main(int argc,char **argv) {
 #elif defined(_WIN32) || defined(SB_ATSPI_TEST)
     CHECK(sb_native_probe(d.ui.window,"Leer",NULL,SB_NATIVE_SCROLL_INTO_VIEW,NULL,0,pump,&d));
 #endif
-    for (unsigned i=0;i<40;++i) frame(&d);
+    for (unsigned i=0;i<40;++i) frame_run(&d,i==39);
     bool last_cell_visible=false;
     for (size_t i=0;i<d.passive_count;++i) if (!strcmp(d.passive[i].id,last_cell)) last_cell_visible=d.passive[i].bounds.h>0;
     CHECK(last_cell_visible && !strcmp(d.model.editor,table_source));
@@ -284,6 +320,22 @@ int main(int argc,char **argv) {
     d.expanded=true; d.reset_reader=true; frame(&d); frame(&d);
     OK(sb_path_join(dump_path,sizeof(dump_path),root,"table-expanded.bmp")); CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
     d.expanded=false;
+    checkpoint("table roles and scroll");
+    char header_source[1000];
+    snprintf(header_source,sizeof(header_source),"# Header-Verweise\n\n| [Aktion](%sPROJECT.md) | Wert |\n| --- | --- |\n| Tun | 3 |\n",prefix);
+    strcpy(d.model.editor,header_source); OK(sb_app_save(&d.model)); d.reset_reader=true; frame(&d); frame(&d);
+    bool header_visible=false,header_link=false;
+    for (size_t i=0;i<d.passive_count;++i) if (d.passive[i].role==ACCESSKIT_ROLE_ROW && d.passive[i].row==0) header_visible=d.passive[i].bounds.h>0;
+    for (size_t i=0;i<d.target_count;++i) if (!strcmp(d.targets[i].id,"link:0")) header_link=!strcmp(d.targets[i].label,"Aktion") && strstr(d.targets[i].parent,":cell:0");
+    CHECK(header_visible && header_link && !sb_app_dirty(&d.model));
+    OK(sb_path_join(dump_path,sizeof(dump_path),root,"table-header-link.bmp")); CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    strcpy(d.focus,"reader"); link_key.key.key=SDLK_TAB; sb_desktop_event(&d,&link_key); frame(&d); frame(&d);
+    CHECK(!strcmp(d.focus,"link:0"));
+    link_key.key.key=SDLK_RETURN; sb_desktop_event(&d,&link_key); frame(&d); frame(&d);
+    CHECK(d.model.source && strstr(d.model.source_path,"/PROJECT.md"));
+    link_key.key.key=SDLK_ESCAPE; sb_desktop_event(&d,&link_key); frame(&d); frame(&d);
+    CHECK(!d.model.source && !strcmp(d.model.editor,header_source));
+    strcpy(d.model.editor,table_source); OK(sb_app_save(&d.model)); d.reset_reader=true;
     OK(sb_ui_fonts(&d.ui,1)); CHECK(SDL_SetWindowSize(d.ui.window,1336,840)); frame(&d); frame(&d);
     strcpy(d.focus,"link:0"); link_key.key.key=SDLK_RETURN; sb_desktop_event(&d,&link_key); frame(&d); frame(&d);
     CHECK(d.model.source && strstr(d.model.source_path,"/STATE.md") && !sb_app_dirty(&d.model));
@@ -301,6 +353,7 @@ int main(int argc,char **argv) {
 #ifdef SB_ATSPI_TEST
     CHECK(sb_native_cache_check());
 #endif
+    checkpoint("header links, keyboard and guards");
     sb_desktop_free(&d);
     /* Snapshot/queue contract is tested on every OS, independently of the native client. */
     CHECK(SDL_Init(SDL_INIT_VIDEO));
