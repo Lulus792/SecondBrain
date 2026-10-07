@@ -13,7 +13,12 @@ if(source_hash STREQUAL "7f2493b559f0b04884e201d897981a3cce47b2c571863d37ffddb1b
     string(REGEX REPLACE "[\r\n]+$" "" replacement "${replacement}")
     string(SUBSTRING "${text}" 0 ${begin} prefix)
     string(SUBSTRING "${text}" ${end} -1 suffix)
-    file(WRITE "${source}" "${prefix}${replacement}\n\n${suffix}")
+    # file(WRITE) uses native line endings on Windows. Pin the actual bytes.
+    file(CONFIGURE OUTPUT "${source}" CONTENT "${prefix}${replacement}\n\n${suffix}" @ONLY NEWLINE_STYLE UNIX)
+elseif(source_hash STREQUAL "4c9836aa3845b12cdca68c8f7bbad0b1f6ae88d7f4ba10911a2e5881f86f798f")
+    # Recover the exact CRLF output left by the prior Windows preparation.
+    file(READ "${source}" text)
+    file(CONFIGURE OUTPUT "${source}" CONTENT "${text}" @ONLY NEWLINE_STYLE UNIX)
 elseif(NOT source_hash STREQUAL "0fd8cba2e66e5edcaed3fa8d35572e530b7a816a1a716703e96867440709bae1")
     message(FATAL_ERROR "Unrecognized AccessKit Windows text source; refusing an unverified patch")
 endif()

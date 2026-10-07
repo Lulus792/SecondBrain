@@ -91,3 +91,19 @@ Eine vollständige lokale CMake-Fixture bindet die Quellbuild-Integration ein un
 konfiguriert erfolgreich; sie kompiliert keine Windows-Bibliothek.
 Die Quellpatch-Prüfung akzeptiert auch eine CRLF-Fassung des eigenen Snippets;
 daraus wurde kein reproduzierter Fehler abgeleitet. Neuer nativer Diagnoselauf folgt.
+
+
+Der ausführliche Windows-Nachweis 37630397578 nennt nun die Ursache:
+CMake schreibt das geänderte text.rs mit CRLF. Sein tatsächlicher Hash
+`4c9836aa3845b12cdca68c8f7bbad0b1f6ae88d7f4ba10911a2e5881f86f798f`
+ist bytegenau der CRLF-Fassung des vorgesehenen LF-Ergebnisses. Eine CRLF-Fassung
+des eingelesenen eigenen Snippets war hingegen lokal kein Fehler; der relevante
+Unterschied entsteht beim Windows-Dateischreiben.
+
+Der Vorbereitungsschritt verwendet jetzt file(CONFIGURE) mit NEWLINE_STYLE UNIX.
+Originalquelle, bereits vorbereitete LF-Fassung und exakt die hinterlassene
+Windows-CRLF-Fassung ergeben denselben festgelegten LF-Hash. Unbekannte Quellen
+werden weiterhin abgewiesen. Alle vier lokalen Quellenfälle bestehen; Logs in
+build/windows-findtext-lineend-proof. Kein temporärer Konfigurationseingang bleibt
+als Buildabhängigkeit zurück. Neue tatsächliche Windows-Konfiguration/Kompilierung
+und native Ausführung folgen; noch keine Windows-Abnahme behaupten.

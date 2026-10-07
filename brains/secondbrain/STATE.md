@@ -23,8 +23,9 @@ Adapterbefund bestätigt, kleine gehashte UI-Ergänzung und fester DLL-Quellbuil
 vorbereitet. Lokale Quellen-/Lockfile-/Wiederholungsprüfungen und vier Mac-
 Nachprüfungen bestehen. Neue Windows-Kompilierung und native Abnahme folgen.
 Erster Quellbuild 37628165496 stoppt unter Windows schon bei Konfiguration;
-Ursache noch unbekannt. Geprüfter Konfigurationswrapper liefert jetzt Details.
-Neuer Diagnoselauf folgt. Intel-Paket 0.9.13 besteht; kein Windows-Nachweis.
+Ursache inzwischen belegt: native CRLF-Ausgabe statt festgelegter LF-Bytes.
+Vorbereitung erzwingt nun LF und erhält strenge Hashprüfung; vier Quellenfälle
+bestehen lokal. Neue tatsächliche Windows-Abnahme folgt. Intel-Paket 0.9.13 besteht; kein Windows-Nachweis.
 Keine bestätigte Windows-Behebung vorwegnehmen. UI-Bericht SBUI-047.
 Dist enthält weiter geprüftes 0.9.12, Build 4c4a51054334.
 
