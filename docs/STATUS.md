@@ -918,3 +918,35 @@ Das geprüfte Entwicklungspaket ist lokal nach dist/SecondBrain übernommen;
 Versionsausgabe und Standbild mit eigenem Projektgedächtnis bestehen.
 Die [neue 0.9.3-Abnahme zu 3f3d3a0](https://github.com/Lulus792/SecondBrain/actions/runs/37550880880)
 läuft noch; zwölf Kern-/Python-Jobs bestehen bereits.
+
+Die 0.9.3-Abnahme zu 3f3d3a0 besteht inzwischen mit allen 20 Jobs und vier
+entpackten Plattformpaketen. [Umfang](PLATTFORMEN.md). Der folgende Schritt
+0.9.4 wird separat geprüft.
+
+## Gemeinsame Dokumentblockregeln 0.9.4
+
+Ein eigener C-Blockleser erkennt Überschriften, Codezäune, eingerückten Code und
+Absätze anhand schreibgeschützter Quellbereiche. Titel und Leseansicht verwenden
+jetzt dieselben Regeln; CR, CRLF und LF werden erkannt. Code erzeugt keine
+scheinbaren Markdown-Überschriften oder Linkaktionen. [Vertrag und Grenzen](MARKDOWN.md).
+
+16 lokale Debug-Kerntests bestehen (34,04 Sekunden). Der erste vollständige
+Release-Durchlauf mit 30 Tests besteht (316,43 Sekunden). Die abschließende
+Korrektur für eingerückte Absatzfortsetzungen besteht in der separaten Kern-
+und nativen UI-Nachprüfung (11,35 Sekunden); ASan/UBSan besteht mit 181.791
+Aussagen einschließlich 10.000 deterministischer Eingaben. Die Instrumentierung
+betrifft eigenen C-Code; LeakSanitizer ist nicht Bestandteil dieser Prüfung.
+Die native macOS-Prüfung bestätigt 177 Aussagen; ein tatsächliches Rasterbild
+mit Code, Absatz und Setext-Überschrift ist betrachtet. Die neuen Blockrollen-
+Prüfungen scheitern mit der vorherigen Leseansicht aus 368d3b4 bei aktuellem
+übrigem Testaufbau. Paket- und neue native Plattformabnahme folgen separat.
+
+Vollständige Container-/Inline-Regeln, Listen-/Tabellensemantik, Textgeometrie,
+IME, reale assistive Bedienung und übrige Release-Aufgaben bleiben offen.
+Die Version 1.0 bleibt bis zur Nutzerfreigabe gesperrt.
+
+Das endgültige entpackte Intel-Paket besteht mit 126 Desktop-, 142 Tastatur-
+und 75 Sicherungs-UI-Aussagen, Einstellungsneustart und CLI-Sicherung. SHA-256:
+`436f9ddcc4b56c92cc840cf1d7875c1e774855b97e614a5be63cc59f3d912552`. Das geprüfte Entwicklungspaket wurde nach
+dist/SecondBrain übernommen; Version 0.9.4 und eigenes Projekt-Standbild sind
+geprüft. Neue native Plattformabnahme folgt nach dem Push.

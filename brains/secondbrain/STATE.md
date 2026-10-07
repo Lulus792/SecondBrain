@@ -1,151 +1,53 @@
 # SecondBrain: aktueller Stand
 
-Stand: 7. Oktober 2026. Originale: [Umsetzungsstand](../../docs/STATUS.md),
-[Plattformnachweise](../../docs/PLATTFORMEN.md) und [Release-Liste](../../docs/RELEASE.md).
-Historische Arbeitsabschnitte bleiben im [Journal](journal/2026-10-06.md).
+Stand: 7. Oktober 2026. Maßgebliche Originale:
+[Umsetzungsstand](../../docs/STATUS.md), [Plattformnachweise](../../docs/PLATTFORMEN.md)
+und [Release-Aufgaben](../../docs/RELEASE.md). Historische Schritte stehen im
+[Journal](journal/2026-10-07.md).
 
-## Implementiert und belegt
+## Produkt und geprüfter Stand
 
-- Eigene C17-App: Projekte und Notizen anlegen, lesen, bearbeiten, suchen und
-  archivieren; Quellen lesen und gespeicherten KI-Kontext kopieren. Entwürfe und
-  erkannte Speicherkonflikte bleiben geschützt.
-- Lumen-Sternkarte und eigene Glasdarstellung/Icons; direkte Pfeilnavigation,
-  Raumfahrt, begrenztes weiches Scrollen, Menüpfeile und große Leseansicht.
-- Eigene Sicherungsarchive mit SHA-256, Vorschau, Hintergrundarbeit und Abbruch;
-  Wiederherstellung veröffentlicht ausschließlich einen freien neuen Projektordner.
-  [Vertrag](../../docs/SICHERUNG.md).
-- Einstellungen, letzter Arbeitsordner und Projektposition bleiben gespeichert.
-  Native Dialoge sind angebunden. Eigene Auswahl bleibt getrennt von bekannten
-  OS-Vorgaben für Darstellung, Bewegung, Transparenz und Kontrast.
-- AccessKit ausschließlich in der UI; tatsächliche native Provider-/UIA-/AT-SPI-
-  Abfragen und Aktionen bestehen. Die Linux-Cache-Signalstruktur ist korrigiert.
-  [Umfang und Grenzen](../../docs/BARRIEREFREIHEIT_PLAN.md).
-- [0.6.1-Abnahme zu b064bd5](https://github.com/Lulus792/SecondBrain/actions/runs/37529776082):
-  18 erfolgreiche Jobs, 16 Desktoptests je Debug/Release auf Windows x64,
-  macOS ARM64 und Linux x64 sowie drei entpackte Pakete. Raster- und Fokuskontrast
-  sind gezielt nachgeprüft. dist/SecondBrain ist lokal auf 0.9.3 (geprüfter Entwicklungsbuild).
+Eigene C17-Desktop-App für Mensch und KI: Projekte und Notizen anlegen,
+lesen, bearbeiten, suchen und archivieren; Quellen lesen und gespeicherten
+Projektkontext kopieren. Lumen-Sternkarte, eigene Glasdarstellung und Icons,
+direkte Pfeilnavigation, Raumfahrt, begrenztes weiches Scrollen und große
+Leseansicht sind implementiert. Entwürfe und erkannte Konflikte bleiben geschützt.
 
-## Abgenommener erster Start
+Eigene Inhaltsarchive bieten Sicherung, Prüfung und Wiederherstellung in einen
+freien Projektordner. Einstellungen und Arbeitsstand bleiben gespeichert.
+Native Adapter, bekannte Systemvorgaben und Schrift-Fallback sind angebunden.
+[Verträge und Grenzen](SOURCES.md).
 
-0.7.0 bündelt im leeren Zustand Anlegen, Öffnen, Wiederherstellung, Hilfe und
-Darstellung. Große Schrift scrollt die Aktionen unter einer festen Überschrift.
-Dialogabbruch erhält den Ursprung. Alle 17 lokalen Release-Tests bestehen;
-die abschließende Mausradprüfung und gezielte ASan/UBSan-Prüfungen bestehen ebenfalls.
-Die [Abnahme zu beba1e5](https://github.com/Lulus792/SecondBrain/actions/runs/37531214816)
-besteht mit 18 Jobs, 17 Desktoptests je Debug/Release und drei entpackten Paketen.
-[Recherche und Vertrag](../../docs/ERSTER_START.md).
+Die [0.9.3-Abnahme zu 3f3d3a0](https://github.com/Lulus792/SecondBrain/actions/runs/37550880880)
+besteht mit 20 Jobs und vier entpackten Paketen für Windows x64, Linux x64,
+macOS ARM64 und Intel. Sie umfasst 17 lesbare Lizenzressourcen, Tastaturwege,
+Entwurfsschutz und bestehende native Provider-/Clientprüfungen. Lokal liegt
+das geprüfte Intel-Entwicklungspaket 0.9.4 unter dist/SecondBrain.
+Die öffentliche dauerhafte Vorabversion ist weiterhin
+[v0.7.3](https://github.com/Lulus792/SecondBrain/releases/tag/v0.7.3).
 
-## Laufende Arbeit: Datenvertrag
+## Laufender Schritt 0.9.4
 
-0.7.1 prüft Metadatenfelder und unbekannte Schemas konsistent und verhindert
-NUL-bedingte Textverkürzung. Alle acht UI-unabhängigen Kerntests und gezielte
-ASan/UBSan-Prüfungen sowie abschließende Desktop-Nachprüfungen bestehen.
-Die Regression schlägt beim bisherigen Kern fehl. Die [Abnahme zu b3c0af5](https://github.com/Lulus792/SecondBrain/actions/runs/37532681504)
-besteht mit 18 Jobs, 18 Desktoptests je Debug/Release und drei entpackten Paketen.
-[Datenvertrag](../../docs/DATENVERTRAG.md).
+Titel und Leseansicht benutzen gemeinsame schreibgeschützte C-Blockregeln für
+Überschriften, Code und Absätze. Editor und gespeicherte Originalbytes bleiben
+erhalten. 16 Debug-Kernprüfungen, der erste Durchlauf mit 30 Release-Tests,
+abschließende Kern-/native Nachprüfungen und gezieltes ASan/UBSan bestehen.
+Die neue Rollenprüfung scheitert mit der vorherigen Leseansicht.
+[Markdown-Vertrag](../../docs/MARKDOWN.md), [genaue Nachweise](../../docs/STATUS.md).
+Das entpackte Intel-Paket besteht einschließlich Desktop, Tastatur, Sicherung,
+Einstellungsneustart und CLI. Neue native Plattformabnahme folgt nach dem Push.
 
-0.7.2 erhält einzelne Projektfehler als sichtbare Einträge und lässt andere
-Projekte nutzbar. Alle 20 Release-Tests und der zusätzliche CLI-Prozesstest
-bestehen, ebenso zehn reine Kerntests und vier ASan/UBSan-Wege. Erneutes Prüfen
-und Fokus-Reveal nach Größenänderung sind betrachtet. Die [Abnahme zu f2e2725](https://github.com/Lulus792/SecondBrain/actions/runs/37534667024)
-besteht mit 18 Jobs, 21 Desktoptests je Debug/Release und drei entpackten Paketen.
+## Weiterarbeiten
 
-0.7.3 prüft aktuelle Metadaten zusätzlich vor Schreibaktionen, auch bei bereits
-geöffnetem Projekt. Elf reine Kerntests bestehen; Save-Guard, Entwurf und
-Originaldatei bleiben bei erkannten Metadatenfehlern erhalten. 22 Release-Tests,
-elf Kerntests und gezielte ASan/UBSan-/UI-Nachprüfungen bestehen. Die [Abnahme
-zu 7331eca](https://github.com/Lulus792/SecondBrain/actions/runs/37536230101) besteht
-mit 18 Jobs, 22 Desktoptests je Debug/Release und drei entpackten Paketen.
+0.9.4 vollständig auf den nativen Plattformen und im entpackten Paket abnehmen.
+Danach vollständige Container-/Inline-Regeln und Listen-/Tabellensemantik,
+Unicode-Textgeometrie/IME, Support-/Lizenzzuordnung sowie übrige Release-Aufgaben
+weiter umsetzen. Tatsächliche native Dialog- und menschliche VoiceOver/NVDA/Orca-
+Bedienung, Geräte-/Langzeitprüfungen und weitere volle Dateisysteme bleiben offen.
+CI-Nachweise belegen keine vollständige menschliche oder physische Geräteabnahme.
 
-## Laufende Arbeit: dauerhafte Distribution
-
-Die vorbereitete Vorabversions-Pipeline verwendet dieselben Plattformtests,
-plant zusätzlich Intel-macOS-Pakete und verifiziert Uploads anhand der Prüfsummen
-vor Veröffentlichung. Alle zwölf Kerntests einschließlich Tag-/Manifestprüfung und Workflow-Lint
-bestehen lokal;
-tatsächliche Erstveröffentlichung und Intel-CI-Abnahme stehen noch aus.
-
-## Weiterarbeiten und Grenzen
-
-Der vollständige Auftrag vor 1.0 bleibt aktiv. Nächste Schritte: Datenabnahme und
-Einzelprojekt-Fehlerzustände, native Dokument-/Unicode-Semantik und Schrift-Fallback,
-Datenvertrag, reale Sicherungsfehler, Leistung und dauerhafte Distribution abnehmen.
-OS-Dialogbedienung, VoiceOver/NVDA/Orca, echte Systemsteuerungswechsel, individuelle
-Windows-Kontrastfarben und Geräte-/Langzeitprüfungen sind noch nicht vollständig belegt.
-
-Eigener Code: MIT. Apple-Developer-Konto und Windows-Signaturzertifikat fehlen.
-1.0 bleibt bis zur ausdrücklichen Nutzerfreigabe gesperrt. Produkttexte werden
-auf Nutzerwunsch erst abschließend bereinigt, wenn das Produkt vollständig ist.
-Chat-Anbieter, Synchronisation und automatische KI-Pflege sind spätere Optionen.
-
-## Versionsangaben 0.8.0
-
-Versionskarte und CLI-/App-Option `--version` sind implementiert. 13 Kerntests
-und erste Tastatur-/Versionsprüfungen bestehen. Das korrigierte Bild und Intel-Paket sind
-geprüft: 126 Desktop-, 112 Tastatur- und 75 Sicherungs-UI-Aussagen sowie
-Neustart und CLI-Sicherung. Die native Abnahme zu 1ab4ab5 besteht mit 20 Jobs und vier Paketen;
-Windows-CRLF ist im Vergleich berücksichtigt.
-Die dauerhafte Vorabversion v0.7.3 ist öffentlich: 22 erfolgreiche Jobs, vier
-Archive und SHA256SUMS; öffentliche Downloads und API-Digests stimmen überein.
-[Übergabe vom 7. Oktober](journal/2026-10-07.md).
-
-## Textdarstellung 0.9.0
-
-Neue geformte Textläufe und Noto-Ersatzschriften sind in C an die UI angebunden.
-26 lokale Release-Tests, drei Nachprüfungen und das entpackte Intel-Paket
-bestehen; 13 reine C-Kerntests ebenfalls. Der neue Texttest schlägt beim
-bisherigen Renderer fehl. [Vertrag und Grenzen](../../docs/TEXTDARSTELLUNG.md):
-gemischte Schreibrichtungen, graphemgenaue Eingabe, Emoji und native
-Textgeometrie bleiben eigene Arbeiten. Die native 0.9.0-Abnahme zu 3161f08 besteht mit 20 Jobs und vier Paketen.
-
-## Dokumentstruktur 0.9.1
-
-Leseansicht veröffentlicht Überschriften, Absätze, Code und Linkaktionen
-unter dem Dokument. Alt+Bild auf/ab und native Abschnittsanfragen benutzen
-dieselben Quellpositionen. 26 lokale Release-Tests und die abschließende
-macOS-/Vertragsprüfung bestehen; diese bestätigt vollständigen Text über
-6.000 Zeichen, native Scroll-Anfragen und 2.000 stabile Absatzkennungen.
-[Umfang und offene Semantik](../../docs/DOKUMENTSTRUKTUR.md). Das Intel-Paket und gezieltes ASan/UBSan (149 Aussagen) bestehen.
-Neue native Plattformabnahme folgt; der vollständige Auftrag vor 1.0 bleibt aktiv.
-
-## Fehlerszenarien und Linux-Ebenen 0.9.2
-
-15 lokale Debug-Kerntests und fünf Release-Nachprüfungen bestehen.
-Sechs echte Prozess-Kills erhalten Originale und erlauben sichere neue
-Versuche. Zwei echte ENOSPC-Fälle auf einem entbehrlichen HFS+-Volume
-bestehen nach Teilfortschritt; das Volume ist getrennt.
-
-0.9.1 besteht in 18 nativen Jobs; Linux scheitert an einem fehlenden
-AT-SPI-Ebenenattribut. Die neue gehashte UI-Quellkorrektur ist typgeprüft
-und idempotent; native Linux-Wiederholungsabnahme folgt. Originale:
-[Umsetzungsstand](../../docs/STATUS.md), [Sicherungsvertrag](../../docs/SICHERUNG.md)
-und [UI-Abhängigkeiten](../../third_party/README.md). Lokale App bleibt auf
-dem geprüften 0.9.1-Paket; 1.0 und tatsächliche assistive Abnahme sind offen.
-
-Native Linux-Debug-/Release-Nachprüfung zu b69223c einschließlich Paket besteht.
-Die getrennte Python-Importsuche scheitert; 1358794 behebt die Importausführung,
-neun lokale Generator- und zwei Prozess-/Volume-Prüfungen bestehen.
-[Datierter Plattformstand](../../docs/PLATTFORMEN.md).
-
-## Lizenzansicht 0.9.3
-
-17 Originaltexte sind über Über SecondBrain direkt in der App les- und
-kopierbar. Entwürfe bleiben erhalten; alle 29 lokalen Release- und neun
-Generatorprüfungen bestehen. Bilder mit großer Schrift sind betrachtet.
-[Originalvertrag](../../docs/LIZENZEN.md) und [Prüfumfang](../../docs/STATUS.md).
-Neue Plattform-/Paketabnahme folgt; vollständige transitive Zuordnung und
-Supportstruktur bleiben offen. Der Auftrag vor 1.0 bleibt aktiv.
-
-Die Wiederholung von 0.9.2 zu 1358794 besteht nun mit allen 20 Jobs und vier
-entpackten Plattformpaketen. [Originalnachweis](../../docs/PLATTFORMEN.md).
-Der Nachweis umfasst die Linux-Ebenenkorrektur und beide Import-/Prozesswege;
-die neue Lizenzansicht 0.9.3 benötigt ihren eigenen Plattformlauf.
-
-Die letzte Intel-Paketwiederholung nach der Pfadkorrektur besteht: 126 Desktop-,
-142 Tastatur- und 75 Sicherungs-UI-Aussagen, gespeicherte Einstellungen über
-zwei Prozesse und CLI-Sicherung. Archiv-SHA-256:
-`5cf73ce1d180bd64fd9e2f1f3fdca35e95ff2c1a91d4e7e6ed4c14653e3a538c`.
-Das geprüfte Entwicklungspaket ist lokal nach dist/SecondBrain übernommen;
-Versionsausgabe und Standbild mit eigenem Projektgedächtnis bestehen.
-Die [neue 0.9.3-Abnahme zu 3f3d3a0](https://github.com/Lulus792/SecondBrain/actions/runs/37550880880)
-läuft noch; zwölf Kern-/Python-Jobs bestehen bereits.
+Der vollständige Auftrag vor 1.0 bleibt aktiv. Eigener Code: MIT.
+Apple-Developer-Konto und Windows-Signaturzertifikat fehlen.
+1.0 wird ausschließlich nach ausdrücklicher Nutzerfreigabe gesetzt.
+Die abschließende Bereinigung der Produkttexte folgt auf Nutzerwunsch erst,
+wenn das Produkt vollständig ist. Originalnachweise bleiben erhalten.

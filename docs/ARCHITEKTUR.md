@@ -10,6 +10,11 @@ die vorhandene Grundstruktur, liest und schreibt Dateien, durchsucht Inhalte
 und stellt KI-Kontext zusammen. Dateiverweise und Metadaten bleiben lesbar.
 Die vorhandenen Vorlagen und Projektgedächtnisse können weiterverwendet werden.
 
+`src/markdown.c` liefert schreibgeschützte Dokumentblöcke ohne UI-Abhängigkeit.
+Titelermittlung und Leseansicht verwenden dieselben Quellbereiche; Parser und
+Titelausgabe verändern weder Dateien noch Editorinhalt. Der konkrete
+[Markdown-Umfang](MARKDOWN.md) wird unabhängig vom Rendering geprüft.
+
 Eine eigene kleine Plattformschicht verbindet Dateizugriff und Verzeichnislisten
 mit Windows beziehungsweise POSIX auf macOS und Linux. Pfade werden in der
 Anwendung als UTF-8 geführt; Windows-Systemaufrufe erhalten UTF-16.

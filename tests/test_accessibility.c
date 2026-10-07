@@ -161,6 +161,33 @@ int main(int argc,char **argv) {
     bool last_visible=false;
     for (size_t i=0;i<d.passive_count;++i) if (!strcmp(d.passive[i].id,last_id)) last_visible=d.passive[i].bounds.h>0;
     CHECK(last_visible && d.scrolling[0].position>0 && !sb_app_dirty(&d.model));
+    const char *grammar="# Blockregeln ü ###\r\n\r\n  ~~~~c\r\n  ## Nur Code\r\n  ~~~\r\n  [Kein Link](../STATE.md)\r\n  ~~~~~\r\n\r\n2026 bleibt Absatz\rund wird fortgesetzt.\r\n\r\nUnterstrich-Titel\r\n---\r\n\r\n    # Eingerückter Code\r\n";
+    strcpy(d.model.editor,grammar); OK(sb_app_save(&d.model));
+    d.reset_reader=true; frame(&d); frame(&d);
+    CHECK(!strcmp(d.model.title,"Blockregeln ü") && !strcmp(d.model.editor,grammar));
+    headings=paragraphs=codes=0; bool literal_heading=false,literal_fence=false,literal_link=false,joined=false,setext=false;
+    for (size_t i=0;i<d.passive_count;++i) {
+        SBPassiveText *p=&d.passive[i]; if (strcmp(p->parent,"reader")) continue;
+        if (p->role==ACCESSKIT_ROLE_HEADING) { ++headings; if (!strcmp(p->text,"Unterstrich-Titel")) setext=p->level==2; }
+        if (p->role==ACCESSKIT_ROLE_CODE) {
+            ++codes; literal_heading|=!strcmp(p->text,"## Nur Code");
+            literal_fence|=!strcmp(p->text,"~~~"); literal_link|=!strcmp(p->text,"[Kein Link](../STATE.md)");
+        }
+        if (p->role==ACCESSKIT_ROLE_PARAGRAPH) { ++paragraphs; joined|=!strcmp(p->text,"2026 bleibt Absatz und wird fortgesetzt."); }
+    }
+    CHECK(headings==2 && codes==4 && paragraphs==1 && setext && literal_heading && literal_fence && literal_link && joined);
+    for (size_t i=0;i<d.target_count;++i) CHECK(strncmp(d.targets[i].id,"link:",5));
+    char *saved_grammar=NULL; OK(sb_note_load(&d.model.project,d.model.path,&saved_grammar,NULL));
+    CHECK(!strcmp(saved_grammar,grammar) && !sb_app_dirty(&d.model)); free(saved_grammar);
+#ifdef __APPLE__
+    void *native_setext=native_find(view,"Unterstrich-Titel",0); CHECK(native_setext);
+    CHECK(!strcmp(utf8(send(native_setext,"accessibilityRole")),heading_role ? utf8(*heading_role) : "Heading"));
+#elif defined(_WIN32) || defined(SB_ATSPI_TEST)
+    CHECK(sb_native_probe(d.ui.window,"Unterstrich-Titel",NULL,SB_NATIVE_READ_LEVEL,native_value,sizeof(native_value),pump,&d));
+    CHECK(!strcmp(native_value,"2"));
+#endif
+    OK(sb_path_join(dump_path,sizeof(dump_path),root,"markdown-blocks.bmp"));
+    CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
     snprintf(d.reveal_document,sizeof(d.reveal_document),"%s",last_id); d.reveal_document_context=d.semantic_context;
     d.form=SB_FORM_HELP; frame(&d); CHECK(!d.reveal_document[0]); text=dump(&d); CHECK(!strstr(text,"Erster Abschnitt") && !strstr(text,"Ende αΩ")); accesskit_string_free(text);
     d.form=SB_FORM_NONE; frame(&d);

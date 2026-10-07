@@ -129,6 +129,10 @@ erhält bestehende Projekte. [Ablauf und Grenzen](docs/SICHERUNG.md).
 „Groß lesen“ erweitert die Leseansicht auf die verfügbare Fläche. Die Bereichswahl
 bleibt auch nach dem Öffnen eines Archivdokuments erreichbar.
 
+Die Leseansicht unterstützt eigene [Markdown-Blockregeln](docs/MARKDOWN.md)
+für Überschriften, Code und Absätze. Den noch begrenzten Umfang dokumentiert
+der Vertrag; der Editor erhält den Originaltext.
+
 Vor einem Dokumentwechsel oder dem Beenden fragt die App nach ungespeicherten
 Änderungen. Bei einer extern geänderten Datei kannst du deine Fassung als neue
 Notiz sichern, ohne die fremde Fassung zu überschreiben.

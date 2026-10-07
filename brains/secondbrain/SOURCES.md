@@ -27,6 +27,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Einstellungen und Arbeitsstand](../../docs/EINSTELLUNGEN.md): Dateivertrag,
   native Ordnerwahl, Wiederherstellung und Prüfgrenzen.
 - [Native UI-Anbindung](../../docs/BARRIEREFREIHEIT_PLAN.md): integrierte Adapter, tatsächliche macOS-Provider-/UIA-/AT-SPI-Clientprüfungen und offene assistive Abnahme.
+- [Markdown-Blockregeln](../../docs/MARKDOWN.md): gemeinsame C-Erkennung, Originalbytes und verbleibender Umfang.
 - [Dokumentstruktur](../../docs/DOKUMENTSTRUKTUR.md): native Blockstruktur, Überschriften und Abschnittssprünge.
 - [Textdarstellung](../../docs/TEXTDARSTELLUNG.md): UI-Schriftrollen, geformte Textläufe, Fallback und verbleibende Textarbeit.
 - [Lizenzansicht](../../docs/LIZENZEN.md): Originaltexte in der App, Bedienwege und Prüfgrenzen.

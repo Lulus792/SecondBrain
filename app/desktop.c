@@ -3,6 +3,7 @@
 #include "icons.h"
 #include "version.h"
 #include "notices.h"
+#include "markdown.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1185,7 +1186,7 @@ static char *plain_inline(const char *text, size_t length) {
         }
         if (text[i] == '*' && i + 1 < length && text[i + 1] == '*') { i += 2; continue; }
         if (text[i] == 96) { ++i; continue; }
-        if (text[i] == '\r') { ++i; continue; }
+        if (text[i]=='\r') { out[n++]=' '; if (i+1<length && text[i+1]=='\n') ++i; ++i; continue; }
         out[n++] = text[i] == '\n' ? ' ' : text[i];
         ++i;
     }
@@ -1195,10 +1196,9 @@ static char *plain_inline(const char *text, size_t length) {
 
 static void document(SBDesktop *d, const char *text, float width, float height) {
     struct nk_context *ctx = d->ui.ctx;
-    const char *line = text;
     const char *extension = d->model.source ? strrchr(d->model.source_path, '.') : NULL;
     bool whole_code = text==d->notice || (text == d->model.source && !d->model.source_directory && (!extension || strcmp(extension, ".md")));
-    bool code = whole_code, first_heading = true;
+    bool first_heading = true;
     unsigned link_number = 0;
     nk_layout_row_dynamic(ctx, height, 1);
     target(d, "reader"); target_label(d,d->form==SB_FORM_NOTICE_TEXT ? sb_notice_name(d->notice_index) : d->form==SB_FORM_CONTEXT ? "Projektkontext" : d->model.source ? d->model.source_title : d->model.title);
@@ -1207,39 +1207,23 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
     if (!nk_group_begin(ctx, "Reader", NK_WINDOW_NO_SCROLLBAR)) return;
     unsigned slot=modal_reader(d) && (text==d->context || text==d->notice) ? 2 : 0;
     smooth_scroll(d,slot,ctx->current->layout->offset_y);
-    while (*line) {
-        const char *end = strchr(line, '\n');
-        size_t length = end ? (size_t)(end - line) : strlen(line);
-        if (length && line[length - 1] == '\r') --length;
-        const char *content = line;
-        unsigned heading = 0;
-        if (!whole_code && length >= 3 && !strncmp(line, "```", 3)) code = !code;
-        else if (!length) { nk_layout_row_dynamic(ctx, 9 * d->ui.scale, 1); nk_spacer(ctx); }
+    SBMarkdown reader; SBMarkdownBlock block;
+    sb_markdown_init(&reader,text,strlen(text),whole_code);
+    while (sb_markdown_next(&reader,&block)) {
+        const char *content=text+block.content;
+        size_t length=block.length;
+        unsigned heading=block.level;
+        bool code=block.kind==SB_MD_CODE;
+        if (block.kind==SB_MD_FENCE) continue;
+        if (block.kind==SB_MD_BLANK || (!length && !heading)) { nk_layout_row_dynamic(ctx,9*d->ui.scale,1); nk_spacer(ctx); }
         else {
-            if (!code) {
-                while (heading < length && line[heading] == '#') ++heading;
-                if (heading && heading<=6 && heading < length && line[heading] == ' ') {
-                    content += heading + 1; length -= heading + 1;
-                    if (first_heading && heading == 1) {
-                        char *title=plain_inline(content,length);
-                        document_span(d,title ? title : content,title ? strlen(title) : length,(size_t)(line-text),ACCESSKIT_ROLE_HEADING,1,
-                            d->form==SB_FORM_NONE ? d->reader_title_bounds : nk_rect(0,0,0,0),slot,true);
-                        free(title); first_heading = false; goto next_line;
-                    }
-                } else heading = 0;
+            if (first_heading && heading==1) {
+                char *title=plain_inline(content,length);
+                document_span(d,title ? title : content,title ? strlen(title) : length,block.offset,ACCESSKIT_ROLE_HEADING,1,
+                    d->form==SB_FORM_NONE ? d->reader_title_bounds : nk_rect(0,0,0,0),slot,true);
+                free(title); first_heading=false; continue;
             }
-            first_heading = false;
-            if (!code && !heading && length && content[0] != '-' && content[0] != '*' &&
-                content[0] != '>' && content[0] != '|' && !(content[0] >= '0' && content[0] <= '9')) {
-                while (end && end[1]) {
-                    const char *next = end + 1, *next_end = strchr(next, '\n');
-                    size_t next_length = next_end ? (size_t)(next_end - next) : strlen(next);
-                    if (!next_length || *next == '\r' || *next == '#' || *next == '-' || *next == '*' ||
-                        *next == '>' || *next == '|' || *next == 96 || (*next >= '0' && *next <= '9')) break;
-                    end = next_end;
-                    length = next_end ? (size_t)(next_end - content) : strlen(content);
-                }
-            }
+            first_heading=false;
             struct nk_user_font *font = heading ? &d->ui.heading->handle : code ? &d->ui.code->handle : &d->ui.body->handle;
             nk_style_set_font(ctx, font);
             char *plain = code ? NULL : plain_inline(content, length);
@@ -1249,7 +1233,7 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
             float measured = font->width(font->userdata, font->height, shown, (int)shown_length);
             float lines = measured < available * 0.92f ? 1 : ceilf(measured / available) + 1;
             nk_layout_row_dynamic(ctx, lines * (font->height + 4) + (heading ? 10 : 0), 1);
-            document_span(d,shown,shown_length,(size_t)(line-text),heading ? ACCESSKIT_ROLE_HEADING : code ? ACCESSKIT_ROLE_CODE : ACCESSKIT_ROLE_PARAGRAPH,heading,nk_widget_bounds(ctx),slot,false);
+            document_span(d,shown,shown_length,block.offset,heading ? ACCESSKIT_ROLE_HEADING : code ? ACCESSKIT_ROLE_CODE : ACCESSKIT_ROLE_PARAGRAPH,heading,nk_widget_bounds(ctx),slot,false);
             nk_text_wrap(ctx, shown, (int)shown_length);
             free(plain);
             if (!code) {
@@ -1294,8 +1278,6 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
                 }
             }
         }
-next_line:
-        line = end ? end + 1 : line + strlen(line);
     }
     nk_style_set_font(ctx, &d->ui.normal->handle);
     scroll_measure(d,slot);

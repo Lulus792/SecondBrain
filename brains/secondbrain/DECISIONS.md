@@ -213,3 +213,13 @@ Archive. Erst danach wird der Entwurf öffentlich. Vorhandene Releases werden
 nicht ersetzt; automatische 1.0-Veröffentlichung bleibt gesperrt. Der Nutzer
 hat die vollständige Release-Vorbereitung und laufende GitHub-Veröffentlichung
 beauftragt. [Veröffentlichungsvertrag](../../docs/DISTRIBUTION.md).
+
+## D21: Gemeinsame schreibgeschützte Dokumentblockregeln
+
+Implementierungsentscheidung vom 7. Oktober 2026 im beauftragten Release-Umfang:
+Titel und Leseansicht verwenden ab 0.9.4 denselben eigenen C-Blockleser.
+Quellpositionen bleiben die Grundlage für native Textblöcke und Navigation;
+Anzeigen verändert keine Originalbytes. Die Regeln werden am CommonMark-Original
+geprüft und unabhängig vom UI getestet. Weitere Container-/Inline-Regeln und
+vollständige assistive Abnahme bleiben eigener Umsetzungsumfang.
+[Vertrag](../../docs/MARKDOWN.md) und [Nachweise](../../docs/STATUS.md).

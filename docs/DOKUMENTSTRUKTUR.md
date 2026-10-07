@@ -1,7 +1,8 @@
 # Struktur der Leseansicht
 
-Stand: 7. Oktober 2026, Entwicklungsschritt 0.9.1. Native Plattformabnahme
-läuft nach den lokalen Prüfungen gesondert.
+Stand: 7. Oktober 2026. Die Struktur ab 0.9.1 und die Linux-Korrektur ab 0.9.2
+sind nativ nachgeprüft; 0.9.4 erweitert die eigenen [Blockregeln](MARKDOWN.md).
+Die neue Plattformabnahme folgt nach den lokalen Prüfungen gesondert.
 
 ## Grundlage
 
@@ -24,8 +25,9 @@ Die Leseansicht veröffentlicht ihren tatsächlichen Inhalt als Dokument mit
 Überschriften, Absätzen, Codezeilen und Linkaktionen. Der Dokumenttitel gehört
 als erste Überschrift zur Struktur, auch wenn er im festen Kartenkopf steht.
 Ebenen entsprechen den erkannten Markdown-Überschriften; sieben Hashzeichen
-werden als Text behandelt. Fenced-Code wird entsprechend der bisherigen
-Darstellung als Code ausgewiesen. Absätze behalten ihren vollständigen Text,
+werden als Text behandelt. Fenced- und eingerückter Code werden als Code ausgewiesen. Die Erkennung
+berücksichtigt ab 0.9.4 Zeichen, Länge und Einrückung der Codezäune; scheinbare
+Überschriften und Links innerhalb von Code bleiben Text. Absätze behalten ihren vollständigen Text,
 auch wenn sie länger als der aktuelle Bildausschnitt sind.
 
 Textläufe liegen unter ihren jeweiligen Blöcken. Bei strukturierter Darstellung
@@ -78,5 +80,6 @@ Eine korrekte Baumstruktur allein belegt keine vollständige assistive Abnahme.
 Der erste native 0.9.1-Lauf scheitert am fehlenden AT-SPI-`level`-Attribut
 des vorhandenen Adapters. 0.9.2 bereitet eine gehashte UI-Quellkorrektur in
 accesskit_atspi_common 0.21.0 vor; Typprüfung und idempotente Vorbereitung
-bestehen lokal. Die tatsächliche AT-SPI-Abfrage wird anschließend erneut
-geprüft; der bisherige Linux-Lauf gilt nicht als bestanden.
+bestehen lokal. Die tatsächliche AT-SPI-Abfrage und beide nativen Linux-Desktopprüfungen
+bestehen inzwischen im [Wiederholungslauf zu 1358794](https://github.com/Lulus792/SecondBrain/actions/runs/37549092934).
+Der frühere fehlerhafte Linux-Lauf bleibt als solcher dokumentiert.

@@ -1,4 +1,5 @@
 #include "sb.h"
+#include "markdown.h"
 #include "platform.h"
 #include "sb_templates.h"
 #include <ctype.h>
@@ -559,19 +560,22 @@ SBStatus sb_projects_list(const char *workspace,SBProjects *out) { return projec
 SBStatus sb_projects_scan(const char *workspace,SBProjects *out) { return projects_list(workspace,out,true); }
 
 SBStatus sb_markdown_title(const char *text, char *out, size_t capacity) {
-    const char *end;
-    size_t length;
-    while (*text == '\r' || *text == '\n' || *text == ' ') ++text;
-    if (*text != '#') { *out = 0; return sb_ok(); }
-    while (*text == '#') ++text;
-    if (*text != ' ' && *text != '\t' && *text != '\n' && *text != '\r' && *text) { *out = 0; return sb_ok(); }
-    while (*text == ' ') ++text;
-    end = text;
-    while (*end && *end != '\n' && *end != '\r') ++end;
-    length = (size_t)(end - text);
-    if (length >= capacity) length = capacity - 1;
-    while (length && ((unsigned char)text[length] & 0xc0) == 0x80) --length;
-    memcpy(out, text, length); out[length] = 0;
+    if (!text || !out || !capacity) return sb_error(SB_INVALID,"Titelpuffer fehlt.");
+    *out=0;
+    SBMarkdown reader; SBMarkdownBlock block;
+    sb_markdown_init(&reader,text,strlen(text),false);
+    while (sb_markdown_next(&reader,&block)) {
+        if (block.kind==SB_MD_BLANK) continue;
+        if (block.kind!=SB_MD_HEADING) return sb_ok();
+        size_t used=0;
+        for (size_t i=0;i<block.length && used+1<capacity;++i) {
+            char c=text[block.content+i];
+            if (c=='\r' && i+1<block.length && text[block.content+i+1]=='\n') continue;
+            out[used++]=(c=='\r' || c=='\n') ? ' ' : c;
+        }
+        while (used && !sb_utf8_valid(out,used)) --used;
+        out[used]=0; return sb_ok();
+    }
     return sb_ok();
 }
 

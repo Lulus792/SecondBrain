@@ -472,3 +472,13 @@ Intel: 27 Tests auf Windows/Linux, 28 auf macOS (zusätzlich echtes Fehler-Volum
 Sechs C17-Kernjobs und sechs Python-Jobs bestehen ebenfalls. Damit sind die
 Linux-Ebenenkorrektur und die importseitige Testkorrektur auf den zugesagten
 CI-Systemen abgenommen. Dieser Nachweis betrifft 0.9.2; 0.9.3 folgt separat.
+
+## Lizenzansicht 0.9.3
+
+[Lauf37550880880 zu 3f3d3a0](https://github.com/Lulus792/SecondBrain/actions/runs/37550880880)
+besteht mit allen 20 Jobs und vier entpackten Paketen. Acht Desktopjobs prüfen
+Debug/Release auf Windows x64, Linux x64, macOS ARM64 und Intel: 28 Tests auf
+Windows/Linux und 29 auf macOS. Die Ressourcenprüfung liest alle 17 Lizenztexte;
+der Tastaturweg prüft erste, lange und letzte Auswahl, Kopieren, Scrollen und
+Entwurfsschutz. Kern- und Python-Jobs bestehen ebenfalls. Dieser Lauf betrifft
+0.9.3; die neuen Markdown-Blockregeln in 0.9.4 benötigen einen eigenen Lauf.

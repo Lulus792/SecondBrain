@@ -68,9 +68,11 @@ verwenden denselben Textvertrag und bleiben schreibgeschützt. Bei abgewiesener
 Quelle bleiben die bisherige Quelle und ein offener Entwurf erhalten.
 
 Markdown ist das Speicherformat; der aktuelle Renderer ist kein vollständiger
-CommonMark-Parser. Er stellt Absätze, einfache Überschriften, Aufzählungen,
-fenced Codeblöcke und einfache Inline-Links dar. Unverstandene Syntax bleibt
-Text. Schreiben und Sicherung erhalten den eigenen gespeicherten Markdown-Text.
+CommonMark-Parser. Ab 0.9.4 teilen Titel und Leseansicht eigene Regeln für
+Absätze, ATX-/Setext-Überschriften, eingerückten und fenced Code. Inline-Links
+sind begrenzt aufbereitet; Listen, Zitate und Tabellen haben weiterhin eine
+vorläufige Textdarstellung. [Umfang und Grenzen](MARKDOWN.md). Schreiben und
+Sicherung erhalten den eigenen gespeicherten Markdown-Text.
 Schriftabdeckung, Unicode-Textgeometrie und eine abschließende Markdown-Abnahme
 bleiben Release-Aufgaben.
 

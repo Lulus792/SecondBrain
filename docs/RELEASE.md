@@ -21,11 +21,11 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   mit geprüften Abbruch-, Speicherplatz- und beschädigten-Datei-Szenarien.
   Atomisches Speichern ersetzt keine Sicherung oder Versionshistorie.
   In 0.4.0 implementiert: eigene Inhaltsarchive, prüfbare Vorschau, Wiederherstellung
-  und Abbruch in der App. Noch offen: native Dialogabnahme, tatsächliche volle
-  Zielvolumes und Wiederherstellung nach hartem Prozessabbruch. Ab 0.9.2
-  bestehen lokal sechs echte Prozessabbruch-/Neustartfälle und zwei
-  ENOSPC-Fälle auf einem begrenzten HFS+-Volume. Native Prozessabnahme auf
-  Windows/Linux und weitere Dateisysteme bleiben gesonderte Nachweise.
+  und Abbruch in der App. Ab 0.9.2 bestehen sechs echte Prozessabbruch-/Neustartfälle
+  auf den nativen CI-Systemen einschließlich Windows/Linux und zwei ENOSPC-Fälle
+  auf einem begrenzten HFS+-Volume. Noch offen: native Dialogbedienung, volle
+  Windows-/Linux-Zielvolumes, weitere Dateisysteme und physische Persistenzabnahme.
+  [Konkreter Umfang](PLATTFORMEN.md), [Fehlerszenarien](SICHERUNG.md).
 - [ ] **Alltagskomfort vervollständigen:** Einstellungen und letzten Arbeitsordner
   dauerhaft speichern, native Ordnerauswahl, verständlicher erster Start.
   Speicherung und native Ordnerwahl sind in 0.3.1 implementiert; Systemvorgaben
@@ -47,6 +47,8 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   [TEXTDARSTELLUNG.md](TEXTDARSTELLUNG.md) offen. Ab 0.9.1 veröffentlicht
   die Leseansicht strukturierte Blöcke und bietet Abschnittssprünge;
   [Dokumentstruktur](DOKUMENTSTRUKTUR.md) nennt Umfang und verbleibende Semantik.
+  0.9.4 erweitert die gemeinsamen [Blockregeln](MARKDOWN.md); vollständige
+  Container-/Inline-Regeln und Listen-/Tabellensemantik bleiben offen.
   Die Cache-Signalstruktur ist in 0.5.2 korrigiert und mit echtem Linux-Clientcache
   geprüft; weitere Eventtypen bleiben gesonderte Abnahmen. Systemvorgaben bestehen
   in 0.6.0 auf allen drei CI-Systemen; reale Einstellungswechsel, Windows-Custom-
