@@ -15,6 +15,8 @@
 static void backup_poll(SBDesktop *d);
 static void accessible_actions(SBDesktop *d);
 static void accessible_publish(SBDesktop *d);
+static void search_begin(SBDesktop *d);
+static void search_end(SBDesktop *d);
 static void style_update(SBDesktop *d,bool force) {
     d->system_style=sb_system_style_snapshot(d->style_monitor,force);
     SBStyleChoice effective=sb_style_resolve(d->requested_style,d->system_style);
@@ -48,6 +50,10 @@ static float approach(float current, float destination, float factor, float thre
 }
 void sb_desktop_tick(SBDesktop *d, float seconds) {
     style_update(d,false);
+    struct nk_color caret=d->ui.ctx->style.text.color;
+    if((SDL_GetTicksNS()-d->ui.caret_epoch)%UINT64_C(1000000000)>=UINT64_C(500000000))caret.a=0;
+    d->ui.ctx->style.edit.cursor_normal=d->ui.ctx->style.edit.cursor_hover=caret;
+    d->ui.ctx->style.edit.cursor_size=1.5f*d->ui.scale;
     accessible_actions(d);
     backup_poll(d);
     d->seconds = fmaxf(0, fminf(seconds, 0.05f));
@@ -440,6 +446,7 @@ static void backup_poll(SBDesktop *d) {
 static void field(SBDesktop *d, const char *tag, const char *label, char *text, int capacity, int focus) {
     struct nk_context *ctx = d->ui.ctx;
     int length = (int)strlen(text);
+    if(focus!=1){nk_layout_row_dynamic(ctx,8*d->ui.scale,1);nk_spacer(ctx);}
     nk_layout_row_dynamic(ctx, 22 * d->ui.scale, 1);
     nk_label(ctx, label, NK_TEXT_LEFT);
     nk_layout_row_dynamic(ctx, 36 * d->ui.scale, 1);
@@ -540,7 +547,7 @@ void sb_desktop_free(SBDesktop *d) {
     sb_dialogs_free(d->dialogs);
     if (d->text_edit_ready) nk_textedit_free(&d->text_edit);
     free(d->targets); passive_clear(d); free(d->passive);
-    sb_graph_free(&d->graph);
+    sb_graph_free(&d->graph); sb_notes_free(&d->graph_notes); free(d->graph_ids);
     sb_notes_free(&d->hits); free(d->context); free(d->notice); sb_app_free(&d->model);
     sb_ui_shutdown(&d->ui); memset(d, 0, sizeof(*d));
 }
@@ -566,16 +573,33 @@ static void editor_reset(SBDesktop *d) {
     d->text_edit.mode = NK_TEXT_EDIT_MODE_INSERT;
     d->text_edit_ready = true;
 }
+static void search_begin(SBDesktop *d) {
+    if(!d->search_session){d->search_session=true;d->search_browser_before=d->browser;d->search_expanded_before=d->expanded;}
+    d->browser=true;d->expanded=false;
+}
+static void search_end(SBDesktop *d) {
+    if(d->search_session){d->browser=d->search_browser_before;d->expanded=d->search_expanded_before;d->search_session=false;}
+    d->search[0]=d->searched[0]=0;sb_notes_free(&d->hits);
+}
+static bool graph_matches(SBDesktop *d) {
+    if(d->graph_stale || strcmp(d->graph_project,d->model.project.root) || d->graph_notes.count!=d->model.notes.count)return false;
+    for(size_t i=0;i<d->graph_notes.count;++i) {
+        SBNote *a=&d->graph_notes.items[i],*b=&d->model.notes.items[i];
+        if(strcmp(a->path,b->path) || strcmp(a->title,b->title) || strcmp(a->section,b->section))return false;
+        if(!strcmp(a->path,d->model.path) && (d->graph.revisions[i].hash!=d->model.revision.hash || d->graph.revisions[i].length!=d->model.revision.length))return false;
+    }
+    return true;
+}
 static void synchronize(SBDesktop *d) {
     if (d->generation != d->model.generation) {
+        search_end(d);
         if (strcmp(d->graph_project,d->model.project.root)) d->expanded=false;
         d->generation = d->model.generation;
         d->editing = d->next_edit; d->next_edit = false;
         d->focus_editor = d->editing;
-        d->reset_reader = true; d->card = true; d->graph_dirty = true; d->page = 0;
+        d->reset_reader = true; d->card = true; d->graph_dirty=d->graph_dirty || !graph_matches(d); d->page = 0;
         memset(d->scrolling,0,sizeof(d->scrolling));
         sb_ui_reset_editor(&d->ui); editor_reset(d);
-        d->search[0] = 0; d->searched[0] = 0; sb_notes_free(&d->hits);
         if (strcmp(d->section,"all")) {
             bool present=false;
             for (size_t i=0;i<d->model.notes.count;++i)
@@ -678,7 +702,7 @@ void sb_desktop_apply(SBDesktop *d) {
         if (blend && d->message.code==SB_OK && !d->model.guard && d->model.generation!=previous_generation) sb_ui_transition_begin(&d->ui);
         else if (!d->ui.transitioning) {SDL_DestroyTexture(d->ui.outgoing_texture);d->ui.outgoing_texture=NULL;}
         if (action.kind==SB_ACT_NOTE && d->message.code==SB_OK && !d->model.guard && d->model.generation!=previous_generation && !strcmp(d->graph_project,d->model.project.root)) {
-            for(size_t i=0;i<d->model.notes.count && i<d->graph.count;++i) if(!strcmp(d->model.notes.items[i].path,d->model.path)) {
+            for(size_t i=0;i<d->graph_notes.count;++i) if(!strcmp(d->graph_notes.items[i].path,d->model.path)) {
                 SBStar v=d->graph.stars[i];d->flight_from[0]=d->focus_x;d->flight_from[1]=d->focus_y;d->flight_from[2]=d->focus_z;
                 d->flight_to[0]=v.x;d->flight_to[1]=v.y;d->flight_to[2]=v.z;d->flight=0;d->pan_x=d->pan_y=0;d->follow_star=false;break;
             }
@@ -693,12 +717,15 @@ static SBTarget *focus_target(SBDesktop *d) {
     return NULL;
 }
 static void focus_set(SBDesktop *d, const char *id) {
+    if(!strcmp(id,"search"))search_begin(d);
     snprintf(d->focus, sizeof(d->focus), "%s", id);
+    d->ui.caret_epoch=SDL_GetTicksNS();
     d->focus_changed = true; d->keyboard = true; d->focus_scroll_frames = 3;
     for (unsigned i=0;i<4;++i) { d->scrolling[i].pending=0; d->scrolling[i].elastic=0; d->scrolling[i].ready=false; d->scrolling[i].active=false; }
     d->ui.ctx->text_edit.active = 0;
     for (struct nk_window *w = d->ui.ctx->begin; w; w = w->next) w->edit.active = 0;
 }
+void sb_desktop_focus_start(SBDesktop *d) {if(d->model.has_project && d->form==SB_FORM_NONE && !d->model.guard)focus_set(d,"galaxy");}
 static char *accessible_field(SBDesktop *d,const char *id,size_t *capacity) {
 #define FIELD(tag,member) if (!strcmp(id,tag)) { *capacity=sizeof(d->member); return d->member; }
     FIELD("search",search) FIELD("form-name",name) FIELD("form-id",id)
@@ -716,9 +743,10 @@ static void accessible_actions(SBDesktop *d) {
         if ((!strncmp(action.id,"reader:block:",13) || !strncmp(action.id,"reader:table:",13)) && action.action==ACCESSKIT_ACTION_SCROLL_INTO_VIEW) {
             snprintf(d->reveal_document,sizeof(d->reveal_document),"%s",action.id); d->reveal_document_context=accessible_context(d);
         } else if (!strncmp(action.id,"star:",5) && d->form==SB_FORM_NONE && !d->model.guard) {
-            char *end=NULL; unsigned long index=strtoul(action.id+5,&end,10);
-            if (end && !*end && index<d->model.notes.count && (action.action==ACCESSKIT_ACTION_CLICK || action.action==ACCESSKIT_ACTION_FOCUS)) {
-                d->card=true; d->star=index; d->follow_star=true; focus_set(d,"galaxy"); request(d,SB_ACT_NOTE,d->model.notes.items[index].path);
+            char *end=NULL; unsigned long long identity=strtoull(action.id+5,&end,10);
+            size_t index=0;while(index<d->graph_notes.count && d->graph_ids[index]!=identity)++index;
+            if (end && !*end && index<d->graph_notes.count && (action.action==ACCESSKIT_ACTION_CLICK || action.action==ACCESSKIT_ACTION_FOCUS)) {
+                d->card=true; d->star=index; d->follow_star=true; focus_set(d,"galaxy"); request(d,SB_ACT_NOTE,d->graph_notes.items[index].path);
             }
         } else if (target) {
             if (action.action==ACCESSKIT_ACTION_FOCUS || action.action==ACCESSKIT_ACTION_SCROLL_INTO_VIEW) focus_set(d,action.id);
@@ -760,7 +788,7 @@ static int accessible_order(const void *left,const void *right) {
 static void accessible_publish(SBDesktop *d) {
     if (!d->accessibility) return;
     bool modal=d->form!=SB_FORM_NONE || d->model.guard;
-    size_t stars=modal ? 0 : d->model.notes.count;
+    size_t stars=modal ? 0 : d->graph_notes.count;
     size_t controls=d->target_count+d->passive_count;
     size_t count=controls+stars;
     SBAccessibleItem *items=calloc(count,sizeof(*items)); char (*ids)[100]=stars ? calloc(stars,sizeof(*ids)) : NULL;
@@ -792,9 +820,9 @@ static void accessible_publish(SBDesktop *d) {
     }
     qsort(items,controls,sizeof(*items),accessible_order);
     for (size_t i=0;i<stars;++i) {
-        snprintf(ids[i],100,"star:%zu",i); SBAccessibleItem *v=&items[controls+i];
-        v->id=ids[i]; v->label=d->model.notes.items[i].title; v->role=ACCESSKIT_ROLE_LIST_BOX_OPTION;
-        v->selected=!strcmp(d->model.path,d->model.notes.items[i].path);
+        snprintf(ids[i],100,"star:%llu",(unsigned long long)d->graph_ids[i]); SBAccessibleItem *v=&items[controls+i];
+        v->id=ids[i]; v->label=d->graph_notes.items[i].title; v->role=ACCESSKIT_ROLE_LIST_BOX_OPTION;
+        v->selected=!strcmp(d->model.path,d->graph_notes.items[i].path);
         if (i<d->ui.space.count && d->ui.space.points[i].visible) {
             SBPoint p=d->ui.space.points[i]; v->bounds=nk_rect(p.x-10,p.y-10,20,20);
         }
@@ -804,7 +832,7 @@ static void accessible_publish(SBDesktop *d) {
     char progress[150];
     if (d->backup) { snprintf(progress,sizeof(progress),"Sicherung: %zu von %zu Einträgen, %llu Bytes",d->backup_state.entries,d->backup_state.total,(unsigned long long)d->backup_state.bytes); status=progress; }
     char native_focus[100]; snprintf(native_focus,sizeof(native_focus),"%s",d->focus);
-    if (!strcmp(d->focus,"galaxy") && d->star<stars) snprintf(native_focus,sizeof(native_focus),"star:%zu",d->star);
+    if (!strcmp(d->focus,"galaxy") && d->star<stars) snprintf(native_focus,sizeof(native_focus),"star:%llu",(unsigned long long)d->graph_ids[d->star]);
     sb_accessibility_update(d->accessibility,title,native_focus,items,count,status,modal,d->semantic_context);
     free(items); free(ids);
 }
@@ -916,6 +944,7 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
     if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
         d->keyboard = false;
         for (size_t i = d->target_count; i > 0; --i) if (inside(event->button.x, event->button.y, d->targets[i-1].bounds)) {
+            if(!strcmp(d->targets[i-1].id,"search"))search_begin(d);
             snprintf(d->focus, sizeof(d->focus), "%s", d->targets[i-1].id); break;
         }
         if (map_input(d, event->button.x, event->button.y)) {
@@ -931,7 +960,7 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
                 float dx = d->ui.space.points[i].x - event->button.x, dy = d->ui.space.points[i].y - event->button.y;
                 if (dx * dx + dy * dy < best) { best = dx * dx + dy * dy; found = i; }
             }
-            if (found < d->model.notes.count) { d->star = found; d->card = true; request(d, SB_ACT_NOTE, d->model.notes.items[found].path); }
+            if (found < d->graph_notes.count) { d->star = found; d->card = true; request(d, SB_ACT_NOTE, d->graph_notes.items[found].path); }
         }
     }
     if (event->type == SDL_EVENT_MOUSE_WHEEL) {
@@ -976,7 +1005,7 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
             if (d->model.guard) command(d, SB_CMD_GUARD_CANCEL);
             else if (d->form != SB_FORM_NONE) command(d, SB_CMD_CANCEL);
             else if (d->model.source) { sb_app_source_close(&d->model); d->reset_reader = true; focus_set(d,d->source_focus[0] ? d->source_focus : "reader"); }
-            else if (d->search[0]) { d->search[0] = 0; focus_set(d, "search"); }
+            else if (d->search_session || d->search[0]) { search_end(d); focus_set(d,"galaxy"); }
             else if (d->editing) { d->editing = false; d->expanded=true; focus_set(d, "reader"); }
             else if (d->expanded) { d->expanded=false; d->reset_reader=true; }
             else { d->card = false; focus_set(d, "galaxy"); }
@@ -989,7 +1018,7 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
             if (key == SDLK_S) { command(d, shift ? SB_CMD_COPY : SB_CMD_SAVE); return; }
             if (key == SDLK_N) { command(d, shift ? SB_CMD_NEW_PROJECT : SB_CMD_NEW_NOTE); return; }
             if (key == SDLK_O) { command(d, SB_CMD_WORKSPACE); return; }
-            if (key == SDLK_F) { d->browser = true; d->expanded=false; focus_set(d, "search"); return; }
+            if (key == SDLK_F) { focus_set(d,"search"); return; }
             if (key == SDLK_E && d->model.editor && !d->model.source) { d->card = true; d->editing = !d->editing; d->expanded=true; d->focus_editor = d->editing; focus_set(d, d->editing ? "editor" : "reader"); return; }
             if (key == SDLK_R) { command(d, SB_CMD_RELOAD); return; }
             if (key == SDLK_C && shift) { command(d, SB_CMD_CONTEXT); return; }
@@ -1003,8 +1032,8 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
             nk_input_unicode(d->ui.ctx, '\t'); return;
         }
         if (!modifier && !text && (key == SDLK_RETURN || key == SDLK_SPACE)) {
-            if (!strcmp(d->focus, "galaxy") && d->star < d->model.notes.count) {
-                d->card = true; request(d, SB_ACT_NOTE, d->model.notes.items[d->star].path);
+            if (!strcmp(d->focus, "galaxy") && d->star < d->graph_notes.count) {
+                d->card = true; request(d, SB_ACT_NOTE, d->graph_notes.items[d->star].path);
             } else snprintf(d->activate, sizeof(d->activate), "%s", d->focus);
             return;
         }
@@ -1018,9 +1047,9 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
                     if (key == SDLK_DOWN) d->pitch = fminf(1.2f, d->pitch + 0.1f);
                 } else {
                     size_t previous = d->star; star_step(d,key);
-                    if (d->star != previous && d->star < d->model.notes.count) {
+                    if (d->star != previous && d->star < d->graph_notes.count) {
                         d->follow_star = true; d->card = true;
-                        request(d,SB_ACT_NOTE,d->model.notes.items[d->star].path);
+                        request(d,SB_ACT_NOTE,d->graph_notes.items[d->star].path);
                     }
                 }
                 d->keyboard = true; return;
@@ -1130,7 +1159,7 @@ static void glass(SBDesktop *d, struct nk_rect r, float radius) {
     if (space->glass_count < 64) space->glass[space->glass_count++] = (SBGlass){{r.x,r.y,r.w,r.h}, radius};
 }
 static void search_box(SBDesktop *d) {
-    struct nk_context *ctx=d->ui.ctx;float s=d->ui.scale;struct nk_rect box=nk_widget_bounds(ctx);
+    struct nk_context *ctx=d->ui.ctx;float s=d->ui.scale;struct nk_rect box=nk_widget_bounds(ctx);d->search_bounds=box;
     struct nk_vec2 padding=ctx->style.window.group_padding,spacing=ctx->style.window.spacing,edit_padding=ctx->style.edit.padding;
     struct nk_style_item background=ctx->style.edit.normal,hover=ctx->style.edit.hover,active=ctx->style.edit.active;float border=ctx->style.edit.border;
     nk_fill_rect(nk_window_get_canvas(ctx),box,10*s,d->ui.dark ? nk_rgba(6,16,30,170) : nk_rgba(255,255,255,180));
@@ -1139,20 +1168,21 @@ static void search_box(SBDesktop *d) {
     ctx->style.edit.normal=ctx->style.edit.hover=ctx->style.edit.active=nk_style_item_color(nk_rgba(0,0,0,0));ctx->style.edit.border=0;
     ctx->style.edit.padding=nk_vec2(0,fmaxf(0,(box.h-d->ui.normal->handle.height)/2));
     if (nk_group_begin(ctx,"Search field",NK_WINDOW_NO_SCROLLBAR)) {
-        float available=ctx->current->layout->bounds.w-2*ctx->style.window.group_padding.x-2*ctx->style.window.spacing.x;
-        nk_layout_row_begin(ctx,NK_STATIC,box.h,3);nk_layout_row_push(ctx,18*s);
+        float available=ctx->current->layout->bounds.w-2*ctx->style.window.spacing.x;
+        nk_layout_row_begin(ctx,NK_STATIC,box.h,3);nk_layout_row_push(ctx,24*s);
         struct nk_rect icon=nk_widget_bounds(ctx);nk_spacer(ctx);
-        sb_icon_draw(nk_window_get_canvas(ctx),SB_ICON_SEARCH,nk_rect(icon.x,icon.y+(icon.h-16*s)/2,16*s,16*s),ctx->style.text.color);
-        nk_layout_row_push(ctx,fmaxf(24,available-18*s-24*s));
+        sb_icon_draw(nk_window_get_canvas(ctx),SB_ICON_SEARCH,nk_rect(icon.x+(icon.w-16*s)/2,icon.y+(icon.h-16*s)/2,16*s,16*s),ctx->style.text.color);
+        nk_layout_row_push(ctx,fmaxf(24,available-24*s-24*s));
         text_target(d,"search");target_label(d,"Suche im Projekt");int length=(int)strlen(d->search);
         nk_edit_string(ctx,NK_EDIT_FIELD,d->search,&length,sizeof(d->search),nk_filter_default);d->search[length]=0;
         if (!length && !focused(d,"search")) {
             struct nk_rect hint=d->targets[d->target_count-1].bounds;hint.y+=(hint.h-d->ui.normal->handle.height)/2;hint.h=d->ui.normal->handle.height;
             nk_draw_text(nk_window_get_canvas(ctx),hint,"Suche im Projekt",16,&d->ui.normal->handle,nk_rgba(0,0,0,0),d->ui.dark ? nk_rgb(168,186,210) : nk_rgb(80,100,124));
         }
-        ring(d,"search");nk_layout_row_push(ctx,24*s);
-        if (length || focused(d,"clear-search")) { if(button(d,"clear-search","Suche leeren")) d->search[0]=0; } else nk_spacer(ctx);
+        nk_layout_row_push(ctx,24*s);
+        if (length || focused(d,"clear-search")) { if(button(d,"clear-search","Suche leeren")) {search_end(d);strcpy(d->focus,"search");} } else nk_spacer(ctx);
         nk_layout_row_end(ctx);nk_group_end(ctx);
+        if(focused(d,"search"))nk_stroke_rect(nk_window_get_canvas(ctx),box,10*s,2,d->ui.contrast ? ctx->style.text.color : nk_rgb(142,191,255));
     }
     ctx->style.window.group_padding=padding;ctx->style.window.spacing=spacing;ctx->style.edit.padding=edit_padding;
     ctx->style.edit.normal=background;ctx->style.edit.hover=hover;ctx->style.edit.active=active;ctx->style.edit.border=border;
@@ -1189,7 +1219,7 @@ static void tools(SBDesktop *d, int width, float height, nk_flags flags) {
             nk_layout_row_push(ctx,fmaxf(90,content-project-fixed-6*ctx->style.window.spacing.x)); search_box(d);
             nk_layout_row_push(ctx,88*s);
         }
-        if (button(d,"list","Liste")) { d->browser=d->expanded || !d->browser; d->expanded=false; }
+        if (button(d,"list","Liste")) { bool next=d->expanded || !d->browser;search_end(d);d->browser=next;d->expanded=false; }
         nk_layout_row_push(ctx,compact ? 104*s+fmaxf(0,content-326*s-4*ctx->style.window.spacing.x)/2 : 88*s);
         int section=0; for (int k=0;k<6;++k) if (!strcmp(d->section,sections[k])) section=k;
         const char *names[]={"Alle","Kern","Wissen","Eingang","Journal","Archiv"};
@@ -1800,6 +1830,8 @@ static void popup(SBDesktop *d, int width, int height) {
         d->form==SB_FORM_BACKUP ? "Projekt sichern" : d->form==SB_FORM_RESTORE ? "Sicherung wiederherstellen" : d->form==SB_FORM_ABOUT ? "Über SecondBrain" : d->form==SB_FORM_NOTICE_LIST ? "Lizenzen" : d->form==SB_FORM_NOTICE_TEXT ? sb_notice_name(d->notice_index) : "Tastaturhilfe";
     if (d->form==SB_FORM_FILTER) w=fminf(width-40.0f,menu_width(d,section_names,6,260));
     if (d->form==SB_FORM_ACTIONS) { const char *labels[]={"Als neue Notiz speichern","Sicherung wiederherstellen","Dokumentaktionen"};w=fminf(width-40.0f,menu_width(d,labels,3,320)); }
+    if(d->form==SB_FORM_NOTE)w=fminf(width-40.0f,460*s);
+    if(d->form==SB_FORM_PROJECT)w=fminf(width-40.0f,500*s);
     float gap=ctx->style.window.spacing.y;
     bool has_footer=d->backup || d->form==SB_FORM_PROJECT || d->form==SB_FORM_NOTE || d->form==SB_FORM_WORKSPACE || d->form==SB_FORM_BACKUP || d->form==SB_FORM_RESTORE;
     float shell=2*ctx->style.window.padding.y+32*s+2*gap+(has_footer ? 36*s+gap : 0);
@@ -1877,20 +1909,21 @@ static void popup(SBDesktop *d, int width, int height) {
             nk_layout_row_dynamic(ctx,32*s,1); native_wrap(d,save ? "Vorhandene Sicherungen werden nicht ersetzt." : "Vorhandene Projektordner bleiben erhalten.");
         } else if (d->form == SB_FORM_PROJECT || d->form == SB_FORM_NOTE) {
             char previous_id[65];
-            field(d, "form-name", d->form == SB_FORM_PROJECT ? "Projektname" : "Titel", d->name, sizeof(d->name), 1);
-            if (!d->id_manual) sb_app_slug(d->name, d->id, sizeof(d->id));
-            strcpy(previous_id, d->id);
-            field(d, "form-id", d->form == SB_FORM_PROJECT ? "Ordnername" : "Dateiname", d->id, sizeof(d->id), 2);
-            if (strcmp(previous_id, d->id)) d->id_manual = true;
-            nk_layout_row_dynamic(ctx, 44 * s, 1);
-            native_wrap(d, "Kleinbuchstaben, Zahlen und Bindestriche. Vorhandene Projekte und Notizen bleiben erhalten.");
-            if (d->form == SB_FORM_PROJECT)
-                field(d, "form-repo", "Projektordner verknüpfen (optional)", d->repository, sizeof(d->repository), 3);
-            else {
-                nk_layout_row_dynamic(ctx, 24 * s, 1); native_label(d, "Wissensbereich", NK_TEXT_LEFT);
-                nk_layout_row_dynamic(ctx, 34 * s, 1);
-                if (button(d, "section-choice", new_names[d->note_section])) d->note_section = (d->note_section + 1) % 3;
+            field(d,"form-name",d->form==SB_FORM_PROJECT ? "Projektname" : "Titel",d->name,sizeof(d->name),1);
+            if(d->form==SB_FORM_NOTE) {
+                nk_layout_row_dynamic(ctx,10*s,1);nk_spacer(ctx);
+                nk_layout_row_dynamic(ctx,22*s,1);native_label(d,"Wissensbereich",NK_TEXT_LEFT);
+                nk_layout_row_dynamic(ctx,36*s,3);
+                for(int k=0;k<3;++k){char tag[100];snprintf(tag,sizeof(tag),"section-choice:%s",new_sections[k]);nk_bool selected=d->note_section==k;if(selectable(d,tag,new_names[k],&selected))d->note_section=k;}
             }
+            if(!d->id_manual)sb_app_slug(d->name,d->id,sizeof(d->id));
+            strcpy(previous_id,d->id);
+            field(d,"form-id",d->form==SB_FORM_PROJECT ? "Ordnername" : "Dateiname",d->id,sizeof(d->id),2);
+            if(strcmp(previous_id,d->id))d->id_manual=true;
+            const char *hint=d->form==SB_FORM_PROJECT ? "Aus dem Projektnamen abgeleitet. Kleinbuchstaben, Zahlen und Bindestriche sind möglich." : "Aus dem Titel abgeleitet. Kleinbuchstaben, Zahlen und Bindestriche sind möglich.";
+            float hint_width=ctx->current->layout->bounds.w;
+            nk_layout_row_dynamic(ctx,sb_ui_wrap_height(ctx,&d->ui.normal->handle,hint,strlen(hint),hint_width),1);native_wrap(d,hint);
+            if(d->form==SB_FORM_PROJECT)field(d,"form-repo","Verknüpfter Ordner (optional)",d->repository,sizeof(d->repository),3);
         } else if (d->form == SB_FORM_WORKSPACE) {
             nk_layout_row_dynamic(ctx, 48 * s, 1);
             native_wrap(d, "Wähle den Ordner mit deinen Projektgedächtnissen.");
@@ -2028,34 +2061,62 @@ static void popup(SBDesktop *d, int width, int height) {
             nk_layout_row_dynamic(ctx,36*s,2); nk_spacer(ctx);
             if (button(d,"backup-cancel","Abbrechen")) command(d,SB_CMD_CANCEL);
         } else if (form) {
-            nk_layout_row_dynamic(ctx,36*s,2); nk_spacer(ctx);
             const char *submit=d->form==SB_FORM_WORKSPACE ? "Öffnen" : d->form==SB_FORM_BACKUP ? "Sichern" : d->form==SB_FORM_RESTORE ? d->restore_checked ? "Wiederherstellen" : "Prüfen" : "Anlegen";
-            if (button(d,"submit",submit)) command(d,SB_CMD_SUBMIT);
+            const struct nk_user_font *font=&d->ui.normal->handle;
+            float cancel_width=fmaxf(88*s,font->width(font->userdata,font->height,"Abbrechen",9)+32*s);
+            float submit_width=fmaxf(88*s,font->width(font->userdata,font->height,submit,(int)strlen(submit))+32*s);
+            nk_layout_row_begin(ctx,NK_STATIC,36*s,3);
+            nk_layout_row_push(ctx,fmaxf(0,available-cancel_width-submit_width-2*ctx->style.window.spacing.x));nk_spacer(ctx);
+            nk_layout_row_push(ctx,cancel_width);if(button(d,"cancel-footer","Abbrechen"))command(d,SB_CMD_CANCEL);
+            nk_layout_row_push(ctx,submit_width);if(button(d,"submit",submit))command(d,SB_CMD_SUBMIT);
+            nk_layout_row_end(ctx);
         }
     }
     nk_end(ctx);ctx->style.window=original_window;
 }
+static void graph_snapshot_clear(SBDesktop *d) {
+    sb_graph_free(&d->graph);sb_notes_free(&d->graph_notes);free(d->graph_ids);d->graph_ids=NULL;
+    free(d->ui.space.points);d->ui.space.points=NULL;d->ui.space.count=0;
+    d->ui.space.graph=&d->graph;d->graph_stale=false;d->graph_status=sb_ok();d->star=0;
+}
 static void graph_refresh(SBDesktop *d) {
     if (!d->graph_dirty) return;
-    d->graph_dirty = false;
-    if (strcmp(d->graph_project, d->model.project.root)) {
-        snprintf(d->graph_project, sizeof(d->graph_project), "%s", d->model.project.root); camera_reset(d);
-        d->view_yaw=d->view_pitch=d->view_pan_x=d->view_pan_y=0; d->view_zoom=1;
-        d->focus_x=d->focus_y=d->focus_z=0; memset(d->flight_from,0,sizeof(d->flight_from));
-        memset(d->flight_to,0,sizeof(d->flight_to)); d->flight=1; d->map_ready=false;
+    d->graph_dirty=false;
+    if (strcmp(d->graph_project,d->model.project.root)) {
+        graph_snapshot_clear(d);
+        snprintf(d->graph_project,sizeof(d->graph_project),"%s",d->model.project.root);camera_reset(d);
+        d->view_yaw=d->view_pitch=d->view_pan_x=d->view_pan_y=0;d->view_zoom=1;
+        d->focus_x=d->focus_y=d->focus_z=0;memset(d->flight_from,0,sizeof(d->flight_from));
+        memset(d->flight_to,0,sizeof(d->flight_to));d->flight=1;d->map_ready=false;
     }
-    if (d->model.has_project) {
-        SBStatus status = sb_graph_build(&d->model.project, &d->model.notes, &d->graph);
-        if (status.code != SB_OK) { sb_graph_free(&d->graph); result(d, status, NULL); }
-    } else sb_graph_free(&d->graph);
-    free(d->ui.space.points); d->ui.space.points = NULL; d->ui.space.count = 0;
-    if (d->graph.count) {
-        d->ui.space.points = calloc(d->graph.count, sizeof(*d->ui.space.points));
-        if (!d->ui.space.points) { result(d, sb_error(SB_MEMORY, "Kein Speicher für Sterne."), NULL); return; }
-        d->ui.space.count = d->graph.count;
+    if (!d->model.has_project) {graph_snapshot_clear(d);return;}
+    SBGraph graph={0};SBNotes notes={0};SBPoint *points=NULL;uint64_t *ids=NULL;
+    SBStatus status=sb_graph_build(&d->model.project,&d->model.notes,&graph);
+    if (status.code==SB_OK && graph.count) {
+        notes.items=malloc(graph.count*sizeof(*notes.items));points=calloc(graph.count,sizeof(*points));ids=calloc(graph.count,sizeof(*ids));
+        if (!notes.items || !points || !ids) status=sb_error(SB_MEMORY,"Kein Speicher für die Sternkarte.");
+        else {
+            notes.count=graph.count;memcpy(notes.items,d->model.notes.items,graph.count*sizeof(*notes.items));
+            uint64_t next=d->next_graph_id;
+            for(size_t i=0;i<notes.count;++i) {
+                for(size_t j=0;j<d->graph_notes.count;++j) if(!strcmp(notes.items[i].path,d->graph_notes.items[j].path)) {ids[i]=d->graph_ids[j];break;}
+                if(!ids[i]) {if(next==UINT64_MAX) {status=sb_error(SB_LIMIT,"Sternkennungen sind ausgeschöpft.");break;}ids[i]=++next;}
+            }
+            if(status.code==SB_OK)d->next_graph_id=next;
+        }
     }
-    d->ui.space.graph = &d->graph;
-    for (size_t i = 0; i < d->model.notes.count; ++i) if (!strcmp(d->model.path, d->model.notes.items[i].path)) d->star = i;
+    if(status.code!=SB_OK) {
+        sb_graph_free(&graph);sb_notes_free(&notes);free(points);free(ids);d->graph_stale=true;
+        d->graph_status=sb_error(status.code,d->graph.count ? "Sternkarte: letzter gültiger Stand. %s" : "Sternkarte konnte nicht geladen werden. %s",status.message);
+        result(d,d->graph_status,NULL);return;
+    }
+    bool recovered_feedback=d->graph_stale && d->message.code==d->graph_status.code && !strcmp(d->message.message,d->graph_status.message);
+    char focused_path[SB_PATH_CAP]={0};if(d->star<d->graph_notes.count)strcpy(focused_path,d->graph_notes.items[d->star].path);
+    graph_snapshot_clear(d);d->graph=graph;d->graph_notes=notes;d->graph_ids=ids;
+    d->ui.space.points=points;d->ui.space.count=graph.count;
+    if(recovered_feedback)result(d,sb_ok(),"Sternkarte aktualisiert.");
+    for(size_t i=0;i<notes.count;++i)if(!strcmp(focused_path,notes.items[i].path))d->star=i;
+    for(size_t i=0;i<notes.count;++i)if(!strcmp(d->model.path,notes.items[i].path))d->star=i;
 }
 static void galaxy(SBDesktop *d, int width, int height, struct nk_rect card, struct nk_rect list) {
     struct nk_context *ctx = d->ui.ctx; SBSpace *space = &d->ui.space;
@@ -2093,13 +2154,13 @@ static void galaxy(SBDesktop *d, int width, int height, struct nk_rect card, str
         p->x = cx + x * perspective * unit + d->view_pan_x;
         p->y = cy + y * perspective * unit + d->view_pan_y;
         p->depth = perspective; p->group = v.group;
-        p->selected = !strcmp(d->model.path, d->model.notes.items[i].path);
+        p->selected = !strcmp(d->model.path, d->graph_notes.items[i].path);
         p->focused = focused(d, "galaxy") && i == d->star;
         p->visible = inside(p->x, p->y, d->map_bounds) &&
-            (!strcmp(d->section, "all") || !strcmp(d->section, d->model.notes.items[i].section));
+            (!strcmp(d->section, "all") || !strcmp(d->section, d->graph_notes.items[i].section));
         if (d->search[0]) {
             bool hit = false;
-            for (size_t j = 0; j < d->hits.count; ++j) if (!strcmp(d->hits.items[j].path, d->model.notes.items[i].path)) { hit = true; break; }
+            for (size_t j = 0; j < d->hits.count; ++j) if (!strcmp(d->hits.items[j].path, d->graph_notes.items[i].path)) { hit = true; break; }
             p->visible = p->visible && hit;
         }
     }
@@ -2114,7 +2175,7 @@ static void galaxy(SBDesktop *d, int width, int height, struct nk_rect card, str
             if (!p.visible || (d->card && inside(p.x,p.y,card)) || (d->browser && inside(p.x,p.y,list))) continue;
             if (p.selected) nk_stroke_circle(canvas, nk_rect(p.x-8,p.y-8,16,16), d->ui.contrast ? 2 : 1, d->ui.contrast ? ctx->style.text.color : nk_rgba(142,191,255,145));
             if (p.focused) nk_stroke_circle(canvas, nk_rect(p.x-13,p.y-13,26,26), 2.5f, d->ui.contrast ? ctx->style.text.color : nk_rgb(190,223,255));
-            char title[SB_NAME_CAP]; compact_label(d, d->model.notes.items[i].title, title, sizeof(title), 200);
+            char title[SB_NAME_CAP]; compact_label(d, d->graph_notes.items[i].title, title, sizeof(title), 200);
             float tw = d->ui.normal->handle.width(d->ui.normal->handle.userdata, d->ui.normal->handle.height, title, (int)strlen(title));
             struct nk_rect r = nk_rect(p.x+12,p.y-8,tw+5,24*d->ui.scale);
             if (d->card && r.x < card.x+card.w && r.x+r.w > card.x && r.y < card.y+card.h && r.y+r.h > card.y)
@@ -2212,7 +2273,13 @@ void sb_desktop_frame(SBDesktop *d) {
     synchronize(d);
     passive_clear(d); d->semantic_order=0;d->hover_claimed=false;d->modal_sizing=false;d->hint_visible=false;
     for (unsigned i=0;i<4;++i) d->scrolling[i].used=false;
-    if (d->search[0] && strcmp(d->search,d->searched)) { d->browser=true; d->expanded=false; }
+    if(d->search[0] && !d->search_session)search_begin(d);
+    bool search_focus=!strcmp(d->focus,"search") || !strcmp(d->focus,"clear-search") || !strcmp(d->focus,"list") ||
+        !strncmp(d->focus,"note:",5) || !strncmp(d->focus,"note-hash:",10) || !strncmp(d->focus,"page-",5) || !strncmp(d->focus,"section:",8);
+    bool left_search=(!d->keyboard && !search_focus) || !strcmp(d->focus,"reader") || !strcmp(d->focus,"editor") || !strcmp(d->focus,"galaxy") || d->form!=SB_FORM_NONE || d->model.guard;
+    /* Tab may cross toolbar controls on its way to the results. Keep the
+       session until it reaches document/map content or activates another task. */
+    if(d->search_session && ((d->searched[0] && !d->search[0]) || left_search))search_end(d);
     search_refresh(d); graph_refresh(d);
     bool modal = d->form != SB_FORM_NONE || d->model.guard;
     if (modal || !d->card || d->editing || d->model.source) sb_ui_transition_tick(&d->ui,1,true);
@@ -2283,5 +2350,8 @@ void sb_desktop_frame(SBDesktop *d) {
     nk_sdl_update_TextInput(d->ui.ctx);
     if (!d->hover_claimed) d->hover_label[0]=0;
     if (d->hint_visible && ((d->form==SB_FORM_NONE && !d->model.guard) || d->hint_group==3)) draw_hint(d);
+    bool text_pointer=false;struct nk_vec2 pointer=d->ui.ctx->input.mouse.pos;
+    for(size_t i=0;i<d->target_count;++i)if(d->targets[i].kind==SB_FOCUS_TEXT && inside(pointer.x,pointer.y,d->targets[i].bounds)){text_pointer=true;break;}
+    if(text_pointer!=d->ui.pointer_text){SDL_SetCursor(text_pointer && d->ui.text_cursor ? d->ui.text_cursor : SDL_GetDefaultCursor());d->ui.pointer_text=text_pointer;}
     accessible_publish(d);
 }

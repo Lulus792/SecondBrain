@@ -55,7 +55,7 @@ int main(int argc,char **argv) {
     OK(capture(&d,root,"filter.bmp"));CHECK(last>0 && d.modal_bounds.y+d.modal_bounds.h-last<45);
     d.form=SB_FORM_ACTIONS;frame(&d);frame(&d);frame(&d);CHECK(d.modal_bounds.w<450 && find(&d,"help-actions"));OK(capture(&d,root,"actions.bmp"));
     d.form=SB_FORM_NONE;d.search[0]=0;frame(&d);frame(&d);CHECK(!find(&d,"clear-search"));OK(capture(&d,root,"search-empty.bmp"));
-    strcpy(d.search,"Dokument");frame(&d);frame(&d);CHECK(find(&d,"clear-search"));OK(capture(&d,root,"search-filled.bmp"));
+    strcpy(d.focus,"search");strcpy(d.search,"Dokument");frame(&d);frame(&d);CHECK(find(&d,"clear-search"));OK(capture(&d,root,"search-filled.bmp"));
     SBTarget *target=find(&d,"settings");CHECK(target);e.type=SDL_EVENT_MOUSE_MOTION;e.motion.windowID=SDL_GetWindowID(d.ui.window);e.motion.x=target->bounds.x+target->bounds.w/2;e.motion.y=target->bounds.y+target->bounds.h/2;
     nk_input_begin(d.ui.ctx);sb_desktop_event(&d,&e);nk_input_end(d.ui.ctx);frame(&d);CHECK(d.hover_label[0]);d.hover_started=SDL_GetTicksNS()-400000000u;frame(&d);OK(capture(&d,root,"hover.bmp"));
     target=find(&d,"edit");CHECK(target);e.motion.x=target->bounds.x+target->bounds.w/2;e.motion.y=target->bounds.y+target->bounds.h/2;

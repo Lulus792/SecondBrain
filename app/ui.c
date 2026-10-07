@@ -164,6 +164,7 @@ void sb_ui_theme(SBUi *ui, bool dark) {
         colors[NK_COLOR_SELECT_ACTIVE]=dark ? nk_rgb(80,80,80) : nk_rgb(175,175,175);
     }
     nk_style_from_table(ui->ctx, colors);
+    ui->ctx->style.edit.cursor_size=1.5f*ui->scale;
     ui->ctx->style.edit.cursor_text_normal = bg;
     ui->ctx->style.edit.cursor_text_hover = bg;
     ui->ctx->style.edit.selected_normal = dark ? nk_rgb(38, 94, 164) : nk_rgb(189, 216, 252);
@@ -213,6 +214,7 @@ SBStatus sb_ui_init(SBUi *ui, const char *font_path, int width, int height, bool
     SDL_SetWindowMinimumSize(ui->window, 780, 520);
     ui->renderer = SDL_CreateRenderer(ui->window, testing ? "software" : NULL);
     if (!ui->renderer) { sb_ui_shutdown(ui); return sb_error(SB_IO, "Darstellung: %s", SDL_GetError()); }
+    ui->text_cursor=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_TEXT);ui->caret_epoch=SDL_GetTicksNS();
     ui->ctx = nk_sdl_init(ui->window, ui->renderer, nk_sdl_allocator());
     ui->ctx->clip.paste = paste;
     result = sb_ui_fonts(ui, 1);
@@ -222,6 +224,7 @@ SBStatus sb_ui_init(SBUi *ui, const char *font_path, int width, int height, bool
 }
 
 void sb_ui_event(SBUi *ui, const SDL_Event *event) {
+    if(event->type==SDL_EVENT_KEY_DOWN || event->type==SDL_EVENT_TEXT_INPUT || event->type==SDL_EVENT_MOUSE_BUTTON_DOWN)ui->caret_epoch=SDL_GetTicksNS();
     SDL_Event copy = *event;
     if (event->type == SDL_EVENT_TEXT_INPUT) {
         const char *text = event->text.text;
@@ -315,6 +318,7 @@ SBStatus sb_ui_capture(SBUi *ui, const char *path) {
 }
 void sb_ui_shutdown(SBUi *ui) {
     SDL_DestroyTexture(ui->outgoing_texture);
+    if(ui->text_cursor){SDL_SetCursor(SDL_GetDefaultCursor());SDL_DestroyCursor(ui->text_cursor);}
     sb_space_free(&ui->space);
     sb_ui_text_free(ui);
     if (ui->ctx) nk_sdl_shutdown(ui->ctx);

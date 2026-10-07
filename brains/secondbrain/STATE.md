@@ -20,8 +20,9 @@ Die bisherige App 0.9.16 bleibt als Rückfallkopie in build/previous-dist-0.9.16
 
 Quellschritt ee71cc4 ist normal nach origin gepusht.
 [Neue CI 37673520042](https://github.com/Lulus792/SecondBrain/actions/runs/37673520042)
-ist bei der letzten Abfrage noch in der Warteschlange. Daraus keine neue Windows-,
-Linux- oder ARM64-Abnahme ableiten. Frühere Plattformnachweise bleiben historisch.
+besteht inzwischen in allen acht Desktop-Debug/Release-Jobs auf Windows, Linux
+und macOS ARM64/Intel einschließlich entpackter Pakete. Das ist die Abnahme
+zu 0.9.18; neue 0.9.19-Nachweise folgen.
 
 ## Laufende Interaktionspolitur
 
@@ -38,8 +39,14 @@ mit 128 Assertions. Endgültig 44/44 Tests in 287,66 s bestanden. Der Materialve
 Keine pauschale FPS- oder menschliche assistive Abnahme.
 
 Nächster Schritt: neue CI-Nachweise übernehmen und weitere Release-Arbeiten. Die C-Graphfunktion erhält den
-letzten gültigen Graph. Die Desktop-Sicht benötigt dafür noch stabile Inventur-
-kennungen; alte Indizes dürfen keine neue Notizliste beschriften.
+letzten gültigen Graph. Die Desktop-Sicht
+hält ab 0.9.19 eine eigene zusammenhängende Inventur mit stabilen Kennungen.
+Gezielte Fehler-/Wiederherstellungsprüfung besteht. Neues Feedback führt zu
+[Textlayoutcaches, Startfokus, Suchende, Caret und Anlegekarten](../../docs/NAVIGATION_POLITUR.md).
+48 vollständige Rasterprüfsummen/Höhen stimmen mit ungecachetem Reflow überein.
+46/46 Tests (424,71 s), letzte Nachprüfung 4/4 (155,29 s), gezielte ASan/UBSan
+mit 95 Navigations- und 34 Graphassertions ohne Diagnose bestanden. Paketabnahme
+folgt; Dist bleibt bis dahin 0.9.18.
 
 ## Weitere offene Release-Arbeit
 

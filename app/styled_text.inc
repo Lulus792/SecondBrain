@@ -1,6 +1,12 @@
 /* Shared measurement and drawing layout for own Markdown style spans. */
 typedef struct { SBUi *ui; const struct nk_user_font *base; const SBStyledText *text; size_t span; } StyledCursor;
 typedef struct { float *widths; size_t count,capacity; } StyledLines;
+typedef struct {size_t offset,length,line;float x,y,width;const struct nk_user_font *font;} StyledPiece;
+typedef struct {StyledPiece *pieces;size_t count,capacity;StyledLines lines;} StyledPlan;
+static bool styled_piece(StyledPlan *plan,StyledPiece piece) {
+    if(plan->count==plan->capacity){size_t capacity=plan->capacity ? plan->capacity*2 : 16;StyledPiece *next=realloc(plan->pieces,capacity*sizeof(*next));if(!next)return false;plan->pieces=next;plan->capacity=capacity;}
+    plan->pieces[plan->count++]=piece;return true;
+}
 static bool styled_line(StyledLines *lines,size_t index,float width) {
     if (!lines) return true;
     if (index>=lines->capacity) {
@@ -37,7 +43,7 @@ static float styled_width(StyledCursor cursor,size_t begin,size_t end,float maxi
     }
     return width;
 }
-static float styled_layout_view(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,struct nk_rect bounds,bool draw,nk_flags alignment,StyledLines *lines) {
+static float styled_layout_view(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,struct nk_rect bounds,bool draw,nk_flags alignment,StyledLines *lines,StyledPlan *plan) {
     struct nk_context *ctx=ui->ctx; struct nk_vec2 pad=ctx->style.text.padding;
     float width=fmaxf(1,bounds.w-2*pad.x),ascent=0,descent=0;
     for (size_t i=0;i<text->count;++i) {
@@ -84,10 +90,11 @@ static float styled_layout_view(SBUi *ui,const struct nk_user_font *base,const S
                 if (alignment&NK_TEXT_ALIGN_RIGHT) shift=fmaxf(0,width-lines->widths[line]);
                 else if (alignment&NK_TEXT_ALIGN_CENTERED) shift=fmaxf(0,(width-lines->widths[line])/2);
             }
-            if (draw) {
+            if (draw || plan) {
                 float above,below;
                 if (!sb_ui_text_metrics(font,text->text+begin,fitting,&above,&below)) return 0;
-                nk_draw_text(nk_window_get_canvas(ctx),nk_rect(bounds.x+pad.x+x+shift,bounds.y+pad.y+y+ascent-above,fmaxf(measured,1),font->height),
+                if(plan && !styled_piece(plan,(StyledPiece){begin,fitting,line,pad.x+x,pad.y+y+ascent-above,fmaxf(measured,1),font}))return 0;
+                if(draw)nk_draw_text(nk_window_get_canvas(ctx),nk_rect(bounds.x+pad.x+x+shift,bounds.y+pad.y+y+ascent-above,fmaxf(measured,1),font->height),
                     text->text+begin,(int)fitting,font,nk_rgba(0,0,0,0),ctx->style.text.color);
             }
             x+=measured; begin+=fitting;
@@ -125,17 +132,62 @@ bool sb_ui_styled_spans(const SBStyledText *text,SBTextSpan **spans,size_t *coun
 static float styled_layout(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,struct nk_rect bounds,bool draw,nk_flags alignment,StyledLines *lines) {
     SBStyledText display={.text=text->text};
     if (!sb_ui_styled_spans(text,&display.spans,&display.count)) return 0;
-    float height=styled_layout_view(ui,base,&display,bounds,draw,alignment,lines); free(display.spans); return height;
+    float height=styled_layout_view(ui,base,&display,bounds,draw,alignment,lines,NULL); free(display.spans); return height;
+}
+#define SB_STYLED_SETS 512
+#define SB_STYLED_WAYS 4
+#define SB_STYLED_BYTES (32u*1024u*1024u)
+typedef struct {
+    SBStyledText text;StyledPlan plan;const struct nk_user_font *font;
+    float width,height;struct nk_vec2 padding;uint64_t hash,stamp;size_t bytes;
+} StyledMemo;
+struct SBStyledCache {StyledMemo entries[SB_STYLED_SETS][SB_STYLED_WAYS];size_t bytes;uint64_t stamp;};
+static void styled_memo_free(StyledMemo *memo){sb_styled_free(&memo->text);free(memo->plan.pieces);free(memo->plan.lines.widths);memset(memo,0,sizeof(*memo));}
+void sb_ui_styled_cache_clear(SBUi *ui) {
+    if(!ui->styled_cache)return;
+    for(size_t i=0;i<SB_STYLED_SETS;++i)for(size_t j=0;j<SB_STYLED_WAYS;++j)styled_memo_free(&ui->styled_cache->entries[i][j]);
+    free(ui->styled_cache);ui->styled_cache=NULL;
+}
+static StyledMemo *styled_memo(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,float width) {
+    size_t length=strlen(text->text);if(ui->styled_cache_disabled || length>65536)return NULL;
+    uint64_t hash=sb_hash(text->text,length);
+    for(size_t i=0;i<text->count;++i){hash=hash*1099511628211ULL^text->spans[i].offset;hash=hash*1099511628211ULL^text->spans[i].length;hash=hash*1099511628211ULL^text->spans[i].style;}
+    if(!ui->styled_cache)ui->styled_cache=calloc(1,sizeof(*ui->styled_cache));if(!ui->styled_cache)return NULL;
+    SBStyledCache *cache=ui->styled_cache;StyledMemo *slot=&cache->entries[hash%SB_STYLED_SETS][0];
+    for(size_t j=0;j<SB_STYLED_WAYS;++j) {
+        StyledMemo *memo=&cache->entries[hash%SB_STYLED_SETS][j];bool spans=memo->text.count==text->count;
+        if(spans)for(size_t i=0;i<text->count;++i)if(memo->text.spans[i].offset!=text->spans[i].offset || memo->text.spans[i].length!=text->spans[i].length || memo->text.spans[i].style!=text->spans[i].style){spans=false;break;}
+        if(memo->text.text && memo->hash==hash && memo->font==base && memo->width==width && memo->padding.x==ui->ctx->style.text.padding.x && memo->padding.y==ui->ctx->style.text.padding.y && spans && !strcmp(memo->text.text,text->text)){memo->stamp=++cache->stamp;return memo;}
+        if(memo->stamp<slot->stamp)slot=memo;
+    }
+    StyledMemo next={.font=base,.width=width,.padding=ui->ctx->style.text.padding,.hash=hash};
+    next.text.text=malloc(length+1);next.text.spans=text->count ? malloc(text->count*sizeof(*text->spans)) : NULL;
+    if(!next.text.text || (text->count && !next.text.spans)){styled_memo_free(&next);return NULL;}
+    memcpy(next.text.text,text->text,length+1);next.text.count=text->count;if(text->count)memcpy(next.text.spans,text->spans,text->count*sizeof(*text->spans));
+    SBStyledText display={.text=next.text.text};
+    if(sb_ui_styled_spans(&next.text,&display.spans,&display.count))next.height=styled_layout_view(ui,base,&display,nk_rect(0,0,width,0),false,NK_TEXT_LEFT,&next.plan.lines,&next.plan);
+    free(display.spans);
+    if(next.height<=0){styled_memo_free(&next);return NULL;}
+    next.bytes=length+1+text->count*sizeof(*text->spans)+next.plan.capacity*sizeof(*next.plan.pieces)+next.plan.lines.capacity*sizeof(float);
+    if(next.bytes>SB_STYLED_BYTES){styled_memo_free(&next);return NULL;}
+    if(cache->bytes+next.bytes>SB_STYLED_BYTES){sb_ui_styled_cache_clear(ui);ui->styled_cache=calloc(1,sizeof(*ui->styled_cache));if(!ui->styled_cache){styled_memo_free(&next);return NULL;}cache=ui->styled_cache;slot=&cache->entries[hash%SB_STYLED_SETS][0];}
+    cache->bytes-=slot->bytes;styled_memo_free(slot);next.stamp=++cache->stamp;*slot=next;cache->bytes+=next.bytes;return slot;
 }
 float sb_ui_styled_height(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,float width) {
-    return styled_layout(ui,base,text,nk_rect(0,0,width,0),false,NK_TEXT_LEFT,NULL);
+    StyledMemo *memo=styled_memo(ui,base,text,width);return memo ? memo->height : styled_layout(ui,base,text,nk_rect(0,0,width,0),false,NK_TEXT_LEFT,NULL);
 }
-void sb_ui_styled_draw(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text) {
-    sb_ui_styled_aligned(ui,base,text,NK_TEXT_LEFT);
-}
+void sb_ui_styled_draw(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text) {sb_ui_styled_aligned(ui,base,text,NK_TEXT_LEFT);}
 void sb_ui_styled_aligned(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,nk_flags alignment) {
-    struct nk_rect bounds; nk_widget(&bounds,ui->ctx); StyledLines lines={0};
-    bool aligned=(alignment&(NK_TEXT_ALIGN_RIGHT|NK_TEXT_ALIGN_CENTERED))!=0;
-    if (aligned && !styled_layout(ui,base,text,bounds,false,alignment,&lines)) { free(lines.widths); return; }
-    styled_layout(ui,base,text,bounds,true,alignment,aligned ? &lines : NULL); free(lines.widths);
+    struct nk_rect bounds;if(nk_widget(&bounds,ui->ctx)==NK_WIDGET_INVALID)return;
+    StyledMemo *memo=styled_memo(ui,base,text,bounds.w);
+    if(memo) {
+        float available=fmaxf(1,bounds.w-2*memo->padding.x);
+        for(size_t i=0;i<memo->plan.count;++i){StyledPiece p=memo->plan.pieces[i];float shift=0;
+            if(p.line<memo->plan.lines.count){if(alignment&NK_TEXT_ALIGN_RIGHT)shift=fmaxf(0,available-memo->plan.lines.widths[p.line]);else if(alignment&NK_TEXT_ALIGN_CENTERED)shift=fmaxf(0,(available-memo->plan.lines.widths[p.line])/2);}
+            nk_draw_text(nk_window_get_canvas(ui->ctx),nk_rect(bounds.x+p.x+shift,bounds.y+p.y,p.width,p.font->height),memo->text.text+p.offset,(int)p.length,p.font,nk_rgba(0,0,0,0),ui->ctx->style.text.color);
+        }return;
+    }
+    StyledLines lines={0};bool aligned=(alignment&(NK_TEXT_ALIGN_RIGHT|NK_TEXT_ALIGN_CENTERED))!=0;
+    if(aligned && !styled_layout(ui,base,text,bounds,false,alignment,&lines)){free(lines.widths);return;}
+    styled_layout(ui,base,text,bounds,true,alignment,aligned ? &lines : NULL);free(lines.widths);
 }

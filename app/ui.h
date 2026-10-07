@@ -21,10 +21,16 @@
 
 void sb_ui_grapheme_clamp(struct nk_text_edit *edit);
 typedef struct SBTextSystem SBTextSystem;
+typedef struct SBStyledCache SBStyledCache;
 typedef struct {
     SBTextSystem *text;
+    SBStyledCache *styled_cache;
+    bool styled_cache_disabled;
     SDL_Window *window;
     SDL_Renderer *renderer;
+    SDL_Cursor *text_cursor;
+    Uint64 caret_epoch;
+    bool pointer_text;
     struct nk_context *ctx;
     struct nk_font *normal, *body, *heading, *code;
     char font_path[SB_PATH_CAP];
@@ -51,6 +57,7 @@ void sb_ui_text_aligned(struct nk_context *ctx,const char *text,size_t length,nk
 float sb_ui_wrap_height(struct nk_context *ctx,const struct nk_user_font *font,const char *text,size_t length,float width);
 /* Returned spans are owned by the caller; text remains borrowed. */
 bool sb_ui_styled_spans(const SBStyledText *text,SBTextSpan **spans,size_t *count);
+void sb_ui_styled_cache_clear(SBUi *ui);
 float sb_ui_styled_height(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,float width);
 void sb_ui_styled_draw(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text);
 void sb_ui_styled_aligned(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,nk_flags alignment);

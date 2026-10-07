@@ -59,7 +59,10 @@ static void replace(SBDesktop *d, const char *text) {
     if (*text) type(d,text); else key(d,SDLK_BACKSPACE,0);
 }
 static bool reach(SBDesktop *d, const char *id) {
-    for (size_t i = 0; i <= d->target_count + 1; ++i) {
+    /* Search dismissal can shrink the target list mid-traversal. Keep a fixed
+       budget that allows reaching controls in the newly restored layout. */
+    size_t limit=2*d->target_count+4;
+    for (size_t i = 0; i <= limit; ++i) {
         if (!strcmp(d->focus, id)) return true;
         key(d, SDLK_TAB, 0);
     }
@@ -95,11 +98,12 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
     key(d,SDLK_TAB,0); CHECK(!strcmp(d->focus,"form-repo"));
     type(d,directory);
     CHECK(!strcmp(d->repository,directory));
+    key(d,SDLK_TAB,0); CHECK(!strcmp(d->focus,"cancel-footer"));
     key(d,SDLK_TAB,0); CHECK(!strcmp(d->focus,"submit"));
     key(d,SDLK_RETURN,0);
     CHECK(d->model.has_project && !strcmp(d->model.project.id,"tastatur-ue") && d->form == SB_FORM_NONE);
     key(d,SDLK_N,MOD); CHECK(SDL_TextInputActive(d->ui.window)); type(d,"Erkenntnis");
-    CHECK(reach(d,"section-choice"));
+    CHECK(reach(d,"section-choice:inbox"));
     key(d,SDLK_SPACE,0); CHECK(d->note_section == 1);
     CHECK(activate(d,"submit"));
     CHECK(!strcmp(d->model.path,"inbox/erkenntnis.md") && d->editing);

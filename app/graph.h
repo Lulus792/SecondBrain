@@ -7,6 +7,7 @@ typedef struct { float x, y, z; unsigned group; } SBStar;
 typedef struct { size_t from, to; } SBEdge;
 typedef struct {
     SBStar *stars;
+    SBRevision *revisions;
     SBEdge *edges;
     size_t count, edge_count, edge_capacity;
 } SBGraph;

@@ -29151,7 +29151,9 @@ nk_do_edit(nk_flags *state, struct nk_command_buffer *out,
         /* cursor */
         if (edit->select_start == edit->select_end)
         {
-            if (edit->cursor >= nk_str_len(&edit->string) ||
+            /* SecondBrain: insertion uses a caret between characters. */
+            if (edit->mode == NK_TEXT_EDIT_MODE_INSERT ||
+                edit->cursor >= nk_str_len(&edit->string) ||
                 (cursor_ptr && *cursor_ptr == '\n')) {
                 /* draw cursor at end of line */
                 struct nk_rect cursor;

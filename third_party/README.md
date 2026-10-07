@@ -27,6 +27,8 @@ Lokale Anpassungen des Nuklear-Headers:
   wurde aus einer vorhandenen MIT-lizenzierten UI-Anpassung übernommen.
 - Rückgängig und Wiederholen stellen eine zusammengefallene Auswahl am Cursor her.
 - Positionen und Einfügelängen jenseits des 16-Bit-Bereichs werden erhalten.
+- Einfügen zeigt einen dünnen Caret auch innerhalb einer Zeile; der Überschreibmodus
+  behält seine Blockdarstellung. Die Cursorfarben folgen dem eigenen Blink-/Eingabezustand.
 - Bei rückwärts belegtem Zeichenpuffer entsteht vor einer nötigen Vergrößerung
   kein überlaufender Probezeiger. Die Interaktionsprüfung führt diesen Wachstumspfad
   mit ASan/UBSan aus.

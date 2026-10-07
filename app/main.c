@@ -85,6 +85,7 @@ int main(int argc, char **argv) {
         status = sb_app_request(&desktop.model, SB_ACT_PROJECT, project_arg);
         if (status.code != SB_OK) { fprintf(stderr, "%s\n", status.message); sb_desktop_free(&desktop); return 1; }
     }
+    sb_desktop_focus_start(&desktop);
     unsigned frames = 0;
     Uint64 last_tick=SDL_GetTicksNS();
     while (!desktop.model.quit) {

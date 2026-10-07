@@ -28,11 +28,12 @@ static void phase(SBDesktop *d,const char *name,unsigned mode) {
     printf("%s: layout %.2f ms; draw %.2f ms; present %.2f ms; apply %.2f ms; frame median %.2f p95 %.2f max %.2f ms\n",name,layout/60,draw/60,present/60,apply/60,times[30],times[56],times[59]);fflush(stdout);
 }
 int main(int argc,char **argv) {
-    if(argc!=5){fprintf(stderr,"Usage: profile WORKSPACE PROJECT FONT software|native\n");return 2;}
+    if(argc!=5 && argc!=6){fprintf(stderr,"Usage: profile WORKSPACE PROJECT FONT software|native [NOTE]\n");return 2;}
     SBDesktop d;SBStatus s=sb_desktop_init(&d,argv[1],argv[3],!strcmp(argv[4],"software"));
     if(s.code!=SB_OK){fprintf(stderr,"%s\n",s.message);return 1;}
     s=sb_app_request(&d.model,SB_ACT_PROJECT,argv[2]);
     if(s.code!=SB_OK){fprintf(stderr,"%s\n",s.message);sb_desktop_free(&d);return 1;}
+    if(argc==6){s=sb_app_request(&d.model,SB_ACT_NOTE,argv[5]);if(s.code!=SB_OK){fprintf(stderr,"%s\n",s.message);sb_desktop_free(&d);return 1;}}
     printf("Renderer: %s; notes: %zu; view: 1336x840\n",SDL_GetRendererName(d.ui.renderer),d.model.notes.count);
     phase(&d,"idle",0);phase(&d,"scroll",1);phase(&d,"camera",2);phase(&d,"switch",3);
     sb_desktop_free(&d);return 0;

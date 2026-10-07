@@ -53,7 +53,7 @@ bool sb_graph_destination(const char *from, const char *link, char *out, size_t 
 }
 void sb_graph_free(SBGraph *g) {
     if (!g) return;
-    free(g->stars); free(g->edges); memset(g, 0, sizeof(*g));
+    free(g->stars); free(g->revisions); free(g->edges); memset(g, 0, sizeof(*g));
 }
 static SBStatus edge(SBGraph *g, size_t from, size_t to) {
     if (from == to) return sb_ok();
@@ -97,7 +97,8 @@ SBStatus sb_graph_build(const SBProject *project, const SBNotes *notes, SBGraph 
     static const char *groups[] = {"overview", "knowledge", "inbox", "journal", "archive"};
     if (notes->count > 4096) return sb_error(SB_LIMIT, "Die Sternkarte unterstützt höchstens 4096 Dokumente. Die Dokumentliste bleibt verfügbar.");
     graph.stars = calloc(notes->count ? notes->count : 1, sizeof(*graph.stars));
-    if (!graph.stars) return sb_error(SB_MEMORY, "Kein Speicher für die Sternkarte.");
+    graph.revisions=calloc(notes->count ? notes->count : 1,sizeof(*graph.revisions));
+    if (!graph.stars || !graph.revisions) {sb_graph_free(&graph);return sb_error(SB_MEMORY,"Kein Speicher für die Sternkarte.");}
     graph.count = notes->count;
     for (size_t i = 0; i < notes->count; ++i) {
         unsigned group = 0;
@@ -110,7 +111,7 @@ SBStatus sb_graph_build(const SBProject *project, const SBNotes *notes, SBGraph 
             sinf(center) * 165 + sinf(angle) * orbit * 0.7f,
             (float)((int)((hash >> 32) % 180) - 90), group};
         char *text = NULL;
-        status = sb_note_load(project, notes->items[i].path, &text, NULL);
+        status = sb_note_load(project, notes->items[i].path, &text, &graph.revisions[i]);
         if (status.code != SB_OK) goto fail;
         SBDocument document; SBReferences references={0};
         status=sb_document_init(&document,text,strlen(text));

@@ -29,7 +29,9 @@ Glaskarten. Schriftgröße, helle Darstellung, reduzierte Transparenz und reduzi
 Bewegung lassen sich in den Einstellungen wählen. Die Glasdarstellung ist eine
 eigene Umsetzung nach Apple-Vorbild. Ab 0.9.18 verbinden kurze
 [Übergänge](docs/INTERAKTION.md) die Kamera mit dem Dokumentwechsel; Hinweise
-zeigen passende Tastenkürzel.
+zeigen passende Tastenkürzel. Ab 0.9.19 startet die Tastatur direkt in der
+Sternkarte. [Lange Dokumente, Suchende und Texteingabe](docs/NAVIGATION_POLITUR.md)
+sind gezielt verfeinert.
 
 ## Starten
 

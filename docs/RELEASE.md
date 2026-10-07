@@ -121,9 +121,12 @@ werden. Entwicklungspakete werden bis dahin eindeutig als solche gekennzeichnet.
 
 ## Ergänzende Nachprüfung vom 7. Oktober
 
-- [ ] Den letzten gültigen Desktop-Graph mit stabilen Dokumentkennungen und
+- [x] Den letzten gültigen Desktop-Graph mit stabilen Dokumentkennungen und
   zugehörigen Beschriftungen erhalten, wenn die aktuelle Notizinventur geändert
   oder unlesbar ist. Der Kern erhält seinen Graph bereits; die Desktopdarstellung
-  darf keine alten Indizes auf neue Notizen anwenden.
+  darf keine alten Indizes auf neue Notizen anwenden. Ab 0.9.19 ist die
+  [zusammenhängende Desktop-Inventur](STERNKARTEN_BESTAND.md) implementiert;
+  lokale Gesamt-/Schlussprüfung und gezielte ASan/UBSan bestehen. Neue
+  Plattform- und menschliche Abnahmen bleiben gesondert offen.
 - [ ] Die neue [Interaktionspolitur](INTERAKTION.md) auf den tatsächlichen
   Zielsystemen und mit menschlicher Bedienung/verschiedenen Geräten abnehmen.

@@ -45,6 +45,8 @@ typedef struct {
     char backup_path[SB_PATH_CAP],checked_backup[SB_PATH_CAP],restore_id[65];
     bool restore_checked,quit_after_backup,backup_feedback_reset,backup_error_copied,backup_clipboard_failed;
     char search[256], searched[256], section[32];
+    struct nk_rect search_bounds;
+    bool search_session,search_browser_before,search_expanded_before;
     char hover_label[SB_NAME_CAP];
     struct nk_rect hover_bounds,tooltip_bounds;
     Uint64 hover_started;
@@ -82,6 +84,11 @@ typedef struct {
     /* Optional platform URL opener; NULL uses SDL_OpenURL. */
     bool (*open_url)(const char *url);
     SBGraph graph;
+    /* The graph and its metadata are replaced as one successful snapshot. */
+    SBNotes graph_notes;
+    uint64_t *graph_ids,next_graph_id;
+    bool graph_stale;
+    SBStatus graph_status;
     struct nk_text_edit text_edit;
     bool text_edit_ready;
     char graph_project[SB_PATH_CAP];
@@ -108,6 +115,7 @@ void sb_desktop_free(SBDesktop *desktop);
 SBStatus sb_desktop_preferences(SBDesktop *desktop, const char *path, bool explicit_workspace);
 SBStatus sb_desktop_store_preferences(SBDesktop *desktop);
 void sb_desktop_event(SBDesktop *desktop, const SDL_Event *event);
+void sb_desktop_focus_start(SBDesktop *desktop);
 void sb_desktop_frame(SBDesktop *desktop);
 void sb_desktop_tick(SBDesktop *desktop, float seconds);
 bool sb_desktop_animating(const SBDesktop *desktop);

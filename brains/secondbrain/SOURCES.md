@@ -96,3 +96,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 
 - [Reaktionszeit und Flächen](../../docs/INTERAKTION.md): gemeinsame Zeitplanung,
   Kartenwechsel, Scrollen, Dialogmessung, Hinweise und Suchfläche ab 0.9.18.
+
+- [Letzter gültiger Sternkartenstand](../../docs/STERNKARTEN_BESTAND.md): zusammenhängende Desktop-Inventur, stabile Kennungen, Fehler- und Wiederherstellungsvertrag ab 0.9.19.
+
+- [Navigation und Texteingabe](../../docs/NAVIGATION_POLITUR.md): Mess-/Umbruchplancaches, Startfokus, Suchende, Textcursor und Anlegekarten ab 0.9.19.

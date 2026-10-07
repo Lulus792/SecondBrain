@@ -24,11 +24,20 @@ typedef struct {
     int width, height, maximum;
     uint64_t stamp;
 } SBTextCache;
+/* Bounded, exact-key measurement cache. Font systems own all entries and
+   discard them on font/density changes; hash collisions compare full bytes. */
+typedef struct {
+    char *text;size_t length;uint64_t hash;unsigned face;
+    float width,ascent,descent;bool width_ready,metrics_ready;
+} SBMeasureCache;
+#define SB_MEASURE_CACHE_ENTRIES 4096
+#define SB_MEASURE_CACHE_LENGTH 2048
 struct SBTextSystem {
     SDL_Renderer *renderer;
     float density;
     SBTextFace faces[SB_TEXT_FACES];
     SBTextCache cache[SB_TEXT_CACHE_ENTRIES];
+    SBMeasureCache measures[SB_MEASURE_CACHE_ENTRIES];
     size_t bytes;
     uint64_t frame;
 };
@@ -40,6 +49,7 @@ static void cache_free(SBTextSystem *text, SBTextCache *entry) {
 static void system_free(SBTextSystem *text) {
     if (!text) return;
     for (unsigned i=0;i<SB_TEXT_CACHE_ENTRIES;++i) cache_free(text,&text->cache[i]);
+    for (unsigned i=0;i<SB_MEASURE_CACHE_ENTRIES;++i) free(text->measures[i].text);
     for (unsigned i=0;i<SB_TEXT_FACES;++i) {
         TTF_CloseFont(text->faces[i].font);
         for (unsigned j=0;j<SB_FALLBACK_COUNT;++j) TTF_CloseFont(text->faces[i].fallback[j]);
@@ -89,13 +99,22 @@ static bool run_next(SBFontRuns *runs,SBFontRun *run) {
     }
     runs->available=false; return true;
 }
+static SBMeasureCache *measure_entry(SBTextFace *face,const char *value,size_t length) {
+    if(length>SB_MEASURE_CACHE_LENGTH)return NULL;
+    unsigned index=(unsigned)(face-face->owner->faces);uint64_t hash=sb_hash(value,length)^((uint64_t)index*UINT64_C(0x9e3779b97f4a7c15));
+    SBMeasureCache *entry=&face->owner->measures[hash%SB_MEASURE_CACHE_ENTRIES];
+    if(entry->text && entry->hash==hash && entry->face==index && entry->length==length && !memcmp(entry->text,value,length))return entry;
+    char *copy=malloc(length+1);if(!copy)return NULL;memcpy(copy,value,length);copy[length]=0;
+    free(entry->text);*entry=(SBMeasureCache){.text=copy,.length=length,.hash=hash,.face=index};return entry;
+}
 static float width(nk_handle handle, float height, const char *value, int length) {
     SBTextFace *face=handle.ptr; (void)height;
     if (length<=0 || !value || !face) return 0;
+    SBMeasureCache *memo=measure_entry(face,value,(size_t)length);if(memo && memo->width_ready)return memo->width;
     SBFontRuns runs; SBFontRun run; int total=0;
     if (!runs_init(&runs,face,value,(size_t)length)) return 0;
     while (run_next(&runs,&run)) { int w=0,h=0; if (!TTF_GetStringSize(run.font,value+run.start,run.end-run.start,&w,&h)) return 0; total+=w; }
-    return (float)total/face->owner->density;
+    float measured=(float)total/face->owner->density;if(memo){memo->width=measured;memo->width_ready=true;}return measured;
 }
 static TTF_Font *open_font(const char *path, float logical_height, float density) {
     TTF_Font *font=TTF_OpenFont(path,logical_height*density);
@@ -135,7 +154,7 @@ SBStatus sb_ui_text_fonts(SBUi *ui, float scale, float density) {
         face->nk.handle.height=heights[i]*scale;
         face->nk.handle.width=width;
     }
-    system_free(ui->text); ui->text=next;
+    sb_ui_styled_cache_clear(ui);system_free(ui->text); ui->text=next;
     ui->normal=&next->faces[0].nk; ui->body=&next->faces[8].nk;
     ui->heading=&next->faces[16].nk; ui->code=&next->faces[24].nk;
     ui->scale=scale; ui->density=density;
@@ -193,11 +212,14 @@ size_t sb_ui_text_fit(const struct nk_user_font *font,const char *value,size_t l
 bool sb_ui_text_metrics(const struct nk_user_font *font,const char *value,size_t length,float *ascent,float *descent) {
     SBTextFace *face=font->userdata.ptr; SBFontRuns runs; SBFontRun run;
     if (!face || !ascent || !descent || !runs_init(&runs,face,value,length)) return false;
+    SBMeasureCache *memo=measure_entry(face,value,length);
+    if(memo && memo->metrics_ready){*ascent=memo->ascent;*descent=memo->descent;return true;}
     int above=TTF_GetFontAscent(face->font),below=-TTF_GetFontDescent(face->font);
     while (run_next(&runs,&run)) {
         above=SDL_max(above,TTF_GetFontAscent(run.font)); below=SDL_max(below,-TTF_GetFontDescent(run.font));
     }
-    *ascent=above/face->owner->density; *descent=below/face->owner->density; return true;
+    *ascent=above/face->owner->density; *descent=below/face->owner->density;
+    if(memo){memo->ascent=*ascent;memo->descent=*descent;memo->metrics_ready=true;}return true;
 }
 
 void sb_ui_text_draw(struct nk_draw_list *list, const struct nk_command_text *command) {
@@ -277,5 +299,6 @@ void sb_ui_text_frame_end(SBUi *ui) {
     ++text->frame;
 }
 void sb_ui_text_free(SBUi *ui) {
+    sb_ui_styled_cache_clear(ui);
     if (ui->text) { system_free(ui->text); ui->text=NULL; TTF_Quit(); }
 }

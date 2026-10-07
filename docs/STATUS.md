@@ -1865,3 +1865,37 @@ Präzisierung zum vorherigen Graph-Nachweis: Die C-Graphfunktion erhält ihren
 letzten gültigen Wert bei Fehlern. Der Desktop verwirft derzeit die Darstellung,
 da seine Labels/Aktionen aktuelle Notizindizes benutzen. Eine an stabile
 Dokumentkennungen gebundene vorherige Desktop-Sicht bleibt Release-Arbeit.
+
+
+## 0.9.19: zusammenhängender letzter Sternkartenstand
+
+Die Desktop-Sicht hält ab 0.9.19 eine eigene Kopie von Dokumentpfaden, Titeln,
+Bereichen und stabilen Kennungen neben dem Graph. Fehler eines Neuaufbaus
+ersetzen keinen Teil dieses Stands; Projektgrenzen verwerfen ihn ausdrücklich.
+Rendern, Kamera, native Aktionen, Maus und Tastatur verwenden diese Inventur.
+[Vertrag und Grenzen](STERNKARTEN_BESTAND.md). Gezielte Fehler-/Wiederherstellungs-
+prüfung besteht; neue Gesamt- und Sanitizerabnahme laufen. Dist bleibt beim
+geprüften 0.9.18, bis das neue Paket geprüft ist.
+
+[CI 37673520042](https://github.com/Lulus792/SecondBrain/actions/runs/37673520042)
+zu ee71cc4: alle acht Desktop-Debug/Release-Jobs auf Windows, Linux,
+macOS ARM64 und Intel einschließlich der entpackten Pakete tatsächlich bestanden.
+Das sind Nachweise zu 0.9.18, keine Plattformabnahme der neuen Graphänderung.
+
+
+Neues Nutzerfeedback erweitert 0.9.19 um [lange Dokumentwechsel, Suche,
+Texteingabe und Anlegekarten](NAVIGATION_POLITUR.md). Erste lokale Metal-Probe
+zeigt für das 54-KiB-Journal rund 95 ms Layout pro Bild. Exakte begrenzte Messungs-
+und Umbruchplancaches reduzieren die warme lokale Layoutzeit auf rund 9 ms.
+48 unabhängige gecachte/ungecachte Rasterfälle stimmen samt Höhen überein;
+Unicode-/Schriftprüfung besteht. Such-/Cursor-/Startprüfung besteht gezielt mit
+24 Assertions. Suche erhält beim Tabweg zu Ergebnissen ihre Fläche; Verlassen
+in Dokument/Sternkarte oder andere Aufgaben stellt die vorherige Fläche wieder her.
+Gesamtprüfung: 46/46 in 424,71 s. Nach letzter Suchfokuszeichnung und
+Projektwechselkorrektur bestehen Interaktion, Graphinventur, Cache-/Navigation
+und der vollständige Tastaturweg nochmals (4/4 in 155,29 s).
+Endgültige Prüfungen: 95 Navigationsassertions mit 48 gleichen vollständigen
+Rasterprüfsummen/Höhen, 34 Graphinventurassertions. Eigene gezielte ASan/UBSan
+mit instrumentiertem Desktop, UI, Text- und Materialrenderer sowie Graph besteht
+mit denselben 95 und 34 Assertions ohne Diagnose. Weitere externe UI-Bibliotheken
+nicht vollständig instrumentiert, macOS-Leakprüfung deaktiviert. Paket folgt.
