@@ -31,14 +31,17 @@ bestehen; nach ergänzten Grenzfällen bestehen die drei Markdown-Nachprüfungen
 und ASan/UBSan mit 5.644 Assertions. Der native macOS-Basisdurchlauf besteht.
 32 erste Release-Tests und sechs abschließende Nachprüfungen mit 256 nativen
 Assertions bestehen; Geometrie, Zellenansprung und Rasteransichten sind geprüft.
-Das neue entpackte Intel-Paket wird noch geprüft. Die frühere Betriebssystem-Startblockade ist behoben.
+Das entpackte Intel-Paket einschließlich Desktop, Tastatur, Sicherung, Neustart
+und CLI besteht; dist/SecondBrain enthält 0.9.6. Die frühere Betriebssystem-Startblockade ist behoben.
 UIA GridPattern und AT-SPI Table fehlen in den festgelegten Providern; die
 separate native Kinderprüfung ersetzt keine vollständige Tabellenbedienung.
 
 ## Weiterarbeiten
 
-0.9.6 lokal und als Paket abschließend prüfen, committen/pushen und native
-Plattformabnahme ausführen. Danach verbleibende Container-/Inline-/Listenregeln,
+Die geprüfte Umsetzung ist als 648a696 gepusht. Die
+[native 0.9.6-Abnahme](https://github.com/Lulus792/SecondBrain/actions/runs/37593650781)
+läuft noch; tatsächliche Ergebnisse übernehmen und offene Fehler beheben.
+Danach verbleibende Container-/Inline-/Listenregeln,
 Unicode-Textgeometrie/IME, Support-/Lizenzzuordnung und übrige Release-Aufgaben.
 Tatsächliche native Dialog- und menschliche VoiceOver/NVDA/Orca-Bedienung,
 Geräte-/Langzeitprüfungen und weitere volle Dateisysteme bleiben offen.

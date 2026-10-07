@@ -517,7 +517,12 @@ Darstellungskorrekturen: 34,86 s, einschließlich 256 nativer Assertions.
 4×3 Tabellenrollen/Zellwerte und eine Scrollanfrage; Rasteransichten bei normaler
 und 200-%-Schrift wurden betrachtet. [Umfang und Grenzen](TABELLEN.md).
 
-Das neue entpackte Intel-Paket wird noch geprüft. Native Windows-/Linux-/ARM64-
-Läufe werden nach Veröffentlichung anhand ihrer tatsächlichen Ergebnisse
-nachgetragen. Die Windows-/Linux-Clientprüfungen für Tabellenkinder sind bisher
+Das entpackte Intel-Paket 0.9.6 besteht mit 126 Desktop-, 142 Tastatur- und
+75 Sicherungsassertions, zwei Einstellungs-Neustartprozessen und dem produktiven
+Sicherungswerkzeug. Archiv-SHA-256:
+`4d35909f54230806131886602d7872885270d1a595a4734e4ebb936262ff64f7`.
+Die geprüfte lokale Kopie liegt unter dist/SecondBrain. Der
+[20-Job-Lauf zu 648a696](https://github.com/Lulus792/SecondBrain/actions/runs/37593650781)
+läuft noch. Native Windows-/Linux-/ARM64-Ergebnisse werden anhand des tatsächlich
+abgeschlossenen Laufs nachgetragen. Die Windows-/Linux-Clientprüfungen für Tabellenkinder sind bisher
 nur vorbereitet; fehlende UIA-/AT-SPI-Matrixschnittstellen bleiben offen.

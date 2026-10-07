@@ -1029,9 +1029,18 @@ Lokale Logs: build/table-core-check.log, table-core-final-check.log,
 table-sanitize-final.log, table-ui-full-check.log, table-ui-final-check.log,
 table-graph-final-check.log und table-regression/result.log.
 
-Das neue Intel-Paket wird gerade entpackt geprüft; bis zu dessen bestandenem
-Ablauf bleibt dist/SecondBrain bei 0.9.5. Neue Windows-/Linux-/ARM64-Abnahme folgt
-nach Push. UIA GridPattern und AT-SPI Table fehlen in den festgelegten Providern.
+Das entpackte Intel-Paket 0.9.6 besteht mit 126 Desktop-, 142 Tastatur- und
+75 Sicherungsassertions, zwei Neustartprozessen mit erhaltenen Einstellungen
+sowie dem produktiven Sicherungswerkzeug. Unicode-Pfade und der verschobene
+Paketordner wurden tatsächlich verwendet. Archiv-SHA-256:
+`4d35909f54230806131886602d7872885270d1a595a4734e4ebb936262ff64f7`.
+Log: build/table-package-check.log. dist/SecondBrain enthält dieses geprüfte
+Entwicklungspaket; die ehrliche lokale Buildkennung ist 37dba5897e9d-dirty,
+weil es vor dem Commit gepackt wurde. Die geprüfte Umsetzung ist als
+[648a696](https://github.com/Lulus792/SecondBrain/commit/648a69631c990fdcfb27dbfabfaa3af1a24aab12)
+gepusht. [Native CI-Abnahme](https://github.com/Lulus792/SecondBrain/actions/runs/37593650781)
+läuft noch; neue Windows-/Linux-/ARM64-Ergebnisse werden erst nach Abschluss
+übernommen. UIA GridPattern und AT-SPI Table fehlen in den festgelegten Providern.
 Die vorbereitete Clientprüfung unterscheidet diese Lücke von zugänglichen
 Zeilenkindern. Menschliche Screenreader-Abnahme, volle GFM-Containerregeln und
 Leistung sehr großer Tabellen bleiben offen. Die gestapelte Kopfzeile soll bei
