@@ -86,3 +86,16 @@ der Aktion. Lange Fixtures werden in vollständigen UTF-8-Abschnitten innerhalb
 des vorhandenen Ereignislimits zugeführt; zuvor fehlte bei einer Einzelzufuhr
 der Rest eines langen Linkfixtures. Die normalen App-Eingaben und Kopieraktionen
 bleiben unverändert. Das abschließende Paket wird erneut erzeugt.
+
+
+Das abschließende, neu erzeugte und entpackte Intel-Paket 0.9.8 besteht mit
+126 Desktop-, 142 Tastatur- und 75 Sicherungsassertions, zwei Einstellungs-Neustart-
+prozessen und dem produktiven Sicherungswerkzeug. Der Unicode-Lizenztext ist
+im Paket geprüft. Archiv-SHA-256: `ecef5c9c0027629cdfb7287879b5749f42b919498f35010e00b6155269bb93c0`.
+Log: build/grapheme-package-verified-check.log. dist/SecondBrain enthält dieses
+geprüfte Entwicklungspaket, lokale Buildkennung 83ce90d6ee9b-dirty (vor Commit
+gepackt). Der Quellstand 605527e ist gepusht; die
+[native Abnahme 37604300744](https://github.com/Lulus792/SecondBrain/actions/runs/37604300744)
+läuft noch. Die frühere fehlerhafte Paketprüfung wird dadurch nicht nachträglich
+als bestanden geführt. Emoji-Glyphen, komplexe Geometrie und menschliche
+assistive Bedienung bleiben offen.

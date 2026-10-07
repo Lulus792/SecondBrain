@@ -39,7 +39,7 @@ separate native Kinderprüfung ersetzt keine vollständige Tabellenbedienung.
 ## Laufender Schritt 0.9.8
 
 Die [0.9.7-Abnahme](https://github.com/Lulus792/SecondBrain/actions/runs/37596496154)
-besteht jetzt mit allen 20 Jobs und vier Paketen. 0.9.8 ist unveröffentlicht:
+besteht jetzt mit allen 20 Jobs und vier Paketen. 0.9.8 ist als 605527e gepusht:
 eigene C-Grapheme nach Unicode 18.0, ganze Zeichen in Eingaben, atomischer Undo-
 Vorgang, native Teilmarkierungen und vollständige geformte Editorzeilen. 19 Kern-
 prüfungen, 33 erste Release-Tests und sechs abschließende Prüfungen bestehen;
@@ -48,8 +48,10 @@ werden unter ASan/UBSan geprüft; vorherige Navigation scheitert am Akzentfall.
 Ein früherer Paketlauf scheitert an gewechselter Zwischenablage im Pfadfixture;
 Testeingaben verwenden jetzt UTF-8-sichere SDL-Abschnitte; Kopierwerte werden
 sofort nach der Aktion geprüft. Desktop 126 und Tastatur 142 bestehen nochmals.
-Der Quellstand wird gepusht; abschließendes Paket neu erzeugen und native
-Plattformabnahme ausführen.
+Das neu erzeugte Intel-Paket einschließlich Desktop, Tastatur, Sicherung,
+Einstellungsneustart und CLI besteht; dist/SecondBrain enthält 0.9.8.
+Die [native 0.9.8-Abnahme](https://github.com/Lulus792/SecondBrain/actions/runs/37604300744)
+läuft noch; tatsächliche Ergebnisse übernehmen und neue Fehler beheben.
 [Vertrag](../../docs/GRAPHEME.md), [Nachweise](../../docs/STATUS.md).
 
 Danach verbleibende Container-/Inline-/Listenregeln,
