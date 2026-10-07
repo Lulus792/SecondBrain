@@ -76,3 +76,14 @@ Prozent Schriftgröße. Beide liefern RGB 0/0/0. Die Fixture verändert nur das
 Fensterflag, keine vorgegebenen Rückgabewerte. Das ist keine Windows-/Linux-
 Bedienabnahme. Logs: build/rules-density-proof/{before,after}.log und
 rules-density-final-2x-check.log. Neues Paket und neue native Abnahme folgen.
+
+
+Das abschließende, korrigierte Intel-Paket 0.9.10 zu f3a758e besteht mit
+126 Desktop-, 142 Tastatur- und 75 Sicherungsassertions, zwei Einstellungs-
+Neustartprozessen und dem produktiven Sicherungswerkzeug. Archiv-SHA-256:
+`110062f29d98ca0f9150e39cc4985cde03d3e8c34dcaee436588a67ff9893bbb`. Log: build/rules-verified-package-check.log.
+dist/SecondBrain enthält dieses Paket mit Buildkennung f3a758eb61d9. Die frühere lokale Kopie
+ist unter /Users/lulus/Projects/SecondBrain/build/rules-verified-previous-dist-20261007-132843 erhalten. Das eigene Projektgedächtnis wurde mit dem Paket
+geladen und als Raster betrachtet. [Neue native Abnahme](https://github.com/Lulus792/SecondBrain/actions/runs/37613957814)
+läuft noch; insbesondere die früher fehlerhaften Kontrastfälle werden erst anhand
+ihrer tatsächlich abgeschlossenen neuen Ergebnisse abgenommen.

@@ -21,14 +21,16 @@ und ein sichtbarer Hilfe-Punkt sind umgesetzt. Nach Paddingkorrektur bestehen
 alle 33 lokalen Intel/macOS-Release-Tests (195,44 s), darunter 342 native Assertions.
 181.838 Blockassertions und eigene ASan/UBSan-Instrumentierung bestehen; vorheriger
 Blockleser scheitert. Das entpackte erste Paket besteht mit Desktop 126, Tastatur
-142, Sicherung 75, Neustart und CLI. dist enthält 0.9.10, Build 92b293a68167.
+142, Sicherung 75, Neustart und CLI. Das korrigierte Paket besteht ebenfalls mit allen genannten Paketwegen;
+dist enthält 0.9.10, Build f3a758eb61d9.
 
 Erste neue Windows-/Linux-CI scheitert am Kontrastpixel. Ein tatsächliches lokales
 1x-Fenster reproduziert Grau statt des vorgesehenen deckenden Kerns. Die Linie
 hat im Kontrastmodus jetzt ausreichende integrale Stärke. Nachprüfung mit 352
 Assertions besteht bei 1x/2x-Pixeldichte und 100/200 Prozent Schriftgröße; strenge
-Farbanforderung bleibt erhalten. Neues Paket und neue native CI folgen nach Push.
-UI-Bericht: ../../../../UI_reviewer/reviews/secondbrain/2026-10-07_13-01-27/UI_REVIEW.md.
+Farbanforderung bleibt erhalten. Die neue native CI 37613957814 läuft; tatsächliche
+Windows-/Linux- und Mac-Ergebnisse übernehmen.
+UI-Bericht: ../../../UI_reviewer/reviews/secondbrain/2026-10-07_13-01-27/UI_REVIEW.md.
 
 0.9.9 zu 099de24 besteht unter Windows/Linux einschließlich Debug/Release und
 Paketen; Mac-Jobs stehen noch aus. Ein früherer einzelner Windows-Debug-Kernfehler
