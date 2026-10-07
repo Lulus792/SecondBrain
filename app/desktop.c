@@ -1352,7 +1352,10 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
         if (block.kind==SB_MD_RULE) {
             nk_layout_row_dynamic(ctx,24*d->ui.scale,1);
             struct nk_rect bounds=nk_widget_bounds(ctx);
-            struct nk_rect line=nk_rect(bounds.x,bounds.y+(bounds.h-d->ui.scale)/2,bounds.w,d->ui.scale);
+            /* Nuklear stores integral stroke widths. Keep an opaque center in
+               contrast mode even on a display with one pixel per point. */
+            float thickness=d->ui.contrast ? ceilf(fmaxf(d->ui.scale,fmaxf(2,3/fmaxf(1,d->ui.density)))) : d->ui.scale;
+            struct nk_rect line=nk_rect(bounds.x,bounds.y+(bounds.h-thickness)/2,bounds.w,thickness);
             nk_spacer(ctx);
             struct nk_color color=ctx->style.text.color;
             if (!d->ui.contrast) color.a=110;

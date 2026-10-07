@@ -240,6 +240,8 @@ int main(int argc,char **argv) {
         CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
     }
     SBStyleChoice previous_style=d.requested_style;
+    for (unsigned size=0;size<2;++size) {
+    OK(sb_ui_fonts(&d.ui,size ? 2 : 1)); d.reset_reader=true;
     sb_desktop_set_style(&d,(SBStyleChoice){.dark=false,.contrast=true}); frame(&d); frame(&d);
     CHECK(d.ui.contrast && !d.ui.dark);
     SDL_Surface *pixels=SDL_RenderReadPixels(d.ui.renderer,NULL); CHECK(pixels);
@@ -254,10 +256,14 @@ int main(int argc,char **argv) {
         CHECK(SDL_ReadSurfacePixel(pixels,(int)((bounds.x+bounds.w/2)*d.ui.density),
             (int)((bounds.y+bounds.h/2)*d.ui.density),&red,&green,&blue,&alpha));
         struct nk_color ink=d.ui.ctx->style.text.color;
+        printf("Separator pixel density %.2f at %.2f: RGB %u/%u/%u, expected %u/%u/%u\n",d.ui.density,
+            (bounds.y+bounds.h/2)*d.ui.density,red,green,blue,ink.r,ink.g,ink.b);
+        fflush(stdout);
         separator_pixel=abs((int)red-ink.r)<=1 && abs((int)green-ink.g)<=1 && abs((int)blue-ink.b)<=1;
     }
     SDL_DestroySurface(pixels); CHECK(separator_pixel);
-    OK(sb_path_join(dump_path,sizeof(dump_path),root,"markdown-rules-contrast.bmp")); CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    OK(sb_path_join(dump_path,sizeof(dump_path),root,size ? "markdown-rules-contrast.bmp" : "markdown-rules-contrast-normal.bmp")); CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    }
     sb_desktop_set_style(&d,previous_style);
     char *saved_separators=NULL; OK(sb_note_load(&d.model.project,d.model.path,&saved_separators,NULL));
     CHECK(!strcmp(saved_separators,separators)); free(saved_separators);

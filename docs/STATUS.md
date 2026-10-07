@@ -1283,3 +1283,19 @@ Das ist keine Abnahme der neuen 0.9.10. Verbleibende Markdown-Container, Bidi,
 Textgeometrie, native Matrixschnittstellen und menschliche Bedienabnahme bleiben offen.
 
 Die abschließende native Teilprüfung umfasst 342 Assertions.
+
+
+Die [erste native 0.9.10-Abnahme zu 92b293a](https://github.com/Lulus792/SecondBrain/actions/runs/37612203745)
+scheitert in Windows/Linux Release am realen Kontrastpixel; Rollen und Abstände
+bestehen bis dahin. Lokal mit einem tatsächlichen SDL-Fenster ohne das High-
+Pixel-Density-Flag reproduziert: Pixeldichte 1, RGB 128/128/128 statt 0/0/0.
+Die dünne geglättete Linie hat dort keinen deckenden Kern. Im Kontrastmodus
+verwendet die Produktion jetzt mindestens zwei integrale logische Stricheinheiten
+und mindestens drei Rasterpixel; der übrige Modus behält seine dezente Linie.
+Native Rechtecke verwenden dieselbe tatsächliche Stärke. Das Farbkriterium bleibt
+streng; es wird nicht auf Grau gelockert. Nachprüfung besteht mit 352 Assertions
+bei realer Pixeldichte 2 und in der lokalen 1x-Fensterfixture, jeweils bei 100/200
+Prozent Schriftgröße. Beide liefern RGB 0/0/0. Die Fixture verändert nur das
+Fensterflag, keine vorgegebenen Rückgabewerte. Das ist keine Windows-/Linux-
+Bedienabnahme. Logs: build/rules-density-proof/{before,after}.log und
+rules-density-final-2x-check.log. Neues Paket und neue native Abnahme folgen.
