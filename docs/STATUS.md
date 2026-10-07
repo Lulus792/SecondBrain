@@ -1243,3 +1243,9 @@ Ein absichtlich fehlschlagender lokaler CTest bestätigt erhaltenen Fehlerstatus
 Ursachen-Annotation und Prozent-Escaping; Log unter build/core-diagnostic-proof.
 Die neue YAML-Workflowstruktur ist gelesen und geprüft. Dies ist Diagnoseverbesserung,
 keine behauptete Behebung des unbekannten Windows-Fehlers; neuer nativer Lauf folgt.
+
+Nach Veröffentlichung als 099de24 sind die neuen Formulare im Repository.
+Der Prüftab für GitHubs Formularauswahl wird auf die Anmeldung umgeleitet;
+die tatsächliche Serverdarstellung ist damit noch nicht abgenommen. Es wurde
+kein Testissue versendet und keine Anmeldung vorgenommen. Die neue native
+Abnahme 37609566084 ist gestartet; konkrete Ergebnisse folgen separat.

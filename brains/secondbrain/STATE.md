@@ -67,8 +67,9 @@ Korrektur plus zusätzlicher Zerlegungsprüfung besteht lokal mit 46 Assertions
 und ASan/UBSan; neue native Abnahme folgt nach Push. Keine vollständige neue
 Plattformabnahme behaupten. [Originalnachweise](../../docs/STATUS.md).
 
-Support-/Beitrags-/Issue-Vorlagen und Abhängigkeitsupdate-Ablauf sind vorbereitet;
-YAML und lokale Verweise geprüft. Vertraulicher Sicherheitskanal ist angefragt.
+Support-/Beitrags-/Issue-Vorlagen und Abhängigkeitsupdate-Ablauf sind als 099de24
+gepusht; YAML und lokale Verweise geprüft. GitHub verlangt für die tatsächliche
+Formularansicht eine Anmeldung; diese Darstellung ist noch nicht abgenommen. Vertraulicher Sicherheitskanal ist angefragt.
 Der neue native Nachlauf 37608867987 meldet einen Windows-Debug-Kernfehler ohne
 brauchbare Ursache; Workflow ergänzt vorhandene CTest-Diagnose und Logs.
 Lokale Fehlerprovokation bestätigt den Diagnosepfad, die eigentliche Ursache
