@@ -7,6 +7,28 @@ import sys
 import tempfile
 import time
 
+
+def wait_checkpoint(marker, proc, phase, timeout=30):
+    deadline = time.monotonic() + timeout
+    last_error = None
+    while True:
+        try:
+            text = marker.read_text(encoding='utf-8')
+        except (FileNotFoundError, PermissionError) as error:
+            # CREATE_NEW exposes the name before the writer closes its handle.
+            # Windows denies the read while that exclusive handle is open.
+            last_error = error
+        else:
+            if text.endswith('\n'):
+                fields = text.split()
+                if len(fields) != 2 or not all(value.isdecimal() for value in fields) or int(fields[0]) != phase:
+                    raise AssertionError('Unexpected checkpoint contents: ' + repr(text))
+                return
+        if proc.poll() is not None or time.monotonic() >= deadline:
+            raise AssertionError(f'Checkpoint not reached: phase={phase}, exit={proc.poll()}, last_error={last_error}')
+        time.sleep(0.02)
+
+
 def main():
     worker, cli, test_root = map(Path, sys.argv[1:])
     worker, cli = worker.resolve(), cli.resolve()
@@ -51,12 +73,7 @@ def main():
                                  identity, str(phase), str(marker)], stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
-            deadline = time.monotonic() + 30
-            while not marker.exists():
-                if proc.poll() is not None or time.monotonic() >= deadline:
-                    raise AssertionError(f"Checkpoint not reached: {operation}/{phase}, exit={proc.poll()}")
-                time.sleep(0.02)
-            assert int(marker.read_text().split()[0]) == phase
+            wait_checkpoint(marker, proc, phase)
             assert proc.poll() is None, "worker must still be frozen"
             proc.kill()  # SIGKILL on POSIX; TerminateProcess on Windows.
             proc.communicate(timeout=10)

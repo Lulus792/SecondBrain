@@ -97,3 +97,8 @@ RUNNER~1 wird mit korrekt aufgelöstem runneradmin-Pfad als Text verglichen.
 Fixture vergleicht jetzt kanonische Pfade; reale Aliasprobe und insgesamt
 26 Python-Tests bestehen lokal. Windows-Nachprüfung folgt. GitHub-API aktuell
 rate-limited; das ist keine Aussage über den terminalen Status laufender Jobs.
+
+CI edfa86b bestätigt Windows-Debug; Release findet eine Marker-Lesesperre
+in der Abbruchprobe. Begrenzte Synchronisation korrigiert und lokal mit
+3 Prozessfällen, 6 Produktionsabbrüchen und 29 Python-Tests geprüft.
+Neue Windows-/Gesamtabnahme folgt; Rust-Sammlung ist noch in Arbeit.

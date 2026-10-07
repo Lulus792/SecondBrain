@@ -2043,3 +2043,21 @@ einen Symlink; Windows behält seine drei nativen TEMP-Pfadfälle ohne zusätzli
 Symlink-Rechte. Neue Windows-Ausführung und Gesamtabnahme bleiben ausstehend.
 Die öffentliche GitHub-API meldet bei der letzten Abfrage ein Rate-Limit;
 weiteres Polling wird bis zu neuer Zugriffsmöglichkeit unterlassen.
+
+
+## Windows-Abbruchkontrollpunkt synchronisiert
+
+[CI zu edfa86b](https://github.com/Lulus792/SecondBrain/actions/runs/37693298342)
+besteht in Windows-Debug und in den zuletzt abgeschlossenen Linux-/macOS-
+Varianten. Windows-Release scheitert allein beim Kontrollpunktlesen der
+Prozessabbruchprobe: PermissionError für checkpoint.txt. Der C-Worker erzeugt
+die Datei mit exklusivem Windows-Handle; ihr Name ist vor dessen Schließen sichtbar.
+
+Die Probe wartet jetzt begrenzt auf einen lesbaren vollständigen Kontrollpunkt,
+prüft Phase und Worker-Lebensdauer und führt denselben harten Abbruch aus.
+Falsche Phasen, abgelaufene Wartezeit und ein beendeter Worker bleiben Fehler.
+Eine unabhängige echte Datei-/Prozessprobe schreibt verzögert; unter Windows
+verwendet sie einen exklusiven Handle. Lokal bestehen 3 Synchronisationsfälle,
+die 6 Produktions-Abbruch-/Wiederanlauffälle und 29 Python-Unittests.
+Logs: build/checkpoint-{wait-check,crash-check,python-check}.log.
+Die tatsächliche neue Windows-Handle-Probe und Gesamt-CI stehen aus.
