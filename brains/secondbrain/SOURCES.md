@@ -63,3 +63,9 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 
 - [Anforderungen und Abnahme](knowledge/anforderungen.md).
 - [Pflege des gemeinsamen Gedächtnisses](knowledge/pflege.md).
+
+## Support und Mitarbeit
+
+- [Support](../../SUPPORT.md): öffentliche Meldungen, benötigte Angaben und Grenzen.
+- [Beiträge](../../CONTRIBUTING.md): Architekturvorgaben und Prüfwege für Änderungen.
+- [Abhängigkeitswartung](../../docs/ABHAENGIGKEITEN_WARTUNG.md): feste Quellen und Updateablauf.

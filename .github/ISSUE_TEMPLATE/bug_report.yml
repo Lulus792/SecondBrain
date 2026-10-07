@@ -1,0 +1,73 @@
+name: Fehler melden
+description: Einen Fehler in der Anwendung nachvollziehbar beschreiben.
+title: "Fehler: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Prüfe zuerst die vorhandenen Issues. Diese Meldung ist öffentlich:
+        bitte neutrale Testinhalte verwenden und keine privaten Notizen,
+        Zugangsdaten oder Sicherheitslücken veröffentlichen.
+  - type: textarea
+    id: build
+    attributes:
+      label: Version und Build
+      description: "Darstellung → Über SecondBrain → Buildangaben kopieren, oder secondbrain --version."
+      render: text
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Betriebssystem
+      options:
+        - macOS
+        - Windows
+        - Linux
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Systemversion und Prozessor
+      placeholder: "Zum Beispiel macOS 14.6.1, Intel x64"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Schritte zum Wiederholen
+      description: "Ausgangszustand und Bedienweg nennen, möglichst mit einem kleinen Testprojekt."
+      placeholder: |
+        1. Anwendung starten und ...
+        2. ...
+        3. Der Fehler tritt auf, wenn ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Erwartetes Verhalten
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Tatsächliches Verhalten
+      description: "Falls vorhanden, die Meldung über Meldung kopieren übernehmen."
+    validations:
+      required: true
+  - type: textarea
+    id: display
+    attributes:
+      label: Darstellung und Eingabe
+      description: "Bei UI-Fehlern Fenstergröße, Schriftgröße, Bildschirm-Skalierung, Maus/Tastatur und gegebenenfalls Screenreader nennen."
+    validations:
+      required: false
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Ergänzende Aufnahme oder Log
+      description: "Optional. Persönliche Angaben vorher entfernen; keine vollständigen Projektordner oder Sicherungen hochladen."
+    validations:
+      required: false

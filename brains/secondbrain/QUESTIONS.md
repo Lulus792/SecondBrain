@@ -45,3 +45,10 @@ Sie sind noch keine Implementierungsaufträge oder zugesagten Funktionen.
 - Werden signierte Pakete, Installer und dauerhafte Release-Downloads benötigt?
 
 Anforderungen und Abgrenzung: [Projektauftrag](PROJECT.md).
+
+## Vertrauliche Sicherheitsmeldungen
+
+Am 7. Oktober angefragt: GitHub Private Vulnerability Reporting oder eigene
+Kontaktadresse. Die öffentlichen Fehlerformulare sind ein anderer Weg.
+Aktivierung/Erreichbarkeit und tatsächliche Nutzung des gewählten Kanals bleiben
+bis zur Entscheidung und Prüfung offen. Keine vertraulichen Inhalte in Issues.

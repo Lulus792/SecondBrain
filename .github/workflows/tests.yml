@@ -90,7 +90,18 @@ jobs:
       - name: Build native core and tools
         run: cmake --build build/native --config ${{ matrix.config }} --parallel
       - name: Verify native project workflow
-        run: ctest --test-dir build/native -C ${{ matrix.config }} --output-on-failure
+        run: cmake -DSB_TEST_DIR=build/native -DSB_TEST_CONFIG=${{ matrix.config }} -P tools/test_checked.cmake
+      - name: Publish failed core test diagnostics
+        if: failure()
+        run: cmake -DSB_TEST_LOG=build/native/Testing/Temporary/LastTest.log -P tools/ci_diagnostics.cmake
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: Core-evidence-${{ runner.os }}-${{ matrix.config }}
+          path: |
+            build/native/Testing/Temporary/LastTest.log
+            build/native/checked-ctest.log
+          retention-days: 30
   tests:
     name: ${{ matrix.os }} / Python ${{ matrix.python }}
     runs-on: ${{ matrix.os }}

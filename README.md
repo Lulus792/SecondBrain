@@ -188,4 +188,5 @@ ab 0.9.3 die mitgelieferten Originaltexte direkt in der App lesen und kopieren.
 [Bedienung und Umfang](docs/LIZENZEN.md).
 
 Fehlerberichte sollten Betriebssystem, Version, Schritte zum Wiederholen und das
-beobachtete Verhalten enthalten. [GitHub Issues](https://github.com/Lulus792/SecondBrain/issues).
+beobachtete Verhalten enthalten. [Hilfe und Fehlermeldungen](SUPPORT.md),
+[Mitarbeit](CONTRIBUTING.md) und [GitHub Issues](https://github.com/Lulus792/SecondBrain/issues).

@@ -1222,3 +1222,24 @@ ASan/UBSan-Nachprüfung ebenfalls; frühere Fallback-Fassung scheitert weiter.
 Logs: build/emoji-rounding-check.log, emoji-sanitize/rounding-result.log und
 emoji-regression/rounding-result.log. Neuer nativer Lauf folgt nach Push.
 Diese Testkorrektur verändert das bereits gepackte Anwendungsprogramm nicht.
+
+
+## Support und nachvollziehbare Kernfehler
+
+Am 7. Oktober sind öffentliche Fehler-/Vorschlagsformulare, SUPPORT.md,
+CONTRIBUTING.md, PR-Vorlage und ein dokumentierter UI-Abhängigkeitsupdate-Ablauf
+vorbereitet. Die drei Formular-/Konfigurationsdateien sind mit Psych als YAML
+geprüft; lokale Dokumentverweise sind aufgelöst. GitHub-Serverdarstellung folgt
+nach Veröffentlichung. Das eigene C-Programm und das geprüfte Paket bleiben unverändert.
+Vertraulicher Sicherheitskanal ist angefragt; eine Vorlage aktiviert ihn nicht.
+Vollständige transitive Lizenzzuordnung und Wartungsverantwortlichkeit bleiben offen.
+
+Der [0.9.9-Nachlauf zu 1b17738](https://github.com/Lulus792/SecondBrain/actions/runs/37608867987)
+findet zusätzlich einen Windows-Debug-Kernfehler im CTest-Schritt. Die bisherige
+Annotation enthält nur Exit 1; konkrete Ursache ist noch nicht festgestellt.
+Der Kernworkflow benutzt jetzt wie die UI den vorhandenen CTest-Wrapper, veröffentlicht
+passende Fehlerblöcke und bewahrt LastTest.log/checked-ctest.log als Artefakt.
+Ein absichtlich fehlschlagender lokaler CTest bestätigt erhaltenen Fehlerstatus,
+Ursachen-Annotation und Prozent-Escaping; Log unter build/core-diagnostic-proof.
+Die neue YAML-Workflowstruktur ist gelesen und geprüft. Dies ist Diagnoseverbesserung,
+keine behauptete Behebung des unbekannten Windows-Fehlers; neuer nativer Lauf folgt.

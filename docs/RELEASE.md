@@ -76,6 +76,10 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   Abhängigkeiten und übernommenen Anpassungen vollständig zuordnen, Fehler- und
   Sicherheitsmeldungen sowie Wartung der UI-Abhängigkeiten organisieren. Ab 0.9.3
   stehen mitgelieferte Originaltexte direkt in der [App-Lizenzansicht](LIZENZEN.md).
+  Fehler-/Vorschlagsformulare, [Supporthinweise](../SUPPORT.md),
+  [Beitragsregeln](../CONTRIBUTING.md) und ein
+  [Ablauf für Abhängigkeitsupdates](ABHAENGIGKEITEN_WARTUNG.md) sind vorbereitet.
+  Vertraulicher Sicherheitskanal und vollständige transitive Lizenzprüfung bleiben offen.
 - [ ] **Endprodukt redaktionell prüfen:** kurze, natürliche Texte in App, Hilfe,
   Fehlermeldungen, Vorlagen und README; keine generischen Werbesätze oder unnötige
   Technik im normalen Bedienweg. Diese abschließende Bereinigung erfolgt auf

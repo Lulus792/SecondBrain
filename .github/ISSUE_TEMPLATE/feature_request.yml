@@ -1,0 +1,24 @@
+name: Verbesserung vorschlagen
+description: Eine konkrete Aufgabe oder einen Bedienablauf verbessern.
+title: "Vorschlag: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Welche Aufgabe ist derzeit umständlich oder nicht möglich?
+      description: "Beschreibe den Ablauf mit neutralen Beispielen."
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Gewünschtes Ergebnis
+      description: "Was soll mit der Anwendung möglich sein?"
+    validations:
+      required: true
+  - type: textarea
+    id: approach
+    attributes:
+      label: Mögliche Umsetzung oder Alternativen
+    validations:
+      required: false

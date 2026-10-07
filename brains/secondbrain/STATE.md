@@ -67,6 +67,13 @@ Korrektur plus zusätzlicher Zerlegungsprüfung besteht lokal mit 46 Assertions
 und ASan/UBSan; neue native Abnahme folgt nach Push. Keine vollständige neue
 Plattformabnahme behaupten. [Originalnachweise](../../docs/STATUS.md).
 
+Support-/Beitrags-/Issue-Vorlagen und Abhängigkeitsupdate-Ablauf sind vorbereitet;
+YAML und lokale Verweise geprüft. Vertraulicher Sicherheitskanal ist angefragt.
+Der neue native Nachlauf 37608867987 meldet einen Windows-Debug-Kernfehler ohne
+brauchbare Ursache; Workflow ergänzt vorhandene CTest-Diagnose und Logs.
+Lokale Fehlerprovokation bestätigt den Diagnosepfad, die eigentliche Ursache
+bleibt bis zum neuen nativen Lauf offen.
+
 Danach verbleibende Container-/Inline-/Listenregeln,
 Unicode-Textgeometrie/IME, Support-/Lizenzzuordnung und übrige Release-Aufgaben.
 Tatsächliche native Dialog- und menschliche VoiceOver/NVDA/Orca-Bedienung,
