@@ -1093,3 +1093,10 @@ Windows Debug / native-accessibility / Timeout 120s. Die erfolgreichen Pakete
 belegen ihren konkreten Release-Ablauf, ersetzen aber keinen grünen Debug-Job.
 
 UI-Nachprüfung SBUI-037: /Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-07_10-49-33/UI_REVIEW.md.
+
+
+Nachprüfung zu 2edb2bf am 7. Oktober: Der neue native Lauf 37596496154 besteht
+inzwischen für Windows und Linux in Debug und Release, einschließlich der
+nativen Prüfung und der jeweiligen entpackten Release-Pakete. Windows Debug
+ist damit nach dem vorherigen nativen Timeout wieder vollständig erfolgreich.
+Die noch laufenden/ausstehenden Mac-Jobs werden separat nach Abschluss bewertet.

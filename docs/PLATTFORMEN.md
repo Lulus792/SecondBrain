@@ -552,3 +552,10 @@ Der 0.9.6-Lauf 37593650781 ist inzwischen abgeschlossen: 19 von 20 Jobs bestehen
 einschließlich aller vier entpackten Release-Pakete. Einziger Fehler bleibt
 Windows Debug / native-accessibility / Timeout 120s. Die erfolgreichen Pakete
 belegen ihren konkreten Release-Ablauf, ersetzen aber keinen grünen Debug-Job.
+
+
+Nachprüfung zu 2edb2bf am 7. Oktober: Der neue native Lauf 37596496154 besteht
+inzwischen für Windows und Linux in Debug und Release, einschließlich der
+nativen Prüfung und der jeweiligen entpackten Release-Pakete. Windows Debug
+ist damit nach dem vorherigen nativen Timeout wieder vollständig erfolgreich.
+Die noch laufenden/ausstehenden Mac-Jobs werden separat nach Abschluss bewertet.

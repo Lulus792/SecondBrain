@@ -46,7 +46,8 @@ bei native-accessibility. Die Prüfrasterarbeit ist reduziert, Zustände und
 Endbilder bleiben geprüft. Neuer nativer Nachweis ist dafür erforderlich.
 Das entpackte Intel-Paket einschließlich Desktop, Tastatur, Sicherung, Neustart
 und CLI besteht. Die [neue native Abnahme](https://github.com/Lulus792/SecondBrain/actions/runs/37596496154)
-läuft noch; tatsächliche Ergebnisse übernehmen und Windows Debug nachprüfen.
+besteht inzwischen für Windows und Linux in beiden Buildprofilen; der native
+Windows-Debug-Timeout ist nachgeprüft behoben. Restliche Mac-Jobs noch abnehmen.
 Danach verbleibende Container-/Inline-/Listenregeln,
 Unicode-Textgeometrie/IME, Support-/Lizenzzuordnung und übrige Release-Aufgaben.
 Tatsächliche native Dialog- und menschliche VoiceOver/NVDA/Orca-Bedienung,
