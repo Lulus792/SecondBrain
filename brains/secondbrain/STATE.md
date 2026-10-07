@@ -80,3 +80,7 @@ Testframes 81,55 → 4,88 s. Saubere Paketierung und Installation bestehen.
 
 [Quell-CI zu 1f1e23c](https://github.com/Lulus792/SecondBrain/actions/runs/37690493714)
 ist beim Abschluss queued; neuer Gesamt-Plattformnachweis steht aus.
+
+CI-Einstieg normalisiert native CMake-Pfade; Python meldet auch fehlende Logs
+und erhält frühen Fehlerkontext. 7 Prozessfälle, 23 Python-Unittests und
+31/31 lokale Release-Kernprüfungen bestehen. Neue Windows-Abnahme folgt.

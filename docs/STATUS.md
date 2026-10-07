@@ -1992,3 +1992,16 @@ Arbeit bleiben offen; 1.0 ist nicht gesetzt.
 
 [Quell-CI zu 1f1e23c](https://github.com/Lulus792/SecondBrain/actions/runs/37690493714)
 ist beim Abschluss queued; neuer Gesamt-Plattformnachweis steht aus.
+
+
+## Native CI-Pfade und Fehlerberichte
+
+Nach Auswertung von CI 37690493714 werden Testverzeichnisse ab dem nativen
+Python-Einstieg mit vorwärts gerichteten CMake-Pfadtrennern übergeben. UI-/
+Core-Eintragslogs werden direkt durch Python gelesen; fehlende Logs erhalten
+eine eigene Annotation, frühe Fehler ihren Kontext. Der CTest-Auftrag bleibt
+unverändert. Sieben reale Prozess-/Diagnosefälle, 23 Python-Unittests und der
+volle lokale Release-Kernlauf über diesen Einstieg bestehen (31/31 in 54,71 s).
+Logs: build/ci-path-{report-check,python-check,core-check}.log.
+Neue Windows-Abnahme steht aus; die Pfadkorrektur ist noch keine bestätigte
+Behebung aller dortigen Prüffehler. Die installierte Mac-App bleibt 0.9.21.

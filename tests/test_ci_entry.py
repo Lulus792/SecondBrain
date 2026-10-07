@@ -63,6 +63,26 @@ class EntryTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0)
             self.assertIn(b'ValueError: original license hash mismatch', result.stdout)
 
+    def test_native_report_preserves_error_context_and_escapes_annotations(self):
+        with tempfile.TemporaryDirectory(prefix='SecondBrain ü ') as temporary:
+            log = Path(temporary) / 'entry.log'
+            log.write_text('AssertionError: checkpoint 100%\nDirectory not found\n' + 'Passed\n' * 1000,
+                           encoding='utf-8')
+            result = subprocess.run([sys.executable, str(ROOT / 'tools/ci_log_report.py'),
+                                     '--log', str(log), '--title', 'Fixture'],
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            self.assertEqual(result.returncode, 0)
+            self.assertIn(b'checkpoint 100%25%0ADirectory not found', result.stdout)
+            self.assertEqual(result.stdout.count(b'::error'), 1)
+
+    def test_native_report_identifies_absent_log(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            result = subprocess.run([sys.executable, str(ROOT / 'tools/ci_log_report.py'),
+                                     '--log', str(Path(temporary) / 'missing.log')],
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            self.assertEqual(result.returncode, 0)
+            self.assertIn(b'No entry log exists:', result.stdout)
+
 
 if __name__ == '__main__':
     unittest.main()

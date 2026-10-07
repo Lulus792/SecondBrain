@@ -33,7 +33,7 @@ def main():
         if not cmake:
             write(b'Failed before CTest: CMake not found\n')
             return 1
-        command = [cmake, '-DSB_TEST_DIR=' + str(directory),
+        command = [cmake, '-DSB_TEST_DIR=' + directory.as_posix(),
                    '-DSB_TEST_CONFIG=' + args.config, '-P',
                    str(Path(__file__).resolve().with_name('test_checked.cmake'))]
         try:

@@ -45,8 +45,7 @@ jobs:
         run: python tools/test_entry.py --test-dir build/ui --config ${{ matrix.config }} --log build/ui/test-entry.log
       - name: Publish test entry diagnostics
         if: failure()
-        shell: bash
-        run: cmake -DSB_DIAGNOSTIC_LOG=build/ui/test-entry.log "-DSB_DIAGNOSTIC_TITLE=UI test entry" -P tools/ci_log_report.cmake
+        run: python tools/ci_log_report.py --log build/ui/test-entry.log --title "UI test entry"
       - name: Publish failed test diagnostics
         if: failure()
         run: cmake -DSB_TEST_LOG=build/ui/Testing/Temporary/LastTest.log -P tools/ci_diagnostics.cmake
@@ -106,7 +105,10 @@ jobs:
       - name: Build native core and tools
         run: cmake --build build/native --config ${{ matrix.config }} --parallel
       - name: Verify native project workflow
-        run: cmake -DSB_TEST_DIR=build/native -DSB_TEST_CONFIG=${{ matrix.config }} -P tools/test_checked.cmake
+        run: python tools/test_entry.py --test-dir build/native --config ${{ matrix.config }} --log build/native/test-entry.log
+      - name: Publish core test entry diagnostics
+        if: failure()
+        run: python tools/ci_log_report.py --log build/native/test-entry.log --title "Core test entry"
       - name: Publish failed core test diagnostics
         if: failure()
         run: cmake -DSB_TEST_LOG=build/native/Testing/Temporary/LastTest.log -P tools/ci_diagnostics.cmake
@@ -117,6 +119,7 @@ jobs:
           path: |
             build/native/Testing/Temporary/LastTest.log
             build/native/checked-ctest.log
+            build/native/test-entry.log
           retention-days: 30
   tests:
     name: ${{ matrix.os }} / Python ${{ matrix.python }}
