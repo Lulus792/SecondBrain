@@ -42,8 +42,8 @@ Empfänger werden vor OS-Übergabe kodiert. 37 Release-Tests, 19 Originalfälle,
 bestehen lokal; Raster betrachtet. UI-Bericht SBUI-050/051. Reale Mail-App
 nicht bedient. Neues Intel/macOS-Paket besteht; dist enthält 0.9.15,
 Build 9e6cd5675f78. Eigenes Gedächtnis geladen, Raster betrachtet.
-Quellcommit 9e6cd56 ist lokal gesichert; vier GitHub-Pushes scheitern mit
-serverseitigem Internal Server Error. Neuer Plattformnachweis fehlt bis zum Push.
+Quellcommit 9e6cd56 ist lokal gesichert; vier GitHub-Pushes scheiterten damals mit
+serverseitigem Internal Server Error. Der nachfolgende erfolgreiche Push enthält diese Commits.
 Referenzlinks wurden danach in der folgenden Version integriert.
 
 ## Neue Arbeit 0.9.16
@@ -54,12 +54,15 @@ Originalbytes geprüft. Scrollschiene/Fokusrand sind mit festem Inhaltsrand
 getrennt; Raster sowie 100/200-Prozent-Geometrie betrachtet. Alle 40 abschließenden
 Release-Tests, 433 native Sanitizerassertions, 6.030 Referenz-/1.187.526 eigene
 Inlineassertions, 81 Originalfälle und 1.606 Original-Mappings bestehen lokal.
-UI-Bericht SBUI-052/053. Neuer Paketstand folgt; dist bleibt bis dahin 0.9.15.
-GitHub-Veröffentlichung und neue Plattformnachweise sind noch ausstehend.
+UI-Bericht SBUI-052/053. Neues Intel/macOS-Paket besteht und ist installiert;
+dist enthält 0.9.16, Build b19b47624512. Eigenes Gedächtnis geladen und
+Vorschau betrachtet. Normaler Push a57bdfc..b19b476 erfolgreich; auch vorherige
+Commits sind veröffentlicht. Neue CI 37646348381 läuft: C17/Python für
+Windows/Linux bestehen, Desktop-/Paket-/Mac-Nachweise noch nicht abgeschlossen.
 
 ## Nächste Arbeit und Grenzen
 
-Ausstehende Commits normal pushen und neue CI-Nachweise übernehmen. Danach Container-/
+Neue CI-Nachweise übernehmen. Danach vollständige Container-/
 Inline-/Listenregeln, Bidi, visuelle/native Textgeometrie und IME, native Tabellen-
 Matrixschnittstellen sowie übrige Release-Aufgaben umsetzen und abnehmen.
 Support-/Beitrags-/Issue-Vorlagen und Updateablauf sind veröffentlicht; vertraulicher

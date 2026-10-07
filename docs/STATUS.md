@@ -1689,3 +1689,33 @@ Abnahme dieser Änderung ableiten. Dist enthält bis zum neuen Paket weiterhin
 0.9.15. Vollständige Container/Definitionen darin, Bidi/Textgeometrie/IME,
 Tabellenmatrix, menschliche assistive Bedienung und weitere Release-Arbeiten
 bleiben offen. Der Gesamtauftrag bleibt aktiv, 1.0 bleibt unverändert offen.
+
+
+## Abschließendes lokales Paket 0.9.16 und erfolgreicher Push
+
+Das Intel/macOS-Paket zu b19b476 besteht mit 126 Desktop-, 142 Tastatur- und
+75 Sicherungsassertions, zwei isolierten Einstellungs-Neustartprozessen sowie
+der produktiven Sicherungs-/Prüf-/Wiederherstellungs-CLI. App und CLI melden
+0.9.16, Build b19b47624512. Archiv-SHA-256:
+`99f3bd806a8321cf408968f223295c8d313c4247488577bf7caae7ffd7905963`.
+Log: build/references-package-check.log. Die vorhandene Unicode-Lizenz ist
+in Paket und Bundle enthalten. dist/SecondBrain enthält dieses geprüfte Paket;
+vorherige App unter /Users/lulus/Projects/SecondBrain/build/references-previous-dist-20261007-174739 erhalten. Das eigene Gedächtnis wurde geladen
+und die erzeugte Vorschau dist/SecondBrain/preview.png betrachtet.
+
+Der normale Push a57bdfc..b19b476 ist erfolgreich abgeschlossen. Die ausstehenden
+0.9.15-Commits und die neue 0.9.16-Implementierung sind damit veröffentlicht.
+Die vorherigen serverseitigen Abweisungen bleiben historische Zwischenstände;
+keine Historie wurde umgeschrieben.
+
+[Lauf 37646348381](https://github.com/Lulus792/SecondBrain/actions/runs/37646348381)
+prüft b19b476. Beim dokumentierten Zwischenstand bestehen die vier C17- und
+vier Python-Jobs für Windows/Linux. Die vier Desktop-Jobs laufen noch, die
+macOS-CI ist noch in der Warteschlange. Neue abgeschlossene Desktop-/Paket-
+oder ARM64-Abnahme daraus noch nicht ableiten. Nachfolgende Ergebnisse
+werden anhand des tatsächlichen Laufs übernommen.
+
+SBUI-052/053 im beschriebenen lokalen Umfang nachgeprüft; vollständige
+Container und ihre Definitionen, Bidi/Textgeometrie/IME, native Tabellenmatrix,
+menschliche assistive Bedienung und übrige Release-Aufgaben bleiben offen.
+Der vollständige Auftrag bleibt aktiv; keine Versionsnummer 1.0 gesetzt.
