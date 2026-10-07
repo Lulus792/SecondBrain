@@ -1625,3 +1625,23 @@ autolinks-ui-sanitize/result.log und autolinks-regression/{result,nested}.log.
 UI-Bericht SBUI-050/051: /Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-07_17-08-19/UI_REVIEW.md.
 Neue Paket-/Plattformabnahme folgt nach dem Quellpush; dist bleibt bis dahin
 beim geprüften 0.9.14. Der vollständige Auftrag bleibt aktiv, 1.0 unverändert offen.
+
+
+## Lokal installiertes Paket 0.9.15; GitHub-Push ausstehend
+
+Das Intel/macOS-Paket zu 9e6cd56 besteht mit 126 Desktop-, 142 Tastatur- und
+75 Sicherungsassertions, zwei isolierten Einstellungs-Neustartprozessen sowie
+der produktiven Sicherungs-/Prüf-/Wiederherstellungs-CLI. App und CLI melden
+0.9.15, Build 9e6cd5675f78. Archiv-SHA-256:
+`baeb9831bf752a095d644588f817ec48429922ba5cb42dbc19aa734644ca41f1`.
+Log: build/autolinks-package-check.log. dist/SecondBrain enthält dieses geprüfte
+Paket. Vorherige 0.9.14-App bleibt unter /Users/lulus/Projects/SecondBrain/build/autolinks-previous-dist-20261007-171235. Eigenes Projektgedächtnis
+gestartet, Raster erzeugt und dist/SecondBrain/preview.png betrachtet.
+
+Vier normale SSH-Pushes wurden am 7. Oktober zwischen 17:08 und 17:12 Europe/
+Berlin vom GitHub-Server mit Internal Server Error abgewiesen. Git ls-remote
+bestätigte weiterhin a57bdfc auf main; 9e6cd56 ist lokal erhalten. Es wurde
+keine Historie umgeschrieben. Neue Windows-/Linux-/ARM64-CI für 0.9.15 fehlt
+daher noch; frühere Abnahmen werden nicht als Nachweis dieser Änderung ausgegeben.
+Nächster Veröffentlichungsschritt ist ein normaler erneuter Push und die
+tatsächliche Plattformnachprüfung. Der vollständige Auftrag bleibt aktiv.

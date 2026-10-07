@@ -14,7 +14,7 @@ Entwürfe und erkannte Konflikte bleiben geschützt. Sicherung/Wiederherstellung
 Einstellungen, eigener Markdown-Blockleser und vollständige Graphem-Eingaben
 gehören zum bisherigen geprüften Umfang. [Verträge und Quellen](SOURCES.md).
 
-## Geprüfter Paketstand 0.9.14
+## Vorheriger Plattformstand 0.9.14
 
 [Zeichenreferenzen](../../docs/ENTITIES.md) sind im eigenen C-Leser implementiert:
 2.125 festgelegte Namen, numerische Angaben, stabile Ausgabestile, erhaltene
@@ -24,7 +24,7 @@ und Lizenzen sind zugeordnet. 36 Release-Tests, abschließende Kern-/native
 Nachprüfungen und neun Python-Strukturtests bestehen lokal. Eigene Kern-
 ASan/UBSan mit 1.194.343 Assertions besteht; letzte native Sanitizer-Nachprüfung
 besteht mit 393 Assertions. UI-Bericht SBUI-048/049. Neues Intel/macOS-Paket besteht einschließlich
-Desktop/Tastatur/Sicherung/Neustart/CLI; dist enthält 0.9.14, Build ddd2186d2ab9.
+Desktop/Tastatur/Sicherung/Neustart/CLI; der damalige Build ist ddd2186d2ab9.
 Das eigene Gedächtnis wurde geladen und die Darstellung betrachtet.
 Lauf 37639562794 zu ddd2186 besteht in allen zwölf Windows-/Linux-Jobs
 einschließlich Debug/Release und entpackter Pakete. Neue Mac-CI noch nicht
@@ -40,12 +40,15 @@ E-Mail-Autolinks und innerer Linkvorrang sind implementiert; automatische
 Empfänger werden vor OS-Übergabe kodiert. 37 Release-Tests, 19 Originalfälle,
 1.000 Adressfälle, 1.194.616 eigene Kern- und 401 native Sanitizerassertions
 bestehen lokal; Raster betrachtet. UI-Bericht SBUI-050/051. Reale Mail-App
-nicht bedient. Paket-/Plattformabnahme folgt; dist bleibt bis dahin 0.9.14.
+nicht bedient. Neues Intel/macOS-Paket besteht; dist enthält 0.9.15,
+Build 9e6cd5675f78. Eigenes Gedächtnis geladen, Raster betrachtet.
+Quellcommit 9e6cd56 ist lokal gesichert; vier GitHub-Pushes scheitern mit
+serverseitigem Internal Server Error. Neuer Plattformnachweis fehlt bis zum Push.
 Referenzlinks sind recherchiert, die dokumentweite C-Umgebung bleibt nächste Arbeit.
 
 ## Nächste Arbeit und Grenzen
 
-Verbleibende macOS-CI-Nachweise übernehmen. Danach Container-/
+Ausstehende Commits normal pushen und neue CI-Nachweise übernehmen. Danach Container-/
 Inline-/Listenregeln, Bidi, visuelle/native Textgeometrie und IME, native Tabellen-
 Matrixschnittstellen sowie übrige Release-Aufgaben umsetzen und abnehmen.
 Support-/Beitrags-/Issue-Vorlagen und Updateablauf sind veröffentlicht; vertraulicher
