@@ -29,7 +29,7 @@ class EntryTests(unittest.TestCase):
             self.assertIn('Checked test entry', detail)
             self.assertIn(str(directory), detail)
             self.assertIn('CMake exit status:', detail)
-            self.assertTrue((directory / 'checked-ctest.log').is_file())
+            self.assertTrue((directory / 'checked-ctest.log').is_file(), result.stdout.decode(errors='replace'))
             self.assertEqual(result.stdout, log.read_bytes())
 
     def test_success_with_spaces_and_unicode(self):
@@ -51,6 +51,17 @@ class EntryTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn('Checked test entry', log.read_text(encoding='utf-8', errors='replace'))
             self.assertIn('CMake exit status:', log.read_text(encoding='utf-8', errors='replace'))
+
+    def test_error_before_long_success_tail_remains_in_ci_annotation(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            log = Path(temporary) / 'entry.log'
+            log.write_text('ValueError: original license hash mismatch\n' + 'Later successful test\n' * 400,
+                           encoding='utf-8')
+            result = subprocess.run([shutil.which('cmake'), '-DSB_DIAGNOSTIC_LOG=' + str(log),
+                                     '-P', str(ROOT / 'tools/ci_log_report.cmake')],
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            self.assertEqual(result.returncode, 0)
+            self.assertIn(b'ValueError: original license hash mismatch', result.stdout)
 
 
 if __name__ == '__main__':

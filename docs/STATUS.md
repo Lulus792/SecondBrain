@@ -1956,3 +1956,19 @@ Layoutzeit von 81,55 auf 4,88 s; Gesamtlauf 183,60 auf 110,59 s. Dies sind
 Software-Renderer-Testmessungen, keine allgemeine FPS-Zusage. Logs:
 build/literal-culling-check.log und literal-culling-raster-proof.json.
 Saubere Paketierung folgt.
+
+
+## Windows-Zeilenenden und ergänzte Diagnosen
+
+CI zu 3d96c29 ([37689224148](https://github.com/Lulus792/SecondBrain/actions/runs/37689224148))
+besteht zuletzt im Linux-Release einschließlich Paket und macOS-ARM64-Release.
+Windows-Release führt die App-UI-Prüfungen erfolgreich aus, scheitert aber in
+den neuen Inventur-/Teststarter-Prüfungen. Öffentliche Annotationen zeigen
+Testnummern, noch nicht alle Ursachen. Keine komplette Windows-Abnahme behauptet.
+
+Git mit core.autocrlf=true verändert nachweislich die Bundle-Bytes ohne besondere
+Attribute. Explizite LF-Attribute erhalten beide Originalhashes exakt; lokal
+mit echten Git-Checkoutfiltern geprüft. Sieben Inventurprüfungen bestehen.
+Die CI-Fehlerausgabe erhält frühe Python-Fehler vor langen erfolgreichen
+Log-Enden; fünf echte Prozess-/Diagnoseprüfungen bestehen. Der Windows-
+Teststarterfehler bleibt bis zu genauer Diagnose und neuer Abnahme offen.
