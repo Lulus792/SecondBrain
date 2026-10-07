@@ -13,13 +13,13 @@ KI-Kontext kopieren. Lumen-Sternkarte, eigene Glaskarten/Icons, direkte Pfeil-
 navigation, Raumfahrt, weiches Scrollen und große Leseansicht sind implementiert.
 Entwürfe, Originalbytes und erkannte Konflikte bleiben geschützt.
 
-Dist enthält lokal geprüftes **0.9.21, Build d7e328d2afa2**, Intel/macOS Release.
-Die letzten drei UI-/Native-/Tastaturprüfungen bestehen. Entpacktes Paket besteht
-mit 126 Desktop-, 150 Tastatur- und 75 Sicherungsassertions, zwei Neustart-
-prozessen und produktiver CLI-Sicherung/Wiederherstellung. Beide Lizenzsammlungen
-stimmen in Paketwurzel/App bytegenau mit dem Manifest überein. Eigenes Gedächtnis
-in installierter App geladen und Raster betrachtet; seine Dateien unverändert.
-0.9.19 bleibt als Rückfallkopie in build/previous-dist-0.9.19-20261007-233745.
+Dist enthält lokal geprüftes **0.9.22, Build 4e6f15c86d71**, Intel/macOS Release.
+Saubere Versions-/Inventurprobe besteht 4/4. Entpacktes Paket besteht mit
+126 Desktop-, 157 Tastatur- und 75 Sicherungsassertions, zwei Neustartprozessen
+und produktiver CLI-Sicherung/Wiederherstellung. Alle drei Lizenzsammlungen
+stimmen in Paketwurzel/App bytegenau mit den Manifesten überein. Eigenes
+Gedächtnis in installierter App geladen und Raster betrachtet; Dateien
+unverändert. 0.9.21 bleibt in build/previous-dist-0.9.21-20261008-004632.
 
 Quellschritt 9ab187a ist normal nach origin gepusht.
 [Neue CI 37680520037](https://github.com/Lulus792/SecondBrain/actions/runs/37680520037)
@@ -107,3 +107,6 @@ CI 82c2970 besteht in allen 20 Jobs, acht Desktop-Varianten und vier Paketen.
 Windows-/Linux-Cargo bestätigen 1.98.1/48a229c. 0.9.22 ergänzt Rust-Originale
 für zwei geprüfte Quellenstände; 36 Python-Prüfungen, Ressourcen und 157
 Tastaturassertions bestehen. Paket-/neue Plattformabnahme folgen vor Installation.
+
+0.9.22-Paket und Installation sind abgeschlossen. Neue Quell-CI 37697739324
+zu 4e6f15c zuletzt queued; deren Plattformabnahme bleibt offen.

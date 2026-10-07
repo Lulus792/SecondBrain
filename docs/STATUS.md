@@ -2,7 +2,7 @@
 
 Stand: 8. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.21. Aktuell werden die Windows-CI-
+Die installierte Intel/macOS-App ist 0.9.22. Aktuell werden die Windows-CI-
 Nachprüfung und die Lizenzanteile der Rust-UI-Laufzeit weitergeführt.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -2085,3 +2085,22 @@ In-tree-/SDK-/Systemruntime-Abnahme und abweichende Toolchains bleiben offen.
 CI 37695359274 zu 82c2970 besteht in allen 20 Jobs einschließlich acht
 Desktop-Varianten und vier entpackten Release-Paketen. Die neuen 0.9.22-Daten
 sind davon getrennt; ihre Plattformabnahme folgt nach Veröffentlichung.
+
+
+## Installiertes Intel/macOS-Paket 0.9.22
+
+Sauberer Quellstand 4e6f15c86d71 ist paketiert und nach dist/SecondBrain installiert.
+Versions-/Inventurprüfungen bestehen 4/4 in 1,32 s. Entpacktes Paket besteht mit
+126 Desktop-, 157 Tastatur- und 75 Sicherungsassertions, zwei echten Neustart-
+prozessen und produktiver CLI-Sicherung/Wiederherstellung aus Unicode-Pfad.
+Alle drei Sammlungen stimmen in Paketwurzel und App bytegenau mit ihren
+Manifesten überein. Eigenes Gedächtnis geladen und Raster betrachtet, seine
+Dateien per Hashinventur unverändert. 0.9.21 bleibt als Rückfallkopie in
+build/previous-dist-0.9.21-20261008-004632. Archiv-SHA-256:
+`65055cdba294a915a6d0aac4136f5bf3d38c9e58edf45a0fd0f8cb067cff8cad`.
+Logs: build/runtime-package-{configure,build,identity,create,check}.log,
+runtime-install.json und runtime-installed-brain.log.
+
+[Neue Quell-CI 37697739324](https://github.com/Lulus792/SecondBrain/actions/runs/37697739324)
+war zuletzt queued. Neue 0.9.22-Plattformabnahme folgt; die bestätigte Gesamt-
+abnahme zu 82c2970 gehört zu 0.9.21. Übrige Release-Aufgaben bleiben offen.
