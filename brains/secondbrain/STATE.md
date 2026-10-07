@@ -16,20 +16,21 @@ gehören zum bisherigen geprüften Umfang. [Verträge und Quellen](SOURCES.md).
 
 ## Aktueller Arbeitsschritt 0.9.13
 
-Windows Debug/Release der 0.9.12-Abnahme scheitert am fehlenden FindText-Bereich;
-32 andere UI-Tests bestehen. Linux Debug/Release einschließlich Stilabfragen
-und Release-Paket besteht. [Windows-UIA-Textsuche](../../docs/UIA_TEXTSUCHE.md):
-Adapterbefund bestätigt, kleine gehashte UI-Ergänzung und fester DLL-Quellbuild
-vorbereitet. Lokale Quellen-/Lockfile-/Wiederholungsprüfungen und vier Mac-
-Nachprüfungen bestehen. Neue Windows-Kompilierung und native Abnahme folgen.
-Erster Quellbuild 37628165496 stoppt unter Windows schon bei Konfiguration;
-Ursache inzwischen belegt: native CRLF-Ausgabe statt festgelegter LF-Bytes.
-Vorbereitung erzwingt nun LF und erhält strenge Hashprüfung; vier Quellenfälle
-bestehen lokal. Windows-Konfiguration besteht nun. Zwei vom Windows-Compiler gemeldete falsche
-API-Aufrufe sind nach den Originalquellen korrigiert; neue Kompilierung und native
-Clientprüfung folgen. Intel-Paket 0.9.13 besteht; kein Windows-Nachweis.
-Keine bestätigte Windows-Behebung vorwegnehmen. UI-Bericht SBUI-047.
-Dist enthält weiter geprüftes 0.9.12, Build 4c4a51054334.
+[Windows-UIA-Textsuche](../../docs/UIA_TEXTSUCHE.md) ist tatsächlich nachgeprüft:
+Lauf 37631991014 zu 9c38604 besteht in allen zwölf Windows-/Linux-Jobs, einschließlich
+Debug/Release, nativen Stil-/FindText-Abfragen und entpackten Release-Paketen.
+Native Windows-Konfiguration erzwingt LF-Bytes; die UI-DLL verwendet den
+geprüften Patchhash 453fcaaa4faf52c87cc8f15fc50d4710540e35bc181bd6ac3daf28613ed7874a.
+Vier Quellenfälle und Fremdquellen-Abweisung bestehen lokal. UI-Bericht SBUI-047
+und vorherige Stilabnahme SBUI-046 sind im beschriebenen Windows-/Linux-Umfang
+nachgeprüft. Neue Mac-CI-Jobs warten noch; lokal 380 native, 85 Text- und 111
+Editorassertions sowie vier Nachprüfungen bestanden.
+
+Das abschließende Intel-Paket besteht mit Desktop 126, Tastatur 142, Sicherung
+75, Neustart und CLI. Dist enthält 0.9.13, Build cade9ea34b95; eigene Instanz
+geladen und Raster betrachtet, vorherige App erhalten. Die nächste C-Parserarbeit
+ist in [Zeichenreferenzen-Recherche](../../docs/ENTITIES_RECHERCHE.md) vorbereitet,
+noch nicht implementiert. Menschliche assistive und Geometrieabnahmen bleiben offen.
 
 ## Nächste Arbeit und Grenzen
 

@@ -1,6 +1,6 @@
 # Windows: Textsuche im nativen Textbereich
 
-Stand: 7. Oktober 2026, Entwicklungsschritt 0.9.13; native Abnahme noch offen.
+Stand: 7. Oktober 2026, Entwicklungsschritt 0.9.13; Windows-/Linux-Abnahme bestanden, neue Mac-CI noch offen.
 Die [erste 0.9.12-Abnahme](https://github.com/Lulus792/SecondBrain/actions/runs/37624868119)
 scheitert unter Windows Debug/Release am ersten Stilfall. HRESULT 0, aber kein
 zurückgegebener Bereich. Die tatsächlich gelesene Quelle des festgelegten
@@ -38,8 +38,8 @@ Archiv-SHA-256 `f15581c841eed0f2f6cec6a6f9b7fd4ca9d34a654546efa22ae29351efa06568
 Windows-Adapter 0.35.1: Crate-SHA-256
 `ce63f35d6bdcf59f26b76b3379063f738e6412cef46999cc772d46aa3de35adb`.
 Original src/text.rs: `7f2493b559f0b04884e201d897981a3cce47b2c571863d37ffddb1bb695e5c55`;
-geprüfte Änderung: `0fd8cba2e66e5edcaed3fa8d35572e530b7a816a1a716703e96867440709bae1`.
-Der Vorbereitungsschritt erlaubt ausschließlich Original oder exakt diese
+geprüfte Änderung: `453fcaaa4faf52c87cc8f15fc50d4710540e35bc181bd6ac3daf28613ed7874a`.
+Der Vorbereitungsschritt erlaubt Original, exakt bekannte bisherige Patchfassungen und diese endgültige
 geänderte Quelle; unbekannte Quellen werden abgewiesen.
 
 Cargo baut mit dem festen Lockfile; andere Paketversionen und Abhängigkeiten
@@ -61,7 +61,8 @@ Die tatsächlichen Windows-Stilabfragen bleiben erhalten. Zusätzliche UIA-Fäll
 prüfen ersten/letzten Treffer, Großschreibung, fehlenden Treffer, UTF-16-Indizes
 nach einem Emoji, einen Treffer am Anfang und einen begrenzten Teilbereich.
 Ausführung und entpacktes Windows-Paket werden erst anhand der neuen nativen CI
-abgenommen. Die neue Arbeit ist bis dahin noch keine bestätigte Windows-Behebung.
+abgenommen. Die neue Arbeit wurde anschließend tatsächlich unter Windows geprüft;
+den abgeschlossenen Umfang nennt der folgende Nachweis.
 Menschliche Screenreader-Bedienung und präzise Textgeometrie bleiben getrennte Abnahmen.
 
 
@@ -119,3 +120,21 @@ Original, beide exakt bekannten bisherigen Fassungen und neue LF-Fassung
 werden reproduzierbar auf diese Version gebracht; unbekannte Quellen bleiben
 abgewiesen. Vier Quellenfälle und Abweisung bestehen lokal. Windows-Kompilierung
 und native Clientausführung werden im neuen Lauf weiter geprüft.
+
+
+## Tatsächliche Windows-/Linux-Abnahme zu 9c38604
+
+Der [Lauf 37631991014](https://github.com/Lulus792/SecondBrain/actions/runs/37631991014)
+besteht unter Windows und Linux in Debug und Release, einschließlich der nativen
+Stilabfragen. Windows kompiliert die neue UI-DLL aus den festgelegten Quellen;
+die neun FindText-Fälle bestehen mit ersten/letzten Treffern, Großschreibung,
+fehlenden Treffern, Emoji-Indizes, Anfang und begrenzten Suchbereichen.
+Beide tatsächlich entpackten Release-Pakete bestehen ihre Abläufe. Insgesamt
+bestehen alle zwölf Windows-/Linux-Jobs;
+neue Mac-Jobs sind beim dokumentierten Zwischenstand noch in der Warteschlange.
+
+Damit sind FindText und die vorher fehlgeschlagenen Windows-Stilabfragen im
+automatisierten Umfang nachgeprüft. Keine menschliche NVDA-/Orca-/VoiceOver-
+Abnahme daraus ableiten. MinGW, genaue Textgeometrie und weitere Release-
+Aufgaben bleiben offen. Die strenge Quellenprüfung bleibt erhalten; der
+endgültige Patchhash lautet 453fcaaa4faf52c87cc8f15fc50d4710540e35bc181bd6ac3daf28613ed7874a.

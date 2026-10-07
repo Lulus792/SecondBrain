@@ -1492,3 +1492,35 @@ Original, beide exakt bekannten bisherigen Fassungen und neue LF-Fassung
 werden reproduzierbar auf diese Version gebracht; unbekannte Quellen bleiben
 abgewiesen. Vier Quellenfälle und Abweisung bestehen lokal. Windows-Kompilierung
 und native Clientausführung werden im neuen Lauf weiter geprüft.
+
+
+## Tatsächliche Windows-/Linux-Abnahme zu 9c38604
+
+Der [Lauf 37631991014](https://github.com/Lulus792/SecondBrain/actions/runs/37631991014)
+besteht unter Windows und Linux in Debug und Release, einschließlich der nativen
+Stilabfragen. Windows kompiliert die neue UI-DLL aus den festgelegten Quellen;
+die neun FindText-Fälle bestehen mit ersten/letzten Treffern, Großschreibung,
+fehlenden Treffern, Emoji-Indizes, Anfang und begrenzten Suchbereichen.
+Beide tatsächlich entpackten Release-Pakete bestehen ihre Abläufe. Insgesamt
+bestehen alle zwölf Windows-/Linux-Jobs;
+neue Mac-Jobs sind beim dokumentierten Zwischenstand noch in der Warteschlange.
+
+Damit sind FindText und die vorher fehlgeschlagenen Windows-Stilabfragen im
+automatisierten Umfang nachgeprüft. Keine menschliche NVDA-/Orca-/VoiceOver-
+Abnahme daraus ableiten. MinGW, genaue Textgeometrie und weitere Release-
+Aufgaben bleiben offen. Die strenge Quellenprüfung bleibt erhalten; der
+endgültige Patchhash lautet 453fcaaa4faf52c87cc8f15fc50d4710540e35bc181bd6ac3daf28613ed7874a.
+
+
+## Abschließendes lokales Intel-Paket 0.9.13
+
+Das aus dem korrigierten Quellstand gepackte Intel/macOS-Paket besteht mit
+126 Desktop-, 142 Tastatur- und 75 Sicherungsassertions, zwei Einstellungs-
+Neustartprozessen sowie der produktiven Sicherungs-/Prüf-/Wiederherstellungs-CLI.
+App und CLI melden 0.9.13, Build cade9ea34b95. Archiv-SHA-256:
+`1ac29c6ba03c8df5880f254309a2fed82c0cedd8ad1256f199805e12d6e99cde`.
+Log: build/windows-findtext-verified-package-check.log. dist/SecondBrain enthält
+dieses geprüfte Paket; vorherige App unter /Users/lulus/Projects/SecondBrain/build/windows-findtext-previous-dist-20261007-160855 erhalten. Eigenes
+Projektgedächtnis geladen und Raster betrachtet. Die neue Mac-CI bleibt separat
+zu übernehmen; die beschriebenen Windows-/Linux-Abnahmen zu 9c38604 bestehen.
+1.0, menschliche assistive Bedienung und verbleibende Release-Arbeiten bleiben offen.
