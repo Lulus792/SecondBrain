@@ -222,8 +222,8 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
     CHECK(sb_path_join(path,sizeof(path),directory,"about-small.bmp").code == SB_OK);
     CHECK(sb_ui_capture(&d->ui,path).code == SB_OK);
     CHECK(activate(d,"notice-list") && d->form==SB_FORM_NOTICE_LIST);
-    /* Resource checks cover all files; UI exercises first, long and last entry. */
-    const size_t notice_samples[]={0,14,sb_notice_count()-1};
+    /* Resource checks cover all files; UI also exercises both large collections. */
+    const size_t notice_samples[]={0,14,sb_notice_count()-2,sb_notice_count()-1};
     for (size_t sample=0;sample<sizeof(notice_samples)/sizeof(*notice_samples);++sample) {
         size_t i=notice_samples[sample];
         char notice_id[100]; snprintf(notice_id,sizeof(notice_id),"notice:%zu",i);

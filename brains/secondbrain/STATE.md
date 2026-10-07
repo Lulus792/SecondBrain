@@ -21,7 +21,9 @@ Die bisherige App 0.9.18 bleibt als Rückfallkopie in build/previous-dist-0.9.18
 
 Quellschritt 9ab187a ist normal nach origin gepusht.
 [Neue CI 37680520037](https://github.com/Lulus792/SecondBrain/actions/runs/37680520037)
-war zuletzt queued; neue Plattformnachweise zu 0.9.19 stehen aus.
+besteht in beiden macOS-Architekturen (Debug/Release) und Windows-Debug.
+Windows-Release scheitert beim UI-Teststart, ohne öffentlich lesbares Testlog;
+beide Linux-Jobs sind abgebrochen. Ursache bleibt ungeklärt, Diagnose ist angefragt.
 [Neue CI 37673520042](https://github.com/Lulus792/SecondBrain/actions/runs/37673520042)
 besteht inzwischen in allen acht Desktop-Debug/Release-Jobs auf Windows, Linux
 und macOS ARM64/Intel einschließlich entpackter Pakete. Das ist die Abnahme
@@ -41,7 +43,8 @@ gefundene Reader-/UI-Pufferfehler sind korrigiert. Gezielte ASan/UBSan besteht
 mit 128 Assertions. Endgültig 44/44 Tests in 287,66 s bestanden. Der Materialvergleich besteht in 48 exakt gleichen Rastern.
 Keine pauschale FPS- oder menschliche assistive Abnahme.
 
-Nächster Schritt: neue CI-Nachweise übernehmen und weitere Release-Arbeiten. Die C-Graphfunktion erhält den
+Nächster Schritt: Lizenzinventur abschließend prüfen/paketieren, neue CI-Nachweise
+übernehmen und weitere Release-Arbeiten. Die C-Graphfunktion erhält den
 letzten gültigen Graph. Die Desktop-Sicht
 hält ab 0.9.19 eine eigene zusammenhängende Inventur mit stabilen Kennungen.
 Gezielte Fehler-/Wiederherstellungsprüfung besteht. Neues Feedback führt zu
@@ -62,3 +65,9 @@ weitere Vollvolume-Abnahmen fehlen. CI/Raster ersetzen sie nicht.
 Der vollständige Auftrag bleibt aktiv. Eigener Code: MIT; Signaturkonten fehlen.
 1.0 erst nach ausdrücklicher Freigabe, abschließende Produkttext-Bereinigung
 nach den festgelegten Voraussetzungen. Verträge und Originale in [SOURCES](SOURCES.md).
+
+0.9.20 erweitert die Lizenzansicht mit 113 zugeordneten Cargo-Komponenten und
+SDL-/HarfBuzz-Quellenhinweisen. 47/47 CTests und nachfolgende
+gezielte Prüfungen bestehen; beide großen Sammlungen sind per Tastatur gelesen/
+kopiert. 20 Python-Prüfungen bestehen. Saubere Paketabnahme folgt; Dist bleibt 0.9.19. Rust-/Systemruntime-Abgleich
+und vollständige transitive Release-Abnahme bleiben offen.

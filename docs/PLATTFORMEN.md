@@ -827,3 +827,15 @@ Paketabläufe. Damit sind Referenzlinks, Unicode-Namen und Scroll-/Fokusabstand
 im automatisierten Umfang auf diesen beiden Plattformen nachgeprüft. Die
 neuen macOS-CI-Jobs sind beim dokumentierten Zwischenstand noch in der Warteschlange.
 Menschliche assistive Bedienung und weitere Release-Arbeiten bleiben offen.
+
+
+## 0.9.19: Ergebnis der neuen Desktop-Prüfung
+
+[Lauf 37680520037](https://github.com/Lulus792/SecondBrain/actions/runs/37680520037)
+zu 9ab187a besteht in macOS ARM64/Intel jeweils Debug/Release einschließlich
+Release-Paketen sowie Windows-Debug. Windows-Release scheitert im UI-Testschritt;
+beide Linux-Jobs sind abgebrochen. Der öffentliche Job meldet kein verfügbares
+Testlog. Ohne die anmeldepflichtigen Details bleibt die Ursache ungeklärt.
+Ab 0.9.20 schreibt der native Teststarter vor dem CMake-Aufruf ein Eintragslog;
+dieser Diagnoseschritt ist lokal mit echten CMake-/CTest-Prozessen geprüft.
+Er ersetzt weder die ausstehende Fehleranalyse noch eine neue Plattformabnahme.

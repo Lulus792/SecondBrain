@@ -1910,4 +1910,33 @@ Raster mit direktem Sternkartenfokus betrachtet. Rückfallkopie: `build/previous
 Logs: build/navigation-{package-check,install,installed-brain}.log.
 Quellschritt 9ab187a ist nach origin gepusht;
 [CI 37680520037](https://github.com/Lulus792/SecondBrain/actions/runs/37680520037)
-war zuletzt queued. Neue Windows-/Linux-/ARM64-Nachweise zu 0.9.19 stehen aus.
+besteht in macOS ARM64/Intel Debug/Release einschließlich Paketen und Windows-
+Debug. Windows-Release scheitert im UI-Testschritt; beide Linux-Jobs sind
+abgebrochen. Öffentlich fehlen Testdetails (Logs/Artefakte erfordern Anmeldung).
+Eine Ursache ist noch nicht belegt. Der nächste Lauf verwendet einen nativen
+Python-Teststarter mit früh geschriebenem Eintragslog und unverändertem CTest-
+Prüfauftrag. Vier echte CMake-/CTest-Prozessfälle bestehen lokal: Erfolg,
+Testfehler, keine Tests und fehlendes Verzeichnis, einschließlich Unicode/Leerzeichen.
+Das ist Diagnoseverbesserung, keine bestätigte Windows-Fehlerbehebung.
+
+
+## 0.9.20: UI-Lizenzinventur und mitgelieferte Originale
+
+Festgelegte Cargo-Abhängigkeiten sind gegen die durch SHA-256 geprüfte originale
+AccessKit-C-Lockdatei abgeglichen: 113 Komponenten, Mac 20 (ARM64/Intel identisch),
+Windows 24, Linux 90. 57 Original-Payloads sowie Quellenhinweise aus SDL3 und
+HarfBuzz sind gesammelt; darunter zuvor fehlende YUV-/HIDAPI-BSD-Hinweise.
+[Nachweis und offene Laufzeitanteile](LIZENZ_INVENTUR.md).
+
+23 Ressourceneinträge bestehen mit 66 Assertions. Zunächst 47/47 CTests in
+259,02 s bestanden; nach Build-Abhängigkeits- und Quellenlinkkorrektur bestehen
+Ressourcen/Tastatur/Inventur/CI-Eintrag 4/4 in 133,80 s. Sieben Inventur- und
+Fehlerprovokationsprüfungen bestehen. Der Tastaturweg liest/kopiert ausgewählte
+Texte; Ressourcenprüfungen decken sämtliche Dateien ab. Reine Lizenzänderung
+und Wiederherstellung werden beim Neubau bytegenau in App-Ressourcen übernommen.
+Zusätzliche Tastaturprobe für beide großen Sammlungen besteht in 183,62 s.
+20 Python-Unittests bestehen in 2,30 s. Lizenzlistenraster im kleinen Fenster
+mit 150 Prozent Schrift geprüft. Paketabnahme folgt; Dist bleibt bis dahin bei
+geprüftem 0.9.19. Logs: build/license-{all-check,final-targeted,keyboard-final,
+python-final}.log sowie license-resource-fixed-{change,restore}.log. Die komplette
+transitive Release-Abnahme bleibt wegen Rust-/Systemruntime-Abgleich offen.

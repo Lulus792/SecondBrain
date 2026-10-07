@@ -1,4 +1,5 @@
 #include "notices.h"
+#include "sb_ui_notice_revision.h"
 #include "platform.h"
 #include <stdlib.h>
 #include <string.h>
@@ -23,7 +24,9 @@ static const struct { const char *name,*file; } notices[]={
     {"Unicode-Daten · Unicode License V3","Unicode.txt"},
     {"Noto Emoji · SIL Open Font License","OFL-Emoji.txt"},
     {"WHATWG-Zeichenreferenzen · CC BY / BSD","WHATWG.txt"},
-    {"Noto Math · SIL Open Font License","OFL-Math.txt"}
+    {"Noto Math · SIL Open Font License","OFL-Math.txt"},
+    {"AccessKit · Unterabhängigkeiten","AccessKit-transitive.txt"},
+    {"SDL3 und HarfBuzz · Quellenhinweise","UI-source-notices.txt"}
 };
 size_t sb_notice_count(void) { return sizeof(notices)/sizeof(*notices); }
 const char *sb_notice_name(size_t index) { return index<sb_notice_count() ? notices[index].name : "Lizenzen"; }

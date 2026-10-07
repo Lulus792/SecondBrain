@@ -197,3 +197,13 @@ vollständige Mathematik-Grapheme, unverändert aus Google-Fonts-Commit
 Original-OFL unter assets/fonts/OFL-Math.txt und licenses/OFL-Math.txt, SHA-256
 `403a95275b469061b7d4371c328e0ada3bc7d63328abe2e88aad5cd243b2fe21`.
 [Vertrag und Nachweise](../docs/ENTITIES.md).
+
+## Geprüfte Unterabhängigkeiten ab 0.9.20
+
+Die [Inventur](../docs/LIZENZ_INVENTUR.md) dokumentiert 113 Cargo-Komponenten
+(20 macOS, 24 Windows, 90 Linux) aus den festgelegten Quellen.
+[Manifest](license-manifest.json) und Original-Sammlungen unter licenses/
+halten Ursprung und Hashes fest. Dazu gehören weitere SDL3-/HarfBuzz-
+Copyrightblöcke, YUV-BSD und die gewählte HIDAPI-BSD-Alternative.
+Rust-Standardbibliothek/Compilerlaufzeit und Systemanteile bleiben gesonderte
+offene Abnahmen; die Sammlung ersetzt diese Prüfung nicht.

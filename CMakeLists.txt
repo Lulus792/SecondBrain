@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-project(SecondBrain VERSION 0.9.19 LANGUAGES C)
+project(SecondBrain VERSION 0.9.20 LANGUAGES C)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
@@ -150,6 +150,18 @@ if(SB_BUILD_UI)
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/OFL.txt"
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/OFL-CJK.txt"
         "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+    # LINK_DEPENDS alone would omit Visual Studio. Track resource content in a
+    # generated include so every generator rebuilds and recopies changed notices.
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${SB_RUNTIME_NOTICES})
+    set(SB_NOTICE_HASHES "")
+    foreach(SB_NOTICE IN LISTS SB_RUNTIME_NOTICES)
+        file(SHA256 "${SB_NOTICE}" SB_NOTICE_HASH)
+        get_filename_component(SB_NOTICE_NAME "${SB_NOTICE}" NAME)
+        string(APPEND SB_NOTICE_HASHES "${SB_NOTICE_NAME}:${SB_NOTICE_HASH}\n")
+    endforeach()
+    string(SHA256 SB_NOTICE_REVISION "${SB_NOTICE_HASHES}")
+    configure_file(cmake/UiNoticeRevision.h.in generated/sb_ui_notice_revision.h @ONLY)
+    target_include_directories(sb_desktop PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
     add_custom_command(TARGET secondbrain POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets" "${SB_ASSET_DEST}"
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${SB_ASSET_DEST}/licenses"
@@ -172,6 +184,8 @@ if(SB_BUILD_UI)
     install(FILES third_party/licenses/AccessKit-LICENSE-MIT.txt
         third_party/licenses/AccessKit-LICENSE-APACHE.txt third_party/licenses/AccessKit-LICENSE.chromium.txt
         third_party/licenses/AccessKit-AUTHORS.txt third_party/licenses/Unicode.txt third_party/licenses/OFL-Emoji.txt third_party/licenses/WHATWG.txt third_party/licenses/OFL-Math.txt DESTINATION licenses COMPONENT Runtime)
+    install(FILES third_party/licenses/AccessKit-transitive.txt third_party/licenses/UI-source-notices.txt
+        DESTINATION licenses COMPONENT Runtime)
     install(FILES docs/QUICKSTART.txt LICENSE DESTINATION . COMPONENT Runtime)
     if(BUILD_TESTING)
         add_executable(secondbrain-projects-ui-tests tests/test_projects_ui.c)
@@ -183,7 +197,7 @@ if(SB_BUILD_UI)
             "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/NotoSans-Regular.ttf" "${CMAKE_CURRENT_BINARY_DIR}/project-errors-data")
         set_tests_properties(project-errors-ui PROPERTIES TIMEOUT 120 RESOURCE_LOCK secondbrain_clipboard)
         add_executable(secondbrain-notices-tests tests/test_notices.c app/notices.c)
-        target_include_directories(secondbrain-notices-tests PRIVATE app)
+        target_include_directories(secondbrain-notices-tests PRIVATE app "${CMAKE_CURRENT_BINARY_DIR}/generated")
         target_link_libraries(secondbrain-notices-tests PRIVATE sb_core)
         if(MSVC)
             target_compile_options(secondbrain-notices-tests PRIVATE /utf-8)
@@ -310,6 +324,10 @@ endif()
 
 if(BUILD_TESTING)
     find_package(Python3 COMPONENTS Interpreter REQUIRED)
+    add_test(NAME ui-license-inventory COMMAND "${Python3_EXECUTABLE}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_ui_license_inventory.py")
+    add_test(NAME ci-test-entry COMMAND "${Python3_EXECUTABLE}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_ci_entry.py")
     add_executable(secondbrain-backup-crash-worker tests/backup_crash_worker.c)
     target_link_libraries(secondbrain-backup-crash-worker PRIVATE sb_core)
     if(MSVC)

@@ -58,3 +58,10 @@ Die Ressourcennachprüfung mit 18 Originalen besteht lokal. [Herkunft und Hashes
 Quelle und unveränderte Schriftdatei sind im [Emoji-Vertrag](EMOJI.md) festgelegt.
 Die lokale Ressourcennachprüfung besteht mit 58 Assertions. Die neue Paketprüfung
 verlangt Schrift und Lizenz; ihren tatsächlichen Abschluss dokumentiert STATUS.md.
+
+## Transitive Originale ab 0.9.20
+
+23 Einträge enthalten nun zusätzlich die festgelegten Cargo-Unterabhängigkeiten
+von AccessKit und Quellenhinweise aus SDL3/HarfBuzz. Sammlungen behalten ihre
+Originaltexte und Attributionsangaben; die App liest sie als Literaltext.
+[Inventur, Wiederholung und offene Laufzeitanteile](LIZENZ_INVENTUR.md).

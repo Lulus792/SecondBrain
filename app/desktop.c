@@ -1669,6 +1669,7 @@ static bool document_tree(SBDesktop *d,const SBDocument *document,const SBRefere
 
 static void document(SBDesktop *d, const char *text, float height) {
     struct nk_context *ctx = d->ui.ctx;
+    size_t text_length=strlen(text);
     const char *extension = d->model.source ? strrchr(d->model.source_path, '.') : NULL;
     bool whole_code = text==d->notice || (text == d->model.source && !d->model.source_directory && (!extension || strcmp(extension, ".md")));
     bool first_heading = true;
@@ -1685,14 +1686,14 @@ static void document(SBDesktop *d, const char *text, float height) {
     smooth_scroll(d,slot,ctx->current->layout->offset_y);
     SBDocument parsed={0}; SBReferences references={0};
     if (!whole_code) {
-        SBStatus status=sb_document_init(&parsed,text,strlen(text));
+        SBStatus status=sb_document_init(&parsed,text,text_length);
         if (status.code==SB_OK) status=sb_document_references(&parsed,&references);
         if (status.code!=SB_OK) { d->message=status;whole_code=true; }
     }
     if (!whole_code && !document_tree(d,&parsed,&references,slot,&link_number,&first_heading)) whole_code=true;
     if (whole_code) {
-        SBMarkdown reader; SBMarkdownBlock block; sb_markdown_init(&reader,text,strlen(text),true);
-        while (sb_markdown_next(&reader,&block)) document_block(d,text,strlen(text),block,slot,&link_number,&references,NULL,"reader",&first_heading);
+        SBMarkdown reader; SBMarkdownBlock block; sb_markdown_init(&reader,text,text_length,true);
+        while (sb_markdown_next(&reader,&block)) document_block(d,text,text_length,block,slot,&link_number,&references,NULL,"reader",&first_heading);
     }
     nk_style_set_font(ctx, &d->ui.normal->handle);
     sb_references_free(&references); sb_document_free(&parsed);

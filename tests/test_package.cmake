@@ -43,6 +43,8 @@ foreach(SB_RESOURCE IN ITEMS "${SB_EXECUTABLE}" "${SB_ASSETS}/fonts/NotoSans-Reg
     "${SB_ASSETS}/licenses/OFL-Emoji.txt" "${SB_ASSETS}/licenses/Unicode.txt" "${SB_ASSETS}/licenses/LICENSE" "${SB_ASSETS}/licenses/Nuklear-LICENSE"
     "${SB_ASSETS}/licenses/SDL_ttf.txt" "${SB_ASSETS}/licenses/FreeType-FTL.txt"
     "${SB_ASSETS}/licenses/HarfBuzz-MS-USE.txt" "${SB_ASSETS}/licenses/OFL-CJK.txt" "${SB_ROOT}/licenses/SDL3.txt"
+    "${SB_ROOT}/licenses/AccessKit-transitive.txt" "${SB_ROOT}/licenses/UI-source-notices.txt"
+    "${SB_ASSETS}/licenses/AccessKit-transitive.txt" "${SB_ASSETS}/licenses/UI-source-notices.txt"
     "${SB_ROOT}/licenses/Nuklear.txt" "${SB_ROOT}/licenses/Noto.txt" "${SB_ROOT}/QUICKSTART.txt" "${SB_ROOT}/LICENSE")
     if(NOT EXISTS "${SB_RESOURCE}")
         message(FATAL_ERROR "Missing package resource: ${SB_RESOURCE}")

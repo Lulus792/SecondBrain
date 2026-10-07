@@ -89,6 +89,9 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   [Beitragsregeln](../CONTRIBUTING.md) und ein
   [Ablauf für Abhängigkeitsupdates](ABHAENGIGKEITEN_WARTUNG.md) sind vorbereitet.
   Vertraulicher Sicherheitskanal und vollständige transitive Lizenzprüfung bleiben offen.
+  Ab 0.9.20 sind 113 Cargo-Komponenten und zusätzliche SDL-/HarfBuzz-Hinweise
+  [inventarisiert](LIZENZ_INVENTUR.md) und mitgeliefert. Der Rust-/Systemruntime-
+  Abgleich bleibt offen; dieser Teilschritt schließt die Release-Aufgabe nicht.
 - [ ] **Endprodukt redaktionell prüfen:** kurze, natürliche Texte in App, Hilfe,
   Fehlermeldungen, Vorlagen und README; keine generischen Werbesätze oder unnötige
   Technik im normalen Bedienweg. Diese abschließende Bereinigung erfolgt auf

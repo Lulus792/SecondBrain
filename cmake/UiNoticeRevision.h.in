@@ -1,0 +1,3 @@
+/* Generated resource dependency: changing a notice regenerates this header,
+ * rebuilds notices.c and runs the asset-copy step on every CMake generator. */
+#define SB_UI_NOTICE_REVISION "@SB_NOTICE_REVISION@"

@@ -100,3 +100,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Letzter gültiger Sternkartenstand](../../docs/STERNKARTEN_BESTAND.md): zusammenhängende Desktop-Inventur, stabile Kennungen, Fehler- und Wiederherstellungsvertrag ab 0.9.19.
 
 - [Navigation und Texteingabe](../../docs/NAVIGATION_POLITUR.md): Mess-/Umbruchplancaches, Startfokus, Suchende, Textcursor und Anlegekarten ab 0.9.19.
+
+- [Lizenzinventur](../../docs/LIZENZ_INVENTUR.md) und [Manifest](../../third_party/license-manifest.json): ausgewertete Zielplattform-Abhängigkeiten, Originale, Hashes und offene Laufzeitanteile ab 0.9.20.
+
+- [CI-Teststarter](../../tools/test_entry.py) und [Prozessprüfung](../../tests/test_ci_entry.py): frühes, natives Eintragslog; keine unbelegte Fehlerursache.
