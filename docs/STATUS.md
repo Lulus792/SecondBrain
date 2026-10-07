@@ -1172,3 +1172,29 @@ gepackt). Der Quellstand 605527e ist gepusht; die
 läuft noch. Die frühere fehlerhafte Paketprüfung wird dadurch nicht nachträglich
 als bestanden geführt. Emoji-Glyphen, komplexe Geometrie und menschliche
 assistive Bedienung bleiben offen.
+
+
+## Schriftwahl und Emoji in 0.9.9
+
+Am 7. Oktober ergänzt eine unveränderte, festgelegte Noto-Emoji-Schrift die UI.
+Eigener C-Code wählt Ersatzschriften für vollständige Grapheme, formt benachbarte
+kompatible Zeichen und verwendet dieselbe Auswahl für Messung und Rasterung.
+Die Grundlinie wird aus den Schriftmetriken zusammengesetzt; Alpha wird beim
+Zusammenfügen erhalten und erst bei der Anzeige verrechnet. Die App bietet jetzt
+19 Original-Lizenzressourcen. [Quellen, Hashes und Grenzen](EMOJI.md).
+
+Der erste gesamte lokale Release-Lauf besteht mit 33 Tests (620,10 s); er läuft
+auf einem gleichzeitig belasteten Rechner und ist kein Geräte-Leistungsnachweis.
+Nach abschließender Fehlerbehandlung/Alpha-Korrektur bestehen drei passende Tests
+(6,61 s), darunter 43 Text-, 111 Editor- und 58 Lizenzassertions. Eigene Text- und
+Graphemimplementierung besteht unter ASan/UBSan; UI-Abhängigkeiten sind nicht
+vollständig instrumentiert. Der vorherige Renderer mit lediglich ergänzter
+Emoji-Schrift scheitert an der verbundenen Frau/Laptop-Breite (33 statt 16,5).
+Rasterprüfung zeigt verbundene Familie, Flagge, Hautton und gemischte Hangul-/
+Devanagari-Zeilen. Logs: build/emoji-ui-full-check.log, emoji-final-render-check.log,
+emoji-regression/result.log und emoji-sanitize/result.log.
+
+Die neue Paket- und native Plattformabnahme folgt separat. dist/SecondBrain
+bleibt bis zum bestandenen neuen Paket bei 0.9.8. Bidi-Absätze, präzise visuelle/
+native Textgeometrie, IME und menschliche assistive Bedienung bleiben offen.
+UI-Nachprüfung SBUI-040: /Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-07_12-29-00/UI_REVIEW.md.

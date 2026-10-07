@@ -43,8 +43,10 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   Unicode-Textgeometrie und tatsächliche VoiceOver/NVDA/Orca-Abnahme bleiben offen.
   In 0.9.0 ergänzt eine eigene SDL_ttf-Anbindung HarfBuzz, FreeType und
   Ersatzschriften; lokale Raster-/Text-/Paketprüfungen bestehen. Gemischte
-  Schreibrichtungen und graphemgenaue Eingabe bleiben in
-  [TEXTDARSTELLUNG.md](TEXTDARSTELLUNG.md) offen. Ab 0.9.1 veröffentlicht
+  Schreibrichtungen und präzise visuelle Eingabegeometrie bleiben in
+  [TEXTDARSTELLUNG.md](TEXTDARSTELLUNG.md) offen. 0.9.8 implementiert und prüft
+  [vollständige Graphem-Eingaben](GRAPHEME.md); 0.9.9 ergänzt die
+  [Emoji-Schrift und Schriftläufe](EMOJI.md), deren Abschlussprüfung läuft. Ab 0.9.1 veröffentlicht
   die Leseansicht strukturierte Blöcke und bietet Abschnittssprünge;
   [Dokumentstruktur](DOKUMENTSTRUKTUR.md) nennt Umfang und verbleibende Semantik.
   0.9.4 erweitert die gemeinsamen [Blockregeln](MARKDOWN.md); vollständige
@@ -73,7 +75,7 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
 - [ ] **Lizenz und Support klären:** Die eigene MIT-Lizenz ist auf Nutzerentscheidung festgelegt. Noch offen: alle
   Abhängigkeiten und übernommenen Anpassungen vollständig zuordnen, Fehler- und
   Sicherheitsmeldungen sowie Wartung der UI-Abhängigkeiten organisieren. Ab 0.9.3
-  stehen 17 mitgelieferte Originaltexte direkt in der [App-Lizenzansicht](LIZENZEN.md).
+  stehen mitgelieferte Originaltexte direkt in der [App-Lizenzansicht](LIZENZEN.md).
 - [ ] **Endprodukt redaktionell prüfen:** kurze, natürliche Texte in App, Hilfe,
   Fehlermeldungen, Vorlagen und README; keine generischen Werbesätze oder unnötige
   Technik im normalen Bedienweg. Diese abschließende Bereinigung erfolgt auf

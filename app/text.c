@@ -1,5 +1,6 @@
 #include "text.h"
 #include "platform.h"
+#include "grapheme.h"
 #include <SDL3_ttf/SDL_ttf.h>
 #include <math.h>
 #include <stdlib.h>
@@ -7,7 +8,7 @@
 
 #define SB_TEXT_CACHE_ENTRIES 1024
 #define SB_TEXT_CACHE_BYTES (32u * 1024u * 1024u)
-#define SB_FALLBACK_COUNT 5
+#define SB_FALLBACK_COUNT 6
 
 typedef struct {
     struct nk_font nk;
@@ -44,11 +45,56 @@ static void system_free(SBTextSystem *text) {
     }
     free(text);
 }
+typedef struct { size_t start,end; TTF_Font *font; } SBFontRun;
+typedef struct { SBTextFace *face; SBGrapheme reader; SBGraphemeBoundary boundary; TTF_Font *previous; bool available; } SBFontRuns;
+static bool ignored(Uint32 cp) {
+    return cp==0x200d || cp==0x200c || (cp>=0xfe00 && cp<=0xfe0f) || (cp>=0xe0020 && cp<=0xe007f) || (cp>=0xe0100 && cp<=0xe01ef);
+}
+static bool covers(TTF_Font *font,const char *text,size_t length) {
+    const char *end=text+length;
+    while (text<end) { Uint32 cp=(Uint32)SDL_StepUTF8(&text,NULL); if (!ignored(cp) && !TTF_FontHasGlyph(font,cp)) return false; }
+    return true;
+}
+static TTF_Font *cluster_font(SBTextFace *face,const char *text,size_t length,TTF_Font *previous) {
+    const char *at=text,*end=text+length; bool emoji=false,neutral=true;
+    while (at<end) {
+        Uint32 cp=(Uint32)SDL_StepUTF8(&at,NULL);
+        emoji|=cp>=0x1f000 || (cp>=0x2600 && cp<=0x27bf) || cp==0xfe0f || cp==0x20e3;
+        if (cp>=0x80 || (cp>='A' && cp<='Z') || (cp>='a' && cp<='z') || (cp>='0' && cp<='9')) neutral=false;
+    }
+    if (emoji && covers(face->fallback[3],text,length)) return face->fallback[3];
+    if (neutral && previous && previous!=face->fallback[3] && covers(previous,text,length)) return previous;
+    if (covers(face->font,text,length)) return face->font;
+    for (unsigned i=0;i<SB_FALLBACK_COUNT;++i) if (covers(face->fallback[i],text,length)) return face->fallback[i];
+    return face->font;
+}
+static bool runs_init(SBFontRuns *runs,SBTextFace *face,const char *text,size_t length) {
+    *runs=(SBFontRuns){.face=face};
+    if (!sb_grapheme_init(&runs->reader,text,length)) return false;
+    runs->available=sb_grapheme_next(&runs->reader,&runs->boundary); return true;
+}
+static bool run_next(SBFontRuns *runs,SBFontRun *run) {
+    if (!runs->available) return false;
+    size_t start=runs->boundary.byte; SBGraphemeBoundary next;
+    if (!sb_grapheme_next(&runs->reader,&next)) { runs->available=false; return false; }
+    TTF_Font *font=cluster_font(runs->face,runs->reader.text+start,next.byte-start,runs->previous);
+    *run=(SBFontRun){start,next.byte,font}; runs->boundary=next; runs->previous=font;
+    for (;;) {
+        SBGrapheme saved=runs->reader;
+        if (!sb_grapheme_next(&runs->reader,&next)) break;
+        TTF_Font *candidate=cluster_font(runs->face,runs->reader.text+runs->boundary.byte,next.byte-runs->boundary.byte,font);
+        if (candidate!=font) { runs->reader=saved; return true; }
+        run->end=next.byte; runs->boundary=next;
+    }
+    runs->available=false; return true;
+}
 static float width(nk_handle handle, float height, const char *value, int length) {
-    SBTextFace *face=handle.ptr; int w=0,h=0; (void)height;
+    SBTextFace *face=handle.ptr; (void)height;
     if (length<=0 || !value || !face) return 0;
-    if (!TTF_GetStringSize(face->font,value,(size_t)length,&w,&h)) return 0;
-    return (float)w/face->owner->density;
+    SBFontRuns runs; SBFontRun run; int total=0;
+    if (!runs_init(&runs,face,value,(size_t)length)) return 0;
+    while (run_next(&runs,&run)) { int w=0,h=0; if (!TTF_GetStringSize(run.font,value+run.start,run.end-run.start,&w,&h)) return 0; total+=w; }
+    return (float)total/face->owner->density;
 }
 static TTF_Font *open_font(const char *path, float logical_height, float density) {
     TTF_Font *font=TTF_OpenFont(path,logical_height*density);
@@ -61,7 +107,7 @@ static TTF_Font *open_font(const char *path, float logical_height, float density
 }
 SBStatus sb_ui_text_fonts(SBUi *ui, float scale, float density) {
     static const char *fallbacks[]={"NotoSansArabic-Regular.ttf","NotoSansHebrew-Regular.ttf",
-        "NotoSansDevanagari-Regular.ttf","NotoSansSymbols2-Regular.ttf","NotoSansCJKjp-Regular.otf"};
+        "NotoSansDevanagari-Regular.ttf","NotoEmoji-Variable.ttf","NotoSansSymbols2-Regular.ttf","NotoSansCJKjp-Regular.otf"};
     const float heights[]={15,18,26,17};
     bool first=ui->text==NULL;
     if (first && !TTF_Init()) return sb_error(SB_IO,"Textdarstellung: %s",SDL_GetError());
@@ -82,7 +128,7 @@ SBStatus sb_ui_text_fonts(SBUi *ui, float scale, float density) {
         for (unsigned j=0;j<SB_FALLBACK_COUNT;++j) {
             if (sb_path_join(path,sizeof(path),folder,fallbacks[j]).code!=SB_OK) goto failed;
             face->fallback[j]=TTF_OpenFont(path,TTF_GetFontSize(face->font));
-            if (!face->fallback[j] || !TTF_AddFallbackFont(face->font,face->fallback[j])) goto failed;
+            if (!face->fallback[j]) goto failed;
         }
         face->nk.handle.userdata=nk_handle_ptr(face);
         face->nk.handle.height=heights[i]*scale;
@@ -122,11 +168,32 @@ void sb_ui_text_draw(struct nk_draw_list *list, const struct nk_command_text *co
         for (unsigned i=0;i<SB_TEXT_CACHE_ENTRIES;++i)
             if (!text->cache[i].texture) { entry=&text->cache[i]; break; }
         if (!entry) return;
-        int measured=0; size_t fitting=0;
-        if (maximum<1 || !TTF_MeasureString(face->font,command->string,length,maximum,&measured,&fitting) || !fitting) return;
-        if (fitting<length) length=fitting;
-        SDL_Surface *surface=TTF_RenderText_Blended(face->font,command->string,length,(SDL_Color){255,255,255,255});
+        SBFontRuns runs; SBFontRun run; int measured=0,ascent=0,descent=0;
+        if (!runs_init(&runs,face,command->string,length)) return;
+        while (run_next(&runs,&run)) {
+            int w=0,h=0; if (!TTF_GetStringSize(run.font,command->string+run.start,run.end-run.start,&w,&h)) return;
+            if (measured<maximum) measured=SDL_min(maximum,measured+w);
+            ascent=SDL_max(ascent,TTF_GetFontAscent(run.font)); descent=SDL_max(descent,-TTF_GetFontDescent(run.font));
+        }
+        if (measured<=0 || ascent+descent<=0) return;
+        /* Match SDL_ttf's raster format; avoid an extra channel conversion. */
+        SDL_Surface *surface=SDL_CreateSurface(measured,ascent+descent,SDL_PIXELFORMAT_ARGB8888);
         if (!surface) return;
+        if (!SDL_ClearSurface(surface,0,0,0,0)) { SDL_DestroySurface(surface); return; }
+        runs_init(&runs,face,command->string,length); int x=0;
+        while (x<maximum && run_next(&runs,&run)) {
+            int w=0,h=0; size_t fitting=0,run_length=run.end-run.start;
+            if (!TTF_MeasureString(run.font,command->string+run.start,run_length,maximum-x,&w,&fitting)) { SDL_DestroySurface(surface); return; }
+            if (!fitting) break;
+            SDL_Surface *piece=TTF_RenderText_Blended(run.font,command->string+run.start,fitting,(SDL_Color){255,255,255,255});
+            if (!piece) { SDL_DestroySurface(surface); return; }
+            SDL_Rect destination={x,ascent-TTF_GetFontAscent(run.font),piece->w,piece->h};
+            /* Preserve straight alpha; the final texture draw blends exactly once. */
+            bool copied=SDL_SetSurfaceBlendMode(piece,SDL_BLENDMODE_NONE) && SDL_BlitSurface(piece,NULL,surface,&destination);
+            if (!copied) { SDL_DestroySurface(piece); SDL_DestroySurface(surface); return; }
+            SDL_DestroySurface(piece); x+=w;
+            if (fitting<run_length) break;
+        }
         entry->text=malloc((size_t)command->length);
         if (entry->text) entry->texture=SDL_CreateTextureFromSurface(text->renderer,surface);
         if (!entry->text || !entry->texture) {

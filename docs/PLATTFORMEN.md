@@ -589,3 +589,14 @@ gepackt). Der Quellstand 605527e ist gepusht; die
 läuft noch. Die frühere fehlerhafte Paketprüfung wird dadurch nicht nachträglich
 als bestanden geführt. Emoji-Glyphen, komplexe Geometrie und menschliche
 assistive Bedienung bleiben offen.
+
+
+## Lokale Schriftlauf-Nachprüfung 0.9.9
+
+33 erste Intel/macOS-Release-Tests bestehen (620,10 s). Nach abschließender
+Raster-Fehlerbehandlung und Alpha-Korrektur bestehen drei gezielte Prüfungen
+mit 43 Text-, 111 Editor- und 58 Lizenzassertions. Eigene C-Text-/Graphem-Bereiche
+bestehen unter ASan/UBSan; vorherige reine Fallback-Anbindung scheitert an der
+neuen verbundenen Emoji-Prüfung. [Details und Grenzen](EMOJI.md).
+Das neue entpackte Paket und native Windows-/Linux-/ARM64-Abnahmen sind noch
+offen; die vorherige dist-Kopie bleibt bis zur bestandenen Paketprüfung erhalten.

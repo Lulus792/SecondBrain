@@ -36,7 +36,7 @@ und CLI besteht; dist/SecondBrain enthält inzwischen das geprüfte 0.9.7-Paket.
 UIA GridPattern und AT-SPI Table fehlen in den festgelegten Providern; die
 separate native Kinderprüfung ersetzt keine vollständige Tabellenbedienung.
 
-## Laufender Schritt 0.9.8
+## Geprüfter lokaler Schritt 0.9.8
 
 Die [0.9.7-Abnahme](https://github.com/Lulus792/SecondBrain/actions/runs/37596496154)
 besteht jetzt mit allen 20 Jobs und vier Paketen. 0.9.8 ist als 605527e gepusht:
@@ -53,6 +53,14 @@ Einstellungsneustart und CLI besteht; dist/SecondBrain enthält 0.9.8.
 Die [native 0.9.8-Abnahme](https://github.com/Lulus792/SecondBrain/actions/runs/37604300744)
 läuft noch; tatsächliche Ergebnisse übernehmen und neue Fehler beheben.
 [Vertrag](../../docs/GRAPHEME.md), [Nachweise](../../docs/STATUS.md).
+
+## Laufender Schritt 0.9.9
+
+[Emoji-Schrift und Schriftläufe](../../docs/EMOJI.md) sind implementiert.
+33 erste lokale Release-Tests und drei abschließende Raster-/Lizenzprüfungen
+bestehen mit 43 Text-, 111 Editor- und 58 Lizenzassertions. Eigene Text-/Graphem-
+Instrumentierung besteht; vorheriger reiner Fallback zerlegt die Emoji-Verbindung.
+Neue Paket- und native Plattformabnahme folgen; dist bleibt bis dahin bei 0.9.8.
 
 Danach verbleibende Container-/Inline-/Listenregeln,
 Unicode-Textgeometrie/IME, Support-/Lizenzzuordnung und übrige Release-Aufgaben.

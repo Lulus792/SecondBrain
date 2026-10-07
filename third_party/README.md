@@ -169,3 +169,12 @@ Algorithmus unter der Projektlizenz. Der Lizenztext ist auch in der App lesbar.
 Nuklear erhält optionale eigene C-Hooks für Cursorgrenzen, vollständige Auswahl
 und atomisches Texteingeben; diese Anpassungen sind bei einem Update zu erhalten
 oder anhand der Unicode- und Editorprüfungen erneut zu ersetzen.
+
+
+## Noto Emoji ab 0.9.9
+
+Unveränderte variable Mono-Schrift aus Google Fonts, Commit
+8b0a1d0f5983c89bc2b93f1b5fb55f9e252744b5, lokal NotoEmoji-Variable.ttf.
+Die originale SIL-OFL steht unter licenses/OFL-Emoji.txt und gehört in App und
+Paket. Quelle, Hashes und Anbindung: [Emoji-Vertrag](../docs/EMOJI.md).
+Die Schrift ergänzt die UI; Originalzeichen werden nicht in Bilder umgeschrieben.

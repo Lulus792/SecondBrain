@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-project(SecondBrain VERSION 0.9.8 LANGUAGES C)
+project(SecondBrain VERSION 0.9.9 LANGUAGES C)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
@@ -171,7 +171,7 @@ if(SB_BUILD_UI)
         third_party/licenses/HarfBuzz.txt third_party/licenses/HarfBuzz-MS-USE.txt DESTINATION licenses COMPONENT Runtime)
     install(FILES third_party/licenses/AccessKit-LICENSE-MIT.txt
         third_party/licenses/AccessKit-LICENSE-APACHE.txt third_party/licenses/AccessKit-LICENSE.chromium.txt
-        third_party/licenses/AccessKit-AUTHORS.txt third_party/licenses/Unicode.txt DESTINATION licenses COMPONENT Runtime)
+        third_party/licenses/AccessKit-AUTHORS.txt third_party/licenses/Unicode.txt third_party/licenses/OFL-Emoji.txt DESTINATION licenses COMPONENT Runtime)
     install(FILES docs/QUICKSTART.txt LICENSE DESTINATION . COMPONENT Runtime)
     if(BUILD_TESTING)
         add_executable(secondbrain-projects-ui-tests tests/test_projects_ui.c)

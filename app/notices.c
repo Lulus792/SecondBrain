@@ -20,7 +20,8 @@ static const struct { const char *name,*file; } notices[]={
     {"AccessKit · Apache 2.0","AccessKit-LICENSE-APACHE.txt"},
     {"AccessKit · Chromium BSD","AccessKit-LICENSE.chromium.txt"},
     {"AccessKit · Autoren","AccessKit-AUTHORS.txt"},
-    {"Unicode-Daten · Unicode License V3","Unicode.txt"}
+    {"Unicode-Daten · Unicode License V3","Unicode.txt"},
+    {"Noto Emoji · SIL Open Font License","OFL-Emoji.txt"}
 };
 size_t sb_notice_count(void) { return sizeof(notices)/sizeof(*notices); }
 const char *sb_notice_name(size_t index) { return index<sb_notice_count() ? notices[index].name : "Lizenzen"; }
