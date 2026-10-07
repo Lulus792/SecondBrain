@@ -2104,3 +2104,27 @@ runtime-install.json und runtime-installed-brain.log.
 [Neue Quell-CI 37697739324](https://github.com/Lulus792/SecondBrain/actions/runs/37697739324)
 war zuletzt queued. Neue 0.9.22-Plattformabnahme folgt; die bestätigte Gesamt-
 abnahme zu 82c2970 gehört zu 0.9.21. Übrige Release-Aufgaben bleiben offen.
+
+
+## 0.9.22: Gesamt-CI und Prüfung verlinkter Paketabhängigkeiten
+
+[CI 37697739324](https://github.com/Lulus792/SecondBrain/actions/runs/37697739324)
+zu 4e6f15c besteht inzwischen in allen 20 Jobs einschließlich acht Desktop-
+Varianten und vier tatsächlich entpackten Release-Paketen. Damit sind auch die
+neuen Rust-Lizenzdaten im automatisierten Umfang nativ nachgeprüft.
+
+[Neue Laufzeitprüfung](PAKET_LAUFZEIT.md) untersucht die entpackten App-/CLI-
+Imports je Programm mit CMake/native tools und schreibt Hash-/Abhängigkeits-
+berichte. Ein echtes C-Shared-Library-Fixture besteht; nach Entfernung der
+Bibliothek wird es abgewiesen. Zwei legitime gleichnamige Mac-Bibliothekskopien
+werden pro Programm getrennt aufgelöst. Lokales 0.9.22-Paket enthält keine
+externen Nicht-Systemimports; seine Systemimports sind erfasst. App/CLI-
+LC_BUILD_VERSION: minos 14.0, SDK 15.2; das ist keine frische 14.0-Abnahme.
+
+38 Python-Prüfungen bestehen (7,68 s), davon die native Windows-Kategorieprobe
+lokal ausdrücklich ausgelassen. Entpackter Paketablauf mit neuer Importprüfung
+besteht mit 126 Desktop-, 157 Tastatur-, 75 Sicherungsassertions, zwei Neustarts
+und CLI. Logs: build/package-runtime-{fixture-final,python-final,local}.log,
+package-runtime-local.json und dependency-package-check.log. Native Windows-/
+Linux-Abnahme des neuen Scanners, optionale dynamische Renderer-/Geräteimporte
+und frische Zielrechner bleiben offen. Die installierte App bleibt 0.9.22.

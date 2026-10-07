@@ -25,6 +25,9 @@ neuen Ordner mit Leerzeichen und Umlauten. Er prüft Schriften, Lizenzen und
 Anleitung und startet anschließend die entpackte App für den vollständigen
 Maus-/Tastatur-Bedienablauf und zusätzlich einen reinen Tastaturdurchlauf. Schriften werden anhand des Anwendungsordners gesucht; eine
 Referenz auf den ursprünglichen Quellordner ist nicht erforderlich.
+Die Entwickler-Paketprüfung benötigt Python 3 und die nativen Werkzeuge
+otool/dumpbin/objdump. Sie prüft außerdem die
+[verlinkten Laufzeitabhängigkeiten](PAKET_LAUFZEIT.md) des entpackten Pakets.
 
 ## Inhalt
 
@@ -100,8 +103,8 @@ Nur nach diesem Vergleich wird die Vorabversion veröffentlicht. Eine bestehende
 Release-Version wird nicht ersetzt; ein Fehler nach dem Anlegen kann einen
 unveröffentlichten Entwurf hinterlassen. Tags werden nicht erzwungen verschoben.
 
-Die tatsächliche Erstveröffentlichung und der Intel-CI-Nachweis stehen noch aus;
-Workflow-Konfiguration allein ist kein Distributionsnachweis. Automatische
+Die tatsächliche Erstveröffentlichung und der Intel-CI-Nachweis stehen im
+Abschnitt zur veröffentlichten Vorabversion. Automatische
 1.0-Veröffentlichung ist gesperrt. Signierung und Notarisierung bleiben mangels
 Herausgeberzertifikaten offen. Der Release-Auftrag und die laufenden GitHub-Pushes
 sind vom Nutzer autorisiert; 1.0 benötigt weiterhin seine ausdrückliche Freigabe.

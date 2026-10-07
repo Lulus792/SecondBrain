@@ -856,3 +856,13 @@ Die Cargo-Compileraufzeichnung bestätigt in Windows-/Linux-Release jeweils
 mit den entsprechenden nativen Hosts. Neue 0.9.22-Lizenzdaten benötigen ihren
 eigenen Plattform-/Paketnachweis. Menschliche assistive, Geräte-, Volumen- und
 weitere Release-Abnahmen bleiben offen.
+
+
+## 0.9.22: abgeschlossene native Prüfung
+
+[Lauf 37697739324](https://github.com/Lulus792/SecondBrain/actions/runs/37697739324)
+zu 4e6f15c besteht in allen 20 Jobs: Windows/Linux/macOS ARM64/Intel Desktop
+Debug/Release, C17 und Python. Alle vier Release-Pakete sind entpackt geprüft.
+Die Root-/Registry-/Quellhinweise der Rust-Laufzeit und die 24 Lizenzressourcen
+sind damit im automatisierten Umfang nachgeprüft. Die danach ergänzte native
+Importprüfung erhält ihren eigenen folgenden CI-Nachweis.

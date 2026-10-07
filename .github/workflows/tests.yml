@@ -80,6 +80,7 @@ jobs:
             build/ui/checked-ctest.log
             build/ui/test-entry.log
             build/ui/ui-rust-compiler.json
+            build/ui/package-check/runtime-dependencies.json
             build/ui/checked-configure.log
             build/ui/configure-entry.log
             build/ui/accesskit-windows-build/**/*.log

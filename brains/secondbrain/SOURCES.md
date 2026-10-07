@@ -106,3 +106,5 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [CI-Teststarter](../../tools/test_entry.py) und [Prozessprüfung](../../tests/test_ci_entry.py): frühes, natives Eintragslog; keine unbelegte Fehlerursache.
 
 - [Rust-Laufzeitnachweis](../../docs/RUST_RUNTIME_NACHWEIS.md): originale Library-Lockdatei und buildbezogene Compileridentität; zusätzliche Original-Lizenzen bleiben offen.
+
+- [Paket-Laufzeitprüfung](../../docs/PAKET_LAUFZEIT.md): native Imports/Abhängigkeitsauflösung, Systemverträge, tatsächliche Fixture-/Paketnachweise und Grenzen.

@@ -84,6 +84,17 @@ if(APPLE)
     endforeach()
 endif()
 
+# Inspect linked dependencies before running GUI workflows. Developer verifier
+# only; the extracted application has no Python/CMake runtime requirement.
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
+execute_process(COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_LIST_DIR}/../tools/package_runtime.py"
+    --root "${SB_ROOT}" --output "${SB_TEST_ROOT}/runtime-dependencies.json"
+    RESULT_VARIABLE SB_RUNTIME_RESULT OUTPUT_VARIABLE SB_RUNTIME_OUTPUT ERROR_VARIABLE SB_RUNTIME_ERROR TIMEOUT 120)
+message(STATUS "${SB_RUNTIME_OUTPUT}")
+if(NOT SB_RUNTIME_RESULT EQUAL 0)
+    message(FATAL_ERROR "Package runtime dependency verification failed:\n${SB_RUNTIME_ERROR}")
+endif()
+
 # Run the extracted app with its bundled assets from a different directory.
 execute_process(COMMAND "${SB_EXECUTABLE}" --self-test "${SB_TEST_ROOT}/Bedienprüfung ü"
     WORKING_DIRECTORY "${SB_UNPACK}" RESULT_VARIABLE SB_RESULT
