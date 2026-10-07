@@ -71,3 +71,8 @@ SDL-/HarfBuzz-Quellenhinweisen. 47/47 CTests und nachfolgende
 gezielte Prüfungen bestehen; beide großen Sammlungen sind per Tastatur gelesen/
 kopiert. 20 Python-Prüfungen bestehen. Saubere Paketabnahme folgt; Dist bleibt 0.9.19. Rust-/Systemruntime-Abgleich
 und vollständige transitive Release-Abnahme bleiben offen.
+
+0.9.21 überspringt unsichtbare Literal-Zeichenarbeit bei unverändertem Layout/
+nativer Semantik. Drei Nachprüfungen und 150 Tastaturassertions bestehen;
+drei vollständige Raster sind bytegleich. Lokale Layoutzeit bei 600 gleichen
+Testframes 81,55 → 4,88 s. Saubere Paketierung folgt.

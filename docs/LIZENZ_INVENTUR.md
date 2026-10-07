@@ -40,6 +40,9 @@ Paketwurzel enthalten dieselben Dateien. Reine Lizenzdateiänderungen lösen
 Neu-Verlinken und erneutes Kopieren der Ressourcen aus; sie bleiben nicht nur
 in der Paketwurzel aktualisiert. Die Längenmessung für lange Literaltexte
 läuft einmal pro Darstellung und nicht erneut für jede Zeile.
+Ab 0.9.21 wird zusätzlich das Zeichnen vollständig außerhalb des sichtbaren
+Bereichs liegender Literalzeilen übersprungen. Layout und native Textinformationen
+werden weiterhin aufgebaut; Originale und Kopierinhalt bleiben unverändert.
 
 Die Ressourcen-, vollständigen Lizenz-/Tastatur- und Paketprüfungen prüfen die
 bekannten Texte. `tests/test_ui_license_inventory.py` prüft Vollständigkeit im

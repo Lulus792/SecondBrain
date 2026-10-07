@@ -1940,3 +1940,19 @@ mit 150 Prozent Schrift geprüft. Paketabnahme folgt; Dist bleibt bis dahin bei
 geprüftem 0.9.19. Logs: build/license-{all-check,final-targeted,keyboard-final,
 python-final}.log sowie license-resource-fixed-{change,restore}.log. Die komplette
 transitive Release-Abnahme bleibt wegen Rust-/Systemruntime-Abgleich offen.
+
+
+## 0.9.21: Literaltexte außerhalb des sichtbaren Bereichs
+
+Die zusätzliche Lizenzprobe deckt wiederholte Umbrucharbeit für bereits vollständig
+abgeschnittene Literalzeilen auf. Nuklear berechnet diese auch ohne sichtbare
+Pixel. Eigene Dokumentdarstellung überspringt ab 0.9.21 deren Zeichenarbeit,
+behält aber Zeilenhöhe, Scrollumfang und native Textspans bei. Das betrifft
+auch Code- und Quellansichten. Native Textinformationen, Navigation und
+Tastatur bestehen 3/3 in 163,94 s; 150 Tastaturassertions. Drei vollständige
+Raster (Lizenzliste, Lizenztext und kleine Tastaturansicht) sind bytegleich zum
+ungekürzten Zeichenweg. Lokal bei 600 gleichen Testframes sinkt angesammelte
+Layoutzeit von 81,55 auf 4,88 s; Gesamtlauf 183,60 auf 110,59 s. Dies sind
+Software-Renderer-Testmessungen, keine allgemeine FPS-Zusage. Logs:
+build/literal-culling-check.log und literal-culling-raster-proof.json.
+Saubere Paketierung folgt.

@@ -1543,7 +1543,16 @@ static void document_block(SBDesktop *d,const char *text,size_t length_total,SBM
                 SBStyledText literal={.text=d->passive_count==before+1 ? d->passive[before].text : "",.spans=&code_span,.count=1};
                 passive_styles(d,before,&literal,font->height);
             }
-            if (plain) sb_ui_styled_draw(&d->ui,font,&styled); else nk_text_wrap(ctx, shown, (int)shown_length);
+            if (plain) sb_ui_styled_draw(&d->ui,font,&styled);
+            else {
+                /* Literal rows still contribute layout and native text above.
+                   Nuklear wraps even fully clipped rows; avoid that work when
+                   their allocated rectangle cannot paint into the viewport. */
+                struct nk_rect row=nk_widget_bounds(ctx),clip=ctx->current->layout->clip;
+                if (row.x>=clip.x+clip.w || row.x+row.w<=clip.x || row.y>=clip.y+clip.h || row.y+row.h<=clip.y)
+                    nk_spacer(ctx);
+                else nk_text_wrap(ctx,shown,(int)shown_length);
+            }
             }
             sb_styled_free(&styled);
             if (!code && inline_status.code==SB_OK) document_links(d,&inline_reader,link_number,parent,NULL);
