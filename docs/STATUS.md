@@ -1757,3 +1757,40 @@ Darstellung oder native Containersemantik daraus ableiten; kein neues Paket
 und keine andere App-Version deswegen ausgeben. Nächste Arbeit ist der
 Dokumentbaum samt vollständiger gemeinsamer Integration. Gesamtauftrag und
 1.0-Aufgaben bleiben offen.
+
+
+## Eigener Dokumentbaum: geprüfter Kern, App-Anbindung noch offen
+
+[Dokumentbaum](DOKUMENTBAUM.md) in eigenem C baut Container/Blätter mit
+Eltern-/Geschwisterbeziehungen und besessenen Quellprojektionen auf. Physische
+Tabspalten, erlaubte Fortsetzungen, leere/kompakte/lockere Listen, Code-/
+Überschriften-/Trennungsregeln und Definitionen innerhalb von Listen/Zitaten
+sind berücksichtigt. Referenzen leihen ihre tatsächlichen Blatttexte; erste
+Definition und Unicode-Vergleich bleiben dieselben Regeln. ATX-Überschriften
+erzeugen keine Definitionen; Setext prüft Definitionen vor der Umwandlung.
+
+Alle 29 lokalen Kern-Debug-Tests bestehen (16,35 s). Nach zusätzlich geprüften
+Knoten-/16-MiB-Endgrenzen bestehen zwei letzte Nachprüfungen (1,13 s); der
+abschließende CTest-Wrapper besteht nochmals mit 29 Tests (23,12 s).
+683.008 eigene Dokumentassertions einschließlich 4.000 begrenzter Eingaben,
+Quellen-/Baum-/Positionsinvarianten, Definitionen und Grenzen bestehen unter
+gezielter eigener ASan/UBSan. 307 unveränderte Normfälle bestehen mit dem
+unabhängigen HTML-Baumvergleich. Prüfumfang und Literal-Ausnahmen stehen im
+Vertrag; keine vollständige CommonMark-/GFM-/UI-Abnahme. Logdateien:
+build/document-{targeted,core,final-targeted}-check.log, document-combined-
+check.log, document-sanitize/{result,final-result}.log und document-wrapper-check.log.
+
+Der neue Baum wird noch nicht von der App verwendet. Titel-/Graph-/Reader-/
+Tabellenanbindung, native Container und sichtbare Gestaltung bleiben die
+unmittelbar folgende Arbeit. Dist bleibt beim geprüften 0.9.16, Build b19b47624512.
+Der vollständige Auftrag bleibt aktiv; 1.0 bleibt offen.
+
+Im [vorherigen Lauf 37649752627](https://github.com/Lulus792/SecondBrain/actions/runs/37649752627)
+zu 0a1e872 bestehen elf Windows-/Linux-Jobs; Windows Desktop Debug scheitert
+nach sechs Minuten Testschritt, ohne öffentlich verfügbare LastTest-Diagnose.
+Der konkrete Testfehler ist noch nicht nachgewiesen. Neuer Diagnosepfad
+zeichnet den gesamten Testeinstieg über Bash/tee mit absoluten Pfaden auf,
+publiziert ihn gesondert und weist leere Testsammlungen als Fehler ab.
+Lokale Erfolgs-/Fehler-/Leerfall- und frühe Log-/Escaping-Prüfungen bestehen.
+Das bereitet die tatsächliche Nachprüfung vor, behauptet aber keine Behebung
+der noch unbekannten Windows-Testursache. Neue CI nach Push übernehmen.

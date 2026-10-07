@@ -19,6 +19,15 @@ typedef struct {
     bool reference_limit;
 } SBMarkdown;
 void sb_markdown_init(SBMarkdown *reader,const char *text,size_t length,bool literal);
+/* Probe a physical line after container prefixes. Indentation is measured in
+   the caller's physical tab columns, not recalculated from a sliced string. */
+typedef struct {
+    SBMarkdownKind kind;
+    size_t content,length,fence_length;
+    unsigned level,setext;
+    char fence;
+} SBMarkdownProbe;
+void sb_markdown_probe(const char *text,size_t end,size_t body,unsigned indent,SBMarkdownProbe *probe);
 bool sb_markdown_boundary(const char *text,size_t length,size_t offset);
 bool sb_markdown_next(SBMarkdown *reader,SBMarkdownBlock *block);
 #endif

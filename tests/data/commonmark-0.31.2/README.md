@@ -32,3 +32,16 @@ Fälle (201/536) folgen dem Literalvertrag, zwei Bildfälle (585/589) dem bereit
 bestehenden aufbereiteten Stil des Alternativtexts. Originaldaten und Lizenz
 bleiben erhalten; Text/Stile/Ziele werden mit diesen ausdrücklichen Produkt-
 verträgen verglichen. Dies behauptet keine vollständige CommonMark-Abnahme.
+
+
+Dokumentbaum-Auswahl: 307 unveränderte Originalfälle aus Tabs, Trennungen,
+ATX-/Setext-Überschriften, eingerücktem/fenced Code, Absätzen/Leerzeilen,
+allen Blockquote-/List-item-/List-Fällen sowie Referenzdefinitionen und den
+bisher ausgewählten Referenz-/Bildfällen; zusätzlich Entity-Ziel 33.
+Ein eigener HTML-Strukturvergleich prüft Eltern, Reihenfolge, Listentyp,
+Anfangszahl, kompakte/lockere Listen, Blatttyp, Ebene und Klartext. Inline-
+Styles und Linkziele sind nicht Teil dieses Baumvergleichs; dafür bleiben
+die bestehenden separaten Prüfer zuständig. Die Roh-HTML-Fälle 201/536
+verwenden den bestehenden Literalvertrag; Kommentare bleiben wörtliche
+Raw-Blöcke. Quelle/Nummern/Lizenz bleiben erhalten. Kein vollständiger
+CommonMark-/GFM- oder UI-Nachweis daraus ableiten.

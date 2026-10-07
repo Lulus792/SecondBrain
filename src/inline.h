@@ -28,6 +28,8 @@ typedef struct {
 /* Initialize fresh storage, then free it even after an error. Source is borrowed. */
 SBStatus sb_inline_init(SBInline *reader,const char *text,size_t length);
 SBStatus sb_inline_init_references(SBInline *reader,const char *text,size_t length,const SBReferences *references);
+/* Lexical standalone raw tag recognition, without inline allocation/parsing. */
+bool sb_inline_raw_tag(const char *text,size_t length,size_t *end);
 void sb_inline_free(SBInline *reader);
 bool sb_inline_next(SBInline *reader,SBInlineToken *token);
 SBStatus sb_inline_text(const SBInline *reader,size_t offset,size_t length,char **out);

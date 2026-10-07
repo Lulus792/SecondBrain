@@ -55,6 +55,13 @@ static bool spend(size_t *budget) { if (!*budget) return false; --*budget; retur
 #include "inline_raw.inc"
 #include "inline_entities.inc"
 #include "inline_emphasis.inc"
+bool sb_inline_raw_tag(const char *text,size_t length,size_t *end) {
+    if(!text || !length || text[0]!='<' || !end || length>SB_TEXT_LIMIT)return false;
+    SBInline reader={.text=text,.length=length};SBInlineKind kind=SB_INLINE_RAW;size_t budget=length*32+64;
+    size_t position=angle_end(&reader,0,&budget,&kind);
+    if(!position || !budget || kind!=SB_INLINE_RAW)return false;
+    *end=position;return true;
+}
 static bool spaces(const SBInline *r,size_t *p,size_t *budget) {
     unsigned endings=0;
     while (*p<r->length && whitespace(r->text[*p])) {
@@ -344,9 +351,10 @@ SBStatus sb_inline_destination(const SBInline *r,const SBInlineToken *t,char *ou
     const char *source=r->text;size_t destination=t->destination,length=t->destination_length;
     if (t->has_reference) {
         if (!r->references || t->reference>=r->references->count) return sb_error(SB_INVALID,"Markdown-Referenzziel ist ungültig.");
-        const SBReferenceDefinition *definition=&r->references->items[t->reference].source;
-        source=r->references->text;destination=definition->destination;length=definition->destination_length;
-        if (destination>r->references->length || length>r->references->length-destination) return sb_error(SB_INVALID,"Markdown-Referenzziel ist ungültig.");
+        const SBReference *entry=&r->references->items[t->reference];
+        const SBReferenceDefinition *definition=&entry->source;
+        source=entry->text;destination=definition->destination;length=definition->destination_length;
+        if (!source || destination>entry->length || length>entry->length-destination) return sb_error(SB_INVALID,"Markdown-Referenzziel ist ungültig.");
     }
     size_t used=0;
     if (t->kind==SB_INLINE_AUTOLINK && t->email) {

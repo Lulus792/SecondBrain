@@ -29,14 +29,19 @@ Commits sind normal nach GitHub gepusht; keine Historie wurde umgeschrieben.
 [Quellprojektion](../../docs/CONTAINER_PLAN.md) in eigenem C bereitet die notwendige
 Trennung von Originalquelle und aufbereitetem Containertext vor. Teilweise Tabs,
 physische Spalten, Quellpositionen, Zeilenenden, Bereichsgrenzen und Rücknahme
-fehlgeschlagener Anfügungen sind mit 315.754 Assertions und gezielter ASan/UBSan
-lokal geprüft. Der Baustein ist noch nicht in der UI verbunden; Listen/Zitate
-sind dadurch noch nicht fertig. Die installierte App bleibt 0.9.16.
+fehlgeschlagener Anfügungen sind mit zuletzt 315.759 Assertions und gezielter ASan/UBSan
+lokal geprüft. Der darauf aufbauende [Dokumentbaum](../../docs/DOKUMENTBAUM.md) ist jetzt
+im Kern implementiert: 307 Originalfälle, 683.008 eigene Assertions und
+gezielte ASan/UBSan bestehen; 29 Kern-Debug-Tests bestehen. Baum/Projektion
+sind noch nicht mit der App verbunden; Listen-/Zitat-UI bleibt offen. Die installierte App bleibt 0.9.16.
 
-Nächster Schritt: Dokumentbaum auf der Projektion aufbauen; vollständige
-Containerfortsetzung, Referenzen in Containern und gemeinsame Titel-/Reader-/
-Tabellen-/Graphanbindung implementieren und gegen Originale prüfen. Neue
+Nächster Schritt: gemeinsame Titel-/Reader-/Tabellen-/Graphanbindung an den
+Baum und seine Referenzen, danach sichtbare/nativ bedienbare Container
+implementieren und gegen Originale prüfen. Neue
 Plattformnachweise jeweils anhand tatsächlicher Jobs übernehmen.
+Die Folge-CI zu 0a1e872 hat einen noch unbekannten Windows-Debug-Testfehler
+ohne LastTest-Diagnose; Einstiegserfassung ist ergänzt, tatsächliche neue
+Nachprüfung steht noch aus.
 
 ## Weitere offene Release-Arbeit
 

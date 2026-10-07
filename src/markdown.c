@@ -93,6 +93,19 @@ static bool opening(const SBMarkdown *r,Line l,char *marker,size_t *count) {
     if (!*count) return false;
     return *marker!='`' || !memchr(r->text+tail,'`',l.end-tail);
 }
+void sb_markdown_probe(const char *text,size_t end,size_t body,unsigned indent,SBMarkdownProbe *probe) {
+    if (!probe) return;
+    *probe=(SBMarkdownProbe){.kind=SB_MD_TEXT,.content=body,.length=end>=body ? end-body : 0};
+    if (!text || body>end) return;
+    SBMarkdown reader={.text=text,.length=end};
+    Line line={.start=body,.end=end,.content=body,.indent=indent};
+    SBMarkdownBlock block={0};
+    probe->setext=underline(&reader,line);
+    if (body==end) { probe->kind=SB_MD_BLANK;return; }
+    if (heading(&reader,line,&block)) { probe->kind=block.kind;probe->content=block.content;probe->length=block.length;probe->level=block.level; }
+    else if (opening(&reader,line,&probe->fence,&probe->fence_length)) probe->kind=SB_MD_FENCE;
+    else if (rule(&reader,line)) probe->kind=SB_MD_RULE;
+}
 bool sb_markdown_boundary(const char *text,size_t length,size_t offset) {
     if (!text || offset>=length) return true;
     SBMarkdown r={.text=text,.length=length}; Line l=line_at(&r,offset);

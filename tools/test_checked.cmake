@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
+if(NOT SB_TEST_DIR)
+    message(FATAL_ERROR "SB_TEST_DIR is required")
+endif()
 get_filename_component(cmake_bin "${CMAKE_COMMAND}" DIRECTORY)
 find_program(ctest_executable ctest HINTS "${cmake_bin}" REQUIRED)
-execute_process(COMMAND "${ctest_executable}" --test-dir "${SB_TEST_DIR}" -C "${SB_TEST_CONFIG}" --output-on-failure
+execute_process(COMMAND "${ctest_executable}" --test-dir "${SB_TEST_DIR}" -C "${SB_TEST_CONFIG}" --output-on-failure --no-tests=error
     RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE errors)
 message("${output}${errors}")
 if(EXISTS "${SB_TEST_DIR}/Testing/Temporary/LastTest.log")

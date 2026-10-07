@@ -33,8 +33,9 @@ nicht als Laufzeitbibliothek eingebunden oder in den eigenen Kern kopiert.
 Der unveränderte Originaldatensatz enthält 25 Blockquote-, 48 List-item- und
 26 List-Fälle. Seine bereits festgelegte Herkunft/Lizenz steht unter
 [tests/data/commonmark-0.31.2](../tests/data/commonmark-0.31.2/README.md).
-Diese Fälle sind für die folgende Baum-Abnahme vorgesehen; ihre Zählung ist
-noch kein Nachweis einer Implementierung.
+Diese 99 Fälle sind inzwischen Teil des 307er-Baumvergleichs. Die
+[Kernimplementierung und weitere offene Integration](DOKUMENTBAUM.md) sind dort
+getrennt dokumentiert; daraus folgt noch keine App-Abnahme.
 
 ## Implementierte Voraussetzung: Quellprojektion
 

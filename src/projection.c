@@ -37,6 +37,7 @@ static SBStatus reserve(SBProjection *v,size_t extra,bool merge) {
     return sb_ok();
 }
 static void span(SBProjection *v,size_t offset,size_t length,size_t source_length,bool copy,bool merge) {
+    if(!v->length)v->origin=offset;
     if(merge){v->spans[v->count-1].length+=length;v->spans[v->count-1].source_length+=source_length;}
     else v->spans[v->count++]=(SBProjectionSpan){v->length,length,offset,source_length,copy};
     v->length+=length;v->text[v->length]=0;
@@ -68,11 +69,17 @@ SBStatus sb_projection_newline(SBProjection *v,size_t offset,size_t length) {
 }
 SBStatus sb_projection_source(const SBProjection *v,size_t offset,size_t *source) {
     if(!v || !v->text || !source || offset>v->length)return sb_error(SB_INVALID,"Projektionsposition ist ungültig.");
-    if(offset==v->length){*source=v->count ? v->spans[v->count-1].source+v->spans[v->count-1].source_length : 0;return sb_ok();}
+    if(offset==v->length){*source=v->count ? v->spans[v->count-1].source+v->spans[v->count-1].source_length : v->origin;return sb_ok();}
     size_t lo=0,hi=v->count;
     while(lo<hi){size_t mid=lo+(hi-lo)/2;if(v->spans[mid].view+v->spans[mid].length<=offset)lo=mid+1;else hi=mid;}
     if(lo==v->count)return sb_error(SB_INVALID,"Quellposition fehlt.");
     const SBProjectionSpan *s=&v->spans[lo];*source=s->source+(s->copy ? offset-s->view : 0);return sb_ok();
+}
+SBStatus sb_projection_truncate(SBProjection *v,size_t length) {
+    if(!v || !v->text || length>v->length)return sb_error(SB_INVALID,"Projektionsende ist ungültig.");
+    while(v->count && v->spans[v->count-1].view>=length)--v->count;
+    if(v->count){SBProjectionSpan *last=&v->spans[v->count-1];if(last->view+last->length>length){last->length=length-last->view;if(last->copy)last->source_length=last->length;}}
+    v->length=length;v->text[length]=0;return sb_ok();
 }
 SBStatus sb_projection_cursor(SBProjectionCursor *cursor,size_t offset,size_t end,size_t column) {
     if(!cursor || offset>end)return sb_error(SB_INVALID,"Zeilenposition ist ungültig.");
@@ -101,9 +108,9 @@ SBStatus sb_projection_remainder(SBProjection *v,const SBProjectionCursor *curso
     if(!v || !v->text || !cursor || cursor->end>v->source_length || cursor->byte>cursor->end || cursor->pending>3 ||
        (cursor->pending && (cursor->anchor>=v->source_length || v->source[cursor->anchor]!='\t')))
         return sb_error(SB_INVALID,"Restbereich ist ungültig.");
-    size_t previous_length=v->length,previous_count=v->count;
+    size_t previous_length=v->length,previous_count=v->count,previous_origin=v->origin;
     SBStatus status=cursor->pending ? sb_projection_spaces(v,cursor->pending,cursor->anchor) : sb_ok();
     if(status.code==SB_OK)status=sb_projection_copy(v,cursor->byte,cursor->end-cursor->byte);
-    if(status.code!=SB_OK){v->length=previous_length;v->count=previous_count;v->text[v->length]=0;}
+    if(status.code!=SB_OK){v->length=previous_length;v->count=previous_count;v->origin=previous_origin;v->text[v->length]=0;}
     return status;
 }

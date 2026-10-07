@@ -141,38 +141,54 @@ bool sb_reference_parse(const char *t,size_t n,size_t offset,SBReferenceDefiniti
 }
 static int compare(const void *a,const void *b) {
     const SBReference *x=a,*y=b;int c=strcmp(x->name,y->name);
-    return c ? c : x->source.offset<y->source.offset ? -1 : x->source.offset>y->source.offset;
+    return c ? c : x->order<y->order ? -1 : x->order>y->order;
 }
 void sb_references_free(SBReferences *r) {
     if(!r)return;
     for(size_t i=0;i<r->count;++i)free(r->items[i].name);
     free(r->items);*r=(SBReferences){0};
 }
-SBStatus sb_references_init(SBReferences *r,const char *text,size_t length) {
+SBStatus sb_references_begin(SBReferences *r,const char *text,size_t length) {
     if(!r)return sb_error(SB_INVALID,"Referenzumgebung fehlt.");
     *r=(SBReferences){.text=text,.length=length};
     if((!text && length) || length>SB_TEXT_LIMIT)return sb_error(SB_INVALID,"Referenztext ist ungültig oder zu groß.");
+    return sb_ok();
+}
+SBStatus sb_references_add(SBReferences *r,const char *text,size_t length,const SBReferenceDefinition *source,size_t order) {
+    if(!r || !text || !source || length>SB_TEXT_LIMIT+1 || order>r->length ||
+       source->label>length || source->label_length>length-source->label ||
+       source->destination>length || source->destination_length>length-source->destination ||
+       source->offset>source->end || source->end>length)return sb_error(SB_INVALID,"Referenzbereich ist ungültig.");
+    char name[SB_REFERENCE_LABEL_CAP];SBStatus status=sb_reference_label(text+source->label,source->label_length,name,sizeof(name));
+    if(status.code!=SB_OK)return status;
+    size_t bytes=strlen(name)+1;
+    if(r->count==SB_REFERENCE_LIMIT || bytes>SB_TEXT_LIMIT-r->name_bytes)return sb_error(SB_LIMIT,"Das Dokument enthält zu viele Referenzdefinitionen.");
+    if(r->count==r->capacity){size_t capacity=r->capacity ? r->capacity*2 : 32;void *items=realloc(r->items,capacity*sizeof(*r->items));if(!items)return sb_error(SB_MEMORY,"Kein Speicher für Referenzdefinitionen.");r->items=items;r->capacity=capacity;}
+    char *copy=malloc(bytes);if(!copy)return sb_error(SB_MEMORY,"Kein Speicher für Referenznamen.");
+    memcpy(copy,name,bytes);r->items[r->count++]=(SBReference){.name=copy,.source=*source,.text=text,.length=length,.order=order};r->name_bytes+=bytes;
+    return sb_ok();
+}
+SBStatus sb_references_init(SBReferences *r,const char *text,size_t length) {
+    SBStatus initial=sb_references_begin(r,text,length);if(initial.code!=SB_OK)return initial;
     SBMarkdown reader;SBMarkdownBlock block;sb_markdown_init(&reader,text,length,false);
     while(sb_markdown_next(&reader,&block)) {
         if(reader.reference_limit)return sb_error(SB_LIMIT,"Markdown-Definitionen sind zu komplex.");
         if(block.kind!=SB_MD_REFERENCE)continue;
         SBReferenceDefinition source;
         if(!sb_reference_parse(text,length,block.offset,&source,&reader.reference_budget))return sb_error(SB_LIMIT,"Markdown-Definitionen sind zu komplex.");
-        char name[SB_REFERENCE_LABEL_CAP];SBStatus status=sb_reference_label(text+source.label,source.label_length,name,sizeof(name));
-        if(status.code!=SB_OK)return status;
-        size_t bytes=strlen(name)+1;
-        if(r->count==SB_REFERENCE_LIMIT || bytes>SB_TEXT_LIMIT-r->name_bytes)return sb_error(SB_LIMIT,"Das Dokument enthält zu viele Referenzdefinitionen.");
-        if(r->count==r->capacity){size_t capacity=r->capacity ? r->capacity*2 : 32;void *items=realloc(r->items,capacity*sizeof(*r->items));if(!items)return sb_error(SB_MEMORY,"Kein Speicher für Referenzdefinitionen.");r->items=items;r->capacity=capacity;}
-        char *copy=malloc(bytes);if(!copy)return sb_error(SB_MEMORY,"Kein Speicher für Referenznamen.");
-        memcpy(copy,name,bytes);r->items[r->count++]=(SBReference){copy,source};r->name_bytes+=bytes;
+        SBStatus status=sb_references_add(r,text,length,&source,source.offset);if(status.code!=SB_OK)return status;
     }
+    sb_references_finish(r);return sb_ok();
+}
+void sb_references_finish(SBReferences *r) {
+    if(!r)return;
     if(r->count>1)qsort(r->items,r->count,sizeof(*r->items),compare);
     size_t used=0;
     for(size_t i=0;i<r->count;++i){
         if(used && !strcmp(r->items[used-1].name,r->items[i].name)){r->name_bytes-=strlen(r->items[i].name)+1;free(r->items[i].name);}
         else r->items[used++]=r->items[i];
     }
-    r->count=used;return sb_ok();
+    r->count=used;
 }
 size_t sb_reference_find(const SBReferences *r,const char *text,size_t length) {
     if(!r || !r->count)return SIZE_MAX;

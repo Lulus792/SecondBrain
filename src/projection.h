@@ -9,7 +9,7 @@ typedef struct {
 } SBProjectionSpan;
 typedef struct {
     const char *source;
-    size_t source_length;
+    size_t source_length,origin;
     char *text;
     size_t length,capacity;
     SBProjectionSpan *spans;
@@ -24,6 +24,7 @@ SBStatus sb_projection_copy(SBProjection *view,size_t offset,size_t length);
 SBStatus sb_projection_spaces(SBProjection *view,size_t count,size_t source_tab);
 SBStatus sb_projection_newline(SBProjection *view,size_t offset,size_t length);
 SBStatus sb_projection_source(const SBProjection *view,size_t offset,size_t *source);
+SBStatus sb_projection_truncate(SBProjection *view,size_t length);
 SBStatus sb_projection_cursor(SBProjectionCursor *cursor,size_t offset,size_t end,size_t column);
 /* Consume only indentation; a short prefix succeeds with consumed < requested.
    A tab can be partially consumed. Errors leave the cursor unchanged. */

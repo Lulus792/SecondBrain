@@ -10,6 +10,8 @@ typedef struct {
 typedef struct {
     char *name;
     SBReferenceDefinition source;
+    const char *text;
+    size_t length,order;
 } SBReference;
 typedef struct {
     const char *text;
@@ -21,4 +23,7 @@ bool sb_reference_parse(const char *text,size_t length,size_t offset,SBReference
 SBStatus sb_references_init(SBReferences *references,const char *text,size_t length);
 void sb_references_free(SBReferences *references);
 size_t sb_reference_find(const SBReferences *references,const char *text,size_t length);
+SBStatus sb_references_begin(SBReferences *references,const char *source,size_t length);
+SBStatus sb_references_add(SBReferences *references,const char *text,size_t length,const SBReferenceDefinition *definition,size_t original_offset);
+void sb_references_finish(SBReferences *references);
 #endif

@@ -52,6 +52,11 @@ int main(void) {
     }
     CHECK(sb_projection_init(&v,"abcdef",6).code==SB_OK);
     CHECK(sb_projection_copy(&v,0,3).code==SB_OK && sb_projection_copy(&v,3,3).code==SB_OK && v.count==1 && !strcmp(v.text,"abcdef"));sb_projection_free(&v);
+    CHECK(sb_projection_init(&v,"abcdef",6).code==SB_OK && sb_projection_copy(&v,2,4).code==SB_OK);
+    CHECK(sb_projection_truncate(&v,2).code==SB_OK && !strcmp(v.text,"cd"));
+    CHECK(sb_projection_source(&v,2,&origin).code==SB_OK && origin==4);
+    CHECK(sb_projection_truncate(&v,0).code==SB_OK && !v.count && sb_projection_source(&v,0,&origin).code==SB_OK && origin==2);
+    CHECK(sb_projection_truncate(&v,1).code==SB_INVALID && !v.length);sb_projection_free(&v);
     uint32_t seed=0x1706;
     for(unsigned run=0;run<3000;++run){
         char raw[80],original[80];size_t n=run%79;for(size_t i=0;i<n;++i){seed=seed*1664525u+1013904223u;raw[i]=" \tab"[(seed>>16)%4];}
