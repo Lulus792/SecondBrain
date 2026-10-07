@@ -2,7 +2,7 @@
 
 Stand: 7. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Der aktuelle Entwicklungsschritt 0.9.11 ergänzt gemeinsame Markdown-Hervorhebungen.
+Der aktuelle Entwicklungsschritt 0.9.12 ergänzt native Textstile.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
 ## Abgeschlossene Grundlagen
@@ -1362,3 +1362,40 @@ läuft. Zum dokumentierten Zwischenstand bestehen alle sechs C-Kern- und sechs
 Python-Jobs; die acht Desktopjobs laufen oder warten noch. Neue automatische
 Desktop-/Paketabnahmen erst nach tatsächlichem Abschluss übernehmen. Menschliche
 assistive Bedienung, native Stilattribute und weitere Release-Aufgaben bleiben offen.
+
+
+## Native Textstile in 0.9.12
+
+Leseabsätze, formatierte Überschriften, Codeblöcke und Tabellenzellen veröffentlichen
+Stilbereiche mit Gewicht, Kursivmerkmal, primärer Schriftfamilie und logischer
+Größe. Sichtbare und native Bereiche verwenden dieselbe Graphem-Anpassung.
+Snapshots besitzen ihre eigenen Kopien und aktualisieren auch bei Stiländerungen.
+Der Quelleditor behält seine zusammenhängende unformatierte Auswahl-/Bearbeitung.
+[Vertrag und Originalquellen](NATIVE_TEXTSTILE.md).
+
+Drei erste gezielte Prüfungen bestehen (18,59 s); die erweiterte Nachprüfung
+besteht mit 374 nativen, 85 Text- und 111 Editorassertions (20,21 s). Alle
+34 lokalen Intel/macOS-Release-Tests bestehen (279,40 s). Zusätzliche native
+Zellattributprüfung: 376 Assertions, 17,84 s. Abschließende API-Attributprüfung
+bei ausschließlich geändertem Stil: 380 Assertions, 12,63 s. Der API-Test hält
+Text, Rolle, Titel und Geometrie unverändert; er ist zusätzlich zur tatsächlichen
+UI-Integration ausgeführt. Aktuelles Schrift-Raster betrachtet. Der vorige
+Provider scheitert an fehlenden Fontattributen (ACCESSIBILITY FAIL 321).
+
+Eigene UI-, Text-, Desktop-, Zugänglichkeits-, Graphem- und Inline-Komponenten
+sowie native Tests sind unter ASan/UBSan instrumentiert; erster erweiterter Lauf
+besteht mit 376 Assertions. Übriger Kern/externe Bibliotheken sind nicht
+vollständig instrumentiert und Leakprüfung ist deaktiviert. Die abschließende
+Sanitizer-Nachprüfung besteht ebenfalls mit 380 Assertions. Ohne Stilanteil
+in der Änderungskennung scheitert die reine Stil-Fixture an ACCESSIBILITY FAIL 362.
+Logs: build/native-styles-{target,final,full,cell,only}-check.log,
+native-styles-sanitize/{result,final-result}.log,
+native-styles-regression/result.log und native-styles-signature-regression/result.log.
+UI-Bericht SBUI-046: /Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-07_14-53-36/UI_REVIEW.md.
+
+macOS-Fontattribute sind tatsächlich über AppKit-Textbereiche gelesen; neue
+Windows-UIA- und Linux-AT-SPI-Aufrufe sind ergänzt. Neue native Plattform-/Paket-
+abnahme folgt nach Quellpush. Eine primäre Familie ist keine tatsächliche
+Fallbackangabe pro Zeichen; grobe Laufrechtecke sind keine exakten Zeichenrechtecke.
+Menschliche assistive Bedienung, Bidi/IME/Geometrie, native Tabellen-Matrix-
+schnittstellen und weitere Release-Aufgaben bleiben offen. 1.0 ist nicht freigegeben.

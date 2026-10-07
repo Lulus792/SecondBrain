@@ -97,19 +97,20 @@ static float styled_layout_view(SBUi *ui,const struct nk_user_font *base,const S
     }
     return y+line_height+2*pad.y;
 }
-static float styled_layout(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,struct nk_rect bounds,bool draw,nk_flags alignment,StyledLines *lines) {
+bool sb_ui_styled_spans(const SBStyledText *text,SBTextSpan **spans,size_t *count) {
+    *spans=NULL; *count=0;
     size_t length=strlen(text->text),covered=0;
     for (size_t i=0;i<text->count;++i) {
         SBTextSpan span=text->spans[i];
-        if (span.offset!=covered || !span.length || span.length>length-covered) return 0;
+        if (span.offset!=covered || !span.length || span.length>length-covered) return false;
         covered+=span.length;
     }
-    if (covered!=length) return 0;
+    if (covered!=length) return false;
     SBGrapheme reader; SBGraphemeBoundary boundary;
-    if (!sb_grapheme_init(&reader,text->text,length)) return 0;
+    if (!sb_grapheme_init(&reader,text->text,length)) return false;
     SBStyledText display={.text=text->text};
     display.spans=malloc((text->count ? text->count : 1)*sizeof(*display.spans));
-    if (!display.spans) return 0;
+    if (!display.spans) return false;
     size_t start=0,index=0; sb_grapheme_next(&reader,&boundary);
     while (sb_grapheme_next(&reader,&boundary)) {
         while (index<text->count && text->spans[index].offset+text->spans[index].length<=start) ++index;
@@ -119,6 +120,11 @@ static float styled_layout(SBUi *ui,const struct nk_user_font *base,const SBStyl
         else display.spans[display.count++]=(SBTextSpan){start,boundary.byte-start,style};
         start=boundary.byte;
     }
+    *spans=display.spans; *count=display.count; return true;
+}
+static float styled_layout(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,struct nk_rect bounds,bool draw,nk_flags alignment,StyledLines *lines) {
+    SBStyledText display={.text=text->text};
+    if (!sb_ui_styled_spans(text,&display.spans,&display.count)) return 0;
     float height=styled_layout_view(ui,base,&display,bounds,draw,alignment,lines); free(display.spans); return height;
 }
 float sb_ui_styled_height(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,float width) {

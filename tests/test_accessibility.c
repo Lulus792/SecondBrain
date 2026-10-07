@@ -32,6 +32,30 @@ static void *native_find(void *object,const char *label,unsigned depth) {
     }
     return NULL;
 }
+static bool native_text_style(void *view,const char *label,const char *word,char *output,size_t capacity) {
+    typedef struct { size_t location,length; } Range;
+    void *reader=native_find(view,label,0); if (!reader) return false;
+    size_t count=((size_t(*)(void *,SEL))objc_msgSend)(reader,sel_registerName("accessibilityNumberOfCharacters"));
+    if (!count) return false;
+    void *rich=((void *(*)(void *,SEL,Range))objc_msgSend)(reader,sel_registerName("accessibilityAttributedStringForRange:"),(Range){0,count});
+    if (!rich) return false;
+    void *plain=send(rich,"string");
+    Range found=((Range(*)(void *,SEL,void *))objc_msgSend)(plain,sel_registerName("rangeOfString:"),string(word));
+    if (found.location>=count) return false;
+    void *attrs=((void *(*)(void *,SEL,size_t,Range *))objc_msgSend)(rich,sel_registerName("attributesAtIndex:effectiveRange:"),found.location,NULL);
+    void *font=((void *(*)(void *,SEL,void *))objc_msgSend)(attrs,sel_registerName("objectForKey:"),string("AXFont"));
+    if (!font) return false;
+    void *bold=((void *(*)(void *,SEL,void *))objc_msgSend)(font,sel_registerName("objectForKey:"),string("AXFontBold"));
+    void *italic=((void *(*)(void *,SEL,void *))objc_msgSend)(font,sel_registerName("objectForKey:"),string("AXFontItalic"));
+    void *family=((void *(*)(void *,SEL,void *))objc_msgSend)(font,sel_registerName("objectForKey:"),string("AXFontFamily"));
+    void *size=((void *(*)(void *,SEL,void *))objc_msgSend)(font,sel_registerName("objectForKey:"),string("AXFontSize"));
+    if (!family || !size) return false;
+    bool b=bold && ((BOOL(*)(void *,SEL))objc_msgSend)(bold,sel_registerName("boolValue"));
+    bool it=italic && ((BOOL(*)(void *,SEL))objc_msgSend)(italic,sel_registerName("boolValue"));
+    float points=((float(*)(void *,SEL))objc_msgSend)(size,sel_registerName("floatValue"));
+    snprintf(output,capacity,"%d|%d|%s|%.1f",b ? 700 : 400,it,utf8(family),points); return true;
+}
+
 #endif
 static unsigned checks;
 #define CHECK(x) do { ++checks; if (!(x)) { fprintf(stderr,"ACCESSIBILITY FAIL %d: %s\n",__LINE__,#x); return 1; } } while (0)
@@ -49,6 +73,12 @@ static void frame(SBDesktop *d) { frame_run(d,true); }
 /* Polling the real client still processes input, layout, native updates and
    actions. The next observed state is rasterized by frame()/capture. */
 static void pump(void *context) { frame_run(context,false); }
+/* Keep an API-only snapshot stable while the real client reads it. */
+static void pump_snapshot(void *context) {
+    SBDesktop *d=context; SDL_Event event;
+    while (SDL_PollEvent(&event)) sb_desktop_event(d,&event);
+}
+
 #endif
 static Uint64 phase_start;
 static void checkpoint(const char *phase) {
@@ -286,6 +316,53 @@ int main(int argc,char **argv) {
     link_key.key.key=SDLK_ESCAPE; sb_desktop_event(&d,&link_key); frame(&d); frame(&d);
     CHECK(!d.model.source && !strcmp(d.model.editor,inline_source));
     OK(sb_path_join(dump_path,sizeof(dump_path),root,"inline-links.bmp")); CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    strcpy(d.model.editor,"# **Stilprüfung**\n\n🛰️ Normal *kursiv* **fett** ***beides*** und `code`.\n\n```\nBlockcode\n```\n");
+    OK(sb_app_save(&d.model)); d.reset_reader=true; frame(&d); frame(&d);
+#if defined(__APPLE__) || defined(_WIN32) || defined(SB_ATSPI_TEST)
+    const char *style_words[]={"Normal","kursiv","fett","beides","code","Stilprüfung","Blockcode"};
+    const char *style_values[]={"400|0|Noto Sans|18.0","400|1|Noto Sans|18.0","700|0|Noto Sans|18.0","700|1|Noto Sans|18.0","400|0|Noto Sans Mono|18.0","700|0|Noto Sans|26.0","400|0|Noto Sans Mono|17.0"};
+    for (size_t i=0;i<7;++i) {
+        char value[256]={0};
+#ifdef __APPLE__
+        CHECK(native_text_style(view,d.model.title,style_words[i],value,sizeof(value)));
+#elif defined(_WIN32) || defined(SB_ATSPI_TEST)
+        CHECK(sb_native_probe(d.ui.window,d.model.title,style_words[i],SB_NATIVE_TEXT_STYLE,value,sizeof(value),pump,&d));
+#endif
+        CHECK(!strcmp(value,style_values[i]));
+    }
+    /* The plain text is unchanged: style metadata alone must refresh the provider. */
+    strcpy(d.model.editor,"# **Stilprüfung**\n\n🛰️ Normal **kursiv** *fett* ***beides*** und `code`.\n\n```\nBlockcode\n```\n");
+    OK(sb_app_save(&d.model)); frame(&d); frame(&d);
+    char refreshed_style[256]={0};
+#ifdef __APPLE__
+    CHECK(native_text_style(view,d.model.title,"kursiv",refreshed_style,sizeof(refreshed_style)));
+#elif defined(_WIN32) || defined(SB_ATSPI_TEST)
+    CHECK(sb_native_probe(d.ui.window,d.model.title,"kursiv",SB_NATIVE_TEXT_STYLE,refreshed_style,sizeof(refreshed_style),pump,&d));
+#endif
+    CHECK(!strcmp(refreshed_style,"700|0|Noto Sans|18.0"));
+    OK(sb_ui_fonts(&d.ui,2));frame(&d);frame(&d);
+#ifdef __APPLE__
+    CHECK(native_text_style(view,d.model.title,"code",refreshed_style,sizeof(refreshed_style)));
+#elif defined(_WIN32) || defined(SB_ATSPI_TEST)
+    CHECK(sb_native_probe(d.ui.window,d.model.title,"code",SB_NATIVE_TEXT_STYLE,refreshed_style,sizeof(refreshed_style),pump,&d));
+#endif
+    CHECK(!strcmp(refreshed_style,"400|0|Noto Sans Mono|36.0"));
+    OK(sb_ui_fonts(&d.ui,1));frame(&d);frame(&d);
+    SBTextSpan only_style={0,strlen("Gleicher Text"),0};
+    SBAccessibleItem snapshot={.id="style-only",.label="Nur Stil",.value="Gleicher Text",
+        .role=ACCESSKIT_ROLE_DOCUMENT,.bounds={0,0,500,100},.styles=&only_style,.style_count=1,.font_size=18};
+    for (unsigned changed=0;changed<2;++changed) {
+        only_style.style=changed ? SB_TEXT_BOLD : 0;
+        sb_accessibility_update(d.accessibility,"Stilprobe","",&snapshot,1,"",false,d.semantic_context);
+#ifdef __APPLE__
+        CHECK(native_text_style(view,"Nur Stil","Gleicher",refreshed_style,sizeof(refreshed_style)));
+#else
+        CHECK(sb_native_probe(d.ui.window,"Nur Stil","Gleicher",SB_NATIVE_TEXT_STYLE,refreshed_style,sizeof(refreshed_style),pump_snapshot,&d));
+#endif
+        CHECK(!strcmp(refreshed_style,changed ? "700|0|Noto Sans|18.0" : "400|0|Noto Sans|18.0"));
+    }
+    frame(&d);frame(&d);checkpoint("native inline font attributes");
+#endif
     char *previous_context=d.context; d.context=malloc(80); CHECK(d.context);
     strcpy(d.context,"# Sichtbarer Projektname\n\nKontext zum Lesen.\n");
     d.form=SB_FORM_CONTEXT; frame(&d); frame(&d); bool context_heading=false;
@@ -342,6 +419,15 @@ int main(int argc,char **argv) {
     bool table_pattern=sb_native_probe(d.ui.window,"Tabelle",NULL,SB_NATIVE_READ_TABLE_SIZE,native_value,sizeof(native_value),pump,&d);
     if (table_pattern) CHECK(!strcmp(native_value,"4:3"));
     printf("Native table matrix interface: %s (tree checked separately).\n",table_pattern ? "available" : "unavailable; release gate open");
+#endif
+#if defined(__APPLE__) || defined(_WIN32) || defined(SB_ATSPI_TEST)
+    char native_cell_style[256]={0};
+#ifdef __APPLE__
+    CHECK(native_text_style(view,d.model.title,"Ctrl+S",native_cell_style,sizeof(native_cell_style)));
+#else
+    CHECK(sb_native_probe(d.ui.window,d.model.title,"Ctrl+S",SB_NATIVE_TEXT_STYLE,native_cell_style,sizeof(native_cell_style),pump,&d));
+#endif
+    CHECK(!strcmp(native_cell_style,"400|0|Noto Sans Mono|18.0"));
 #endif
     OK(sb_path_join(dump_path,sizeof(dump_path),root,"table-grid.bmp")); CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
     OK(sb_ui_fonts(&d.ui,2)); CHECK(SDL_SetWindowSize(d.ui.window,780,560)); frame(&d); frame(&d);

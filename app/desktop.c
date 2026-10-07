@@ -171,7 +171,7 @@ static SBTarget *target_add(SBDesktop *d, const char *id, struct nk_rect rect, S
     return item;
 }
 static void passive_clear(SBDesktop *d) {
-    for (size_t i=0;i<d->passive_count;++i) free(d->passive[i].text);
+    for (size_t i=0;i<d->passive_count;++i) { free(d->passive[i].text); free(d->passive[i].styles); }
     d->passive_count=0;
 }
 static void passive_span(SBDesktop *d,const char *id,const char *text,size_t length,accesskit_role role,struct nk_rect bounds) {
@@ -196,6 +196,11 @@ static void passive_span(SBDesktop *d,const char *id,const char *text,size_t len
 }
 static void passive_add(SBDesktop *d,const char *id,const char *text,accesskit_role role,struct nk_rect bounds) {
     passive_span(d,id,text,text ? strlen(text) : 0,role,bounds);
+}
+static void passive_styles(SBDesktop *d,size_t before,const SBStyledText *styled,float font_size) {
+    if (d->passive_count!=before+1 || !styled || strcmp(d->passive[before].text,styled->text)) return;
+    SBPassiveText *p=&d->passive[before];
+    if (sb_ui_styled_spans(styled,&p->styles,&p->style_count)) p->font_size=font_size;
 }
 static void document_span(SBDesktop *d,const char *text,size_t length,size_t offset,accesskit_role role,unsigned level,struct nk_rect bounds,unsigned slot,bool title) {
     char id[100]; snprintf(id,sizeof(id),"reader:block:%zu",offset);
@@ -709,6 +714,7 @@ static void accessible_publish(SBDesktop *d) {
         SBPassiveText *p=&d->passive[i]; SBAccessibleItem *v=&items[d->target_count+i];
         v->id=p->id; v->label=p->role==ACCESSKIT_ROLE_TABLE || p->role==ACCESSKIT_ROLE_ROW || p->role==ACCESSKIT_ROLE_CELL || p->role==ACCESSKIT_ROLE_COLUMN_HEADER || p->role==ACCESSKIT_ROLE_SPLITTER || !p->parent[0] || p->role==ACCESSKIT_ROLE_HEADING ? p->text : ""; v->value=p->role==ACCESSKIT_ROLE_TABLE || p->role==ACCESSKIT_ROLE_ROW || p->role==ACCESSKIT_ROLE_SPLITTER ? NULL : p->text; v->bounds=p->bounds; v->role=p->role;
         v->row=p->row; v->column=p->column; v->rows=p->rows; v->columns=p->columns;
+        v->styles=p->styles; v->style_count=p->style_count; v->font_size=p->font_size;
         v->parent=p->parent; v->level=p->level; v->order=((uint64_t)p->group<<32)|p->order;
     }
     qsort(items,controls,sizeof(*items),accessible_order);
@@ -1305,7 +1311,9 @@ static bool document_table(SBDesktop *d,const char *text,size_t length,size_t of
             float cell_height=stacked ? cell->height+2*padding : height;
             struct nk_rect cell_bounds=nk_rect(bounds.x+x,bounds.y+top,column_width,cell_height);
             char cell_id[100]; snprintf(cell_id,sizeof(cell_id),"reader:table:%zu:row:%zu:cell:%zu",offset,cell->row_offset,c);
+            size_t before=d->passive_count;
             table_passive(d,cell_id,cell->plain,r ? ACCESSKIT_ROLE_CELL : ACCESSKIT_ROLE_COLUMN_HEADER,row_id,cell_bounds,reader_top,slot,r,c,0,0);
+            passive_styles(d,before,&cell->styled,font->height);
             float y=top+padding;
             if (stacked && r && *cells[c].plain) {
                 nk_style_set_font(ctx,&d->ui.normal->handle);
@@ -1392,7 +1400,14 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
             float lines = measured < available * 0.92f ? 1 : ceilf(measured / available) + 1;
             float text_height=plain ? sb_ui_styled_height(&d->ui,font,&styled,ctx->current->layout->bounds.w) : lines*(font->height+4);
             nk_layout_row_dynamic(ctx,text_height+(heading ? 10 : 0),1);
+            size_t before=d->passive_count;
             document_span(d,shown,shown_length,block.offset,heading ? ACCESSKIT_ROLE_HEADING : code ? ACCESSKIT_ROLE_CODE : ACCESSKIT_ROLE_PARAGRAPH,heading,nk_widget_bounds(ctx),slot,false);
+            if (plain) passive_styles(d,before,&styled,font->height);
+            else if (code && shown_length) {
+                SBTextSpan code_span={0,shown_length,SB_TEXT_CODE};
+                SBStyledText literal={.text=d->passive_count==before+1 ? d->passive[before].text : "",.spans=&code_span,.count=1};
+                passive_styles(d,before,&literal,font->height);
+            }
             if (plain) sb_ui_styled_draw(&d->ui,font,&styled); else nk_text_wrap(ctx, shown, (int)shown_length);
             }
             sb_styled_free(&styled);

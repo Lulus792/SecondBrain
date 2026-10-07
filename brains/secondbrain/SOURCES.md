@@ -73,3 +73,5 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Abschnittstrennungen](../../docs/TRENNLINIEN.md): eigene Blockregel, Gestaltung, native Semantik und Prüfgrenzen.
 
 - [Inline-Stile](../../docs/INLINE_STILE.md): gemeinsamer C-Leser, Unicode-Zeichengruppen, Darstellung und Grenzen.
+
+- [Native Textstile](../../docs/NATIVE_TEXTSTILE.md): Stilbereiche, Fontattribute, echte native Prüfungen und Geometriegrenzen.

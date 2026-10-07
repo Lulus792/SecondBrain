@@ -57,5 +57,6 @@ vollständige Akzent-/Emoji-Kommandos trotz Formatgrenzen bei drei Schriftgröß
 Ausgeführte abschließende Ergebnisse stehen in STATUS.md.
 
 Gemischte Bidi-Absätze, kontextuelle Script-Formung über Schriftstilgrenzen,
-präzise Zeichenrechtecke, native Inline-Stilattribute und menschliche assistive
-Bedienung bleiben offen. Die neue visuelle Formatierung ersetzt diese Abnahmen nicht.
+präzise Zeichenrechtecke und menschliche assistive
+Bedienung bleiben offen. Die neue visuelle Formatierung ersetzt diese Abnahmen nicht. Ab 0.9.12
+werden [native Textstile](NATIVE_TEXTSTILE.md) separat angebunden und geprüft.

@@ -14,22 +14,21 @@ Entwürfe und erkannte Konflikte bleiben geschützt. Sicherung/Wiederherstellung
 Einstellungen, eigener Markdown-Blockleser und vollständige Graphem-Eingaben
 gehören zum bisherigen geprüften Umfang. [Verträge und Quellen](SOURCES.md).
 
-## Aktueller Arbeitsschritt 0.9.11
+## Aktueller Arbeitsschritt 0.9.12
 
-[Gemeinsame Inline-Stile](../../docs/INLINE_STILE.md) sind umgesetzt: sichtbare
-Hervorhebungen, Mono-Code, gemeinsame Grundlinien und vollständige Grapheme über
-Stilgrenzen. 34 erste Release-Tests und sieben abschließende betroffene Prüfungen
-bestehen lokal; 85 Text-, 352 native Assertions sowie 132 ausgewählte Normfälle.
-Eigene ASan/UBSan und neun Python-Strukturtests bestehen. Drei Raster betrachtet.
-Genauen Umfang und Grenzen nennen STATUS und der UI-Bericht SBUI-044/045.
-Das neue Intel-Paket besteht mit Desktop 126, Tastatur 142, Sicherung 75,
-Neustart und CLI. dist enthält 0.9.11, Build 54aa29fd7bc8; eigenes Gedächtnis
-geladen und Raster betrachtet. Neue Abnahme 37621658743 läuft: alle Kern-/
-Python-Jobs bestehen, Desktopjobs laufen oder warten noch.
+[Native Textstile](../../docs/NATIVE_TEXTSTILE.md) sind angebunden: gemeinsame
+Stilbereiche, primäre Fontrollen und Aktualisierung bei gleichem Klartext.
+34 lokale Release-Tests bestehen (279,40 s); abschließend 380 native Assertions,
+zusätzlich 85 Text- und 111 Editorassertions. Fonttraits, Überschrift/Codeblock,
+Tabellenzelle und 200-Prozent-Codegröße sind über echte AppKit-Abfragen geprüft.
+Voriger Provider scheitert; erste eigene ASan/UBSan mit 376 Assertions besteht.
+Abschließende eigene ASan/UBSan mit 380 Assertions besteht; ohne Stilsignatur
+scheitert die reine Stil-Fixture. UI-Bericht SBUI-046.
+Neue Paket-/Plattformabnahme folgt; dist enthält bisher 0.9.11, Build 54aa29fd7bc8.
 
-Die vorherige 0.9.10-Abnahme 37613957814 ist vollständig erfolgreich: 20 Jobs
-auf Windows, Linux, Intel-/ARM64-macOS einschließlich Release-Paketen. Kein neuer
-Plattformnachweis für 0.9.11 daraus ableiten.
+Die vorherige 0.9.11-Abnahme 37621658743 ist vollständig erfolgreich: 20 Jobs
+auf Windows, Linux, Intel-/ARM64-macOS einschließlich Release-Paketen. Daraus
+keinen neuen Plattformnachweis für 0.9.12 ableiten.
 
 ## Nächste Arbeit und Grenzen
 

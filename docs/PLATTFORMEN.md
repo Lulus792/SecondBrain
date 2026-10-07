@@ -698,3 +698,11 @@ läuft. Zum dokumentierten Zwischenstand bestehen alle sechs C-Kern- und sechs
 Python-Jobs; die acht Desktopjobs laufen oder warten noch. Neue automatische
 Desktop-/Paketabnahmen erst nach tatsächlichem Abschluss übernehmen. Menschliche
 assistive Bedienung, native Stilattribute und weitere Release-Aufgaben bleiben offen.
+
+
+Die [native 0.9.11-Abnahme zu 54aa29f](https://github.com/Lulus792/SecondBrain/actions/runs/37621658743)
+ist vollständig erfolgreich: 20 Jobs auf Windows, Linux, ARM64- und Intel-macOS,
+jeweils einschließlich des vorgesehenen Debug-/Release-Umfangs und tatsächlich
+entpackter Release-Pakete. Alle sechs C-Kern-, sechs Python- und acht Desktopjobs
+bestehen. Die gemeinsamen Hervorhebungen sind damit im automatisierten Umfang
+abgenommen; menschliche assistive und Geräteabnahmen bleiben offen.

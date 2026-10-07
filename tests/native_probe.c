@@ -130,6 +130,24 @@ static bool query(Probe *p) {
             snprintf(p->output,p->capacity,"%ld",level.lVal); success=true;
         }
         VariantClear(&level);
+    } else if (p->operation==SB_NATIVE_TEXT_STYLE) {
+        IUIAutomationTextPattern *pattern=NULL; IUIAutomationTextRange *document=NULL,*range=NULL;
+        hr=IUIAutomationElement_GetCurrentPatternAs(element,UIA_TextPatternId,&IID_IUIAutomationTextPattern,(void **)&pattern);
+        if (SUCCEEDED(hr) && pattern) hr=IUIAutomationTextPattern_get_DocumentRange(pattern,&document);
+        wchar_t *needle=wide(p->value); BSTR word=needle ? SysAllocString(needle) : NULL; free(needle);
+        if (SUCCEEDED(hr) && document && word) hr=IUIAutomationTextRange_FindText(document,word,FALSE,FALSE,&range); else hr=E_FAIL;
+        VARIANT weight,italic,family,size; VariantInit(&weight);VariantInit(&italic);VariantInit(&family);VariantInit(&size);
+        if (SUCCEEDED(hr) && range) hr=IUIAutomationTextRange_GetAttributeValue(range,UIA_FontWeightAttributeId,&weight);
+        if (SUCCEEDED(hr) && range) hr=IUIAutomationTextRange_GetAttributeValue(range,UIA_IsItalicAttributeId,&italic);
+        if (SUCCEEDED(hr) && range) hr=IUIAutomationTextRange_GetAttributeValue(range,UIA_FontNameAttributeId,&family);
+        if (SUCCEEDED(hr) && range) hr=IUIAutomationTextRange_GetAttributeValue(range,UIA_FontSizeAttributeId,&size);
+        char name[160];
+        if (SUCCEEDED(hr) && range && weight.vt==VT_I4 && italic.vt==VT_BOOL && family.vt==VT_BSTR && size.vt==VT_R8 &&
+            WideCharToMultiByte(CP_UTF8,WC_ERR_INVALID_CHARS,family.bstrVal,-1,name,sizeof(name),NULL,NULL)>0 && p->capacity) {
+            snprintf(p->output,p->capacity,"%ld|%d|%s|%.1f",weight.lVal,italic.boolVal!=VARIANT_FALSE,name,size.dblVal);success=true;
+        }
+        VariantClear(&weight);VariantClear(&italic);VariantClear(&family);VariantClear(&size);SysFreeString(word);
+        if (range) IUIAutomationTextRange_Release(range);if (document) IUIAutomationTextRange_Release(document);if (pattern) IUIAutomationTextPattern_Release(pattern);
     } else if (p->operation==SB_NATIVE_READ_DOCUMENT_TEXT) {
         IUIAutomationTextPattern *pattern=NULL; IUIAutomationTextRange *range=NULL; BSTR value=NULL;
         hr=IUIAutomationElement_GetCurrentPatternAs(element,UIA_TextPatternId,&IID_IUIAutomationTextPattern,(void **)&pattern);
@@ -242,6 +260,20 @@ static bool query(Probe *p) {
             const char *level=attributes ? g_hash_table_lookup(attributes,"level") : NULL;
             if (level && strlen(level)<p->capacity) { strcpy(p->output,level); success=true; }
             if (attributes) g_hash_table_unref(attributes);
+        } else if (p->operation==SB_NATIVE_TEXT_STYLE) {
+            AtspiText *text=atspi_accessible_get_text_iface(element);
+            char *content=text ? atspi_text_get_text(text,0,-1,&error) : NULL;
+            const char *word=content ? strstr(content,p->value) : NULL; int offset=0,start=0,end=0;
+            if (word) for (const char *c=content;c<word;++c) if (((unsigned char)*c&0xc0)!=0x80) ++offset;
+            GHashTable *attrs=word && !error ? atspi_text_get_text_attributes(text,offset,&start,&end,&error) : NULL;
+            const char *weight=attrs ? g_hash_table_lookup(attrs,"weight") : NULL;
+            const char *style=attrs ? g_hash_table_lookup(attrs,"style") : NULL;
+            const char *family=attrs ? g_hash_table_lookup(attrs,"family-name") : NULL;
+            const char *size=attrs ? g_hash_table_lookup(attrs,"size") : NULL;
+            if (!error && weight && family && size && start<=offset && end>offset && p->capacity) {
+                snprintf(p->output,p->capacity,"%s|%d|%s|%.1f",weight,style && !strcmp(style,"italic"),family,strtod(size,NULL)); success=true;
+            }
+            if (attrs) g_hash_table_unref(attrs);g_free(content);if (text) g_object_unref(text);
         } else if (p->operation==SB_NATIVE_READ_NAME) {
             char *name=atspi_accessible_get_name(element,&error);
             if (name && strlen(name)<p->capacity) { strcpy(p->output,name); success=true; }
