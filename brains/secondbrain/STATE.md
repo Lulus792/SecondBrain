@@ -32,20 +32,21 @@ und ASan/UBSan mit 5.644 Assertions. Der native macOS-Basisdurchlauf besteht.
 32 erste Release-Tests und sechs abschließende Nachprüfungen mit 256 nativen
 Assertions bestehen; Geometrie, Zellenansprung und Rasteransichten sind geprüft.
 Das entpackte Intel-Paket einschließlich Desktop, Tastatur, Sicherung, Neustart
-und CLI besteht; dist/SecondBrain enthält 0.9.6. Die frühere Betriebssystem-Startblockade ist behoben.
+und CLI besteht; dist/SecondBrain enthält inzwischen das geprüfte 0.9.7-Paket. Die frühere Betriebssystem-Startblockade ist behoben.
 UIA GridPattern und AT-SPI Table fehlen in den festgelegten Providern; die
 separate native Kinderprüfung ersetzt keine vollständige Tabellenbedienung.
 
 ## Weiterarbeiten
 
-0.9.7 ist unveröffentlicht: schmale Tabellen beginnen mit beschrifteten Werten;
+0.9.7 ist als 2edb2bf gepusht: schmale Tabellen beginnen mit beschrifteten Werten;
 Kopfzeilenlinks und native Struktur bleiben erhalten. Fünf passende lokale
 Prüfungen und abschließende 270 native Assertions bestehen; Regression mit
 vorherigem Renderer scheitert. Der 0.9.6-Lauf hat einen Windows-Debug-Timeout
 bei native-accessibility. Die Prüfrasterarbeit ist reduziert, Zustände und
 Endbilder bleiben geprüft. Neuer nativer Nachweis ist dafür erforderlich.
-Das neue entpackte Intel-Paket wird geprüft; danach Schritt committen/pushen
-und CI anhand tatsächlicher Ergebnisse prüfen.
+Das entpackte Intel-Paket einschließlich Desktop, Tastatur, Sicherung, Neustart
+und CLI besteht. Die [neue native Abnahme](https://github.com/Lulus792/SecondBrain/actions/runs/37596496154)
+läuft noch; tatsächliche Ergebnisse übernehmen und Windows Debug nachprüfen.
 Danach verbleibende Container-/Inline-/Listenregeln,
 Unicode-Textgeometrie/IME, Support-/Lizenzzuordnung und übrige Release-Aufgaben.
 Tatsächliche native Dialog- und menschliche VoiceOver/NVDA/Orca-Bedienung,

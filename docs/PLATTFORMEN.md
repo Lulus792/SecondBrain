@@ -539,7 +539,13 @@ Er darf nicht als vollständige Plattformabnahme gelten.
 Rasterarbeit im nativen Prüfprogramm. Fünf passende lokale Tests und die
 abschließende native Prüfung mit 270 Assertions bestehen. Der frühere Renderer
 scheitert an der Kopfzeilenregression; Rasterbilder mit 200 % wurden betrachtet.
-Das neue entpackte Intel-Paket und neue Windows-/Linux-/ARM64-Läufe stehen aus.
+Das entpackte Intel-Paket 0.9.7 besteht inzwischen mit 126 Desktop-, 142
+Tastatur- und 75 Sicherungsassertions, zwei Einstellungs-Neustartprozessen sowie
+dem Sicherungswerkzeug. SHA-256: `81da4693a2efdb816f782c8f8dd4710fb75643ec62bd477664108bc6da5e31de`.
+Die Umsetzung ist als 2edb2bf gepusht. Der
+[native Lauf 37596496154](https://github.com/Lulus792/SecondBrain/actions/runs/37596496154)
+läuft noch; insbesondere Windows Debug ist erst anhand seines neuen tatsächlichen
+Ergebnisses abgenommen.
 
 
 Der 0.9.6-Lauf 37593650781 ist inzwischen abgeschlossen: 19 von 20 Jobs bestehen,

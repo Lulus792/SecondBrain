@@ -1076,9 +1076,14 @@ auch bei langen Logs. Das wurde mit einem gezielt fehlschlagenden lokalen
 Diagnosefall geprüft. Die Ursache und Behebung des Windows-Timeouts werden erst
 nach einem neuen nativen Lauf als bestätigt geführt; kein Geräte-FPS-Nachweis.
 
-Das neue Intel-Paket wird entpackt geprüft. dist/SecondBrain bleibt bis zu dessen
-vollständig bestandenem Ablauf bei der geprüften 0.9.6. Neue native Plattform-
-prüfung und Paketnachweise stehen aus. Native Matrixschnittstellen, volle
+Das entpackte Intel-Paket 0.9.7 besteht mit 126 Desktop-, 142 Tastatur- und
+75 Sicherungsassertions, zwei Einstellungs-Neustartprozessen und dem produktiven
+Sicherungswerkzeug. Archiv-SHA-256: `81da4693a2efdb816f782c8f8dd4710fb75643ec62bd477664108bc6da5e31de`.
+Log: build/compact-table-package-check.log. dist/SecondBrain enthält dieses
+geprüfte Entwicklungspaket; Buildkennung 70c702bb89d8-dirty, vor Commit gepackt.
+Die Umsetzung ist als 2edb2bf gepusht; die
+[native 0.9.7-Abnahme](https://github.com/Lulus792/SecondBrain/actions/runs/37596496154)
+läuft noch. Neue Plattformnachweise stehen bis zum tatsächlichen Abschluss aus. Native Matrixschnittstellen, volle
 Containerregeln und menschliche assistive Bedienung bleiben Release-Aufgaben.
 
 
@@ -1086,3 +1091,5 @@ Der 0.9.6-Lauf 37593650781 ist inzwischen abgeschlossen: 19 von 20 Jobs bestehen
 einschließlich aller vier entpackten Release-Pakete. Einziger Fehler bleibt
 Windows Debug / native-accessibility / Timeout 120s. Die erfolgreichen Pakete
 belegen ihren konkreten Release-Ablauf, ersetzen aber keinen grünen Debug-Job.
+
+UI-Nachprüfung SBUI-037: /Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-07_10-49-33/UI_REVIEW.md.
