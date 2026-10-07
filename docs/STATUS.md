@@ -1972,3 +1972,23 @@ mit echten Git-Checkoutfiltern geprüft. Sieben Inventurprüfungen bestehen.
 Die CI-Fehlerausgabe erhält frühe Python-Fehler vor langen erfolgreichen
 Log-Enden; fünf echte Prozess-/Diagnoseprüfungen bestehen. Der Windows-
 Teststarterfehler bleibt bis zu genauer Diagnose und neuer Abnahme offen.
+
+
+## Installiertes Intel/macOS-Paket 0.9.21
+
+Sauberer Quellstand d7e328d2afa2 ist paketiert und nach dist/SecondBrain installiert.
+Entpacktes Paket besteht mit 126 Desktop-, 150 Tastatur- und 75 Sicherungsassertions,
+zwei tatsächlichen Neustartprozessen und produktiver CLI-Sicherung/Wiederherstellung
+im Unicode-Pfad. Beide Lizenzsammlungen sind in Paketwurzel und App bytegleich
+zum Manifest. Eigenes Gedächtnis geladen, Raster betrachtet und unveränderte
+Projektdateien per Hashinventur geprüft. Rückfallkopie:
+build/previous-dist-0.9.19-20261007-233745. Archiv-SHA-256:
+`2693e449490196dfb2a20061b599a0b0479a064504d2e52dcdf408444dd8b6c3`.
+Logs: build/literal-package-{configure,build,version,create,check}.log,
+literal-install.json und literal-installed-brain.log. Die nachfolgenden
+Git-Attribut-/Diagnosekorrekturen ändern auf macOS die App-/Lizenzbytes nicht.
+Neue Gesamt-Plattformabnahme, Windows-Teststarterdetails und weitere Release-
+Arbeit bleiben offen; 1.0 ist nicht gesetzt.
+
+[Quell-CI zu 1f1e23c](https://github.com/Lulus792/SecondBrain/actions/runs/37690493714)
+ist beim Abschluss queued; neuer Gesamt-Plattformnachweis steht aus.

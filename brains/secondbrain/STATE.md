@@ -12,12 +12,13 @@ KI-Kontext kopieren. Lumen-Sternkarte, eigene Glaskarten/Icons, direkte Pfeil-
 navigation, Raumfahrt, weiches Scrollen und große Leseansicht sind implementiert.
 Entwürfe, Originalbytes und erkannte Konflikte bleiben geschützt.
 
-Dist enthält lokal geprüftes **0.9.19, Build 9ab187aec5f2**, Intel/macOS Release.
-46/46 Tests (424,71 s), letzte Nachprüfung 4/4 (155,29 s), gezielte ASan/UBSan
-mit 95 Navigations- und 34 Graphassertions ohne Diagnose und
-entpacktes Paket bestehen. Desktop, Tastatur, Sicherung, Neustart und CLI sind
-geprüft; eigene Instanz in der installierten App geladen und Raster betrachtet.
-Die bisherige App 0.9.18 bleibt als Rückfallkopie in build/previous-dist-0.9.18-20261007-222210.
+Dist enthält lokal geprüftes **0.9.21, Build d7e328d2afa2**, Intel/macOS Release.
+Die letzten drei UI-/Native-/Tastaturprüfungen bestehen. Entpacktes Paket besteht
+mit 126 Desktop-, 150 Tastatur- und 75 Sicherungsassertions, zwei Neustart-
+prozessen und produktiver CLI-Sicherung/Wiederherstellung. Beide Lizenzsammlungen
+stimmen in Paketwurzel/App bytegenau mit dem Manifest überein. Eigenes Gedächtnis
+in installierter App geladen und Raster betrachtet; seine Dateien unverändert.
+0.9.19 bleibt als Rückfallkopie in build/previous-dist-0.9.19-20261007-233745.
 
 Quellschritt 9ab187a ist normal nach origin gepusht.
 [Neue CI 37680520037](https://github.com/Lulus792/SecondBrain/actions/runs/37680520037)
@@ -43,8 +44,8 @@ gefundene Reader-/UI-Pufferfehler sind korrigiert. Gezielte ASan/UBSan besteht
 mit 128 Assertions. Endgültig 44/44 Tests in 287,66 s bestanden. Der Materialvergleich besteht in 48 exakt gleichen Rastern.
 Keine pauschale FPS- oder menschliche assistive Abnahme.
 
-Nächster Schritt: Lizenzinventur abschließend prüfen/paketieren, neue CI-Nachweise
-übernehmen und weitere Release-Arbeiten. Die C-Graphfunktion erhält den
+Nächster Schritt: Windows-Teststarterdiagnose und neue CI-Nachweise auswerten,
+Rust-/Systemruntime-Inventur und weitere Release-Arbeiten fortsetzen. Die C-Graphfunktion erhält den
 letzten gültigen Graph. Die Desktop-Sicht
 hält ab 0.9.19 eine eigene zusammenhängende Inventur mit stabilen Kennungen.
 Gezielte Fehler-/Wiederherstellungsprüfung besteht. Neues Feedback führt zu
@@ -69,10 +70,13 @@ nach den festgelegten Voraussetzungen. Verträge und Originale in [SOURCES](SOUR
 0.9.20 erweitert die Lizenzansicht mit 113 zugeordneten Cargo-Komponenten und
 SDL-/HarfBuzz-Quellenhinweisen. 47/47 CTests und nachfolgende
 gezielte Prüfungen bestehen; beide großen Sammlungen sind per Tastatur gelesen/
-kopiert. 20 Python-Prüfungen bestehen. Saubere Paketabnahme folgt; Dist bleibt 0.9.19. Rust-/Systemruntime-Abgleich
+kopiert. 20 Python-Prüfungen bestehen. Paketabnahme ist in 0.9.21 abgeschlossen. Rust-/Systemruntime-Abgleich
 und vollständige transitive Release-Abnahme bleiben offen.
 
 0.9.21 überspringt unsichtbare Literal-Zeichenarbeit bei unverändertem Layout/
 nativer Semantik. Drei Nachprüfungen und 150 Tastaturassertions bestehen;
 drei vollständige Raster sind bytegleich. Lokale Layoutzeit bei 600 gleichen
-Testframes 81,55 → 4,88 s. Saubere Paketierung folgt.
+Testframes 81,55 → 4,88 s. Saubere Paketierung und Installation bestehen.
+
+[Quell-CI zu 1f1e23c](https://github.com/Lulus792/SecondBrain/actions/runs/37690493714)
+ist beim Abschluss queued; neuer Gesamt-Plattformnachweis steht aus.
