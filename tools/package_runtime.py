@@ -98,14 +98,22 @@ def main():
     for value in raw['resolved']:
         report['dependencies'].append({'path': value, 'category': category(value, root, sys.platform)})
     problems = raw['unresolved'] + raw['conflicts'] + [d['path'] for d in report['dependencies'] if d['category'].startswith('external-')]
+    report['problems'] = problems
     report['portable_linked_dependencies'] = not problems
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
     print('Package linked dependencies:', len(report['dependencies']), 'resolved;', len(problems), 'unresolved/external/conflicting')
     if problems:
+        detail = ', '.join(problems).replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+        print('::error title=Package runtime dependencies::' + detail, flush=True)
         raise RuntimeError('Package requires unresolved external runtime libraries: ' + ', '.join(problems))
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as error:
+        detail = (type(error).__name__ + ': ' + str(error)).replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+        print('::error title=Package runtime inspection::' + detail, flush=True)
+        raise

@@ -2128,3 +2128,19 @@ und CLI. Logs: build/package-runtime-{fixture-final,python-final,local}.log,
 package-runtime-local.json und dependency-package-check.log. Native Windows-/
 Linux-Abnahme des neuen Scanners, optionale dynamische Renderer-/Geräteimporte
 und frische Zielrechner bleiben offen. Die installierte App bleibt 0.9.22.
+
+
+## Paket-Importfehler unter Windows eingegrenzt
+
+CI 37700502066 zu b901333 besteht zuletzt in Windows-Debug, den Linux-
+Varianten und macOS ARM64. Windows-Release besteht seine App-Prüfungen,
+scheitert aber im entpackten Paketablauf nach erfolgreicher Paketerzeugung.
+Die vorherige Annotation enthält nur den Prozessstatus, noch keine konkreten
+fehlenden/externalen Laufzeitnamen. Diese Ursache wird nicht vorweggenommen.
+
+Referenz-MSVCDLL aus dem festgelegten AccessKit-Archiv importiert laut llvm-
+objdump VCRUNTIME140.dll; sie ist ein Hinweis, kein Nachweis für die aktuell
+gebaute Windows-DLL. Der Scanner schreibt nun konkrete Problemnamen zusätzlich
+als direkte CI-Annotation und erhält auch frühe Inspektionsfehler. Das echte
+Shared-Library-Fixture prüft fehlende Bibliothek, Bericht und Annotation und
+besteht lokal. Neuer Windows-Paketnachweis folgt.

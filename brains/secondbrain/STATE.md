@@ -48,3 +48,7 @@ Sicherheitskanal ist angefragt. Eigener Code MIT, Signaturkonten fehlen.
 
 Der vollständige Auftrag bleibt aktiv. 1.0 erst nach ausdrücklicher Freigabe;
 abschließende Produkttext-Bereinigung nach den festgelegten Voraussetzungen.
+
+Neue CI b901333: Windows-App-Prüfungen bestehen, Release-Paketprüfung scheitert.
+Direkte Runtime-Fehlerannotation ergänzt/geprüft; aktuelle Ursache/Behebung
+und vollständiger Plattformnachweis bleiben ausstehend.

@@ -72,6 +72,8 @@ class PackageRuntimeTests(unittest.TestCase):
             data = json.loads(output.read_text(encoding='utf-8'))
             self.assertFalse(data['portable_linked_dependencies'])
             self.assertTrue(data['unresolved'] or any(d['category'].startswith('external-') for d in data['dependencies']))
+            self.assertTrue(data['problems'])
+            self.assertIn(b'::error title=Package runtime dependencies::', result.stdout)
 
 
 if __name__ == '__main__':
