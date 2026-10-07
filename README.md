@@ -176,7 +176,9 @@ Abgeschlossene, geprüfte Arbeitsschritte werden committet und nach GitHub gepus
 
 Ab 0.8.0 kannst du unter **Darstellung → Über SecondBrain** die Version ansehen und
 die Buildangaben kopieren. Im Terminal zeigen App und CLI mit `--version`
-dieselben Angaben, ohne einen Arbeitsordner zu öffnen.
+dieselben Angaben, ohne einen Arbeitsordner zu öffnen. Unter **Lizenzen** lassen sich
+ab 0.9.3 die mitgelieferten Originaltexte direkt in der App lesen und kopieren.
+[Bedienung und Umfang](docs/LIZENZEN.md).
 
 Fehlerberichte sollten Betriebssystem, Version, Schritte zum Wiederholen und das
 beobachtete Verhalten enthalten. [GitHub Issues](https://github.com/Lulus792/SecondBrain/issues).

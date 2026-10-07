@@ -446,3 +446,29 @@ x64, Linux x64, macOS ARM64 und Intel sowie vier entpackte Pakete. Die
 Textprüfungen umfassen Verbindung, Fallbacks und Schriftgrößen im beschriebenen
 Umfang. Gemischte Schreibrichtungen und vollständige assistive Abnahme bleiben
 offen. Dieser Lauf ist kein Nachweis für die spätere Dokumentstruktur 0.9.1.
+
+## Linux-Ebenen und Fehlerszenarien 0.9.2
+
+Im [Lauf zu b69223c](https://github.com/Lulus792/SecondBrain/actions/runs/37548834947)
+bestehen inzwischen beide nativen Linux-Desktopjobs (Debug und Release). Sie
+führen 27 Tests einschließlich AT-SPI-Dokumenttext/-Ebenen, nativer Abschnitts-
+anfragen und echter Prozess-Kills aus. Der Releasejob bestätigt zudem das
+entpackte Linux-Paket. Die gehashte UI-Ebenenkorrektur ist damit auf Linux
+nachgeprüft. Windows Release und macOS ARM64 Debug/Release sowie Intel Release
+bestehen ebenfalls; weitere Jobs waren beim Eintrag noch nicht abgeschlossen.
+
+Dieser Lauf ist insgesamt noch keine erfolgreiche Gesamtabnahme: sechs
+Python-Jobs scheitern, weil die neuen Prozessskripte beim Import ausgeführt
+wurden. Die Korrektur 1358794 trennt Import und Ausführung. Neun lokale
+Generatorprüfungen und beide gezielten Prozess-/Volume-Nachprüfungen bestehen.
+[Wiederholung](https://github.com/Lulus792/SecondBrain/actions/runs/37549092934)
+ist separat abzunehmen. Keine Signierungs-, Geräte- oder menschliche
+Screenreader-Abnahme aus diesen CI-Ergebnissen abgeleitet.
+
+Der [Wiederholungslauf zu 1358794](https://github.com/Lulus792/SecondBrain/actions/runs/37549092934)
+besteht inzwischen mit allen 20 Jobs und vier entpackten Paketen. Acht native
+Desktopjobs prüfen Debug/Release auf Windows x64, Linux x64, macOS ARM64 und
+Intel: 27 Tests auf Windows/Linux, 28 auf macOS (zusätzlich echtes Fehler-Volume).
+Sechs C17-Kernjobs und sechs Python-Jobs bestehen ebenfalls. Damit sind die
+Linux-Ebenenkorrektur und die importseitige Testkorrektur auf den zugesagten
+CI-Systemen abgenommen. Dieser Nachweis betrifft 0.9.2; 0.9.3 folgt separat.

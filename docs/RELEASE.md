@@ -68,7 +68,8 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   Abnahme auf frischen Nutzerrechnern bleiben offen.
 - [ ] **Lizenz und Support klären:** Die eigene MIT-Lizenz ist auf Nutzerentscheidung festgelegt. Noch offen: alle
   Abhängigkeiten und übernommenen Anpassungen vollständig zuordnen, Fehler- und
-  Sicherheitsmeldungen sowie Wartung der UI-Abhängigkeiten organisieren.
+  Sicherheitsmeldungen sowie Wartung der UI-Abhängigkeiten organisieren. Ab 0.9.3
+  stehen 17 mitgelieferte Originaltexte direkt in der [App-Lizenzansicht](LIZENZEN.md).
 - [ ] **Endprodukt redaktionell prüfen:** kurze, natürliche Texte in App, Hilfe,
   Fehlermeldungen, Vorlagen und README; keine generischen Werbesätze oder unnötige
   Technik im normalen Bedienweg. Diese abschließende Bereinigung erfolgt auf

@@ -8,7 +8,7 @@
 #include "accessibility.h"
 #include "system_style.h"
 
-typedef enum { SB_FORM_NONE, SB_FORM_PROJECT, SB_FORM_NOTE, SB_FORM_WORKSPACE, SB_FORM_SETTINGS, SB_FORM_CONTEXT, SB_FORM_HELP, SB_FORM_ACTIONS, SB_FORM_PROJECTS, SB_FORM_FILTER,SB_FORM_BACKUP,SB_FORM_RESTORE,SB_FORM_ABOUT } SBForm;
+typedef enum { SB_FORM_NONE, SB_FORM_PROJECT, SB_FORM_NOTE, SB_FORM_WORKSPACE, SB_FORM_SETTINGS, SB_FORM_CONTEXT, SB_FORM_HELP, SB_FORM_ACTIONS, SB_FORM_PROJECTS, SB_FORM_FILTER,SB_FORM_BACKUP,SB_FORM_RESTORE,SB_FORM_ABOUT,SB_FORM_NOTICE_LIST,SB_FORM_NOTICE_TEXT } SBForm;
 typedef enum {
     SB_CMD_NONE, SB_CMD_SAVE, SB_CMD_COPY, SB_CMD_NEW_PROJECT, SB_CMD_NEW_NOTE,
     SB_CMD_WORKSPACE, SB_CMD_SUBMIT, SB_CMD_CANCEL, SB_CMD_CONTEXT,
@@ -47,7 +47,8 @@ typedef struct {
     char search[256], searched[256], section[32];
     char name[SB_NAME_CAP], id[65], repository[SB_PATH_CAP], folder[SB_PATH_CAP];
     char command_value[SB_PATH_CAP];
-    char *context;
+    char *context,*notice;
+    size_t notice_index;
     char reveal_document[100];
     uint64_t reveal_document_context,heading_context;
     char heading_cursor[100];

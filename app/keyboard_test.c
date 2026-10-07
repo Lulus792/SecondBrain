@@ -1,6 +1,7 @@
 #include "desktop.h"
 #include "platform.h"
 #include "version.h"
+#include "notices.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -187,6 +188,28 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
     text=SDL_GetClipboardText(); CHECK(text && same_clipboard_text(text,sb_build_info()) && !strstr(text,d->model.project.root)); SDL_free(text); text=NULL;
     CHECK(sb_path_join(path,sizeof(path),directory,"about-small.bmp").code == SB_OK);
     CHECK(sb_ui_capture(&d->ui,path).code == SB_OK);
+    CHECK(activate(d,"notice-list") && d->form==SB_FORM_NOTICE_LIST);
+    /* Resource checks cover all files; UI exercises first, long and last entry. */
+    const size_t notice_samples[]={0,14,sb_notice_count()-1};
+    for (size_t sample=0;sample<sizeof(notice_samples)/sizeof(*notice_samples);++sample) {
+        size_t i=notice_samples[sample];
+        char notice_id[100]; snprintf(notice_id,sizeof(notice_id),"notice:%zu",i);
+        CHECK(activate(d,notice_id) && d->form==SB_FORM_NOTICE_TEXT && d->notice_index==i);
+        CHECK(d->notice && strlen(d->notice)>20);
+        CHECK(activate(d,"copy-notice"));
+        text=SDL_GetClipboardText(); CHECK(same_clipboard_text(text,d->notice)); SDL_free(text); text=NULL;
+        CHECK(reach(d,"reader"));
+        key(d,SDLK_PAGEDOWN,0);
+        CHECK(d->scrolling[2].maximum==0 || d->scrolling[2].destination>0);
+        if (i==14) {
+            CHECK(sb_path_join(path,sizeof(path),directory,"license-small.bmp").code==SB_OK);
+            CHECK(sb_ui_capture(&d->ui,path).code==SB_OK);
+        }
+        CHECK(activate(d,"notices-back") && d->form==SB_FORM_NOTICE_LIST);
+    }
+    CHECK(sb_path_join(path,sizeof(path),directory,"licenses-small.bmp").code==SB_OK);
+    CHECK(sb_ui_capture(&d->ui,path).code==SB_OK);
+    CHECK(activate(d,"notices-about") && d->form==SB_FORM_ABOUT);
     CHECK(activate(d,"about-back") && d->form == SB_FORM_SETTINGS);
     CHECK(activate(d,"about") && d->form == SB_FORM_ABOUT);
     key(d,SDLK_ESCAPE,0); CHECK(d->form == SB_FORM_NONE);
@@ -207,6 +230,12 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
     CHECK(sb_ui_capture(&d->ui,path).code == SB_OK); SDL_RenderPresent(d->ui.renderer);
     strcpy(saved,d->model.path);
     key(d,SDLK_E,MOD); replace(d,"# Meine Fassung\n\nTrotz externer Änderung erhalten.\n");
+    char *draft=malloc(strlen(d->model.editor)+1); CHECK(draft!=NULL); strcpy(draft,d->model.editor);
+    key(d,SDLK_COMMA,MOD);
+    CHECK(activate(d,"about") && activate(d,"notice-list") && activate(d,"notice:0"));
+    key(d,SDLK_ESCAPE,0);
+    CHECK(d->form==SB_FORM_NONE && sb_app_dirty(&d->model) && !strcmp(d->model.editor,draft) && !strcmp(d->model.path,saved));
+    free(draft);
     CHECK(sb_note_save(&d->model.project,saved,"# Extern\n",d->model.revision,NULL).code == SB_OK);
     key(d,SDLK_S,MOD); CHECK(d->message.code == SB_CONFLICT && sb_app_dirty(&d->model));
     CHECK(activate(d,"actions")); CHECK(activate(d,"save-copy"));

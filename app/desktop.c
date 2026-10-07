@@ -2,6 +2,7 @@
 #include "platform.h"
 #include "icons.h"
 #include "version.h"
+#include "notices.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,9 +23,10 @@ static void style_update(SBDesktop *d,bool force) {
     d->applied_style=effective;
 }
 void sb_desktop_set_style(SBDesktop *d,SBStyleChoice style) { d->requested_style=style; style_update(d,true); }
+static bool modal_reader(const SBDesktop *d) { return d->form==SB_FORM_CONTEXT || d->form==SB_FORM_NOTICE_TEXT; }
 static uint64_t accessible_context(const SBDesktop *d) {
     return sb_hash(d->model.project.root,strlen(d->model.project.root))^sb_hash(d->model.source_path,strlen(d->model.source_path))^
-        ((uint64_t)d->model.generation<<24)^((uint64_t)d->form<<8)^(uint64_t)d->model.guard;
+        ((uint64_t)d->model.generation<<24)^((uint64_t)d->form<<8)^((d->form==SB_FORM_NOTICE_TEXT ? (uint64_t)d->notice_index : 0)<<56)^(uint64_t)d->model.guard;
 }
 
 static const char *sections[] = {"all", "overview", "knowledge", "inbox", "journal", "archive"};
@@ -118,7 +120,7 @@ static unsigned scroll_slot(SBDesktop *d, float x, float y, bool pointer) {
             float pw=fminf(w-40,580*d->ui.scale), ph=fminf(h-40,680*d->ui.scale);
             if (x < (w-pw)/2 || x >= (w+pw)/2 || y < (h-ph)/2 || y >= (h+ph)/2) return 4;
         }
-        return d->form == SB_FORM_CONTEXT ? 2 : 3;
+        return modal_reader(d) ? 2 : 3;
     }
     if (!d->model.has_project) {
         if (pointer) {
@@ -206,7 +208,7 @@ static void document_span(SBDesktop *d,const char *text,size_t length,size_t off
 }
 static void heading_step(SBDesktop *d,int direction) {
     uint64_t context=accessible_context(d); size_t current=d->passive_count,chosen=d->passive_count;
-    unsigned slot=d->form==SB_FORM_CONTEXT ? 2 : 0;
+    unsigned slot=modal_reader(d) ? 2 : 0;
     if (d->heading_context==context)
         for (size_t i=0;i<d->passive_count;++i) if (!strcmp(d->heading_cursor,d->passive[i].id)) { current=i; break; }
     for (size_t i=0;i<d->passive_count;++i) {
@@ -468,7 +470,7 @@ void sb_desktop_free(SBDesktop *d) {
     if (d->text_edit_ready) nk_textedit_free(&d->text_edit);
     free(d->targets); passive_clear(d); free(d->passive);
     sb_graph_free(&d->graph);
-    sb_notes_free(&d->hits); free(d->context); sb_app_free(&d->model);
+    sb_notes_free(&d->hits); free(d->context); free(d->notice); sb_app_free(&d->model);
     sb_ui_shutdown(&d->ui); memset(d, 0, sizeof(*d));
 }
 static void search_refresh(SBDesktop *d) {
@@ -640,7 +642,7 @@ static void accessible_actions(SBDesktop *d) {
             if (action.action==ACCESSKIT_ACTION_FOCUS || action.action==ACCESSKIT_ACTION_SCROLL_INTO_VIEW) focus_set(d,action.id);
             else if (action.action==ACCESSKIT_ACTION_CLICK && target->kind==SB_FOCUS_BUTTON) { focus_set(d,action.id); snprintf(d->activate,sizeof(d->activate),"%s",action.id); }
             else if (action.action==ACCESSKIT_ACTION_SCROLL_UP || action.action==ACCESSKIT_ACTION_SCROLL_DOWN) {
-                unsigned slot=d->form==SB_FORM_CONTEXT ? 2 : d->form!=SB_FORM_NONE ? 3 : !strcmp(action.id,"editor") ? 1 : 0;
+                unsigned slot=modal_reader(d) ? 2 : d->form!=SB_FORM_NONE ? 3 : !strcmp(action.id,"editor") ? 1 : 0;
                 d->scrolling[slot].pending+=action.action==ACCESSKIT_ACTION_SCROLL_DOWN ? 220 : -220;
             } else if (!strcmp(action.id,"editor") && d->editing && d->text_edit_ready && !d->model.source && !d->model.guard) {
                 struct nk_text_edit *edit=&d->text_edit;
@@ -693,7 +695,7 @@ static void accessible_publish(SBDesktop *d) {
         if (t->kind==SB_FOCUS_TEXT) {
             size_t capacity=0; v->value=!strcmp(t->id,"editor") ? d->model.editor : accessible_field(d,t->id,&capacity); v->editable=true;
             if (!strcmp(t->id,"editor") && d->text_edit_ready) { v->anchor=(size_t)d->text_edit.select_start; v->caret=(size_t)d->text_edit.select_end; }
-        } else if (t->kind==SB_FOCUS_READER) v->value=d->form==SB_FORM_CONTEXT ? d->context : d->model.source ? d->model.source : d->model.editor;
+        } else if (t->kind==SB_FOCUS_READER) v->value=d->form==SB_FORM_NOTICE_TEXT ? d->notice : d->form==SB_FORM_CONTEXT ? d->context : d->model.source ? d->model.source : d->model.editor;
         if (!strcmp(t->id,"galaxy")) v->label="Dokumente in der Sternkarte";
         v->order=((uint64_t)t->group<<32)|t->order;
         if (!strncmp(t->id,"link:",5)) v->parent="reader";
@@ -786,7 +788,7 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
     if (event->type==SDL_EVENT_MOUSE_BUTTON_DOWN && event->button.button==SDL_BUTTON_LEFT) {
         for (unsigned i=0;i<4;++i) {
             SBScroll *s=&d->scrolling[i];
-            if (!d->model.guard && (d->form==SB_FORM_NONE ? i<2 : d->form==SB_FORM_CONTEXT ? i==2 : i==3) && s->used && s->maximum>0 && inside(event->button.x,event->button.y,s->track)) {
+            if (!d->model.guard && (d->form==SB_FORM_NONE ? i<2 : modal_reader(d) ? i==2 : i==3) && s->used && s->maximum>0 && inside(event->button.x,event->button.y,s->track)) {
                 d->keyboard=false;
                 if (inside(event->button.x,event->button.y,s->thumb)) { s->dragging=true; s->grab=event->button.y-s->thumb.y; }
                 else s->pending+=(event->button.y<s->thumb.y ? -1 : 1)*s->height*0.9f;
@@ -1195,15 +1197,15 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
     struct nk_context *ctx = d->ui.ctx;
     const char *line = text;
     const char *extension = d->model.source ? strrchr(d->model.source_path, '.') : NULL;
-    bool whole_code = text == d->model.source && !d->model.source_directory && (!extension || strcmp(extension, ".md"));
+    bool whole_code = text==d->notice || (text == d->model.source && !d->model.source_directory && (!extension || strcmp(extension, ".md")));
     bool code = whole_code, first_heading = true;
     unsigned link_number = 0;
     nk_layout_row_dynamic(ctx, height, 1);
-    target(d, "reader"); target_label(d,d->form==SB_FORM_CONTEXT ? "Projektkontext" : d->model.source ? d->model.source_title : d->model.title);
+    target(d, "reader"); target_label(d,d->form==SB_FORM_NOTICE_TEXT ? sb_notice_name(d->notice_index) : d->form==SB_FORM_CONTEXT ? "Projektkontext" : d->model.source ? d->model.source_title : d->model.title);
     if (d->target_count) d->targets[d->target_count - 1].kind = SB_FOCUS_READER;
     ring(d, "reader");
     if (!nk_group_begin(ctx, "Reader", NK_WINDOW_NO_SCROLLBAR)) return;
-    unsigned slot=d->form==SB_FORM_CONTEXT && text==d->context ? 2 : 0;
+    unsigned slot=modal_reader(d) && (text==d->context || text==d->notice) ? 2 : 0;
     smooth_scroll(d,slot,ctx->current->layout->offset_y);
     while (*line) {
         const char *end = strchr(line, '\n');
@@ -1399,9 +1401,9 @@ static void popup(SBDesktop *d, int width, int height) {
         d->form == SB_FORM_WORKSPACE ? "Arbeitsordner öffnen" : d->form == SB_FORM_SETTINGS ? "Projekte und Darstellung" :
         d->form == SB_FORM_CONTEXT ? "KI-Kontext" : d->form == SB_FORM_ACTIONS ? "Dokumentaktionen" :
         d->form == SB_FORM_PROJECTS ? "Projekt wählen" : d->form == SB_FORM_FILTER ? "Wissensbereich" :
-        d->form==SB_FORM_BACKUP ? "Projekt sichern" : d->form==SB_FORM_RESTORE ? "Sicherung wiederherstellen" : d->form==SB_FORM_ABOUT ? "Über SecondBrain" : "Tastaturhilfe";
+        d->form==SB_FORM_BACKUP ? "Projekt sichern" : d->form==SB_FORM_RESTORE ? "Sicherung wiederherstellen" : d->form==SB_FORM_ABOUT ? "Über SecondBrain" : d->form==SB_FORM_NOTICE_LIST ? "Lizenzen" : d->form==SB_FORM_NOTICE_TEXT ? sb_notice_name(d->notice_index) : "Tastaturhilfe";
     if (d->form==SB_FORM_ACTIONS || d->form==SB_FORM_FILTER) h=fminf(height-40,(6*42+80)*s+56);
-    if (d->form==SB_FORM_ABOUT) h=fminf(height-40,340*s+60);
+    if (d->form==SB_FORM_ABOUT) h=fminf(height-40,380*s+60);
     if (d->form==SB_FORM_WORKSPACE) h=fminf(height-40,300*s+40);
     if (d->form==SB_FORM_BACKUP || d->form==SB_FORM_RESTORE) h=fminf(height-40,(d->form==SB_FORM_RESTORE && d->restore_checked ? 520 : 340)*s+60);
     glass(d,nk_rect((width-w)/2,(height-h)/2,w,h),16);
@@ -1564,7 +1566,28 @@ static void popup(SBDesktop *d, int width, int height) {
             if (button(d,"copy-version",!strcmp(d->message.message,"Versionsinfos kopiert.") ? "Versionsinfos kopiert" : "Versionsinfos kopieren"))
                 result(d,SDL_SetClipboardText(sb_build_info()) ? sb_ok() : sb_error(SB_IO,"Die Zwischenablage ist nicht erreichbar."),"Versionsinfos kopiert.");
             nk_layout_row_dynamic(ctx,36*s,1);
+            if (button(d,"notice-list","Lizenzen")) { d->message=sb_ok(); d->form=SB_FORM_NOTICE_LIST; }
+            nk_layout_row_dynamic(ctx,36*s,1);
             if (button(d,"about-back","Zurück zu den Einstellungen")) { d->message=sb_ok(); d->form=SB_FORM_SETTINGS; }
+        } else if (d->form==SB_FORM_NOTICE_LIST) {
+            nk_layout_row_dynamic(ctx,48*s,1); native_wrap(d,"Originaltexte der Anwendung, Schriften und UI-Komponenten.");
+            nk_layout_row_dynamic(ctx,36*s,1);
+            if (button(d,"notices-about","Zurück zu Über SecondBrain")) { d->message=sb_ok(); d->form=SB_FORM_ABOUT; }
+            for (size_t i=0;i<sb_notice_count();++i) {
+                char id[100]; snprintf(id,sizeof(id),"notice:%zu",i);
+                nk_layout_row_dynamic(ctx,42*s,1);
+                if (button(d,id,sb_notice_name(i))) {
+                    char *text=NULL; d->message=sb_notice_read(d->ui.font_path,i,&text);
+                    if (d->message.code==SB_OK) { free(d->notice); d->notice=text; d->notice_index=i; d->form=SB_FORM_NOTICE_TEXT; }
+                }
+            }
+        } else if (d->form==SB_FORM_NOTICE_TEXT) {
+            nk_layout_row_dynamic(ctx,36*s,2);
+            if (button(d,"notices-back","Zurück zur Übersicht")) { d->message=sb_ok(); d->form=SB_FORM_NOTICE_LIST; }
+            if (button(d,"copy-notice",!strcmp(d->message.message,"Lizenztext kopiert.") ? "Lizenztext kopiert" : "Lizenztext kopieren"))
+                result(d,SDL_SetClipboardText(d->notice ? d->notice : "") ? sb_ok() : sb_error(SB_IO,"Die Zwischenablage ist nicht erreichbar."),"Lizenztext kopiert.");
+            document(d,d->notice ? d->notice : "",w-70,fmaxf(40,contents-48*s-44));
+            if (d->message.code!=SB_OK) { nk_layout_row_dynamic(ctx,52*s,1); native_wrap(d,d->message.message); }
         } else if (d->form == SB_FORM_CONTEXT) {
             nk_layout_row_dynamic(ctx,24*s,1); muted(d,"Gespeicherte Kerninformationen");
             nk_layout_row_dynamic(ctx, 36 * s, 1);
@@ -1587,7 +1610,7 @@ static void popup(SBDesktop *d, int width, int height) {
                 nk_layout_row_dynamic(ctx, 40 * s, 1); native_wrap(d, help[i]);
             }
         }
-        if (d->message.message[0] && d->form!=SB_FORM_ACTIONS && d->form!=SB_FORM_FILTER && d->form!=SB_FORM_CONTEXT && d->form!=SB_FORM_BACKUP && d->form!=SB_FORM_RESTORE && (d->form!=SB_FORM_ABOUT || d->message.code!=SB_OK)) {
+        if (d->message.message[0] && d->form!=SB_FORM_ACTIONS && d->form!=SB_FORM_FILTER && d->form!=SB_FORM_CONTEXT && d->form!=SB_FORM_NOTICE_TEXT && d->form!=SB_FORM_BACKUP && d->form!=SB_FORM_RESTORE && (d->form!=SB_FORM_ABOUT || d->message.code!=SB_OK)) {
             nk_layout_row_dynamic(ctx,52*s,1); native_wrap(d,d->message.message);
         }
         scroll_measure(d,3); nk_group_end(ctx);
@@ -1770,7 +1793,7 @@ static void welcome(SBDesktop *d,int width,int height,nk_flags flags) {
 }
 void sb_desktop_frame(SBDesktop *d) {
     if (d->reveal_document[0] && (d->reveal_document_context!=accessible_context(d) ||
-        (d->form!=SB_FORM_CONTEXT && (!d->card || (d->editing && !d->model.source))))) d->reveal_document[0]=0;
+        (!modal_reader(d) && (!d->card || (d->editing && !d->model.source))))) d->reveal_document[0]=0;
     int width, height; SDL_GetWindowSize(d->ui.window,&width,&height);
     if (width!=d->layout_width || height!=d->layout_height || d->ui.scale!=d->layout_scale) {
         if (d->keyboard) d->focus_scroll_frames=3;

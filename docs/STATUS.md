@@ -875,3 +875,37 @@ nicht aus. 0.9.2 ergänzt sie mit natürlicher Zählung in einer gehashten
 UI-Quellkorrektur. Cargo-Typprüfung besteht (30,83 Sekunden). Die
 Vorbereitung ist bytegleich wiederholbar und weist unbekannte Quellen ab.
 Neue native AT-SPI-, Prozess- und Volume-Abnahmen folgen im Plattformlauf.
+
+Die native Linux-Nachprüfung zu b69223c besteht inzwischen in Debug und Release,
+einschließlich des entpackten Pakets. Der Lauf scheitert unabhängig davon in
+sechs Python-Jobs an importseitig gestarteten Prozessskripten. 1358794 behebt
+die Testsuche ohne Produktänderung; neun lokale Generatorprüfungen und beide
+Prozess-/Volume-Prüfungen bestehen. [Plattformstand](PLATTFORMEN.md).
+
+## Lizenzansicht 0.9.3
+
+Die Versionskarte öffnet eine Übersicht mit 17 mitgelieferten Originaltexten
+und einen eigenen unverändernden Lesebereich. Zurück, Kopieren und Schließen
+sind mit Tastatur erreichbar; ein Notizentwurf bleibt erhalten. Fehlende oder
+ungültige Lizenzdateien zeigen einen Fehler. [Bedienung und Recherche](LIZENZEN.md).
+
+Alle 29 lokalen Release-Tests bestehen (418,13 Sekunden), einschließlich 54
+Lizenzressourcen-Aussagen, 240 Tastatur-Aussagen im vollständigen Erstlauf über
+alle Texte und 149 nativen/Vertrags-Aussagen. Neun Generatorprüfungen bestehen.
+Reale App-Bilder bei 780×560 und 150 Prozent Schriftgröße sind betrachtet.
+Eine gefundene gemeinsame Scrollzuordnung von verdeckter Notiz und Lizenztext
+ist korrigiert. Die regelmäßige UI-Prüfung benutzt nun ersten, langen Apache-
+und letzten Eintrag; der Ressourcentest prüft weiterhin alle 17 Dateien.
+Die neue Plattformabnahme und die vollständige Lizenz-/Supportprüfung sind
+getrennte offene Schritte; kein 1.0- oder menschlicher Screenreader-Nachweis.
+
+Die wiederholte 0.9.2-Plattformabnahme zu 1358794 ist inzwischen vollständig:
+20 erfolgreiche Jobs, acht Desktopprüfungen in Debug/Release und vier entpackte
+Pakete. [Konkreter Umfang](PLATTFORMEN.md). Dies ist kein 0.9.3-Nachweis.
+
+Die abschließende Tastatur-Nachprüfung mit drei Einträgen besteht mit 142
+Aussagen (115,64 Sekunden). Eine gezielte Ressourcen-Nachprüfung erhält zudem
+Backslashes als echte Namenszeichen auf POSIX; auf Windows werden beide
+Trennzeichen unterstützt. Das zuerst entpackte Intel-Paket besteht mit 126
+Desktop-, 142 Tastatur- und 75 Sicherungs-UI-Aussagen, Einstellungsneustart und
+CLI-Sicherung. Nach der kleinen Pfadkorrektur folgt die letzte Paketwiederholung.

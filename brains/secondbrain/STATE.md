@@ -121,3 +121,22 @@ und idempotent; native Linux-Wiederholungsabnahme folgt. Originale:
 [Umsetzungsstand](../../docs/STATUS.md), [Sicherungsvertrag](../../docs/SICHERUNG.md)
 und [UI-Abhängigkeiten](../../third_party/README.md). Lokale App bleibt auf
 dem geprüften 0.9.1-Paket; 1.0 und tatsächliche assistive Abnahme sind offen.
+
+Native Linux-Debug-/Release-Nachprüfung zu b69223c einschließlich Paket besteht.
+Die getrennte Python-Importsuche scheitert; 1358794 behebt die Importausführung,
+neun lokale Generator- und zwei Prozess-/Volume-Prüfungen bestehen.
+[Datierter Plattformstand](../../docs/PLATTFORMEN.md).
+
+## Lizenzansicht 0.9.3
+
+17 Originaltexte sind über Über SecondBrain direkt in der App les- und
+kopierbar. Entwürfe bleiben erhalten; alle 29 lokalen Release- und neun
+Generatorprüfungen bestehen. Bilder mit großer Schrift sind betrachtet.
+[Originalvertrag](../../docs/LIZENZEN.md) und [Prüfumfang](../../docs/STATUS.md).
+Neue Plattform-/Paketabnahme folgt; vollständige transitive Zuordnung und
+Supportstruktur bleiben offen. Der Auftrag vor 1.0 bleibt aktiv.
+
+Die Wiederholung von 0.9.2 zu 1358794 besteht nun mit allen 20 Jobs und vier
+entpackten Plattformpaketen. [Originalnachweis](../../docs/PLATTFORMEN.md).
+Der Nachweis umfasst die Linux-Ebenenkorrektur und beide Import-/Prozesswege;
+die neue Lizenzansicht 0.9.3 benötigt ihren eigenen Plattformlauf.
