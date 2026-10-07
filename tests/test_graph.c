@@ -87,6 +87,22 @@ int main(int argc, char **argv) {
     for(size_t i=0;i<graph.edge_count;++i)if(graph.edges[i].from==index){++links;CHECK(!strcmp(notes.items[graph.edges[i].to].path,"knowledge/föö.md"));}
     CHECK(links==1);
     CHECK(sb_note_load(&project,note.path,&old,NULL).code==SB_OK && !strcmp(old,reference_links));sb_text_free(old);
+    const char *containers="# [Container][ZIEL]\n\n> [Ziel]: f&ouml;&ouml;.md\n>\n> [Zitat][ziel]\n>\n> - [Stand](../STATE.md)\n>   3. [Fragen](../QUESTIONS.md)\n>      Fortsetzung\n>\n> | Quelle |\n> | --- |\n> | [Tabelle](../DECISIONS.md) |\n\n- [Code][fake]\n\n  ```\n  [fake]: ../PROJECT.md\n  [Nur Code](../PROJECT.md)\n  ```\n\n<div>\n[HTML](../SOURCES.md)\n</div>\n";
+    CHECK(sb_note_load(&project,note.path,&old,&revision).code==SB_OK);sb_text_free(old);
+    CHECK(sb_note_save(&project,note.path,containers,revision,NULL).code==SB_OK);
+    sb_notes_free(&notes);CHECK(sb_notes_list(&project,&notes).code==SB_OK);
+    CHECK(sb_graph_build(&project,&notes,&graph).code==SB_OK);index=0;links=0;
+    while(index<notes.count && strcmp(notes.items[index].path,note.path))++index;
+    CHECK(index<notes.count && !strcmp(notes.items[index].title,"Container"));
+    for(size_t i=0;i<graph.edge_count;++i)if(graph.edges[i].from==index){++links;const char *to=notes.items[graph.edges[i].to].path;CHECK(!strcmp(to,"knowledge/föö.md")||!strcmp(to,"STATE.md")||!strcmp(to,"QUESTIONS.md")||!strcmp(to,"DECISIONS.md"));}
+    CHECK(links==4);
+    CHECK(sb_note_load(&project,note.path,&old,NULL).code==SB_OK && !strcmp(old,containers));sb_text_free(old);
+    SBStar *saved_stars=graph.stars; SBEdge *saved_edges=graph.edges;size_t saved_count=graph.edge_count;
+    char deep[150];memset(deep,'>',65);strcpy(deep+65," x\n");
+    CHECK(sb_note_load(&project,note.path,&old,&revision).code==SB_OK);sb_text_free(old);
+    CHECK(sb_note_save(&project,note.path,deep,revision,NULL).code==SB_OK);
+    sb_notes_free(&notes);CHECK(sb_notes_list(&project,&notes).code==SB_OK);
+    CHECK(sb_graph_build(&project,&notes,&graph).code==SB_LIMIT && graph.stars==saved_stars && graph.edges==saved_edges && graph.edge_count==saved_count);
     sb_graph_free(&graph); sb_notes_free(&notes);
     printf("%u graph assertions passed.\n", checks);
     return 0;

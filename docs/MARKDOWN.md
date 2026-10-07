@@ -1,13 +1,13 @@
 # Markdown in der Leseansicht
 
-Stand: 7. Oktober 2026, Entwicklungsschritte 0.9.4–0.9.11. Die Anwendung liest
+Stand: 7. Oktober 2026, Entwicklungsschritte 0.9.4–0.9.17. Die Anwendung liest
 Markdown selbst in C. Sie verändert die Quelldatei beim Anzeigen nicht.
 Editor und Sicherung behalten die Originalbytes; Anzeigen ist keine Migration.
 
 ## Blockregeln
 
-Der neue UI-unabhängige Blockleser liefert Quellpositionen und Textbereiche
-ohne Kopien oder Schreibzugriffe. Die Leseansicht, ihre nativen Textblöcke und
+Der UI-unabhängige [Dokumentbaum](DOKUMENTBAUM.md) liefert Quellpositionen und
+getrennte Textprojektionen ohne Schreibzugriffe auf das Original. Die Leseansicht, ihre nativen Textblöcke und
 die Titelermittlung benutzen dieselbe Erkennung. Zeilenenden LF, CRLF und CR
 werden erkannt; weiche Umbrüche im aufbereiteten Absatz werden zu Leerzeichen.
 
@@ -27,11 +27,11 @@ keine übernommene vollständige Konformitätssuite.
 
 Ab 0.9.6 werden [Tabellen](TABELLEN.md) als eigener Block erkannt und gelesen.
 [Abschnittstrennungen](TRENNLINIEN.md) werden ab 0.9.10 als waagerechte Linien
-mit passender nativer Semantik dargestellt. Zeilen mit tatsächlichen Listenmarkern
-oder Zitaten werden noch getrennt dargestellt. Normale Zahlen am Absatzanfang lösen keine
-Trennung mehr aus. Die vollständigen Container-Regeln, geschachtelte Listen,
-Tabellen in geschachtelten Containern, Inline-Regeln, Definitionen in Containern und HTML-Blöcke sind
-noch nicht vollständig umgesetzt. Die Anwendung führt kein HTML aus. Ab 0.9.5 verwenden Leseansicht, Titel und
+mit passender nativer Semantik dargestellt. Ab 0.9.17 verarbeitet der
+Dokumentbaum verschachtelte Listen, Zitate, Tabellen und Definitionen darin.
+Normale Zahlen am Absatzanfang lösen keine Trennung aus. Die vollständige
+Markdown-/Inline-Abnahme bleibt offen. HTML-Blöcke werden literal angezeigt;
+die Anwendung führt kein HTML aus. Ab 0.9.5 verwenden Leseansicht, Titel und
 Sternkarte gemeinsame [Inline-/Linkregeln](INLINE_LINKS.md); die dort benannten
 weiteren Regeln bleiben offen. Ab 0.9.11 stehen gemeinsame
 [Hervorhebungen und Inline-Code](INLINE_STILE.md) zur Verfügung.
@@ -41,7 +41,8 @@ weiteren Regeln bleiben offen. Ab 0.9.11 stehen gemeinsame
 Dies ist weiterhin eine begrenzte Markdown-Leseansicht, keine vollständige
 CommonMark- oder GFM-Implementierung. Der Auftrag für die vollständige
 Release-Abnahme bleibt damit offen. [Containerplan und Quellprojektion](CONTAINER_PLAN.md)
-beschreiben die folgende gemeinsame C-Arbeit; noch keine fertige Listen-/Zitat-UI.
+dokumentieren ihre schreibgeschützte Grundlage. [Container-UI](CONTAINER_UI.md)
+nennt die implementierte Gestaltung und ihre Prüfgrenzen.
 
 ## Darstellung und Navigation
 
@@ -61,3 +62,12 @@ C-Implementierung wird zusätzlich unter ASan/UBSan geprüft. Die native UI-Prü
 vergleicht echte Rollen, Text und gespeicherte Originalbytes, einschließlich
 Code mit scheinbarer Überschrift und scheinbarem Link. Konkrete ausgeführte
 Ergebnisse und Plattformgrenzen stehen im [Umsetzungsstand](STATUS.md).
+
+## Listen und Zitate ab 0.9.17
+
+Ein eigener Containerbaum erkennt Listen, Einträge und Zitate einschließlich
+Fortsetzungen, Einrückung und Referenzdefinitionen. Die Darstellung verwendet
+Marker/Nummern und eine Zitatlinie; native Container gruppieren die Textblätter.
+Code und HTML bleiben literal. Titel und Sternkartenlinks benutzen denselben
+Baum. [Regeln, Gestaltung und Grenzen](CONTAINER_UI.md). Die geprüften
+307 ausgewählten CommonMark-Fälle belegen keine vollständige Markdown-Abnahme.

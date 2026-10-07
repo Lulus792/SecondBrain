@@ -1,8 +1,9 @@
 # Eigener Dokumentbaum in C
 
-Stand: 7. Oktober 2026. Implementierter Kernbaustein, noch nicht mit der App-
-Leseansicht, Titelermittlung oder Sternkarte verbunden. Die installierte App
-bleibt beim zuvor geprüften 0.9.16-Paket. [Auftrag und weitere Integration](CONTAINER_PLAN.md).
+Stand: 7. Oktober 2026. Implementierter Kernbaustein. Ab 0.9.17 verwenden Titel,
+Leseansicht, Tabellen und Sternkarte den gemeinsamen Baum. Die installierte App
+bleibt bis zur neuen Paketabnahme beim zuvor geprüften 0.9.16-Paket.
+[Darstellung und weitere Abnahme](CONTAINER_UI.md).
 
 `src/document.c/h` baut einen eigenen Baum für Wurzel, Zitat, Liste und Eintrag
 mit Absätzen, Überschriften, Code, Trennlinien, Literal-HTML und Tabellen. Eltern,
@@ -70,9 +71,10 @@ enthält eigene C-Implementierung, keine zusätzliche externe Fachbibliothek.
 
 ## Folgende Arbeit
 
-Titel, Leseansicht, Tabellen und Graph müssen dieselbe Baum-/Referenzumgebung
-verwenden. Danach folgen sichtbare Listeneinrückung und Zitatgliederung, native
-Containerrollen, Quellpositionen für Abschnittsnavigation sowie Tastatur-/Raster-/
-Provider- und tatsächliche Plattformnachweise. Diese Integration ist noch offen.
+Titel, Leseansicht, Tabellen und Graph verwenden jetzt dieselbe Baum-/Referenzumgebung.
+Die App ergänzt Listeneinrückung, Nummern, Zitatlinien und native Containerrollen.
+Tabellen-/Zeilenkennungen und Abschnittssprünge verwenden ursprüngliche
+Quellpositionen. Aktuelle Tastatur-/Raster-/Provider- und Plattformnachweise
+stehen in [STATUS](STATUS.md); die vollständige assistive Abnahme bleibt offen.
 Auch übrige Markdown-Regeln und [Release-Aufgaben](RELEASE.md) bleiben bestehen;
 307 ausgewählte Fälle sind keine vollständige CommonMark-/GFM-Abnahme.

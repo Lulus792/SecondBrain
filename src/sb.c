@@ -1,5 +1,6 @@
 #include "sb.h"
 #include "markdown.h"
+#include "document.h"
 #include "inline.h"
 #include "platform.h"
 #include "sb_templates.h"
@@ -563,25 +564,28 @@ SBStatus sb_projects_scan(const char *workspace,SBProjects *out) { return projec
 SBStatus sb_markdown_title(const char *text, char *out, size_t capacity) {
     if (!text || !out || !capacity) return sb_error(SB_INVALID,"Titelpuffer fehlt.");
     *out=0;
-    SBMarkdown reader; SBMarkdownBlock block;
-    sb_markdown_init(&reader,text,strlen(text),false);
-    while (sb_markdown_next(&reader,&block)) {
-        if (reader.reference_limit) return sb_error(SB_LIMIT,"Markdown-Definitionen sind zu komplex.");
-        if (block.kind==SB_MD_BLANK || block.kind==SB_MD_REFERENCE) continue;
-        if (block.kind!=SB_MD_HEADING) return sb_ok();
-        SBReferences references; SBStatus status=sb_references_init(&references,text,strlen(text));
-        SBInline inline_reader; char *plain=NULL;
-        if (status.code!=SB_OK) { sb_references_free(&references); return status; }
-        status=sb_inline_init_references(&inline_reader,text+block.content,block.length,&references);
-        if (status.code==SB_OK) status=sb_inline_text(&inline_reader,0,block.length,&plain);
+    SBDocument document; SBReferences references={0};
+    SBStatus status=sb_document_init(&document,text,strlen(text));
+    if (status.code!=SB_OK) { sb_document_free(&document); return status; }
+    for (size_t i=document.nodes[0].first;i!=SIZE_MAX;i=document.nodes[i].next) {
+        const SBDocumentNode *node=&document.nodes[i]; const char *content=NULL; size_t length=0;
+        if (node->kind==SB_DOC_PARAGRAPH && sb_document_content(node,&content,&length).code==SB_OK && !length) continue;
+        if (node->kind!=SB_DOC_HEADING) break;
+        status=sb_document_references(&document,&references);
+        if (status.code!=SB_OK) break;
+        status=sb_document_content(node,&content,&length);
+        SBInline inline_reader={0}; char *plain=NULL;
+        if (status.code==SB_OK) status=sb_inline_init_references(&inline_reader,content,length,&references);
+        if (status.code==SB_OK) status=sb_inline_text(&inline_reader,0,length,&plain);
         sb_inline_free(&inline_reader);
-        sb_references_free(&references);
-        if (status.code!=SB_OK) return status;
-        size_t used=strlen(plain); if (used>=capacity) used=capacity-1;
-        while (used && !sb_utf8_valid(plain,used)) --used;
-        memcpy(out,plain,used); out[used]=0; free(plain); return sb_ok();
+        if (status.code==SB_OK) {
+            size_t used=strlen(plain); if (used>=capacity) used=capacity-1;
+            while (used && !sb_utf8_valid(plain,used)) --used;
+            memcpy(out,plain,used); out[used]=0;
+        }
+        free(plain); break;
     }
-    return sb_ok();
+    sb_references_free(&references); sb_document_free(&document); return status;
 }
 
 typedef struct { const SBProject *project; SBNotes *list; char relative[SB_PATH_CAP]; unsigned depth; } NoteVisit;
@@ -603,7 +607,11 @@ static SBStatus note_visit(const char *name, int kind, void *userdata) {
     if (kind != 1 || n < 3 || strcmp(name + n - 3, ".md")) return sb_ok();
     result = sb_fs_read(full, &text, &length);
     if (result.code == SB_OK && !sb_text_valid(text, length)) result = sb_error(SB_INVALID, "Dokument enthält ungültiges UTF-8 oder NUL-Zeichen: %s", note.path);
-    if (result.code == SB_OK) result = sb_markdown_title(text, note.title, sizeof(note.title));
+    if (result.code == SB_OK) {
+        result = sb_markdown_title(text, note.title, sizeof(note.title));
+        /* A valid file remains reachable when display parsing reaches a limit. */
+        if (result.code==SB_LIMIT) { note.title[0]=0;result=sb_ok(); }
+    }
     free(text);
     if (result.code != SB_OK) return result;
     if (!note.title[0]) snprintf(note.title, sizeof(note.title), "%s", name);

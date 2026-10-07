@@ -150,6 +150,8 @@ static size_t parent_find(const ParentIndex *index,size_t count,const char *id) 
 }
 static bool parent_allowed(const Item *parent,const Item *child) {
     if (parent->role==ACCESSKIT_ROLE_DOCUMENT && !parent->parent[0]) return true;
+    if (parent->role==ACCESSKIT_ROLE_BLOCKQUOTE || parent->role==ACCESSKIT_ROLE_LIST_ITEM) return true;
+    if (parent->role==ACCESSKIT_ROLE_LIST && child->role==ACCESSKIT_ROLE_LIST_ITEM) return true;
     if (parent->role==ACCESSKIT_ROLE_TABLE && child->role==ACCESSKIT_ROLE_ROW) return true;
     if (parent->role==ACCESSKIT_ROLE_ROW && (child->role==ACCESSKIT_ROLE_CELL || child->role==ACCESSKIT_ROLE_COLUMN_HEADER)) return true;
     return (parent->role==ACCESSKIT_ROLE_CELL || parent->role==ACCESSKIT_ROLE_COLUMN_HEADER) && child->role==ACCESSKIT_ROLE_LINK;

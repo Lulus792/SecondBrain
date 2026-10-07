@@ -1,5 +1,5 @@
 #include "graph.h"
-#include "markdown.h"
+#include "document.h"
 #include "inline.h"
 #include "table.h"
 #include <stdlib.h>
@@ -112,26 +112,25 @@ SBStatus sb_graph_build(const SBProject *project, const SBNotes *notes, SBGraph 
         char *text = NULL;
         status = sb_note_load(project, notes->items[i].path, &text, NULL);
         if (status.code != SB_OK) goto fail;
-        SBReferences references;
-        status=sb_references_init(&references,text,strlen(text));
-        if (status.code!=SB_OK) { sb_references_free(&references);free(text);goto fail; }
-        SBMarkdown blocks; SBMarkdownBlock block;
-        sb_markdown_init(&blocks,text,strlen(text),false);
-        while (sb_markdown_next(&blocks,&block)) {
-            if (block.kind==SB_MD_TABLE) {
-                SBTable table; if (!sb_table_parse(text,strlen(text),block.offset,&table)) continue;
+        SBDocument document; SBReferences references={0};
+        status=sb_document_init(&document,text,strlen(text));
+        if (status.code==SB_OK) status=sb_document_references(&document,&references);
+        for (size_t n=1;status.code==SB_OK && n<document.count;++n) {
+            const SBDocumentNode *node=&document.nodes[n]; const char *content=NULL; size_t length=0;
+            if (node->kind!=SB_DOC_TABLE && node->kind!=SB_DOC_PARAGRAPH && node->kind!=SB_DOC_HEADING) continue;
+            status=sb_document_content(node,&content,&length); if (status.code!=SB_OK) break;
+            if (node->kind==SB_DOC_TABLE) {
+                SBTable table; if (!sb_table_parse(content,length,0,&table)) continue;
                 size_t cursor=table.offset; SBTableRow row;
-                while (sb_table_next(&table,&cursor,&row)) for (size_t c=0;c<row.count;++c) {
+                while (status.code==SB_OK && sb_table_next(&table,&cursor,&row)) for (size_t c=0;status.code==SB_OK && c<row.count;++c) {
                     char *cell=NULL; status=sb_table_cell_text(&table,&row.cells[c],&cell);
                     if (status.code==SB_OK) status=graph_links(&graph,notes,notes->items[i].path,i,cell,strlen(cell),&references);
-                    free(cell); if (status.code!=SB_OK) { sb_references_free(&references);free(text); goto fail; }
+                    free(cell);
                 }
-            } else if (block.kind==SB_MD_TEXT || block.kind==SB_MD_HEADING) {
-                status=graph_links(&graph,notes,notes->items[i].path,i,text+block.content,block.length,&references);
-                if (status.code!=SB_OK) { sb_references_free(&references);free(text); goto fail; }
-            }
+            } else if (length) status=graph_links(&graph,notes,notes->items[i].path,i,content,length,&references);
         }
-        sb_references_free(&references);free(text);
+        sb_references_free(&references);sb_document_free(&document);free(text);
+        if (status.code!=SB_OK) goto fail;
     }
     sb_graph_free(out); *out = graph; return sb_ok();
 fail:

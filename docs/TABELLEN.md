@@ -42,7 +42,9 @@ in Quelldatei und Editor erhalten. Codeblöcke erzeugen keine Tabellen.
 Grenzen: höchstens 64 Spalten und 65.536 Zellen einschließlich Kopfzeile innerhalb
 des bestehenden Textlimits. Eine nicht erkannte oder zu große Tabelle fällt auf
 lesbaren Quelltext zurück. Die App lädt keine Bilder aus Zellen. Vollständige
-GFM-Unterstützung einschließlich verschachtelter Container wird nicht zugesagt.
+GFM-Unterstützung wird nicht zugesagt. Ab 0.9.17 erkennt der gemeinsame
+[Dokumentbaum](DOKUMENTBAUM.md) Tabellen auch in Listen/Zitaten; Zellreferenzen
+verwenden dieselbe dokumentweite Umgebung.
 
 Die Darstellung wechselt unter 130 skalierten Pixeln je Spalte zu gestapelten
 Zeilen. Alle Zellen benutzen denselben vertikalen Lesebereich. Die native

@@ -1794,3 +1794,32 @@ publiziert ihn gesondert und weist leere Testsammlungen als Fehler ab.
 Lokale Erfolgs-/Fehler-/Leerfall- und frühe Log-/Escaping-Prüfungen bestehen.
 Das bereitet die tatsächliche Nachprüfung vor, behauptet aber keine Behebung
 der noch unbekannten Windows-Testursache. Neue CI nach Push übernehmen.
+
+## 0.9.17: gemeinsame Container in Titel, Reader und Sternkarte
+
+7. Oktober 2026. `src/document.c` ist jetzt mit Titelermittlung, Leseansicht,
+Tabellen und Graph verbunden. Definitionen aus Listen/Zitaten gelten für alle
+vier Wege. Code/HTML bleiben literal; Originalbytes bleiben in Editor und Datei.
+Tabellen-/Zeilenkennungen und Überschriften verwenden ursprüngliche Positionen.
+Listenmarker/Nummern, Zitatlinie und native Container gliedern die bestehende
+Glaskarte. Lange Nummern reservieren gemessene Breite; Marker stehen nativ vor
+ihrem Inhalt. Containeranfragen verwenden den vorhandenen Scrollweg.
+
+Parsergrenzen lassen gültige Notizen über ihren Dateinamen erreichbar. Der Reader
+zeigt Originaltext ohne Linkaktionen; ein gescheiterter Graph-Neuaufbau ersetzt
+keinen gültigen Graph. Neue Regressionen prüfen verschachtelte Referenzen/Tabellen,
+HTML-/Code-Ausschluss, 65 Präfixe, Quellkennungen, Tastatur, 780×640-Fenster und
+200-Prozent-Schrift. [Entwurf und Grenzen](CONTAINER_UI.md), UI-Bericht SBUI-054–056.
+
+Erster vollständiger lokaler Release-Lauf: 43/43 Tests in 298,53 s.
+Nach den Schlusskorrekturen: 29/29 Kern-Debug-Tests in 29,08 s; abschließender Release-Gesamtlauf: 43/43 in 271,45 s. Gezielte Graph-ASan/UBSan: 75 Assertions. Gezielte eigene native ASan/UBSan besteht mit 552 Assertions; externe
+UI-Bibliotheken sind nicht vollständig instrumentiert, Leakprüfung ist auf diesem
+macOS nicht verfügbar und deaktiviert. Neue Paket-/Plattformnachweise folgen;
+installierte App bleibt 0.9.16.
+Der zuvor ausstehende a45d7e2-Push ist erfolgreich veröffentlicht,
+[Lauf 37656257074](https://github.com/Lulus792/SecondBrain/actions/runs/37656257074)
+besteht inzwischen in allen zwölf Windows-/Linux-Jobs, einschließlich Desktop
+Debug/Release und entpackter Pakete. Die acht macOS-Jobs warten noch. Der frühere
+Windows-Debug-Ausfall tritt in diesem Lauf nicht auf; seine Ursache wurde damit
+nicht bestimmt. Das ist eine Kernbaustein-Abnahme zu a45d7e2, keine neue
+Plattformabnahme der noch unveröffentlichten App-Integration.

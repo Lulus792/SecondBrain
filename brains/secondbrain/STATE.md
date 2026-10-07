@@ -26,22 +26,21 @@ Commits sind normal nach GitHub gepusht; keine Historie wurde umgeschrieben.
 
 ## Laufende Containerarbeit
 
-[Quellprojektion](../../docs/CONTAINER_PLAN.md) in eigenem C bereitet die notwendige
-Trennung von Originalquelle und aufbereitetem Containertext vor. Teilweise Tabs,
-physische Spalten, Quellpositionen, Zeilenenden, Bereichsgrenzen und Rücknahme
-fehlgeschlagener Anfügungen sind mit zuletzt 315.759 Assertions und gezielter ASan/UBSan
-lokal geprüft. Der darauf aufbauende [Dokumentbaum](../../docs/DOKUMENTBAUM.md) ist jetzt
-im Kern implementiert: 307 Originalfälle, 683.008 eigene Assertions und
-gezielte ASan/UBSan bestehen; 29 Kern-Debug-Tests bestehen. Baum/Projektion
-sind noch nicht mit der App verbunden; Listen-/Zitat-UI bleibt offen. Die installierte App bleibt 0.9.16.
+[Dokumentbaum](../../docs/DOKUMENTBAUM.md) in eigenem C: 307 Originalfälle und
+683.008 Assertions mit gezielter ASan/UBSan geprüft. Ab Arbeitsfassung 0.9.17
+verwenden Titel, Reader, Tabellen und Graph dieselben Projektionen/Referenzen.
+[UI](../../docs/CONTAINER_UI.md) ergänzt Listen, Nummern, Zitatlinie und native
+Container. Originalpositionen, Dateien und Entwürfe bleiben erhalten; gültige
+Dateien bleiben bei Parsergrenzen per Dateiname/Literalmodus erreichbar.
 
-Nächster Schritt: gemeinsame Titel-/Reader-/Tabellen-/Graphanbindung an den
-Baum und seine Referenzen, danach sichtbare/nativ bedienbare Container
-implementieren und gegen Originale prüfen. Neue
-Plattformnachweise jeweils anhand tatsächlicher Jobs übernehmen.
-Die Folge-CI zu 0a1e872 hat einen noch unbekannten Windows-Debug-Testfehler
-ohne LastTest-Diagnose; Einstiegserfassung ist ergänzt, tatsächliche neue
-Nachprüfung steht noch aus.
+Erster Release-Lauf 43/43 in 298,53 s; abschließend 29/29 Kern-Debug in 29,08 s.
+Abschließender Release-Lauf: 43/43 in 271,45 s. Eigene native ASan/UBSan: 552 Assertions; Paketabnahme läuft noch. Dist bleibt geprüftes 0.9.16.
+Nächster Schritt: Abschlussnachweise und neues Paket, danach weitere Markdown-/
+Textregeln und native Plattformabnahme. a45d7e2 ist jetzt gepusht;
+[CI 37656257074](https://github.com/Lulus792/SecondBrain/actions/runs/37656257074)
+besteht in allen zwölf Windows-/Linux-Jobs. Acht macOS-Jobs warten noch.
+Der frühere Windows-Debug-Ausfall tritt dort nicht auf; Ursache ungeklärt.
+Die neue App-Anbindung braucht ihre eigene Plattformabnahme.
 
 ## Weitere offene Release-Arbeit
 

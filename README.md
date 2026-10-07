@@ -133,6 +133,7 @@ bleibt auch nach dem Öffnen eines Archivdokuments erreichbar.
 
 Die Leseansicht unterstützt eigene [Markdown-Blockregeln](docs/MARKDOWN.md)
 für Überschriften, Code, Absätze und [Tabellen](docs/TABELLEN.md).
+Ab 0.9.17 gliedert sie außerdem [Listen und Zitate](docs/CONTAINER_UI.md).
 [Hervorhebungen und Inline-Code](docs/INLINE_STILE.md) bleiben dabei sichtbar;
 [Zeichenreferenzen](docs/ENTITIES.md) werden im Lesetext und in Inline-Linkzielen dekodiert. Den noch begrenzten Umfang dokumentiert
 der Vertrag; der Editor erhält den Originaltext. [E-Mail- und URI-Autolinks](docs/AUTOLINKS.md) erhalten bedienbare Ziele.

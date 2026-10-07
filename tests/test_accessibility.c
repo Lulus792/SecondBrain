@@ -464,6 +464,71 @@ int main(int argc,char **argv) {
     CHECK(d.model.source && strstr(d.model.source_path,"/knowledge/föö.md"));
     link_key.key.key=SDLK_ESCAPE;sb_desktop_event(&d,&link_key);frame(&d);frame(&d);
     CHECK(!d.model.source && !strcmp(d.model.editor,reference_source));
+    char container_source[2500];
+    snprintf(container_source,sizeof(container_source),"# [Container][ziel]\n\n> [ziel]: %sknowledge/f&ouml;&ouml;.md\n>\n> ## Unterabschnitt\n>\n> 3. [Erster][ziel]\n>    Fortsetzung.\n> 4. Zweiter.\n>\n> | Quelle |\n> | --- |\n> | [Tabelle][ziel] |\n\n- Alpha\n- Beta\n\n  ```\n  [Code](%sSTATE.md)\n  ```\n\n- Gamma\n",prefix,prefix);
+    strcpy(d.model.editor,container_source);OK(sb_app_save(&d.model));d.reset_reader=true;d.expanded=true;
+    for(unsigned size=0;size<2;++size) {
+        OK(sb_ui_fonts(&d.ui,size ? 2 : 1));frame(&d);frame(&d);
+        unsigned lists=0,items=0,quotes=0,markers=0,links_found=0;bool first_item=false,container_table=false,marker_three=false,marker_four=false,nested_heading=false;
+        size_t heading_offset=(size_t)(strstr(container_source,"## Unterabschnitt")-container_source);
+        size_t table_offset=(size_t)(strstr(container_source,"| Quelle |")-container_source);
+        char table_identifier[100];snprintf(table_identifier,sizeof(table_identifier),"reader:table:%zu",table_offset);
+        for(size_t i=0;i<d.passive_count;++i) {
+            SBPassiveText *p=&d.passive[i];
+            if(p->role==ACCESSKIT_ROLE_LIST) ++lists;
+            if(p->role==ACCESSKIT_ROLE_LIST_ITEM) ++items;
+            if(p->role==ACCESSKIT_ROLE_BLOCKQUOTE) ++quotes;
+            if(p->role==ACCESSKIT_ROLE_LIST_MARKER) {++markers;marker_three|=!strcmp(p->text,"3.");marker_four|=!strcmp(p->text,"4.");}
+            if(p->role==ACCESSKIT_ROLE_PARAGRAPH && !strcmp(p->text,"Erster Fortsetzung.")) {first_item=true;CHECK(!strncmp(p->parent,"reader:container:",17));}
+            if(p->role==ACCESSKIT_ROLE_TABLE) {container_table=true;CHECK(!strcmp(p->id,table_identifier) && !strncmp(p->parent,"reader:container:",17));}
+            if(p->role==ACCESSKIT_ROLE_HEADING && !strcmp(p->text,"Unterabschnitt")) {char expected[100];snprintf(expected,sizeof(expected),"reader:block:%zu",heading_offset);CHECK(!strcmp(p->id,expected) && p->level==2);nested_heading=true;}
+            CHECK(!strstr(p->text,"[ziel]:"));
+        }
+        for(size_t i=0;i<d.target_count;++i) if(!strncmp(d.targets[i].id,"link:",5)) {++links_found;if(d.scrolling[0].track.w>0) CHECK(d.targets[i].bounds.x+d.targets[i].bounds.w+2*d.ui.scale<=d.scrolling[0].track.x);}
+        CHECK(lists==2 && items==5 && quotes==1 && markers==5 && first_item && container_table && marker_three && marker_four && nested_heading && links_found==3);
+        text=dump(&d);CHECK(strstr(text,"role: ListItem") && strstr(text,"role: Blockquote") && strstr(text,"role: ListMarker"));accesskit_string_free(text);
+        OK(sb_path_join(dump_path,sizeof(dump_path),root,size ? "containers-large.bmp" : "containers.bmp"));CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    }
+    OK(sb_ui_fonts(&d.ui,1));frame(&d);frame(&d);
+#ifdef __APPLE__
+    void *native_ordered_list=native_find(view,"Nummerierte Liste",0);CHECK(native_ordered_list);
+    CHECK(!strcmp(utf8(send(native_ordered_list,"accessibilityRole")),"AXList"));
+    void *native_list_children=send(native_ordered_list,"accessibilityChildren");CHECK(native_list_children);
+    CHECK(((size_t(*)(void *,SEL))objc_msgSend)(native_list_children,sel_registerName("count"))>=2);
+    void *container_reader=native_find(view,d.model.title,0);CHECK(container_reader);
+    size_t container_chars=((size_t(*)(void *,SEL))objc_msgSend)(container_reader,sel_registerName("accessibilityNumberOfCharacters"));
+    const char *container_native=utf8(((void *(*)(void *,SEL,NativeRange))objc_msgSend)(container_reader,sel_registerName("accessibilityStringForRange:"),(NativeRange){0,container_chars}));
+    CHECK(container_native && strstr(container_native,"Erster Fortsetzung.") && strstr(container_native,"Gamma") && !strstr(container_native,"[ziel]:"));
+#endif
+    strcpy(d.focus,"reader");d.heading_context=0;d.reset_reader=true;frame(&d);frame(&d);
+    heading_key.key.key=SDLK_PAGEDOWN;heading_key.key.mod=SDL_KMOD_ALT;sb_desktop_event(&d,&heading_key);frame(&d);frame(&d);
+    char container_heading_id[100];snprintf(container_heading_id,sizeof(container_heading_id),"reader:block:%zu",(size_t)(strstr(container_source,"## Unterabschnitt")-container_source));
+    CHECK(!strcmp(d.heading_cursor,container_heading_id) && !sb_app_dirty(&d.model));
+    int container_width,container_height;SDL_GetWindowSize(d.ui.window,&container_width,&container_height);
+    CHECK(SDL_SetWindowSize(d.ui.window,780,640));CHECK(SDL_SyncWindow(d.ui.window));
+    OK(sb_ui_fonts(&d.ui,2));d.reset_reader=true;strcpy(d.focus,"reader");frame(&d);frame(&d);
+    CHECK(d.scrolling[0].maximum>0 && d.scrolling[0].track.w>0);
+    for(size_t i=0;i<d.target_count;++i) if(!strncmp(d.targets[i].id,"link:",5)) CHECK(d.targets[i].bounds.x+d.targets[i].bounds.w+2*d.ui.scale<=d.scrolling[0].track.x);
+    OK(sb_path_join(dump_path,sizeof(dump_path),root,"containers-small.bmp"));CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    CHECK(SDL_SetWindowSize(d.ui.window,container_width,container_height));CHECK(SDL_SyncWindow(d.ui.window));OK(sb_ui_fonts(&d.ui,1));d.reset_reader=true;frame(&d);frame(&d);
+    strcpy(d.model.editor,"# Lange Nummer\n\n123456789. Erster\n123456790. Zweiter\n");OK(sb_app_save(&d.model));d.reset_reader=true;frame(&d);frame(&d);
+    struct nk_rect number_bounds={0},number_text={0};
+    for(size_t i=0;i<d.passive_count;++i) {SBPassiveText *p=&d.passive[i];if(p->role==ACCESSKIT_ROLE_LIST_MARKER && !strcmp(p->text,"123456789."))number_bounds=p->bounds;if(p->role==ACCESSKIT_ROLE_PARAGRAPH && !strcmp(p->text,"Erster"))number_text=p->bounds;}
+    CHECK(number_bounds.w>30 && number_bounds.x+number_bounds.w<number_text.x && number_text.w>100);
+    OK(sb_path_join(dump_path,sizeof(dump_path),root,"containers-numbers.bmp"));CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    char container_deep[100];memset(container_deep,'>',65);strcpy(container_deep+65," Literalquelle\n");
+    strcpy(d.model.editor,container_deep);OK(sb_app_save(&d.model));d.reset_reader=true;frame(&d);frame(&d);
+    bool literal_container_error=false;
+    for(size_t i=0;i<d.passive_count;++i) if(d.passive[i].role==ACCESSKIT_ROLE_CODE && strstr(d.passive[i].text,"Literalquelle"))literal_container_error=true;
+    CHECK(literal_container_error && !strcmp(d.model.editor,container_deep) && !sb_app_dirty(&d.model));
+    for(size_t i=0;i<d.target_count;++i) CHECK(strncmp(d.targets[i].id,"link:",5));
+    strcpy(d.model.editor,container_source);OK(sb_app_save(&d.model));d.reset_reader=true;frame(&d);frame(&d);
+    strcpy(d.focus,"link:1");link_key.key.key=SDLK_RETURN;sb_desktop_event(&d,&link_key);frame(&d);frame(&d);
+    CHECK(d.model.source && strstr(d.model.source_path,"/knowledge/föö.md"));
+    link_key.key.key=SDLK_ESCAPE;sb_desktop_event(&d,&link_key);frame(&d);frame(&d);
+    CHECK(!d.model.source && !strcmp(d.model.editor,container_source));
+    char *container_saved=NULL;OK(sb_note_load(&d.model.project,d.model.path,&container_saved,NULL));CHECK(!strcmp(container_saved,container_source));free(container_saved);
+    d.expanded=false;strcpy(d.model.editor,reference_source);OK(sb_app_save(&d.model));d.reset_reader=true;frame(&d);frame(&d);
     char *previous_context=d.context; d.context=malloc(80); CHECK(d.context);
     strcpy(d.context,"# Sichtbarer Projektname\n\nKontext zum Lesen.\n");
     d.form=SB_FORM_CONTEXT; frame(&d); frame(&d); bool context_heading=false;

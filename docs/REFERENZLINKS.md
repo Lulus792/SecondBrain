@@ -57,8 +57,9 @@ haben eine von der Quellenlänge abhängige Arbeitsgrenze. Ziele behalten maxima
 die Leseansicht zeigt den Quelltext im Literalmodus, der Graph behält seinen
 letzten gültigen Stand. [Bestehende Daten-/Dateigrenzen](DATENVERTRAG.md).
 
-Definitionen innerhalb von Zitaten und Listen brauchen den noch fehlenden
-vollständigen Containerleser. Ihre gemeinsame Integration bleibt Release-Arbeit.
+Ab 0.9.17 sammelt der [Dokumentbaum](DOKUMENTBAUM.md) auch Definitionen
+innerhalb von Zitaten und Listen. Titel, Reader, Tabellen und Graph verwenden
+die zugehörigen Blattprojektionen.
 Dieser Schritt ist deshalb keine vollständige CommonMark-/GFM-Abnahme.
 
 ## Quellen und Nachweise
@@ -78,7 +79,9 @@ unter die bereits mitgelieferte Unicode License V3. [Zuordnung](../third_party/u
 Zwei Raw-HTML-Fälle verwenden den Literalvertrag, zwei Bildfälle den bestehenden
 Stilvertrag des Alternativtexts. Terminale HTML-Code-Serializer-Zeilenumbrüche
 werden wie im bisherigen Vertrag behandelt; Originalfälle werden nicht verändert.
-Definitionsfälle mit vollständigen Containern bleiben offen. Alle 1.606 Original-
+Die Container-Definitionsfälle sind ab 0.9.17 Teil des zusätzlichen 307er-
+Baumvergleichs; dieser prüft Struktur und Klartext, keine vollständigen Inline-
+Stile/Ziele. Eigene Integrationstests prüfen tatsächliche Containerziele. Alle 1.606 Original-
 Casefold-Mappings bestehen gegen tatsächliche C-Ausgabe. Eigene Fälle prüfen
 Unicode-Expansion, Puffer, Quellen, Definitionenzahl und 3.000 begrenzte Eingaben.
 Native Reader-/Graphprüfungen umfassen Titel, Absatz, Zelle, erste Definition,

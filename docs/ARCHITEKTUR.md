@@ -14,8 +14,9 @@ Die vorhandenen Vorlagen und Projektgedächtnisse können weiterverwendet werden
 Titelermittlung und Leseansicht verwenden dieselben Quellbereiche; Parser und
 Titelausgabe verändern weder Dateien noch Editorinhalt. Die eigene
 [Quellprojektion](CONTAINER_PLAN.md) bereitet die notwendige Positionszuordnung
-für den [eigenen Dokumentbaum](DOKUMENTBAUM.md) vor. Dieser Kern ist implementiert;
-seine gemeinsame Anbindung an App-Leser und UI bleibt noch offen. `src/inline.c` ergänzt
+für den [eigenen Dokumentbaum](DOKUMENTBAUM.md) vor. Dieser Kern ist implementiert
+und ab 0.9.17 gemeinsam an Titel, App-Leser und Graph angebunden.
+[Listen-/Zitatdarstellung](CONTAINER_UI.md) nennt Gestaltung und Prüfgrenzen. `src/inline.c` ergänzt
 gemeinsame Code-/Linkerkennung für Titel, Leseansicht und Sternkarte. Der konkrete
 [Markdown-Umfang](MARKDOWN.md) wird unabhängig vom Rendering geprüft.
 

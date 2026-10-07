@@ -3,7 +3,7 @@
 Stand: 7. Oktober 2026. Fortsetzung des vollständigen Markdown-Auftrags,
 keine fertige UI-Funktion und keine abgeschlossene Container-Abnahme.
 
-## Bestätigter Ausgangspunkt
+## Bestätigter Ausgangspunkt bis 0.9.16
 
 Der bisherige Blockleser liefert einen direkten Bereich der Quelldatei pro
 Block. Listenmarker und Zitatpräfixe bleiben dabei häufig im Absatztext. Die
@@ -61,8 +61,10 @@ Abnahme oder endgültige Zusage für vollständige Containerdateien. Der später
 Dokumentleser muss Gesamtarbeit, Baumgröße und benötigte Zuordnungen gemeinsam
 prüfen; bei Fehlern sind Quelle und letzter gültiger Graph zu erhalten.
 
-Die API ist noch nicht mit der Leseansicht verbunden. Die installierte App bleibt
-0.9.16; diese Grundlage bedeutet nicht, dass sie Listen bereits korrekt darstellt.
+Ab 0.9.17 ist die API über den Dokumentbaum mit der Leseansicht verbunden.
+[Listen-/Zitatdarstellung](CONTAINER_UI.md) und [STATUS](STATUS.md) nennen
+den neuen Umfang und Nachweise. Die installierte App bleibt bis zur neuen
+Paketabnahme bei 0.9.16.
 
 ## Folgende Umsetzungsstufen
 

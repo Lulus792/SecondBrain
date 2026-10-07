@@ -72,7 +72,8 @@ sprünge auf macOS. Tastaturziele, Sichtbarkeit, vollständige lange Absätze un
 Modalabschirmung werden im selben Ablauf geprüft. Konkrete abschließende
 Ergebnisse stehen im [Umsetzungsstand](STATUS.md).
 
-Listen-/Tabellensemantik, vollständige Markdown-Regeln, graphemgenaue Text-
+Ab 0.9.17 gruppieren [native Listen und Zitate](CONTAINER_UI.md) ihre Blätter;
+Tabellenmatrixschnittstellen, vollständige Markdown-Regeln, graphemgenaue Text-
 geometrie, gemischte Schreibrichtungen, IME und reale Screenreader-Bedienung
 bleiben weitere Arbeiten. Blockrechtecke sind noch keine Zeichenrechtecke.
 Eine korrekte Baumstruktur allein belegt keine vollständige assistive Abnahme.

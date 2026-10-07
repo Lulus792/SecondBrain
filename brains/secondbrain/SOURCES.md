@@ -90,3 +90,6 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Containerplan](../../docs/CONTAINER_PLAN.md): Originalregeln, implementierte Quellprojektion und noch ausstehende App-Integration.
 
 - [Dokumentbaum](../../docs/DOKUMENTBAUM.md): implementierte Container-/Blattstruktur, projektionsgebundene Referenzen, Prüfungen und ausstehende gemeinsame App-Anbindung.
+
+- [Listen und Zitate](../../docs/CONTAINER_UI.md): vor Umsetzung erneut gelesene
+  Apple-Grundlagen, gemeinsame Baum-Anbindung, Darstellung und native Grenzen.

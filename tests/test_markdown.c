@@ -68,6 +68,9 @@ int main(void) {
     CHECK(sb_markdown_title("## ΩΩΩ",title,6).code==SB_OK && !strcmp(title,"ΩΩ"));
     CHECK(sb_markdown_title("# Ω",title,2).code==SB_OK && !*title);
     CHECK(sb_markdown_title("# Titel",title,0).code==SB_INVALID);
+    CHECK(sb_markdown_title("# [Titel][x]\n\n> [x]: /ziel\n",title,sizeof(title)).code==SB_OK && !strcmp(title,"Titel"));
+    CHECK(sb_markdown_title("> # Zitat\n\n# Später\n",title,sizeof(title)).code==SB_OK && !*title);
+    CHECK(sb_markdown_title("[x]: /ziel\n\n# [Titel][x]\n",title,sizeof(title)).code==SB_OK && !strcmp(title,"Titel"));
     CHECK(sb_markdown_title(NULL,title,sizeof(title)).code==SB_INVALID);
 
     /* Deterministic arbitrary byte strings: every span is bounded, progress
