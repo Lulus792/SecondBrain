@@ -2,75 +2,50 @@
 
 Stand: 7. Oktober 2026. Maßgeblich sind [STATUS](../../docs/STATUS.md),
 [Plattformnachweise](../../docs/PLATTFORMEN.md) und [Release-Aufgaben](../../docs/RELEASE.md).
-Details vergangener Schritte bleiben im [Journal](journal/2026-10-07.md).
+Frühere Arbeit und Rückfallkopien stehen im [Journal](journal/2026-10-07.md).
 
-## Produkt
+## Produkt und geprüfte App
 
-Eigene C17-Desktop-App für Mensch und KI: Projekte/Notizen verwalten, Wissen lesen,
-bearbeiten, suchen und archivieren; Quellen lesen und gespeicherten KI-Kontext
-kopieren. Lumen-Sternkarte, eigene Glaskarten und Icons, direkte Pfeilnavigation,
-Raumfahrt, begrenztes weiches Scrollen und große Leseansicht sind implementiert.
-Entwürfe und erkannte Konflikte bleiben geschützt. Sicherung/Wiederherstellung,
-Einstellungen, eigener Markdown-Blockleser und vollständige Graphem-Eingaben
-gehören zum bisherigen geprüften Umfang. [Verträge und Quellen](SOURCES.md).
+Eigene C17-Desktop-App für Mensch und KI: Projekte/Notizen verwalten, lesen,
+bearbeiten, suchen, archivieren und sichern; Quellen lesen und gespeicherten
+KI-Kontext kopieren. Lumen-Sternkarte, eigene Glaskarten/Icons, direkte Pfeil-
+navigation, Raumfahrt, weiches Scrollen und große Leseansicht sind implementiert.
+Entwürfe, Originalbytes und erkannte Konflikte bleiben geschützt.
 
-## Vorheriger Plattformstand 0.9.14
+Dist enthält lokal geprüftes 0.9.16, Build b19b47624512. Das Intel/macOS-Paket
+besteht einschließlich Desktop/Tastatur/Sicherung/Neustart/CLI; eigenes Gedächtnis
+und Raster betrachtet. Gemeinsame Referenzen, Unicode-Namen und Scroll-/Fokus-
+abstand sind integriert. Letzte lokale Release-Abnahme: 40 Tests; eigene
+Kern-/native Sanitizer bestehen im dokumentierten Umfang. UI-Bericht SBUI-052/053.
 
-[Zeichenreferenzen](../../docs/ENTITIES.md) sind im eigenen C-Leser implementiert:
-2.125 festgelegte Namen, numerische Angaben, stabile Ausgabestile, erhaltene
-Literalbereiche und Quellen, dekodierte lokale Ziele und richtige Sternkarten-
-beziehungen. Math-Fallback ersetzt bestätigte Kästchen; Originaldaten/-fonts
-und Lizenzen sind zugeordnet. 36 Release-Tests, abschließende Kern-/native
-Nachprüfungen und neun Python-Strukturtests bestehen lokal. Eigene Kern-
-ASan/UBSan mit 1.194.343 Assertions besteht; letzte native Sanitizer-Nachprüfung
-besteht mit 393 Assertions. UI-Bericht SBUI-048/049. Neues Intel/macOS-Paket besteht einschließlich
-Desktop/Tastatur/Sicherung/Neustart/CLI; der damalige Build ist ddd2186d2ab9.
-Das eigene Gedächtnis wurde geladen und die Darstellung betrachtet.
-Lauf 37639562794 zu ddd2186 besteht in allen zwölf Windows-/Linux-Jobs
-einschließlich Debug/Release und entpackter Pakete. Neue Mac-CI noch nicht
-vollständig abgeschlossen; daraus keine ARM64-Gesamtabnahme ableiten.
+[Lauf 37646348381](https://github.com/Lulus792/SecondBrain/actions/runs/37646348381)
+zu b19b476 besteht in allen zwölf Windows-/Linux-Jobs, einschließlich Desktop
+Debug/Release und tatsächlich entpackter Pakete. Neue macOS-CI noch in der
+Warteschlange; daraus keine ARM64-Gesamtabnahme ableiten. Die vorher ausstehenden
+Commits sind normal nach GitHub gepusht; keine Historie wurde umgeschrieben.
 
-Vorherige Windows-/Linux-Abnahme 37631991014 zu 9c38604 besteht in zwölf Jobs,
-einschließlich Debug/Release und Release-Paketen. Neue Mac-CI separat übernehmen;
-keinen Plattformnachweis der neuen 0.9.14 daraus ableiten.
+## Laufende Containerarbeit
 
-## Vorheriger Paketstand 0.9.15
+[Quellprojektion](../../docs/CONTAINER_PLAN.md) in eigenem C bereitet die notwendige
+Trennung von Originalquelle und aufbereitetem Containertext vor. Teilweise Tabs,
+physische Spalten, Quellpositionen, Zeilenenden, Bereichsgrenzen und Rücknahme
+fehlgeschlagener Anfügungen sind mit 315.754 Assertions und gezielter ASan/UBSan
+lokal geprüft. Der Baustein ist noch nicht in der UI verbunden; Listen/Zitate
+sind dadurch noch nicht fertig. Die installierte App bleibt 0.9.16.
 
-E-Mail-Autolinks und innerer Linkvorrang sind implementiert; automatische
-Empfänger werden vor OS-Übergabe kodiert. 37 Release-Tests, 19 Originalfälle,
-1.000 Adressfälle, 1.194.616 eigene Kern- und 401 native Sanitizerassertions
-bestehen lokal; Raster betrachtet. UI-Bericht SBUI-050/051. Reale Mail-App
-nicht bedient. Neues Intel/macOS-Paket besteht; dist enthält 0.9.15,
-Build 9e6cd5675f78. Eigenes Gedächtnis geladen, Raster betrachtet.
-Quellcommit 9e6cd56 ist lokal gesichert; vier GitHub-Pushes scheiterten damals mit
-serverseitigem Internal Server Error. Der nachfolgende erfolgreiche Push enthält diese Commits.
-Referenzlinks wurden danach in der folgenden Version integriert.
+Nächster Schritt: Dokumentbaum auf der Projektion aufbauen; vollständige
+Containerfortsetzung, Referenzen in Containern und gemeinsame Titel-/Reader-/
+Tabellen-/Graphanbindung implementieren und gegen Originale prüfen. Neue
+Plattformnachweise jeweils anhand tatsächlicher Jobs übernehmen.
 
-## Neue Arbeit 0.9.16
+## Weitere offene Release-Arbeit
 
-Gemeinsame dokumentweite Referenzen sind in Titel/Reader/Tabelle/native Inhalte/
-Graph integriert. Vollständige Standard-Unicode-Faltung, erste Definition und
-Originalbytes geprüft. Scrollschiene/Fokusrand sind mit festem Inhaltsrand
-getrennt; Raster sowie 100/200-Prozent-Geometrie betrachtet. Alle 40 abschließenden
-Release-Tests, 433 native Sanitizerassertions, 6.030 Referenz-/1.187.526 eigene
-Inlineassertions, 81 Originalfälle und 1.606 Original-Mappings bestehen lokal.
-UI-Bericht SBUI-052/053. Neues Intel/macOS-Paket besteht und ist installiert;
-dist enthält 0.9.16, Build b19b47624512. Eigenes Gedächtnis geladen und
-Vorschau betrachtet. Normaler Push a57bdfc..b19b476 erfolgreich; auch vorherige
-Commits sind veröffentlicht. Neue CI 37646348381 läuft: C17/Python für
-Windows/Linux bestehen, Desktop-/Paket-/Mac-Nachweise noch nicht abgeschlossen.
+Bidi, visuelle/native Textgeometrie, IME, native Tabellenmatrix, transitive
+Lizenzprüfung und übrige Release-Aufgaben bleiben offen. Support/Beitragsregeln
+und Abhängigkeitswartung sind veröffentlicht; vertraulicher Sicherheitskanal
+ist angefragt. Menschliche VoiceOver/NVDA/Orca-, Dialog-, Geräte-/Langzeit- und
+weitere Vollvolume-Abnahmen fehlen. CI/Raster ersetzen sie nicht.
 
-## Nächste Arbeit und Grenzen
-
-Neue CI-Nachweise übernehmen. Danach vollständige Container-/
-Inline-/Listenregeln, Bidi, visuelle/native Textgeometrie und IME, native Tabellen-
-Matrixschnittstellen sowie übrige Release-Aufgaben umsetzen und abnehmen.
-Support-/Beitrags-/Issue-Vorlagen und Updateablauf sind veröffentlicht; vertraulicher
-Sicherheitskanal ist angefragt, transitive Lizenzprüfung und Wartungsverantwortung
-bleiben offen. GitHub-Formularansicht verlangt eine Anmeldung und ist noch nicht abgenommen.
-
-Menschliche VoiceOver/NVDA/Orca-, native Dialog-, Geräte-/Langzeit- und weitere
-Vollvolume-Abnahmen bleiben offen. CI und Raster ersetzen diese Nachweise nicht.
 Der vollständige Auftrag bleibt aktiv. Eigener Code: MIT; Signaturkonten fehlen.
-1.0 und abschließende Produkttext-Bereinigung erst nach den dafür festgelegten
-Voraussetzungen beziehungsweise ausdrücklicher Nutzerfreigabe.
+1.0 erst nach ausdrücklicher Freigabe, abschließende Produkttext-Bereinigung
+nach den festgelegten Voraussetzungen. Verträge und Originale in [SOURCES](SOURCES.md).

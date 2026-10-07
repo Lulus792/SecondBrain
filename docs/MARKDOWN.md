@@ -40,7 +40,8 @@ weiteren Regeln bleiben offen. Ab 0.9.11 stehen gemeinsame
 [Referenzdefinitionen und ihre gemeinsame Umgebung](REFERENZLINKS.md).
 Dies ist weiterhin eine begrenzte Markdown-Leseansicht, keine vollständige
 CommonMark- oder GFM-Implementierung. Der Auftrag für die vollständige
-Release-Abnahme bleibt damit offen.
+Release-Abnahme bleibt damit offen. [Containerplan und Quellprojektion](CONTAINER_PLAN.md)
+beschreiben die folgende gemeinsame C-Arbeit; noch keine fertige Listen-/Zitat-UI.
 
 ## Darstellung und Navigation
 

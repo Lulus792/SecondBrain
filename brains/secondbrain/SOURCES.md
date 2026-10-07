@@ -86,3 +86,5 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Referenzlink-Recherche](../../docs/REFERENZLINKS_RECHERCHE.md): Originalgrundlagen vor der dokumentweiten Definitions-/Unicode-Implementierung.
 
 - [Referenzlinks](../../docs/REFERENZLINKS.md): dokumentweite C-Umgebung, Unicode-Faltung, Quellen und verbleibende Container-Grenzen.
+
+- [Containerplan](../../docs/CONTAINER_PLAN.md): Originalregeln, implementierte Quellprojektion und noch ausstehender Dokumentbaum/Integration.

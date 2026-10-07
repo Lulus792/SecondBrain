@@ -1719,3 +1719,41 @@ SBUI-052/053 im beschriebenen lokalen Umfang nachgeprüft; vollständige
 Container und ihre Definitionen, Bidi/Textgeometrie/IME, native Tabellenmatrix,
 menschliche assistive Bedienung und übrige Release-Aufgaben bleiben offen.
 Der vollständige Auftrag bleibt aktiv; keine Versionsnummer 1.0 gesetzt.
+
+
+## 0.9.16: abgeschlossene Windows-/Linux-Nachprüfung
+
+[Lauf 37646348381](https://github.com/Lulus792/SecondBrain/actions/runs/37646348381)
+zu b19b476 besteht in allen zwölf Windows-/Linux-Jobs: Python, C17 und Desktop
+in Debug/Release. Beide Release-Jobs bestehen ihre tatsächlich entpackten
+Paketabläufe. Damit sind Referenzlinks, Unicode-Namen und Scroll-/Fokusabstand
+im automatisierten Umfang auf diesen beiden Plattformen nachgeprüft. Die
+neuen macOS-CI-Jobs sind beim dokumentierten Zwischenstand noch in der Warteschlange.
+Menschliche assistive Bedienung und weitere Release-Arbeiten bleiben offen.
+
+
+## Voraussetzung für Container: eigene Quellprojektion
+
+Eigener C-Baustein src/projection.c/h trennt geliehene Originalbytes und besessene
+Parseransicht. Physische Tabspalten und teilweise entfernte Tabs bleiben korrekt
+zugeordnet; CR/LF/CRLF und ein terminaler Parserumbruch behalten ihre Original-
+positionen. Quellsuche nutzt geordnete Bereiche, benachbarte Rohkopien werden
+zusammengeführt. Ungültige Bereiche, freigegebene Ansichten, Überlauf und
+fehlgeschlagene mehrteilige Anfügungen werden ohne partielle sichtbare Änderung
+behandelt. [Vertrag und folgende Integration](CONTAINER_PLAN.md).
+
+Die erste Kern-Debug-Abnahme besteht mit 27 Tests (18,66 s). Nach ergänzten
+Lebensdauer-/Endgrenzen bestehen die letzte Projektionsprüfung mit 315.754
+Assertions (1,04 s) und gezielte eigene ASan/UBSan mit derselben Zahl. Enthalten:
+alle vier Tabstartspalten, vollständige/teilweise/zu kurze Einrückung, Unicode-
+Bytepositionen, 3.000 erzeugte Ansichten, erhaltene Originalbytes, 65.536
+Zuordnungsbereiche, exakte 16-MiB-Endgrenze und Rücknahme nach einer bereits
+erfolgreichen Teilanfügung. Nur Projektionscode/Test sind instrumentiert;
+Leakprüfung ist auf diesem macOS nicht verfügbar und deaktiviert. Logs:
+build/projection-{core,final}-check.log und projection-sanitize/result.log.
+
+Dieser Baustein wird noch nicht von der App benutzt. Keine fertige Listen-/Zitat-
+Darstellung oder native Containersemantik daraus ableiten; kein neues Paket
+und keine andere App-Version deswegen ausgeben. Nächste Arbeit ist der
+Dokumentbaum samt vollständiger gemeinsamer Integration. Gesamtauftrag und
+1.0-Aufgaben bleiben offen.
