@@ -75,3 +75,5 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Inline-Stile](../../docs/INLINE_STILE.md): gemeinsamer C-Leser, Unicode-Zeichengruppen, Darstellung und Grenzen.
 
 - [Native Textstile](../../docs/NATIVE_TEXTSTILE.md): Stilbereiche, Fontattribute, echte native Prüfungen und Geometriegrenzen.
+
+- [Windows-UIA-Textsuche](../../docs/UIA_TEXTSUCHE.md): bestätigter Adapterbefund, feste Quellkorrektur und native Prüfgrenzen.

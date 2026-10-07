@@ -46,8 +46,9 @@ werden als unverändertes, vorgebautes UI-Paket geladen. SHA-256:
 `35b7ca8a6f1e038b5da35e1e9e5a0adaed9bfcf21e1496d29598fbbadcc7043f`.
 Die Bibliothek ist intern in Rust implementiert; unsere Anbindung verwendet C.
 macOS verwendet die statische Release-Bibliothek; unter Windows wird die UI-DLL
-neben der Anwendung ausgeliefert. Linux baut die festgelegte UI-Bibliothek aus
-Quelle mit Cargo/Rust ab 1.87 und einer Korrektur von zwei Cache-Signalaufrufen.
+neben der Anwendung ausgeliefert. Ab 0.9.13 wird diese DLL aus festgelegter
+Quelle mit einer [FindText-Ergänzung](../docs/UIA_TEXTSUCHE.md) gebaut. Linux baut
+die festgelegte UI-Bibliothek aus Quelle mit Cargo/Rust ab 1.87 und einer Korrektur von zwei Cache-Signalaufrufen.
 Die Toolchain ist nur zum Bauen dieser UI-Abhängigkeit erforderlich.
 
 Die C-Binding-Quelle ist Commit 8b6ed37c20ed4c59390e253407983333053662ba

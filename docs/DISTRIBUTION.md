@@ -78,7 +78,8 @@ sich in der App aktivieren. Kamera und Scrollen verwenden kurze Übergänge;
 
 Ab 0.5.2 wird die AccessKit-Linux-Bibliothek aus festgelegter Quelle gebaut, um
 ihre AT-SPI-Cache-Signale zu korrigieren. Entwickler benötigen dafür zusätzlich
-Cargo/Rust ab 1.87. Der Anwendungscode und fachliche Kern bleiben C. Ein Kernbuild
+Cargo/Rust ab 1.87. Windows baut ab 0.9.13 ebenfalls die festgelegte UI-DLL
+aus Quelle, einschließlich der [UIA-Textsuche](UIA_TEXTSUCHE.md). Der Anwendungscode und fachliche Kern bleiben C. Ein Kernbuild
 mit SB_BUILD_UI=OFF benötigt keine Rust-Toolchain; fertige Pakete ebenfalls nicht.
 Quellen, Hashes und Umfang stehen in [third_party](../third_party/README.md).
 

@@ -130,12 +130,43 @@ static bool query(Probe *p) {
             snprintf(p->output,p->capacity,"%ld",level.lVal); success=true;
         }
         VariantClear(&level);
+    } else if (p->operation>=SB_NATIVE_FIND_FIRST && p->operation<=SB_NATIVE_FIND_LIMITED) {
+        IUIAutomationTextPattern *pattern=NULL; IUIAutomationTextRange *document=NULL,*scope=NULL,*found=NULL,*prefix=NULL;
+        hr=IUIAutomationElement_GetCurrentPatternAs(element,UIA_TextPatternId,&IID_IUIAutomationTextPattern,(void **)&pattern);
+        if (SUCCEEDED(hr) && pattern) hr=IUIAutomationTextPattern_get_DocumentRange(pattern,&document); else hr=E_FAIL;
+        if (SUCCEEDED(hr) && document) {
+            if (p->operation==SB_NATIVE_FIND_LIMITED) {
+                BSTR beta=SysAllocString(L"beta");
+                hr=IUIAutomationTextRange_FindText(document,beta,FALSE,FALSE,&scope);SysFreeString(beta);
+                if (SUCCEEDED(hr) && !scope) hr=E_FAIL;
+            } else hr=IUIAutomationTextRange_Clone(document,&scope);
+        }
+        wchar_t *needle=wide(p->value);BSTR word=needle ? SysAllocString(needle) : NULL;free(needle);
+        BOOL backward=p->operation==SB_NATIVE_FIND_LAST || p->operation==SB_NATIVE_FIND_LAST_NO_CASE;
+        BOOL folded=p->operation==SB_NATIVE_FIND_NO_CASE || p->operation==SB_NATIVE_FIND_LAST_NO_CASE;
+        if (SUCCEEDED(hr) && scope && word) hr=IUIAutomationTextRange_FindText(scope,word,backward,folded,&found);else hr=E_FAIL;
+        BSTR value=NULL,before=NULL;
+        if (SUCCEEDED(hr) && !found && p->capacity) { snprintf(p->output,p->capacity,"<none>");success=true; }
+        else if (SUCCEEDED(hr) && found) {
+            hr=IUIAutomationTextRange_GetText(found,-1,&value);
+            if (SUCCEEDED(hr)) hr=IUIAutomationTextRange_Clone(document,&prefix);
+            if (SUCCEEDED(hr) && prefix) hr=IUIAutomationTextRange_MoveEndpointByRange(prefix,TextPatternRangeEndpoint_End,found,TextPatternRangeEndpoint_Start);
+            if (SUCCEEDED(hr) && prefix) hr=IUIAutomationTextRange_GetText(prefix,-1,&before);
+            char text[512];
+            if (SUCCEEDED(hr) && value && p->capacity && WideCharToMultiByte(CP_UTF8,WC_ERR_INVALID_CHARS,value,-1,text,sizeof(text),NULL,NULL)>0) {
+                snprintf(p->output,p->capacity,"%u:%s",SysStringLen(before),text);success=true;
+            }
+        }
+        SysFreeString(value);SysFreeString(before);SysFreeString(word);
+        if (prefix) IUIAutomationTextRange_Release(prefix);if (found) IUIAutomationTextRange_Release(found);if (scope) IUIAutomationTextRange_Release(scope);
+        if (document) IUIAutomationTextRange_Release(document);if (pattern) IUIAutomationTextPattern_Release(pattern);
     } else if (p->operation==SB_NATIVE_TEXT_STYLE) {
         IUIAutomationTextPattern *pattern=NULL; IUIAutomationTextRange *document=NULL,*range=NULL;
         hr=IUIAutomationElement_GetCurrentPatternAs(element,UIA_TextPatternId,&IID_IUIAutomationTextPattern,(void **)&pattern);
         if (SUCCEEDED(hr) && pattern) hr=IUIAutomationTextPattern_get_DocumentRange(pattern,&document);
         wchar_t *needle=wide(p->value); BSTR word=needle ? SysAllocString(needle) : NULL; free(needle);
         if (SUCCEEDED(hr) && document && word) hr=IUIAutomationTextRange_FindText(document,word,FALSE,FALSE,&range); else hr=E_FAIL;
+        if (SUCCEEDED(hr) && !range) { fprintf(stderr,"UIA FindText returned no range for '%s'.\n",p->value); hr=E_FAIL; }
         VARIANT weight,italic,family,size; VariantInit(&weight);VariantInit(&italic);VariantInit(&family);VariantInit(&size);
         if (SUCCEEDED(hr) && range) hr=IUIAutomationTextRange_GetAttributeValue(range,UIA_FontWeightAttributeId,&weight);
         if (SUCCEEDED(hr) && range) hr=IUIAutomationTextRange_GetAttributeValue(range,UIA_IsItalicAttributeId,&italic);

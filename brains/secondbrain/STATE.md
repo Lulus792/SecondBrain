@@ -14,24 +14,16 @@ Entwürfe und erkannte Konflikte bleiben geschützt. Sicherung/Wiederherstellung
 Einstellungen, eigener Markdown-Blockleser und vollständige Graphem-Eingaben
 gehören zum bisherigen geprüften Umfang. [Verträge und Quellen](SOURCES.md).
 
-## Aktueller Arbeitsschritt 0.9.12
+## Aktueller Arbeitsschritt 0.9.13
 
-[Native Textstile](../../docs/NATIVE_TEXTSTILE.md) sind angebunden: gemeinsame
-Stilbereiche, primäre Fontrollen und Aktualisierung bei gleichem Klartext.
-34 lokale Release-Tests bestehen (279,40 s); abschließend 380 native Assertions,
-zusätzlich 85 Text- und 111 Editorassertions. Fonttraits, Überschrift/Codeblock,
-Tabellenzelle und 200-Prozent-Codegröße sind über echte AppKit-Abfragen geprüft.
-Voriger Provider scheitert; erste eigene ASan/UBSan mit 376 Assertions besteht.
-Abschließende eigene ASan/UBSan mit 380 Assertions besteht; ohne Stilsignatur
-scheitert die reine Stil-Fixture. UI-Bericht SBUI-046.
-Das neue Intel-Paket besteht mit Desktop 126, Tastatur 142, Sicherung 75,
-Neustart und CLI; eigenes Gedächtnis geladen und Raster betrachtet. dist enthält
-0.9.12, Build 4c4a51054334. Neue native Abnahme 37624868119 läuft: zwölf Jobs
-bereits erfolgreich, acht beim Zwischenstand in Arbeit.
-
-Die vorherige 0.9.11-Abnahme 37621658743 ist vollständig erfolgreich: 20 Jobs
-auf Windows, Linux, Intel-/ARM64-macOS einschließlich Release-Paketen. Daraus
-keinen neuen Plattformnachweis für 0.9.12 ableiten.
+Windows Debug/Release der 0.9.12-Abnahme scheitert am fehlenden FindText-Bereich;
+32 andere UI-Tests bestehen. Linux Debug/Release einschließlich Stilabfragen
+und Release-Paket besteht. [Windows-UIA-Textsuche](../../docs/UIA_TEXTSUCHE.md):
+Adapterbefund bestätigt, kleine gehashte UI-Ergänzung und fester DLL-Quellbuild
+vorbereitet. Lokale Quellen-/Lockfile-/Wiederholungsprüfungen und vier Mac-
+Nachprüfungen bestehen. Neue Windows-Kompilierung und native Abnahme folgen.
+Keine bestätigte Windows-Behebung vorwegnehmen. UI-Bericht SBUI-047.
+Dist enthält weiter geprüftes 0.9.12, Build 4c4a51054334.
 
 ## Nächste Arbeit und Grenzen
 

@@ -62,8 +62,8 @@ auf Linux GCC oder Clang sowie die Entwicklungsdateien des Fenstersystems.
 SDL3 und die UI-Textbibliotheken werden bei Bedarf in festgelegten Versionen
 beim Build geladen. HarfBuzz benötigt zusätzlich einen C++-Compiler;
 der eigene Anwendungscode ist C17.
-Unter Linux benötigt der UI-Build zusätzlich Cargo mit Rust ab 1.87, um die
-festgelegte Zugänglichkeitsbibliothek mit ihrer Cache-Korrektur zu bauen.
+Unter Windows und Linux benötigt der UI-Build zusätzlich Cargo mit Rust ab 1.87,
+um die festgelegte Zugänglichkeitsbibliothek mit ihren UI-Korrekturen zu bauen.
 Die fertige Anwendung benötigt keine Rust-Toolchain.
 Die automatisierten Prozessprüfungen benötigen beim Bauen zusätzlich Python 3;
 für einen reinen Anwendungsbuild kann `-DBUILD_TESTING=OFF` gesetzt werden.

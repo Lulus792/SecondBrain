@@ -2,7 +2,7 @@
 
 Stand: 7. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Der aktuelle Entwicklungsschritt 0.9.12 ergänzt native Textstile.
+Der aktuelle Entwicklungsschritt 0.9.13 ergänzt die Windows-UIA-Textsuche.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
 ## Abgeschlossene Grundlagen
@@ -1417,3 +1417,22 @@ läuft. Beim dokumentierten Zwischenstand sind zwölf Jobs erfolgreich und acht
 in Arbeit; insbesondere neue UIA-/AT-SPI-Stilabfragen werden erst nach ihrem
 tatsächlichen Abschluss abgenommen. Menschliche assistive Bedienung und weitere
 Release-Aufgaben bleiben offen; Version 1.0 ist nicht freigegeben.
+
+
+## Windows-UIA-Textsuche in 0.9.13
+
+Die tatsächliche 0.9.12-CI 37624868119 scheitert unter Windows Debug/Release
+am ersten Fontattributfall; 32 andere UI-Tests dieser Systeme bestehen. Linux
+Debug/Release besteht die Stilabfragen und sein Release-Paket. Festgelegte
+Adapterquelle enthält FindText ohne Implementierung; HRESULT 0 mit leerem
+Pointer ist ein bestätigter Befund. Kleine UI-Adapter-Ergänzung und fester
+Windows-Quellbuild sind vorbereitet. [Vertrag/Quellen](UIA_TEXTSUCHE.md).
+
+Ursprüngliche Anwendung, Wiederholung ohne Änderung, Fremdquellen-Abweisung
+und unveränderter übriger Lockfile-Graph bestehen lokal; Windows-Metadaten werden
+mit cargo metadata --locked aufgelöst. Vier lokale Mac-Nachprüfungen bestehen
+(19,25 s), mit 380 nativen, 85 Text- und 111 Editorassertions. Keine tatsächliche
+Windows-Kompilierung daraus ableiten. Die bisherigen nativen Stilprüfungen
+bleiben erhalten; neun neue Windows-Suchfälle sind vorbereitet. Neue native
+Kompilierung, Bedien- und DLL-Paketabnahme folgen nach Push. Lokale dist-App
+bleibt bis zu einer geprüften neuen Paketfassung bei 0.9.12. UI-Bericht: /Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-07_15-23-52/UI_REVIEW.md.

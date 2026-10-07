@@ -361,6 +361,18 @@ int main(int argc,char **argv) {
 #endif
         CHECK(!strcmp(refreshed_style,changed ? "700|0|Noto Sans|18.0" : "400|0|Noto Sans|18.0"));
     }
+#ifdef _WIN32
+    snapshot.id="find-text";snapshot.label="Suchbereich";snapshot.value="🛰️ Alpha beta ALPHA\nAlpha alpha";
+    only_style=(SBTextSpan){0,strlen(snapshot.value),0};
+    sb_accessibility_update(d.accessibility,"Suchprobe","",&snapshot,1,"",false,d.semantic_context);
+    const int find_modes[]={SB_NATIVE_FIND_FIRST,SB_NATIVE_FIND_LAST,SB_NATIVE_FIND_NO_CASE,SB_NATIVE_FIND_LAST_NO_CASE,SB_NATIVE_FIND_FIRST,SB_NATIVE_FIND_FIRST,SB_NATIVE_FIND_LIMITED,SB_NATIVE_FIND_LIMITED,SB_NATIVE_FIND_FIRST};
+    const char *find_words[]={"Alpha","Alpha","alpha","alpha","ALPHA","fehlt","Alpha","beta","🛰️"};
+    const char *find_results[]={"4:Alpha","21:Alpha","4:Alpha","27:alpha","15:ALPHA","<none>","<none>","10:beta","0:🛰️"};
+    for (size_t i=0;i<sizeof(find_modes)/sizeof(find_modes[0]);++i) {
+        CHECK(sb_native_probe(d.ui.window,"Suchbereich",find_words[i],find_modes[i],refreshed_style,sizeof(refreshed_style),pump_snapshot,&d));
+        CHECK(!strcmp(refreshed_style,find_results[i]));
+    }
+#endif
     frame(&d);frame(&d);checkpoint("native inline font attributes");
 #endif
     char *previous_context=d.context; d.context=malloc(80); CHECK(d.context);
