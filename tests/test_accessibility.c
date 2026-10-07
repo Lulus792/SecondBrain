@@ -213,6 +213,55 @@ int main(int argc,char **argv) {
 #endif
     OK(sb_path_join(dump_path,sizeof(dump_path),root,"markdown-blocks.bmp"));
     CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    const char *separators="# Abschnitte\n\nVorher.\n\n***\n\nDanach.\n\nUntertitel\n---\n\n```\n___\n```\n";
+    strcpy(d.model.editor,separators); OK(sb_app_save(&d.model)); d.reset_reader=true;
+    for (unsigned size=0;size<2;++size) {
+        OK(sb_ui_fonts(&d.ui,size ? 2 : 1)); frame(&d); frame(&d);
+        unsigned rules=0; bool code_rule=false,underline_heading=false;
+        for (size_t i=0;i<d.passive_count;++i) {
+            SBPassiveText *p=&d.passive[i];
+            if (p->role==ACCESSKIT_ROLE_SPLITTER) {
+                ++rules; CHECK(!strcmp(p->parent,"reader") && !strcmp(p->text,"Abschnittstrennung"));
+                CHECK(p->bounds.w>100 && p->bounds.h>0 && p->bounds.h<=2);
+            }
+            if (p->role==ACCESSKIT_ROLE_CODE && !strcmp(p->text,"___")) code_rule=true;
+            if (p->role==ACCESSKIT_ROLE_HEADING && !strcmp(p->text,"Untertitel")) underline_heading=p->level==2;
+        }
+        CHECK(rules==1 && code_rule && underline_heading && !sb_app_dirty(&d.model));
+        text=dump(&d); CHECK(strstr(text,"role: Splitter") && strstr(text,"orientation: Horizontal")); accesskit_string_free(text);
+        for (size_t i=0;i<d.target_count;++i) CHECK(strncmp(d.targets[i].id,"reader:block:",13));
+#ifdef __APPLE__
+        void *native_separator=native_find(view,"Abschnittstrennung",0); CHECK(native_separator);
+        CHECK(!strcmp(utf8(send(native_separator,"accessibilityRole")),"AXSplitter"));
+#elif defined(_WIN32) || defined(SB_ATSPI_TEST)
+        CHECK(sb_native_probe(d.ui.window,"Abschnittstrennung",NULL,SB_NATIVE_IS_SEPARATOR,NULL,0,pump,&d));
+#endif
+        OK(sb_path_join(dump_path,sizeof(dump_path),root,size ? "markdown-rules-large.bmp" : "markdown-rules.bmp"));
+        CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    }
+    SBStyleChoice previous_style=d.requested_style;
+    sb_desktop_set_style(&d,(SBStyleChoice){.dark=false,.contrast=true}); frame(&d); frame(&d);
+    CHECK(d.ui.contrast && !d.ui.dark);
+    SDL_Surface *pixels=SDL_RenderReadPixels(d.ui.renderer,NULL); CHECK(pixels);
+    bool separator_pixel=false;
+    for (size_t i=0;i<d.passive_count;++i) if (d.passive[i].role==ACCESSKIT_ROLE_SPLITTER) {
+        struct nk_rect bounds=d.passive[i].bounds; Uint8 red,green,blue,alpha;
+        for (size_t j=0;j<d.target_count;++j) if (!strcmp(d.targets[j].id,"reader")) {
+            struct nk_rect reader=d.targets[j].bounds;
+            CHECK(bounds.x>reader.x+4*d.ui.scale);
+            CHECK(bounds.x+bounds.w<reader.x+reader.w-4*d.ui.scale);
+        }
+        CHECK(SDL_ReadSurfacePixel(pixels,(int)((bounds.x+bounds.w/2)*d.ui.density),
+            (int)((bounds.y+bounds.h/2)*d.ui.density),&red,&green,&blue,&alpha));
+        struct nk_color ink=d.ui.ctx->style.text.color;
+        separator_pixel=abs((int)red-ink.r)<=1 && abs((int)green-ink.g)<=1 && abs((int)blue-ink.b)<=1;
+    }
+    SDL_DestroySurface(pixels); CHECK(separator_pixel);
+    OK(sb_path_join(dump_path,sizeof(dump_path),root,"markdown-rules-contrast.bmp")); CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    sb_desktop_set_style(&d,previous_style);
+    char *saved_separators=NULL; OK(sb_note_load(&d.model.project,d.model.path,&saved_separators,NULL));
+    CHECK(!strcmp(saved_separators,separators)); free(saved_separators);
+    OK(sb_ui_fonts(&d.ui,1)); checkpoint("thematic separators and native role");
     char inline_source[1800]; const char *prefix=strchr(d.model.path,'/') ? "../" : "";
     snprintf(inline_source,sizeof(inline_source),"# [Titel](%sSTATE.md) `Code` und **Wort**\n\n`[Nur Code](%sPROJECT.md)` \\[Maskiert](%sQUESTIONS.md) ![Bild](%sSOURCES.md)\n[Stand](%sSTATE.md \"Quelle\")\n",prefix,prefix,prefix,prefix,prefix);
     strcpy(d.model.editor,inline_source); OK(sb_app_save(&d.model));

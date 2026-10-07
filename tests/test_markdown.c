@@ -44,9 +44,16 @@ int main(void) {
     START("Absatz\n    - kein neuer Block\n    > ebenfalls Fortsetzung\n");
     token(&r,SB_MD_TEXT,0,"Absatz\n    - kein neuer Block\n    > ebenfalls Fortsetzung"); done(&r);
     START("Abschnitt\n--\n\n---\n> Zitat\n| Spalte |\n**betont**\nweiter\n");
-    token(&r,SB_MD_HEADING,2,"Abschnitt"); token(&r,SB_MD_BLANK,0,""); token(&r,SB_MD_TEXT,0,"---");
+    token(&r,SB_MD_HEADING,2,"Abschnitt"); token(&r,SB_MD_BLANK,0,""); token(&r,SB_MD_RULE,0,"---");
     token(&r,SB_MD_TEXT,0,"> Zitat"); token(&r,SB_MD_TEXT,0,"| Spalte |");
     token(&r,SB_MD_TEXT,0,"**betont**\nweiter"); done(&r);
+    START("***\n  _ _ _\n-\t-\t-\r\n    ---\n\\***\n**\n*-*\n\nAbsatz\n***\nDanach\n");
+    token(&r,SB_MD_RULE,0,"***"); token(&r,SB_MD_RULE,0,"  _ _ _"); token(&r,SB_MD_RULE,0,"-\t-\t-");
+    token(&r,SB_MD_CODE,0,"---"); token(&r,SB_MD_TEXT,0,"\\***\n**\n*-*");
+    token(&r,SB_MD_BLANK,0,""); token(&r,SB_MD_TEXT,0,"Absatz"); token(&r,SB_MD_RULE,0,"***"); token(&r,SB_MD_TEXT,0,"Danach"); done(&r);
+    START("Abschnitt\n---\n\n***\n\n```\n---\n***\n```\n");
+    token(&r,SB_MD_HEADING,2,"Abschnitt"); token(&r,SB_MD_BLANK,0,""); token(&r,SB_MD_RULE,0,"***"); token(&r,SB_MD_BLANK,0,"");
+    token(&r,SB_MD_FENCE,0,"```"); token(&r,SB_MD_CODE,0,"---"); token(&r,SB_MD_CODE,0,"***"); token(&r,SB_MD_FENCE,0,"```"); done(&r);
     const char *literal="# Keine Überschrift\r\n```\n  \n";
     sb_markdown_init(&r,literal,strlen(literal),true);
     token(&r,SB_MD_CODE,0,"# Keine Überschrift"); token(&r,SB_MD_CODE,0,"```"); token(&r,SB_MD_CODE,0,"  "); done(&r);

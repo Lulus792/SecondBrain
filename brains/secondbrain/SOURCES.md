@@ -69,3 +69,5 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Support](../../SUPPORT.md): öffentliche Meldungen, benötigte Angaben und Grenzen.
 - [Beiträge](../../CONTRIBUTING.md): Architekturvorgaben und Prüfwege für Änderungen.
 - [Abhängigkeitswartung](../../docs/ABHAENGIGKEITEN_WARTUNG.md): feste Quellen und Updateablauf.
+
+- [Abschnittstrennungen](../../docs/TRENNLINIEN.md): eigene Blockregel, Gestaltung, native Semantik und Prüfgrenzen.

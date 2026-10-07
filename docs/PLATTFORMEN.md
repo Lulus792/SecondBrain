@@ -624,3 +624,19 @@ ASan/UBSan-Nachprüfung ebenfalls; frühere Fallback-Fassung scheitert weiter.
 Logs: build/emoji-rounding-check.log, emoji-sanitize/rounding-result.log und
 emoji-regression/rounding-result.log. Neuer nativer Lauf folgt nach Push.
 Diese Testkorrektur verändert das bereits gepackte Anwendungsprogramm nicht.
+
+
+## Lokale Nachprüfung 0.9.10
+
+Abschnittstrennungen, native macOS-Separatorrolle, skalierte Reader-Innenabstände
+und Hilfe-Punkt sind implementiert. Abschließender vollständiger Intel/macOS-
+Release-Lauf besteht mit 33 Tests (195,44 s), einschließlich realer Kontrastpixel
+und beidseitigem Abstand zum inneren Fokusring. Blockerkennung/Test besteht in
+eigener ASan/UBSan-Instrumentierung; 100/200-Prozent-Raster sind betrachtet.
+Native UIA-/AT-SPI-Separatorabfragen sind vorbereitet, neue Ausführung folgt
+nach Push. Paketprüfung folgt separat. [Details](TRENNLINIEN.md).
+
+0.9.9 zu 099de24 besteht inzwischen unter Windows und Linux einschließlich aller
+Debug-/Release- und Paketwege; Mac-Jobs fehlen noch. Der zuvor fehlgeschlagene
+Windows-Debug-Kernlauf hat keine festgestellte Ursache, auch wenn der neue Lauf
+besteht. Vollständige Plattform-/Geräteabnahme daraus nicht ableiten.

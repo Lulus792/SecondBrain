@@ -120,6 +120,9 @@ static bool query(Probe *p) {
         if (SUCCEEDED(hr) && pattern) hr=IUIAutomationGridPattern_get_CurrentColumnCount(pattern,&columns);
         if (SUCCEEDED(hr) && pattern && p->capacity) { snprintf(p->output,p->capacity,"%d:%d",rows,columns); success=true; }
         if (pattern) IUIAutomationGridPattern_Release(pattern);
+    } else if (p->operation==SB_NATIVE_IS_SEPARATOR) {
+        CONTROLTYPEID role=0; hr=IUIAutomationElement_get_CurrentControlType(element,&role);
+        success=SUCCEEDED(hr) && role==UIA_SeparatorControlTypeId;
     } else if (p->operation==SB_NATIVE_READ_LEVEL) {
         VARIANT level; VariantInit(&level);
         hr=IUIAutomationElement_GetCurrentPropertyValue(element,UIA_LevelPropertyId,&level);
@@ -232,6 +235,8 @@ static bool query(Probe *p) {
                 if (!error && p->capacity) { snprintf(p->output,p->capacity,"%d:%d",rows,columns); success=true; }
                 g_object_unref(table);
             }
+        } else if (p->operation==SB_NATIVE_IS_SEPARATOR) {
+            success=atspi_accessible_get_role(element,&error)==ATSPI_ROLE_SEPARATOR && !error;
         } else if (p->operation==SB_NATIVE_READ_LEVEL) {
             GHashTable *attributes=atspi_accessible_get_attributes(element,&error);
             const char *level=attributes ? g_hash_table_lookup(attributes,"level") : NULL;

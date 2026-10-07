@@ -1,6 +1,6 @@
 # Markdown in der Leseansicht
 
-Stand: 7. Oktober 2026, Entwicklungsschritte 0.9.4–0.9.6. Die Anwendung liest
+Stand: 7. Oktober 2026, Entwicklungsschritte 0.9.4–0.9.10. Die Anwendung liest
 Markdown selbst in C. Sie verändert die Quelldatei beim Anzeigen nicht.
 Editor und Sicherung behalten die Originalbytes; Anzeigen ist keine Migration.
 
@@ -26,8 +26,9 @@ ATX-/Setext-Überschriften, Codeblöcke und Absätze. Tests sind eigene Fälle,
 keine übernommene vollständige Konformitätssuite.
 
 Ab 0.9.6 werden [Tabellen](TABELLEN.md) als eigener Block erkannt und gelesen.
-Zeilen mit tatsächlichen Listenmarkern, Zitaten oder Trennlinien
-werden noch getrennt dargestellt. Normale Zahlen am Absatzanfang lösen keine
+[Abschnittstrennungen](TRENNLINIEN.md) werden ab 0.9.10 als waagerechte Linien
+mit passender nativer Semantik dargestellt. Zeilen mit tatsächlichen Listenmarkern
+oder Zitaten werden noch getrennt dargestellt. Normale Zahlen am Absatzanfang lösen keine
 Trennung mehr aus. Die vollständigen Container-Regeln, geschachtelte Listen,
 Tabellen in geschachtelten Containern, Inline-Regeln, Entities, Referenzlinks und HTML-Blöcke sind
 noch nicht vollständig umgesetzt. Die Anwendung führt kein HTML aus. Ab 0.9.5 verwenden Leseansicht, Titel und

@@ -123,7 +123,8 @@ bool sb_markdown_next(SBMarkdown *r,SBMarkdownBlock *b) {
         }
         b->content=p; b->length=l.end-p; return true;
     }
-    if (rule(r,l) || container(r,l)) return true;
+    if (rule(r,l)) { b->kind=SB_MD_RULE; return true; }
+    if (container(r,l)) return true;
     b->content=l.content;
     size_t end=l.end;
     while (r->cursor<r->length) {

@@ -178,6 +178,7 @@ static accesskit_tree_update *build_locked(SBAccessibility *a) {
         accesskit_node_set_label(node,v->label);
         accesskit_node_set_author_id(node,v->id);
         if (v->role==ACCESSKIT_ROLE_HEADING) accesskit_node_set_level(node,(v->level ? v->level : 1)-1);
+        if (v->role==ACCESSKIT_ROLE_SPLITTER) accesskit_node_set_orientation(node,ACCESSKIT_ORIENTATION_HORIZONTAL);
         if (v->role==ACCESSKIT_ROLE_TABLE) { accesskit_node_set_row_count(node,v->rows); accesskit_node_set_column_count(node,v->columns); }
         if (v->role==ACCESSKIT_ROLE_ROW) accesskit_node_set_row_index(node,v->row);
         if (v->role==ACCESSKIT_ROLE_CELL || v->role==ACCESSKIT_ROLE_COLUMN_HEADER) {

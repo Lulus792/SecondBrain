@@ -38,7 +38,7 @@ Der ursprüngliche Dokumentwert bleibt für die bestehenden Schnittstellen
 verfügbar. Native Textbereiche liefern den aufbereiteten Lesetext. Editorwerte
 bleiben unverändertes Markdown und erhalten noch keine Blockstruktur.
 
-Die eigene Anbindung führt Ebenen als 1–6; AccessKit 0.25.1 erwartet sie
+Die eigene Anbindung führt Ebenen als 1–6; AccessKit C 0.23.1 erwartet sie
 nullbasiert. Diese Umrechnung erfolgt beim Aufbau des Adapterbaums. Die
 Windows-Level-Eigenschaft rechnet wieder auf natürliche Ebenen um; konkrete
 UIA-/AT-SPI-Abfragen werden erst nach dem jeweiligen Lauf als bestanden genannt.
@@ -85,3 +85,12 @@ accesskit_atspi_common 0.21.0 vor; Typprüfung und idempotente Vorbereitung
 bestehen lokal. Die tatsächliche AT-SPI-Abfrage und beide nativen Linux-Desktopprüfungen
 bestehen inzwischen im [Wiederholungslauf zu 1358794](https://github.com/Lulus792/SecondBrain/actions/runs/37549092934).
 Der frühere fehlerhafte Linux-Lauf bleibt als solcher dokumentiert.
+
+
+## Abschnittstrennungen ab 0.9.10
+
+[Trennlinien](TRENNLINIEN.md) werden als beschriftete horizontale Separatoren
+veröffentlicht, ohne Textwert oder zusätzlichen Tabstopp. Ihre nativen Rechtecke
+entsprechen der tatsächlichen Linie. Code und Setext-Unterstreichungen bleiben
+eigenständige Fälle. Die lokale macOS-Rollen-/Geometrie-/Kontrastprüfung besteht;
+eue Windows-/Linux-Nachweise werden erst nach tatsächlichem Lauf übernommen.

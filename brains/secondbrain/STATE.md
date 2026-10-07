@@ -54,7 +54,7 @@ Die [native 0.9.8-Abnahme](https://github.com/Lulus792/SecondBrain/actions/runs/
 läuft noch; tatsächliche Ergebnisse übernehmen und neue Fehler beheben.
 [Vertrag](../../docs/GRAPHEME.md), [Nachweise](../../docs/STATUS.md).
 
-## Laufender Schritt 0.9.9
+## Schritt 0.9.9
 
 [Emoji-Schrift und Schriftläufe](../../docs/EMOJI.md) sind implementiert.
 33 erste lokale Release-Tests und drei abschließende Raster-/Lizenzprüfungen
@@ -70,10 +70,19 @@ Plattformabnahme behaupten. [Originalnachweise](../../docs/STATUS.md).
 Support-/Beitrags-/Issue-Vorlagen und Abhängigkeitsupdate-Ablauf sind als 099de24
 gepusht; YAML und lokale Verweise geprüft. GitHub verlangt für die tatsächliche
 Formularansicht eine Anmeldung; diese Darstellung ist noch nicht abgenommen. Vertraulicher Sicherheitskanal ist angefragt.
-Der neue native Nachlauf 37608867987 meldet einen Windows-Debug-Kernfehler ohne
-brauchbare Ursache; Workflow ergänzt vorhandene CTest-Diagnose und Logs.
-Lokale Fehlerprovokation bestätigt den Diagnosepfad, die eigentliche Ursache
-bleibt bis zum neuen nativen Lauf offen.
+Der Nachlauf zu 099de24 besteht unter Windows/Linux einschließlich Debug,
+Release und Paketen. Der frühere Windows-Debug-Kernfehler wiederholt sich dort
+nicht; Ursache bleibt ungeklärt. Vorhandene CTest-Diagnose und Log-Artefakte
+sind jetzt auch im Kernworkflow angebunden. Mac-Jobs stehen noch aus.
+
+## Laufender Schritt 0.9.10
+
+[Abschnittstrennungen](../../docs/TRENNLINIEN.md), skalierte Reader-Innenabstände
+und der Hilfe-Punkt sind implementiert und im Raster nachgeprüft. Abschließend
+bestehen alle 33 lokalen Release-Tests (195,44 s), einschließlich nativer Rolle,
+echter Kontrastpixel und Abstand zum Fokusring. Eigene Block-/Test-Instrumentierung
+besteht unter ASan/UBSan; alte Blockerkennung scheitert. Neues Paket und native
+Plattformabnahme folgen; dist bleibt bis zur bestandenen Paketprüfung bei 0.9.9.
 
 Danach verbleibende Container-/Inline-/Listenregeln,
 Unicode-Textgeometrie/IME, Support-/Lizenzzuordnung und übrige Release-Aufgaben.

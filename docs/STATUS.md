@@ -1249,3 +1249,37 @@ Der Prüftab für GitHubs Formularauswahl wird auf die Anmeldung umgeleitet;
 die tatsächliche Serverdarstellung ist damit noch nicht abgenommen. Es wurde
 kein Testissue versendet und keine Anmeldung vorgenommen. Die neue native
 Abnahme 37609566084 ist gestartet; konkrete Ergebnisse folgen separat.
+
+
+## Abschnittstrennungen und Reader-Abstände in 0.9.10
+
+Die eigene C-Blockerkennung veröffentlicht Abschnittstrennungen als eigenen Typ.
+Die Leseansicht zeichnet eine waagerechte Linie und veröffentlicht horizontale
+native Separatorsemantik, ohne zusätzlichen Tabstopp. Setext und Code behalten
+ihre Bedeutung; gespeicherte Originalbytes bleiben erhalten. Bei 200 Prozent
+Schriftgröße werden Reader-Innenabstände mit skaliert, damit der innere
+Kontrastring Abstand zum Inhalt hält. Der fast unsichtbare Hilfe-Icon-Punkt
+wird als Kreisfläche gezeichnet. [Quellen und Vertrag](TRENNLINIEN.md).
+
+Drei erste gezielte Prüfungen bestehen (15,31 s), darunter 334 native,
+111 Editor- und 181.838 Blockassertions mit 10.000 begrenzten Eingaben. Der
+vorherige Blockleser scheitert an der neuen Blocktypprüfung. Eigene Block-/Test-
+Instrumentierung besteht unter ASan/UBSan; andere Kernteile sind dabei nicht
+vollständig instrumentiert. Erster 33-Test-Lauf: 198,26 s. Die helle native
+Kontrastnachprüfung besteht mit 340 Assertions (10,67 s). Nach abschließender
+Paddingkorrektur bestehen erneut alle 33 lokalen Release-Tests (195,44 s),
+einschließlich realer Linienpixel und beidseitigem Abstand zum Kontrastring.
+Raster bei 100/200 Prozent sowie vor/nach Hilfe-Punkt und Kontrastpadding betrachtet.
+Logs: build/rules-target-check.log, rules-regression/{result,sanitize}.log,
+rules-full-check.log, rules-contrast-check.log und rules-padding-full-check.log.
+UI-Bericht SBUI-041–043: /Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-07_13-01-27/UI_REVIEW.md.
+Neues entpacktes Paket und neue native Plattformabnahme folgen separat.
+
+Der [0.9.9-Lauf zu 099de24](https://github.com/Lulus792/SecondBrain/actions/runs/37609566084)
+besteht inzwischen unter Windows und Linux vollständig einschließlich Debug/Release
+und entpackter Release-Pakete. Windows-Debug-Kern besteht wieder; die Ursache
+des früheren einzelnen Fehlers ist weiterhin unbekannt. Mac-Jobs stehen noch aus.
+Das ist keine Abnahme der neuen 0.9.10. Verbleibende Markdown-Container, Bidi,
+Textgeometrie, native Matrixschnittstellen und menschliche Bedienabnahme bleiben offen.
+
+Die abschließende native Teilprüfung umfasst 342 Assertions.

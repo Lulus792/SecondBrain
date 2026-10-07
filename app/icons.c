@@ -67,7 +67,10 @@ void sb_icon_draw(struct nk_command_buffer *canvas, SBIcon icon, struct nk_rect 
     for (size_t i=0;i<count;++i) {
         float x1=b.x+lines[i].x1*scale,y1=b.y+lines[i].y1*scale;
         float x2=b.x+lines[i].x2*scale,y2=b.y+lines[i].y2*scale;
-        if (icon==SB_ICON_ACTIONS) nk_fill_circle(canvas,nk_rect(x1-1.2f*scale,y1-1.2f*scale,2.4f*scale,2.4f*scale),color);
+        if (icon==SB_ICON_ACTIONS || (icon==SB_ICON_HELP && i==1)) {
+            float diameter=icon==SB_ICON_HELP ? weight : 2.4f*scale;
+            nk_fill_circle(canvas,nk_rect(x1-diameter/2,y1-diameter/2,diameter,diameter),color);
+        }
         else nk_stroke_line(canvas,x1,y1,x2,y2,weight,color);
     }
 }

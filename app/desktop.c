@@ -707,7 +707,7 @@ static void accessible_publish(SBDesktop *d) {
     }
     for (size_t i=0;i<d->passive_count;++i) {
         SBPassiveText *p=&d->passive[i]; SBAccessibleItem *v=&items[d->target_count+i];
-        v->id=p->id; v->label=p->role==ACCESSKIT_ROLE_TABLE || p->role==ACCESSKIT_ROLE_ROW || p->role==ACCESSKIT_ROLE_CELL || p->role==ACCESSKIT_ROLE_COLUMN_HEADER || !p->parent[0] || p->role==ACCESSKIT_ROLE_HEADING ? p->text : ""; v->value=p->role==ACCESSKIT_ROLE_TABLE || p->role==ACCESSKIT_ROLE_ROW ? NULL : p->text; v->bounds=p->bounds; v->role=p->role;
+        v->id=p->id; v->label=p->role==ACCESSKIT_ROLE_TABLE || p->role==ACCESSKIT_ROLE_ROW || p->role==ACCESSKIT_ROLE_CELL || p->role==ACCESSKIT_ROLE_COLUMN_HEADER || p->role==ACCESSKIT_ROLE_SPLITTER || !p->parent[0] || p->role==ACCESSKIT_ROLE_HEADING ? p->text : ""; v->value=p->role==ACCESSKIT_ROLE_TABLE || p->role==ACCESSKIT_ROLE_ROW || p->role==ACCESSKIT_ROLE_SPLITTER ? NULL : p->text; v->bounds=p->bounds; v->role=p->role;
         v->row=p->row; v->column=p->column; v->rows=p->rows; v->columns=p->columns;
         v->parent=p->parent; v->level=p->level; v->order=((uint64_t)p->group<<32)|p->order;
     }
@@ -1340,13 +1340,27 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
     target(d, "reader"); target_label(d,d->form==SB_FORM_NOTICE_TEXT ? sb_notice_name(d->notice_index) : d->form==SB_FORM_CONTEXT ? "Projektkontext" : d->model.source ? d->model.source_title : d->model.title);
     if (d->target_count) d->targets[d->target_count - 1].kind = SB_FOCUS_READER;
     ring(d, "reader");
-    if (!nk_group_begin(ctx, "Reader", NK_WINDOW_NO_SCROLLBAR)) return;
+    struct nk_vec2 previous_padding=ctx->style.window.group_padding;
+    ctx->style.window.group_padding=nk_vec2(8*d->ui.scale,10*d->ui.scale);
+    if (!nk_group_begin(ctx, "Reader", NK_WINDOW_NO_SCROLLBAR)) { ctx->style.window.group_padding=previous_padding; return; }
     unsigned slot=modal_reader(d) && (text==d->context || text==d->notice) ? 2 : 0;
     smooth_scroll(d,slot,ctx->current->layout->offset_y);
     SBMarkdown reader; SBMarkdownBlock block;
     sb_markdown_init(&reader,text,strlen(text),whole_code);
     while (sb_markdown_next(&reader,&block)) {
         if (block.kind==SB_MD_TABLE && document_table(d,text,strlen(text),block.offset,slot,&link_number)) { first_heading=false; continue; }
+        if (block.kind==SB_MD_RULE) {
+            nk_layout_row_dynamic(ctx,24*d->ui.scale,1);
+            struct nk_rect bounds=nk_widget_bounds(ctx);
+            struct nk_rect line=nk_rect(bounds.x,bounds.y+(bounds.h-d->ui.scale)/2,bounds.w,d->ui.scale);
+            nk_spacer(ctx);
+            struct nk_color color=ctx->style.text.color;
+            if (!d->ui.contrast) color.a=110;
+            nk_stroke_line(nk_window_get_canvas(ctx),line.x,line.y+line.h/2,line.x+line.w,line.y+line.h/2,line.h,color);
+            document_span(d,"Abschnittstrennung",strlen("Abschnittstrennung"),block.offset,ACCESSKIT_ROLE_SPLITTER,0,line,slot,false);
+            first_heading=false;
+            continue;
+        }
         const char *content=text+block.content;
         size_t length=block.length;
         unsigned heading=block.level;
@@ -1384,6 +1398,7 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
     nk_style_set_font(ctx, &d->ui.normal->handle);
     scroll_measure(d,slot);
     nk_group_end(ctx);
+    ctx->style.window.group_padding=previous_padding;
 }
 
 static void actions(SBDesktop *d, float width) {
