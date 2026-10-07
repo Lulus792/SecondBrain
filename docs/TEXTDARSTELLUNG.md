@@ -76,3 +76,28 @@ Die logische Einheit schließt gemischte Schreibrichtungen, kontextuelle
 Wortgrenzen, exakte Maus-/Caret-Pixelgeometrie, IME-Kandidatenpositionen und
 native Zeichenrechtecke noch nicht ab. Emoji-Fontabdeckung ist eine eigene
 Aufgabe; eine korrekt erhaltene Sequenz belegt keine passende Glyphenanzeige.
+
+
+## Vollständige Schriftläufe ab 0.9.9
+
+Eigene C-Schriftwahl ersetzt die bisherige reine SDL_ttf-Fallback-Anbindung.
+Ein vollständiges Graphem erhält eine abdeckende Schrift; benachbarte kompatible
+Zeichen werden gemeinsam geformt. Noto Emoji ergänzt konkrete verbundene Emoji-
+Prüffolgen. Metriken und Rasterung verwenden dieselbe Auswahl und eine gemeinsame
+Grundlinie. [Quellen, Hashes, Abnahme und Grenzen](EMOJI.md).
+
+Das Zusammensetzen folgt bisher der Quellreihenfolge. Ein vollständiger Bidi-
+Absatzalgorithmus, exakte visuelle Eingabe-/Mausgeometrie und IME-/native
+Zeichenrechtecke bleiben offen. Ganze Unicode-Grapheme in der Eingabe und
+richtige Glyphen für die einzelnen geprüften Folgen ersetzen diese Arbeit nicht.
+
+Am 7. Oktober erneut geprüfte Grundlage für den nächsten Schritt:
+[UAX #9, Unicode 18.0.0, Revision 52](https://www.unicode.org/reports/tr9/tr9-52.html)
+trennt logische Speicherung, Absatzauswertung und visuelle Zeilenreihenfolge.
+[SDL_ttf-Richtung](https://wiki.libsdl.org/SDL3_ttf/TTF_SetFontDirection) steuert
+die Formung eines Laufs. Die festgelegte HarfBuzz-Dokumentation
+(docs/usermanual-what-is-harfbuzz.xml, Abschnitt Bidirectionality) verlangt
+vorbereitete Richtungsabschnitte. Eigene Folgerung: Schrift-Fallback allein kann
+diese Absatzaufgabe nicht lösen; native und visuelle Auswahl benötigen eine
+gemeinsame Abbildung zwischen logischen Indizes und dargestellten Läufen.
+Dies ist Recherche für die verbleibende Umsetzung, kein neuer Funktionsnachweis.

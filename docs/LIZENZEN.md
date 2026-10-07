@@ -50,3 +50,11 @@ festgelegten Eigenschaftsdaten und abgeleiteten Graphemtabellen. Die eigene
 Segmentierung bleibt C-Code unter der Projektlizenz. Der Unicode-Lizenztext
 liegt in den lokalen UI-Ressourcen und jedem Paket; der Pakettest verlangt ihn.
 Die Ressourcennachprüfung mit 18 Originalen besteht lokal. [Herkunft und Hashes](../third_party/unicode/README.md).
+
+
+## Emoji-Schrift ab 0.9.9
+
+19 Originaltexte sind angebunden. Noto Emoji ergänzt die SIL-OFL-Ressource;
+Quelle und unveränderte Schriftdatei sind im [Emoji-Vertrag](EMOJI.md) festgelegt.
+Die lokale Ressourcennachprüfung besteht mit 58 Assertions. Die neue Paketprüfung
+verlangt Schrift und Lizenz; ihren tatsächlichen Abschluss dokumentiert STATUS.md.

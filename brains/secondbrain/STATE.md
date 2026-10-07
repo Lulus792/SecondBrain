@@ -60,7 +60,12 @@ läuft noch; tatsächliche Ergebnisse übernehmen und neue Fehler beheben.
 33 erste lokale Release-Tests und drei abschließende Raster-/Lizenzprüfungen
 bestehen mit 43 Text-, 111 Editor- und 58 Lizenzassertions. Eigene Text-/Graphem-
 Instrumentierung besteht; vorheriger reiner Fallback zerlegt die Emoji-Verbindung.
-Neue Paket- und native Plattformabnahme folgen; dist bleibt bis dahin bei 0.9.8.
+Das neue Intel-Paket besteht mit Desktop 126, Tastatur 142, Sicherung 75,
+Neustart und CLI; dist enthält 0.9.9, Build cf5678a1a177. Erste native Windows-/
+Linux-Release-Tests finden eine um einen Pixel zu enge Familienbreiten-Assertion.
+Korrektur plus zusätzlicher Zerlegungsprüfung besteht lokal mit 46 Assertions
+und ASan/UBSan; neue native Abnahme folgt nach Push. Keine vollständige neue
+Plattformabnahme behaupten. [Originalnachweise](../../docs/STATUS.md).
 
 Danach verbleibende Container-/Inline-/Listenregeln,
 Unicode-Textgeometrie/IME, Support-/Lizenzzuordnung und übrige Release-Aufgaben.

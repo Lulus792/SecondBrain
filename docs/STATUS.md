@@ -1198,3 +1198,27 @@ Die neue Paket- und native Plattformabnahme folgt separat. dist/SecondBrain
 bleibt bis zum bestandenen neuen Paket bei 0.9.8. Bidi-Absätze, präzise visuelle/
 native Textgeometrie, IME und menschliche assistive Bedienung bleiben offen.
 UI-Nachprüfung SBUI-040: /Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-07_12-29-00/UI_REVIEW.md.
+
+
+Das entpackte Intel-Paket 0.9.9 besteht mit 126 Desktop-, 142 Tastatur- und
+75 Sicherungsassertions, zwei Einstellungs-Neustartprozessen und dem produktiven
+Sicherungswerkzeug. Schrift und originale Emoji-Lizenz sind im Paket geprüft.
+Archiv-SHA-256: `83c17797c732e45df03eda7e482d4462ec760309cf815ad12eb4b52817b412f1`.
+Log: build/emoji-package-check.log. dist/SecondBrain enthält dieses geprüfte
+Release-Konfigurationspaket mit Buildkennung cf5678a1a177; die frühere lokale
+Kopie ist unter build/emoji-previous-dist-20261007-123656 erhalten. Das eigene
+Projektgedächtnis wurde mit diesem Paket geladen und als Raster betrachtet.
+
+Die [erste native 0.9.9-Abnahme](https://github.com/Lulus792/SecondBrain/actions/runs/37608033806)
+findet eine zu enge Familienbreiten-Assertion auf Linux und Windows: 17 statt
+16 Rasterpixel. Die übrigen 31 Release-Tests dieser Systeme bestehen; der
+jeweilige Paketlauf wird wegen des Texttestfehlers nicht ausgeführt. SDL_ttf
+berechnet Rastergrenzen einschließlich Glyphenüberhängen (pinned SDL_ttf.c,
+TTF_Size_Internal). Der Test lässt für diese unterschiedliche Glyphe nun zwei
+logische Pixel Abweichung zu und verlangt zusätzlich eine Breite unter der
+Hälfte der vier separat gemessenen Familienfiguren. Die zerlegte Ausgabe bleibt
+so erkannt. Lokale Textnachprüfung besteht mit 46 Assertions (1,19 s), eigene
+ASan/UBSan-Nachprüfung ebenfalls; frühere Fallback-Fassung scheitert weiter.
+Logs: build/emoji-rounding-check.log, emoji-sanitize/rounding-result.log und
+emoji-regression/rounding-result.log. Neuer nativer Lauf folgt nach Push.
+Diese Testkorrektur verändert das bereits gepackte Anwendungsprogramm nicht.

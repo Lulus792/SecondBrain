@@ -49,3 +49,19 @@ Schriftläufe werden in Quellreihenfolge zusammengesetzt. Das implementiert noch
 keinen vollständigen Unicode-Bidi-Absatzalgorithmus. Maus-/Cursorrechtecke,
 IME-Positionen und native Zeichenrechtecke benötigen eigene Abnahmen. Die
 oben genannten Emoji sind konkrete Prüffälle, kein Nachweis für jede Sequenz.
+
+
+## Abschließende lokale Paketprüfung und native Nachprüfung
+
+Das entpackte Intel-Paket 0.9.9 besteht einschließlich Desktop, Tastatur,
+Sicherung, Neustart und CLI; Schrift und Lizenz sind mitgeliefert. Buildkennung
+cf5678a1a177. [Genaue Nachweise und Archivhash](STATUS.md).
+
+Erste native Windows-/Linux-Release-Prüfungen finden eine zu enge Testannahme:
+Familie und Einzelperson unterscheiden sich um einen Rasterpixel. Die Messung
+liefert Glyphen-Rastergrenzen einschließlich Überhang. Die korrigierte Prüfung
+verlangt annähernde Emoji-Breite (maximal zwei logische Pixel Unterschied) und
+zusätzlich weniger als die halbe Breite der vier separat gemessenen Figuren.
+Damit bleibt das Zerlegen der Familie erkennbar. Alle 46 lokalen Textassertions
+und die eigene ASan/UBSan-Nachprüfung bestehen; die vorherige Fallback-Fassung
+scheitert weiterhin an der Frau/Laptop-Verbindung. Neue native Abnahme folgt.

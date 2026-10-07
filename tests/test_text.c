@@ -29,7 +29,10 @@ int main(int argc,char **argv) {
         CHECK(measure(ui.body,"é")<=measure(ui.body,"e")+1);
         float emoji=measure(ui.body,"👩"); CHECK(emoji>measure(ui.body,"?")*1.1f);
         CHECK(fabsf(measure(ui.body,"👩‍💻")-emoji)<1);
-        CHECK(fabsf(measure(ui.body,"👨‍👩‍👧‍👦")-emoji)<1);
+        /* Bounding ink can extend a pixel beyond the common emoji advance. */
+        float family=measure(ui.body,"👨‍👩‍👧‍👦");
+        CHECK(fabsf(family-emoji)<=2);
+        CHECK(family<(measure(ui.body,"👨")+measure(ui.body,"👩")+measure(ui.body,"👧")+measure(ui.body,"👦"))*0.5f);
         CHECK(fabsf(measure(ui.body,"🇩🇪")-emoji)<1);
         CHECK(fabsf(measure(ui.body,"👍🏽")-emoji)<1);
         CHECK(fabsf(measure(ui.code,"👩‍💻")-measure(ui.code,"👩"))<1);
