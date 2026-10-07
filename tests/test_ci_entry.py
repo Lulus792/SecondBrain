@@ -16,18 +16,23 @@ class EntryTests(unittest.TestCase):
                                '--test-dir', str(directory), '--config', 'Release',
                                '--log', str(log)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    def check_case(self, test, expected_success):
+    def check_case(self, test, expected_success, alias=False):
         with tempfile.TemporaryDirectory(prefix='SecondBrain Unicode ü ') as temporary:
             root = Path(temporary)
             directory = root / 'test dir'
             directory.mkdir()
             (directory / 'CTestTestfile.cmake').write_text(test, encoding='utf-8')
+            if alias:
+                link = root / 'directory alias ü'
+                link.symlink_to(directory, target_is_directory=True)
+                directory = link
             log = root / 'logs' / 'entry.log'
             result = self.run_entry(directory, log)
             self.assertEqual(result.returncode == 0, expected_success, result.stdout.decode(errors='replace'))
             detail = log.read_text(encoding='utf-8', errors='replace')
             self.assertIn('Checked test entry', detail)
-            self.assertIn(str(directory), detail)
+            # Windows TEMP may use RUNNER~1; the starter logs the resolved path.
+            self.assertIn(str(directory.resolve()), detail)
             self.assertIn('CMake exit status:', detail)
             self.assertTrue((directory / 'checked-ctest.log').is_file(), result.stdout.decode(errors='replace'))
             self.assertEqual(result.stdout, log.read_bytes())
@@ -35,6 +40,11 @@ class EntryTests(unittest.TestCase):
     def test_success_with_spaces_and_unicode(self):
         cmake = Path(shutil.which('cmake')).as_posix()
         self.check_case('add_test(pass "' + cmake + '" -E true)\n', True)
+
+    @unittest.skipIf(sys.platform == 'win32', 'Windows alias case is supplied by native short TEMP paths; symlink privilege is not required')
+    def test_directory_alias_preserves_the_canonical_test_location(self):
+        cmake = Path(shutil.which('cmake')).as_posix()
+        self.check_case('add_test(pass "' + cmake + '" -E true)\n', True, alias=True)
 
     def test_failed_ctest_is_not_hidden_by_logging(self):
         cmake = Path(shutil.which('cmake')).as_posix()

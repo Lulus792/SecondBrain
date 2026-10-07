@@ -90,3 +90,9 @@ geprüft; 25 Python-Prüfungen bestehen. macOS-Archive zeigen Compilerpfad
 48a229c/1.98.1, lokale Cargo-Probe 1.99.0/b940084d7eb6. Library-Lock des
 Mac-Standes enthält 30 Registry-Pakete; zusätzliche Original-Lizenzen und
 tatsächliche Windows-/Linux-Compilerzuordnung bleiben offen.
+
+Windows-Teststarterursache aus CI 37691907747 belegt: kurzer TEMP-Pfad
+RUNNER~1 wird mit korrekt aufgelöstem runneradmin-Pfad als Text verglichen.
+Fixture vergleicht jetzt kanonische Pfade; reale Aliasprobe und insgesamt
+26 Python-Tests bestehen lokal. Windows-Nachprüfung folgt. GitHub-API aktuell
+rate-limited; das ist keine Aussage über den terminalen Status laufender Jobs.

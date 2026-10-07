@@ -2023,3 +2023,22 @@ AccessKit-Cargo-Probe identifiziert 1.99.0/b940084d7eb6 auf x86_64-apple-darwin.
 Logs: build/rust-provenance-{final,final-python,local}.log und
 rust-provenance-local.json. Neue Windows-/Linux-Identitäten und vollständige
 Übernahme der zusätzlichen Original-Lizenzen bleiben offen. Mac-App unverändert.
+
+
+## Eingegrenzter Windows-Teststarterfehler
+
+[CI 37691907747](https://github.com/Lulus792/SecondBrain/actions/runs/37691907747)
+liefert durch die native Fehlerausgabe erstmals die konkreten drei Tracebacks:
+Das Fixture erwartet C:/Users/RUNNER~1/...; der Starter protokolliert den korrekt
+aufgelösten Pfad C:/Users/runneradmin/.... Der erfolgreiche Fixture-CTest endet
+mit Status 0; anschließend scheitert der reine Textvergleich des Verzeichnisses.
+
+Die Fixture-Prüfung vergleicht nun ebenfalls den kanonischen Pfad. Eine zusätzliche
+reale Verzeichnisalias-Probe erhält Unicode, Leerzeichen, echten CTest und die
+Kontrolle der geschriebenen Logs. Acht Prozess-/Diagnosefälle bestehen lokal
+in 3,12 s, alle 26 Python-Unittests in 7,76 s. Logs:
+build/ci-canonical-{path-check,python-check}.log. Die Aliasprobe verwendet lokal
+einen Symlink; Windows behält seine drei nativen TEMP-Pfadfälle ohne zusätzliche
+Symlink-Rechte. Neue Windows-Ausführung und Gesamtabnahme bleiben ausstehend.
+Die öffentliche GitHub-API meldet bei der letzten Abfrage ein Rate-Limit;
+weiteres Polling wird bis zu neuer Zugriffsmöglichkeit unterlassen.
