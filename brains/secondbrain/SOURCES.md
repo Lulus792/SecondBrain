@@ -77,3 +77,5 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Native Textstile](../../docs/NATIVE_TEXTSTILE.md): Stilbereiche, Fontattribute, echte native Prüfungen und Geometriegrenzen.
 
 - [Windows-UIA-Textsuche](../../docs/UIA_TEXTSUCHE.md): bestätigter Adapterbefund, feste Quellkorrektur und native Prüfgrenzen.
+
+- [Zeichenreferenzen-Recherche](../../docs/ENTITIES_RECHERCHE.md): nächste C-Parserarbeit, Originaldaten, Lizenz und Ausgabegrenzen; noch keine Implementierung.
