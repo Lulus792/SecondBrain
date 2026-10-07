@@ -104,3 +104,5 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Lizenzinventur](../../docs/LIZENZ_INVENTUR.md) und [Manifest](../../third_party/license-manifest.json): ausgewertete Zielplattform-Abhängigkeiten, Originale, Hashes und offene Laufzeitanteile ab 0.9.20.
 
 - [CI-Teststarter](../../tools/test_entry.py) und [Prozessprüfung](../../tests/test_ci_entry.py): frühes, natives Eintragslog; keine unbelegte Fehlerursache.
+
+- [Rust-Laufzeitnachweis](../../docs/RUST_RUNTIME_NACHWEIS.md): originale Library-Lockdatei und buildbezogene Compileridentität; zusätzliche Original-Lizenzen bleiben offen.

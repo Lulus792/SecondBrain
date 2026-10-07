@@ -37,6 +37,12 @@ jobs:
         run: cmake -DSB_DIAGNOSTIC_LOG=build/ui/configure-entry.log -P tools/ci_log_report.cmake
       - name: Build UI and editor checks
         run: cmake -DSB_BUILD_DIR=build/ui -DSB_BUILD_CONFIG=${{ matrix.config }} -P tools/build_checked.cmake
+      - name: Record Windows accessibility compiler
+        if: runner.os == 'Windows'
+        run: python tools/record_ui_rust_compiler.py --target-dir build/ui/accesskit-windows-build --output build/ui/ui-rust-compiler.json
+      - name: Record Linux accessibility compiler
+        if: runner.os == 'Linux'
+        run: python tools/record_ui_rust_compiler.py --target-dir build/ui/accesskit-linux-build --output build/ui/ui-rust-compiler.json
       - name: Verify UI on Linux
         if: runner.os == 'Linux'
         run: sh tools/run_linux_ui_tests.sh cmake -DSB_TEST_DIR=build/ui -DSB_TEST_CONFIG=${{ matrix.config }} -P tools/test_checked.cmake
@@ -73,6 +79,7 @@ jobs:
             build/ui/Testing/Temporary/LastTest.log
             build/ui/checked-ctest.log
             build/ui/test-entry.log
+            build/ui/ui-rust-compiler.json
             build/ui/checked-configure.log
             build/ui/configure-entry.log
             build/ui/accesskit-windows-build/**/*.log

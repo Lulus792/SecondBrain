@@ -2005,3 +2005,21 @@ volle lokale Release-Kernlauf über diesen Einstieg bestehen (31/31 in 54,71 s).
 Logs: build/ci-path-{report-check,python-check,core-check}.log.
 Neue Windows-Abnahme steht aus; die Pfadkorrektur ist noch keine bestätigte
 Behebung aller dortigen Prüffehler. Die installierte Mac-App bleibt 0.9.21.
+
+
+## Compilerherkunft der Rust-UI-Laufzeit
+
+Die [Rust-Laufzeitprüfung](RUST_RUNTIME_NACHWEIS.md) gleicht beide macOS-
+AccessKit-Archive mit dem eingebetteten Compilerpfad ab; Original src/version
+zu 48a229c bestätigt 1.98.1. Dessen Library-Lock enthält 30 Registry-Pakete
+und zusätzliche In-tree-Pakete. Es ist ein konservativer Quellumfang, kein
+Nachweis, dass sämtliche Pakete in jedem App-Binary enthalten sind.
+
+Die neue CI-Aufzeichnung liest den erfolgreichen Compiler-Versionsabruf aus
+dem tatsächlich erzeugten Cargo-Cache der Windows-/Linux-UI-Abhängigkeit.
+Ein reales Cargo-Fixture und ein verworfener unvollständiger Nachweis bestehen
+(2/2 in 2,01 s); alle Python-Prüfungen bestehen 25/25 in 4,50 s. Die lokale
+AccessKit-Cargo-Probe identifiziert 1.99.0/b940084d7eb6 auf x86_64-apple-darwin.
+Logs: build/rust-provenance-{final,final-python,local}.log und
+rust-provenance-local.json. Neue Windows-/Linux-Identitäten und vollständige
+Übernahme der zusätzlichen Original-Lizenzen bleiben offen. Mac-App unverändert.

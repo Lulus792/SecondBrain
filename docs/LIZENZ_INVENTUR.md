@@ -73,6 +73,9 @@ Compiler-Commit `48a229ceaefd4985c50990b14116b6d856af0985` beobachtet, dessen
 Original `src/version` 1.98.1 angibt. Der lokale Rust-Compiler ist 1.99.0.
 Diese Zuordnung allein belegt noch nicht sämtliche Laufzeit-Unterbestandteile.
 Die vollständige transitive Release-Abnahme bleibt deshalb offen.
+Der [Rust-Laufzeitnachweis](RUST_RUNTIME_NACHWEIS.md) konkretisiert die zwei
+beobachteten Compilerstände, den zusätzlichen Library-Lockumfang und die
+Buildaufzeichnung für Windows/Linux.
 
 Dynamische Systembibliotheken sind von tatsächlich mitgelieferten Kopien zu
 unterscheiden. GLib/GIO/D-Bus werden im Linux-Paket nicht mitkopiert. Ihre

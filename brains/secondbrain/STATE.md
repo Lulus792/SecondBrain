@@ -84,3 +84,9 @@ ist beim Abschluss queued; neuer Gesamt-Plattformnachweis steht aus.
 CI-Einstieg normalisiert native CMake-Pfade; Python meldet auch fehlende Logs
 und erhält frühen Fehlerkontext. 7 Prozessfälle, 23 Python-Unittests und
 31/31 lokale Release-Kernprüfungen bestehen. Neue Windows-Abnahme folgt.
+
+Rust-UI-Provenienz ist als CI-Aufzeichnung umgesetzt und mit echtem Cargo
+geprüft; 25 Python-Prüfungen bestehen. macOS-Archive zeigen Compilerpfad
+48a229c/1.98.1, lokale Cargo-Probe 1.99.0/b940084d7eb6. Library-Lock des
+Mac-Standes enthält 30 Registry-Pakete; zusätzliche Original-Lizenzen und
+tatsächliche Windows-/Linux-Compilerzuordnung bleiben offen.
