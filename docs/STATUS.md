@@ -1847,8 +1847,18 @@ Bibliotheken nicht vollständig instrumentiert. Endgültige Gesamt-Nachprüfung:
 48 vollständige Materialraster stimmen exakt mit dem bisherigen Renderer
 überein. Lokale Metal-Messungen belegen keine pauschale 60-fps-Abnahme.
 
-Installierte App bleibt bis zum neuen Paket bei 0.9.16. Neue Sanitizer-/Paket-/
-Plattformnachweise folgen. UI-Bericht SBUI-057–061, Pfad in
+Neue Intel/macOS-Paketabnahme zu **ee71cc4c74aa** besteht: 126 Desktop-,
+142 Tastatur- und 75 Sicherungsassertions, zwei isolierte Neustartprozesse und
+CLI-Sichern/Prüfen/Wiederherstellen. App und CLI identifizieren sauber 0.9.18.
+Archiv SHA-256: `1a0cf18ca59d2352ae38cac06607aaa200bbe99abedb5ec331238bee4ebf5db7`.
+Die geprüfte App ist nach dist/SecondBrain installiert; eigenes Gedächtnis
+gelangt unverändert in die Leseansicht, Raster betrachtet. Rückfallkopie:
+`build/previous-dist-0.9.16-20261007-212254`. Paket-/Installationslogs:
+`build/interaction-package-check.log`, `build/interaction-installed-brain.log`.
+
+Quellschritt ist nach origin gepusht. [CI 37673520042](https://github.com/Lulus792/SecondBrain/actions/runs/37673520042)
+war zuletzt queued; neue Windows-/Linux-/ARM64-Nachweise sind noch offen.
+UI-Bericht SBUI-057–061, Pfad in
 `build/interaction-review-path.txt`; keine menschliche assistive Abnahme.
 
 Präzisierung zum vorherigen Graph-Nachweis: Die C-Graphfunktion erhält ihren
