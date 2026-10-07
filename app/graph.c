@@ -1,4 +1,6 @@
 #include "graph.h"
+#include "markdown.h"
+#include "inline.h"
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -87,66 +89,28 @@ SBStatus sb_graph_build(const SBProject *project, const SBNotes *notes, SBGraph 
         char *text = NULL;
         status = sb_note_load(project, notes->items[i].path, &text, NULL);
         if (status.code != SB_OK) goto fail;
-        const char *p = text;
-        bool fence = false, line_start = true;
-        unsigned inline_ticks = 0, fence_width = 0;
-        char fence_char = 0;
-        while (*p) {
-            if (line_start) {
-                const char *marker = p;
-                for (unsigned spaces = 0; spaces < 3 && *marker == ' '; ++spaces) ++marker;
-                if (*marker == '`' || *marker == '~') {
-                    unsigned width = 1;
-                    while (marker[width] == *marker) ++width;
-                    if (width >= 3) {
-                        if (!fence) { fence = true; fence_char = *marker; fence_width = width; }
-                        else if (*marker == fence_char && width >= fence_width) {
-                            const char *tail = marker + width;
-                            while (*tail == ' ' || *tail == '\t' || *tail == '\r') ++tail;
-                            if (!*tail || *tail == '\n') fence = false;
-                        }
-                        inline_ticks = 0;
-                        while (*p && *p != '\n') ++p;
-                        if (!*p) break;
-                        ++p; line_start = true; continue;
+        SBMarkdown blocks; SBMarkdownBlock block;
+        sb_markdown_init(&blocks,text,strlen(text),false);
+        while (sb_markdown_next(&blocks,&block)) {
+            if (block.kind!=SB_MD_TEXT && block.kind!=SB_MD_HEADING) continue;
+            SBInline reader; status=sb_inline_init(&reader,text+block.content,block.length);
+            if (status.code!=SB_OK) { sb_inline_free(&reader); free(text); goto fail; }
+            SBInlineToken token;
+            while (sb_inline_next(&reader,&token)) {
+                if (token.kind!=SB_INLINE_LINK) continue;
+                char link[SB_PATH_CAP],path[SB_PATH_CAP];
+                status=sb_inline_destination(&reader,&token,link,sizeof(link));
+                if (status.code==SB_LIMIT) { status=sb_ok(); continue; }
+                if (status.code!=SB_OK) { sb_inline_free(&reader); free(text); goto fail; }
+                if (sb_graph_destination(notes->items[i].path,link,path,sizeof(path))) {
+                    for (size_t k=0;k<notes->count;++k) if (!strcmp(path,notes->items[k].path)) {
+                        status=edge(&graph,i,k);
+                        if (status.code!=SB_OK) { sb_inline_free(&reader); free(text); goto fail; }
+                        break;
                     }
                 }
             }
-            line_start = *p == '\n';
-            if (!fence && *p == '`') {
-                unsigned ticks = 1; while (p[ticks] == '`') ++ticks;
-                if (!inline_ticks) inline_ticks = ticks;
-                else if (inline_ticks == ticks) inline_ticks = 0;
-                p += ticks - 1;
-            }
-            unsigned escapes = 0;
-            for (const char *q = p; q > text && q[-1] == '\\'; --q) ++escapes;
-            if (!fence && !inline_ticks && !(escapes % 2) && *p == '[' && (p == text || p[-1] != '!')) {
-                const char *close = strchr(p + 1, ']');
-                if (close && close[1] == '(') {
-                    const char *end = close + 2;
-                    unsigned nesting = 1;
-                    while (*end && *end != '\n' && nesting) {
-                        if (*end == '(') ++nesting;
-                        if (*end == ')') --nesting;
-                        if (nesting) ++end;
-                    }
-                    if (!nesting && (size_t)(end - close - 2) < SB_PATH_CAP) {
-                        char link[SB_PATH_CAP], path[SB_PATH_CAP];
-                        size_t length = (size_t)(end - close - 2);
-                        memcpy(link, close + 2, length); link[length] = 0;
-                        if (sb_graph_destination(notes->items[i].path, link, path, sizeof(path))) {
-                            for (size_t k = 0; k < notes->count; ++k) if (!strcmp(path, notes->items[k].path)) {
-                                status = edge(&graph, i, k);
-                                if (status.code != SB_OK) { free(text); goto fail; }
-                                break;
-                            }
-                        }
-                        p = end;
-                    }
-                }
-            }
-            ++p;
+            sb_inline_free(&reader);
         }
         free(text);
     }

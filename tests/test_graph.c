@@ -35,6 +35,22 @@ int main(int argc, char **argv) {
     SBStar saved = graph.stars[index];
     CHECK(sb_graph_build(&project, &notes, &graph).code == SB_OK);
     CHECK(!memcmp(&saved, &graph.stars[index], sizeof(saved)));
+    char named_path[SB_PATH_CAP];
+    CHECK(sb_path_join(named_path,sizeof(named_path),project.root,"knowledge/Name ü (Teil).md").code==SB_OK);
+    CHECK(sb_fs_write_new(named_path,"# Name ü\n",strlen("# Name ü\n")).code==SB_OK);
+    const char *shared="# A\n\n[Stand](../STATE.md \"Titel\") [Entscheidung](../DECISIONS.md)\n[Name](<Name ü (Teil).md>)\n`[Nur Code](../PROJECT.md)` \\[Maskiert](../SOURCES.md)\n![Bild](../PROJECT.md)\n[Außen [Stand](../STATE.md)](../PROJECT.md)\n\n    [Eingerückt](../PROJECT.md)\n\n```info`ungültiger Zaun\n[Frage](../QUESTIONS.md)\n\n~~~~\n[Falsch](../PROJECT.md)\n~~~\n[Noch falsch](../SOURCES.md)\n~~~~\n";
+    CHECK(sb_note_load(&project,note.path,&old,&revision).code==SB_OK); sb_text_free(old);
+    CHECK(sb_note_save(&project,note.path,shared,revision,NULL).code==SB_OK);
+    sb_notes_free(&notes); CHECK(sb_notes_list(&project,&notes).code==SB_OK);
+    CHECK(sb_graph_build(&project,&notes,&graph).code==SB_OK);
+    index=0; links=0; while (index<notes.count && strcmp(notes.items[index].path,note.path)) ++index;
+    CHECK(index<notes.count);
+    for (size_t i=0;i<graph.edge_count;++i) if (graph.edges[i].from==index) {
+        ++links; const char *to=notes.items[graph.edges[i].to].path;
+        CHECK(!strcmp(to,"STATE.md") || !strcmp(to,"DECISIONS.md") || !strcmp(to,"QUESTIONS.md") || !strcmp(to,"knowledge/Name ü (Teil).md"));
+    }
+    CHECK(links==4);
+    CHECK(sb_note_load(&project,note.path,&old,NULL).code==SB_OK && !strcmp(old,shared)); sb_text_free(old);
     sb_graph_free(&graph); sb_notes_free(&notes);
     printf("%u graph assertions passed.\n", checks);
     return 0;

@@ -22,24 +22,29 @@ Die [0.9.3-Abnahme zu 3f3d3a0](https://github.com/Lulus792/SecondBrain/actions/r
 besteht mit 20 Jobs und vier entpackten Paketen für Windows x64, Linux x64,
 macOS ARM64 und Intel. Sie umfasst 17 lesbare Lizenzressourcen, Tastaturwege,
 Entwurfsschutz und bestehende native Provider-/Clientprüfungen. Lokal liegt
-das geprüfte Intel-Entwicklungspaket 0.9.4 unter dist/SecondBrain.
+das geprüfte Intel-Entwicklungspaket 0.9.5 unter dist/SecondBrain.
 Die öffentliche dauerhafte Vorabversion ist weiterhin
 [v0.7.3](https://github.com/Lulus792/SecondBrain/releases/tag/v0.7.3).
 
-## Laufender Schritt 0.9.4
+## Laufender Schritt 0.9.5
 
-Titel und Leseansicht benutzen gemeinsame schreibgeschützte C-Blockregeln für
-Überschriften, Code und Absätze. Editor und gespeicherte Originalbytes bleiben
-erhalten. 16 Debug-Kernprüfungen, der erste Durchlauf mit 30 Release-Tests,
-abschließende Kern-/native Nachprüfungen und gezieltes ASan/UBSan bestehen.
-Die neue Rollenprüfung scheitert mit der vorherigen Leseansicht.
-[Markdown-Vertrag](../../docs/MARKDOWN.md), [genaue Nachweise](../../docs/STATUS.md).
-Das entpackte Intel-Paket besteht einschließlich Desktop, Tastatur, Sicherung,
-Einstellungsneustart und CLI. Neue native Plattformabnahme folgt nach dem Push.
+Titel, Leseansicht und Sternkarte verwenden gemeinsame eigene C-Regeln für
+Inline-Code, Maskierungen und Verweise. Echte Ziele und optionale Titel bleiben
+getrennt. Überschriftenlinks sind bedienbar, Kontextüberschriften sichtbar.
+17 Kernprüfungen, erster Durchlauf mit 31 Release-Tests und abschließende
+Kern-/native-/Tastaturnachprüfungen bestehen; ASan/UBSan prüft eigene Bereiche.
+Regressionen scheitern mit vorheriger Leseansicht/Sternkarte. Das entpackte
+Intel-Paket einschließlich Desktop, Tastatur, Sicherung, Neustart und CLI besteht.
+[Vertrag](../../docs/INLINE_LINKS.md), [genaue Nachweise](../../docs/STATUS.md).
+
+Der 0.9.4-Lauf besteht in 19 Jobs und vier Paketen; Windows Debug erreicht den
+Tastatur-Timeout. Der Prüfwerkzeug-Renderer zeichnet nun den abgeschlossenen
+Key-up-Zustand, während beide Phasen sämtliche Zustände berechnen. Neue
+native Plattformabnahme ist erforderlich; der frühere Lauf gilt nicht als grün.
 
 ## Weiterarbeiten
 
-0.9.4 vollständig auf den nativen Plattformen und im entpackten Paket abnehmen.
+0.9.5 nativ abnehmen, insbesondere Windows Debug und die geänderte Tastaturprüfung.
 Danach vollständige Container-/Inline-Regeln und Listen-/Tabellensemantik,
 Unicode-Textgeometrie/IME, Support-/Lizenzzuordnung sowie übrige Release-Aufgaben
 weiter umsetzen. Tatsächliche native Dialog- und menschliche VoiceOver/NVDA/Orca-

@@ -950,3 +950,43 @@ und 75 Sicherungs-UI-Aussagen, Einstellungsneustart und CLI-Sicherung. SHA-256:
 `436f9ddcc4b56c92cc840cf1d7875c1e774855b97e614a5be63cc59f3d912552`. Das geprüfte Entwicklungspaket wurde nach
 dist/SecondBrain übernommen; Version 0.9.4 und eigenes Projekt-Standbild sind
 geprüft. Neue native Plattformabnahme folgt nach dem Push.
+
+0.9.4 besteht inzwischen in 19 nativen/Python-Jobs und vier entpackten Paketen.
+Windows Debug erreicht die Tastatur-Zeitgrenze; der Gesamtlauf ist nicht grün.
+[Genauer Plattformstand](PLATTFORMEN.md).
+
+## Gemeinsame Inline- und Linkregeln 0.9.5
+
+Titel, Leseansicht und Sternkarte verwenden denselben eigenen C-Leser.
+Inline-Code und maskierte Zeichen erzeugen keine falschen Aktionen oder
+Beziehungen. Ziel und optionaler Linktitel bleiben getrennt; Code-/Bildbeispiele
+sowie verschachtelte Links sind geprüft. Links in der ersten Überschrift bleiben
+bedienbar. Der KI-Kontext verliert seine erste Projektüberschrift nicht mehr.
+[Vertrag und Grenzen](INLINE_LINKS.md).
+
+17 lokale Debug-Kernprüfungen bestehen (39,23 Sekunden); der erste vollständige
+Release-Durchlauf mit 31 Tests besteht (318,69 Sekunden). Nach dem zusätzlichen
+Grenzfall maskierter erster Backticks und der Überschriftenkorrektur bestehen
+vier Kern-/Graph-Nachprüfungen sowie die abschließenden fünf Release-Nachprüfungen
+(75,59 Sekunden). Die neue Backtick-Regression scheitert vor der Korrektur.
+Gezieltes ASan/UBSan besteht mit 1.117.136 Aussagen einschließlich 5.000
+bereichsgeprüfter Eingaben; es instrumentiert eigenen C-Code, nicht die externen
+UI-Bibliotheken. LeakSanitizer ist nicht Teil dieser Prüfung.
+
+Die abschließende native macOS-/Vertragsprüfung besteht mit 188 Aussagen:
+richtige echte Linkaktionen, Quelle mit optionalem Titel, erhaltene Originale,
+erreichbarer Überschriftenlink und sichtbare erste Kontextüberschrift.
+Ein tatsächliches Rasterbild mit echten Aktionen und Code-/Maskierungs-Literalen
+ist betrachtet. Die Tastatur-Nachprüfung behält 142 Aussagen und alle Aufnahmen;
+der letzte Lauf dauert 65,70 Sekunden. Die Diagnostik zeigt bei 600 Testframes
+14,36 Sekunden für Eingabe/Layout und 47,99 Sekunden für Rasterung/Präsentation.
+Dies sind Prüfwerkzeugdaten, kein normaler App- oder Geräte-Leistungsnachweis.
+Neue Plattform- und Paketabnahme folgen separat.
+
+Die neuen Link-/Beziehungsprüfungen scheitern mit der bisherigen Leseansicht
+beziehungsweise Sternkarte aus ee85750 bei aktuellem übrigen Testaufbau.
+Das endgültige entpackte Intel-Paket besteht mit 126 Desktop-, 142 Tastatur- und
+75 Sicherungs-UI-Aussagen sowie Einstellungsneustart und CLI-Sicherung. SHA-256:
+`c9cb71de396589fbed0b6a300d696b279f292011b872092cb8652c43241cbc13`. Das geprüfte Entwicklungspaket ist lokal unter
+dist/SecondBrain auf 0.9.5 übernommen; Version und eigenes Projekt-Standbild
+sind geprüft. Neue Plattformabnahme folgt nach dem Push.

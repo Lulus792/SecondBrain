@@ -131,7 +131,8 @@ bleibt auch nach dem Öffnen eines Archivdokuments erreichbar.
 
 Die Leseansicht unterstützt eigene [Markdown-Blockregeln](docs/MARKDOWN.md)
 für Überschriften, Code und Absätze. Den noch begrenzten Umfang dokumentiert
-der Vertrag; der Editor erhält den Originaltext.
+der Vertrag; der Editor erhält den Originaltext. [Gemeinsame Linkregeln](docs/INLINE_LINKS.md)
+verhindern falsche Aktionen und Sternkartenverbindungen aus Codebeispielen.
 
 Vor einem Dokumentwechsel oder dem Beenden fragt die App nach ungespeicherten
 Änderungen. Bei einer extern geänderten Datei kannst du deine Fassung als neue

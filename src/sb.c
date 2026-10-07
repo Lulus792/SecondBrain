@@ -1,5 +1,6 @@
 #include "sb.h"
 #include "markdown.h"
+#include "inline.h"
 #include "platform.h"
 #include "sb_templates.h"
 #include <ctype.h>
@@ -567,14 +568,14 @@ SBStatus sb_markdown_title(const char *text, char *out, size_t capacity) {
     while (sb_markdown_next(&reader,&block)) {
         if (block.kind==SB_MD_BLANK) continue;
         if (block.kind!=SB_MD_HEADING) return sb_ok();
-        size_t used=0;
-        for (size_t i=0;i<block.length && used+1<capacity;++i) {
-            char c=text[block.content+i];
-            if (c=='\r' && i+1<block.length && text[block.content+i+1]=='\n') continue;
-            out[used++]=(c=='\r' || c=='\n') ? ' ' : c;
-        }
-        while (used && !sb_utf8_valid(out,used)) --used;
-        out[used]=0; return sb_ok();
+        SBInline inline_reader; char *plain=NULL;
+        SBStatus status=sb_inline_init(&inline_reader,text+block.content,block.length);
+        if (status.code==SB_OK) status=sb_inline_text(&inline_reader,0,block.length,&plain);
+        sb_inline_free(&inline_reader);
+        if (status.code!=SB_OK) return status;
+        size_t used=strlen(plain); if (used>=capacity) used=capacity-1;
+        while (used && !sb_utf8_valid(plain,used)) --used;
+        memcpy(out,plain,used); out[used]=0; free(plain); return sb_ok();
     }
     return sb_ok();
 }

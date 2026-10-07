@@ -188,6 +188,30 @@ int main(int argc,char **argv) {
 #endif
     OK(sb_path_join(dump_path,sizeof(dump_path),root,"markdown-blocks.bmp"));
     CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    char inline_source[1800]; const char *prefix=strchr(d.model.path,'/') ? "../" : "";
+    snprintf(inline_source,sizeof(inline_source),"# [Titel](%sSTATE.md) `Code` und **Wort**\n\n`[Nur Code](%sPROJECT.md)` \\[Maskiert](%sQUESTIONS.md) ![Bild](%sSOURCES.md)\n[Stand](%sSTATE.md \"Quelle\")\n",prefix,prefix,prefix,prefix,prefix);
+    strcpy(d.model.editor,inline_source); OK(sb_app_save(&d.model));
+    d.reset_reader=true; frame(&d); frame(&d);
+    CHECK(!strcmp(d.model.title,"Titel Code und Wort") && !strcmp(d.model.editor,inline_source));
+    unsigned actual_links=0; bool preserved_code=false;
+    for (size_t i=0;i<d.target_count;++i) if (!strncmp(d.targets[i].id,"link:",5)) {
+        ++actual_links; CHECK(!strcmp(d.targets[i].label,actual_links==1 ? "Titel" : "Stand"));
+    }
+    for (size_t i=0;i<d.passive_count;++i) if (d.passive[i].role==ACCESSKIT_ROLE_PARAGRAPH && strstr(d.passive[i].text,"[Nur Code](")) preserved_code=true;
+    CHECK(actual_links==2 && preserved_code);
+    strcpy(d.focus,"link:1"); SDL_Event link_key={0}; link_key.type=SDL_EVENT_KEY_DOWN;
+    link_key.key.key=SDLK_RETURN; link_key.key.down=true; link_key.key.windowID=SDL_GetWindowID(d.ui.window);
+    sb_desktop_event(&d,&link_key); frame(&d); frame(&d);
+    CHECK(d.model.source && strstr(d.model.source_path,"/STATE.md") && !sb_app_dirty(&d.model));
+    link_key.key.key=SDLK_ESCAPE; sb_desktop_event(&d,&link_key); frame(&d); frame(&d);
+    CHECK(!d.model.source && !strcmp(d.model.editor,inline_source));
+    OK(sb_path_join(dump_path,sizeof(dump_path),root,"inline-links.bmp")); CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    char *previous_context=d.context; d.context=malloc(80); CHECK(d.context);
+    strcpy(d.context,"# Sichtbarer Projektname\n\nKontext zum Lesen.\n");
+    d.form=SB_FORM_CONTEXT; frame(&d); frame(&d); bool context_heading=false;
+    for (size_t i=0;i<d.passive_count;++i) if (!strcmp(d.passive[i].parent,"reader") && !strcmp(d.passive[i].text,"Sichtbarer Projektname"))
+        context_heading=d.passive[i].role==ACCESSKIT_ROLE_HEADING && d.passive[i].bounds.h>0;
+    CHECK(context_heading); d.form=SB_FORM_NONE; free(d.context); d.context=previous_context; frame(&d);
     snprintf(d.reveal_document,sizeof(d.reveal_document),"%s",last_id); d.reveal_document_context=d.semantic_context;
     d.form=SB_FORM_HELP; frame(&d); CHECK(!d.reveal_document[0]); text=dump(&d); CHECK(!strstr(text,"Erster Abschnitt") && !strstr(text,"Ende αΩ")); accesskit_string_free(text);
     d.form=SB_FORM_NONE; frame(&d);

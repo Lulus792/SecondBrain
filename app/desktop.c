@@ -4,6 +4,7 @@
 #include "version.h"
 #include "notices.h"
 #include "markdown.h"
+#include "inline.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1162,38 +1163,20 @@ static void document_list(SBDesktop *d, struct nk_rect rect, nk_flags flags) {
     nk_end(ctx);
 }
 
-static char *plain_inline(const char *text, size_t length) {
-    char *out = malloc(length + 1);
-    size_t n = 0, i = 0;
-    if (!out) return NULL;
-    while (i < length) {
-        if (text[i] == '[') {
-            size_t close = i + 1;
-            while (close < length && text[close] != ']') ++close;
-            if (close + 1 < length && text[close + 1] == '(') {
-                size_t end = close + 2;
-                int nesting = 1;
-                while (end < length && nesting) {
-                    if (text[end] == '(') ++nesting;
-                    if (text[end] == ')') --nesting;
-                    ++end;
-                }
-                if (!nesting) {
-                    memcpy(out + n, text + i + 1, close - i - 1);
-                    n += close - i - 1; i = end; continue;
-                }
-            }
-        }
-        if (text[i] == '*' && i + 1 < length && text[i + 1] == '*') { i += 2; continue; }
-        if (text[i] == 96) { ++i; continue; }
-        if (text[i]=='\r') { out[n++]=' '; if (i+1<length && text[i+1]=='\n') ++i; ++i; continue; }
-        out[n++] = text[i] == '\n' ? ' ' : text[i];
-        ++i;
-    }
-    out[n] = 0;
-    return out;
-}
 
+static bool web_reference(const char *destination) {
+    const char *schemes[]={"http://","https://"};
+    for (size_t k=0;k<2;++k) {
+        size_t i=0;
+        for (;schemes[k][i];++i) {
+            unsigned char c=(unsigned char)destination[i];
+            if (c>='A' && c<='Z') c=(unsigned char)(c-'A'+'a');
+            if (c!=(unsigned char)schemes[k][i]) break;
+        }
+        if (!schemes[k][i]) return true;
+    }
+    return false;
+}
 static void document(SBDesktop *d, const char *text, float width, float height) {
     struct nk_context *ctx = d->ui.ctx;
     const char *extension = d->model.source ? strrchr(d->model.source_path, '.') : NULL;
@@ -1217,16 +1200,19 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
         if (block.kind==SB_MD_FENCE) continue;
         if (block.kind==SB_MD_BLANK || (!length && !heading)) { nk_layout_row_dynamic(ctx,9*d->ui.scale,1); nk_spacer(ctx); }
         else {
-            if (first_heading && heading==1) {
-                char *title=plain_inline(content,length);
-                document_span(d,title ? title : content,title ? strlen(title) : length,block.offset,ACCESSKIT_ROLE_HEADING,1,
-                    d->form==SB_FORM_NONE ? d->reader_title_bounds : nk_rect(0,0,0,0),slot,true);
-                free(title); first_heading=false; continue;
+            SBInline inline_reader={0}; SBStatus inline_status=sb_ok(); char *plain=NULL;
+            if (!code) {
+                inline_status=sb_inline_init(&inline_reader,content,length);
+                if (inline_status.code==SB_OK) inline_status=sb_inline_text(&inline_reader,0,length,&plain);
+                if (inline_status.code!=SB_OK) d->message=inline_status;
             }
+            const char *caption=d->model.source ? d->model.source_title : d->model.title;
+            bool fixed_title=first_heading && heading==1 && d->form==SB_FORM_NONE && plain && !strcmp(plain,caption);
+            if (fixed_title) document_span(d,plain,strlen(plain),block.offset,ACCESSKIT_ROLE_HEADING,1,d->reader_title_bounds,slot,true);
             first_heading=false;
+            if (!fixed_title) {
             struct nk_user_font *font = heading ? &d->ui.heading->handle : code ? &d->ui.code->handle : &d->ui.body->handle;
             nk_style_set_font(ctx, font);
-            char *plain = code ? NULL : plain_inline(content, length);
             const char *shown = plain ? plain : content;
             size_t shown_length = plain ? strlen(plain) : length;
             float available = fmaxf(60, width - 55);
@@ -1235,48 +1221,29 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
             nk_layout_row_dynamic(ctx, lines * (font->height + 4) + (heading ? 10 : 0), 1);
             document_span(d,shown,shown_length,block.offset,heading ? ACCESSKIT_ROLE_HEADING : code ? ACCESSKIT_ROLE_CODE : ACCESSKIT_ROLE_PARAGRAPH,heading,nk_widget_bounds(ctx),slot,false);
             nk_text_wrap(ctx, shown, (int)shown_length);
+            }
             free(plain);
-            if (!code) {
-                const char *p = content;
-                const char *limit = content + length;
-                while (p < limit) {
-                    const char *open = memchr(p, '[', (size_t)(limit - p));
-                    if (!open) break;
-                    const char *close = memchr(open + 1, ']', (size_t)(limit - open - 1));
-                    if (!close || close + 1 >= limit || close[1] != '(') { p = open + 1; continue; }
-                    const char *finish = close + 2;
-                    int nesting = 1;
-                    while (finish < limit && nesting) {
-                        if (*finish == '(') ++nesting;
-                        if (*finish == ')') --nesting;
-                        if (nesting) ++finish;
+            if (!code && inline_status.code==SB_OK) {
+                SBInlineToken link;
+                while (sb_inline_next(&inline_reader,&link)) {
+                    if (link.kind!=SB_INLINE_LINK || !link.destination_length) continue;
+                    char destination[SB_PATH_CAP],label[SB_NAME_CAP],tag[100]; char *full_label=NULL;
+                    SBStatus status=sb_inline_destination(&inline_reader,&link,destination,sizeof(destination));
+                    if (status.code==SB_OK) status=sb_inline_text(&inline_reader,link.content,link.content_length,&full_label);
+                    if (status.code!=SB_OK) { d->message=status; free(full_label); continue; }
+                    snprintf(label,sizeof(label),"%s",*full_label ? full_label : destination); free(full_label);
+                    while (label[0] && !sb_utf8_valid(label,strlen(label))) label[strlen(label)-1]=0;
+                    nk_style_set_font(ctx,&d->ui.normal->handle);
+                    nk_layout_row_dynamic(ctx,32*d->ui.scale,1);
+                    snprintf(tag,sizeof(tag),"link:%u",link_number++);
+                    if (button(d,tag,label)) {
+                        if (web_reference(destination))
+                            result(d,SDL_OpenURL(destination) ? sb_ok() : sb_error(SB_IO,"%s",SDL_GetError()),"Webquelle im Browser geöffnet.");
+                        else { strcpy(d->command_value,destination); command(d,SB_CMD_SOURCE); }
                     }
-                    if (finish >= limit) break;
-                    size_t target_length = (size_t)(finish - (close + 2));
-                    if (target_length && target_length < SB_PATH_CAP && (open == content || open[-1] != '!')) {
-                        char destination[SB_PATH_CAP], label[SB_NAME_CAP], tag[100];
-                        size_t label_length = (size_t)(close - open - 1);
-                        if (label_length >= sizeof(label)) label_length = sizeof(label) - 1;
-                        memcpy(label, open + 1, label_length); label[label_length] = 0;
-                        while (label[0] && !sb_utf8_valid(label, strlen(label))) label[strlen(label) - 1] = 0;
-                        memcpy(destination, close + 2, target_length); destination[target_length] = 0;
-                        if (destination[0] == '<' && target_length > 1 && destination[target_length - 1] == '>') {
-                            memmove(destination, destination + 1, target_length - 2); destination[target_length - 2] = 0;
-                        }
-                        nk_style_set_font(ctx, &d->ui.normal->handle);
-                        nk_layout_row_dynamic(ctx, 32 * d->ui.scale, 1);
-                        snprintf(tag, sizeof(tag), "link:%u", link_number++);
-                        if (button(d, tag, label)) {
-                            if (!strncmp(destination, "https://", 8) || !strncmp(destination, "http://", 7))
-                                result(d, SDL_OpenURL(destination) ? sb_ok() : sb_error(SB_IO, "%s", SDL_GetError()), "Webquelle im Browser geöffnet.");
-                            else {
-                                strcpy(d->command_value, destination); command(d, SB_CMD_SOURCE);
-                            }
-                        }
-                    }
-                    p = finish + 1;
                 }
             }
+            sb_inline_free(&inline_reader);
         }
     }
     nk_style_set_font(ctx, &d->ui.normal->handle);

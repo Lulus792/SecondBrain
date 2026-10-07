@@ -223,3 +223,13 @@ Anzeigen verändert keine Originalbytes. Die Regeln werden am CommonMark-Origina
 geprüft und unabhängig vom UI getestet. Weitere Container-/Inline-Regeln und
 vollständige assistive Abnahme bleiben eigener Umsetzungsumfang.
 [Vertrag](../../docs/MARKDOWN.md) und [Nachweise](../../docs/STATUS.md).
+
+## D22: Gemeinsame Inline-Verweise und geschützte Originale
+
+Implementierungsentscheidung vom 7. Oktober 2026: eigener C-Leser für
+Inline-Code, Maskierungen und Inline-Verweise in Titel, Leseansicht und Sternkarte.
+Code-/Bildbeispiele sind keine Beziehungen. Darstellung und echte Aktionen
+benutzen dieselben Quellbereiche; Originalbytes bleiben unverändert.
+Begrenzte Strukturtiefe und Sucharbeit melden überkomplexe Eingaben statt
+unbegrenzt zu suchen. Vollständige Inline-/Container-Regeln bleiben offen.
+[Vertrag](../../docs/INLINE_LINKS.md), [Nachweise](../../docs/STATUS.md).

@@ -482,3 +482,21 @@ Windows/Linux und 29 auf macOS. Die Ressourcenprüfung liest alle 17 Lizenztexte
 der Tastaturweg prüft erste, lange und letzte Auswahl, Kopieren, Scrollen und
 Entwurfsschutz. Kern- und Python-Jobs bestehen ebenfalls. Dieser Lauf betrifft
 0.9.3; die neuen Markdown-Blockregeln in 0.9.4 benötigen einen eigenen Lauf.
+
+## Dokumentblockregeln 0.9.4
+
+[Lauf37552977212 zu ee85750](https://github.com/Lulus792/SecondBrain/actions/runs/37552977212)
+besteht in 19 von 20 Jobs. Windows Release, Linux Debug/Release und macOS
+ARM64/Intel Debug/Release sowie vier entpackte Pakete bestehen. Die acht
+Desktopjobs umfassen 29 Tests auf Windows/Linux und 30 auf macOS.
+Windows Debug scheitert ausschließlich am 300-Sekunden-Timeout des Tastaturtests;
+die übrigen 28 Tests einschließlich der neuen Blockrollen bestehen dort.
+[Originalannotation](https://github.com/Lulus792/SecondBrain/actions/runs/37552977212/job/112572574929).
+Der gesamte Lauf gilt daher nicht als bestanden.
+
+0.9.5 zeichnet im Tastaturprüfwerkzeug den vollständigen Zustand nach Key-up
+und verwirft nur die Zwischen-Zeichenbefehle von Key-down. Beide Phasen
+berechnen weiterhin Eingabe, Layout, Animation, Modell und native Snapshots.
+Die normalen App-Frames und aufgenommenen Prüfbilder werden weiterhin vollständig
+gezeichnet. Die neue Windows-Debug-Abnahme steht aus; der Timeout wird nicht
+allein durch die lokale Verbesserung als behoben bezeichnet.

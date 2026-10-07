@@ -11,18 +11,32 @@
 #else
 #define MOD SDL_KMOD_CTRL
 #endif
-static void frame(SBDesktop *d) {
+static struct { Uint64 layout,render; unsigned frames,drawn; } timing;
+static void frame_run(SBDesktop *d,bool draw) {
+    Uint64 start=SDL_GetPerformanceCounter();
     SDL_Event event;
     nk_input_begin(d->ui.ctx);
     while (SDL_PollEvent(&event)) sb_desktop_event(d, &event);
     sb_desktop_tick(d,1.0f/60);
     nk_input_end(d->ui.ctx);
-    sb_desktop_frame(d); sb_ui_draw(&d->ui); SDL_RenderPresent(d->ui.renderer); sb_desktop_apply(d);
+    sb_desktop_frame(d); Uint64 ready=SDL_GetPerformanceCounter();
+    if (draw) { sb_ui_draw(&d->ui); SDL_RenderPresent(d->ui.renderer); ++timing.drawn; }
+    else nk_clear(d->ui.ctx);
+    Uint64 presented=SDL_GetPerformanceCounter();
+    timing.layout+=ready-start; timing.render+=presented-ready;
+    if (++timing.frames%100==0) {
+        double frequency=(double)SDL_GetPerformanceFrequency();
+        fprintf(stderr,"Keyboard frames %u (%u drawn): layout %.2fs, raster/present %.2fs.\n",timing.frames,timing.drawn,timing.layout/frequency,timing.render/frequency);
+    }
+    sb_desktop_apply(d);
 }
+static void frame(SBDesktop *d) { frame_run(d,true); }
 static void key(SBDesktop *d, SDL_Keycode code, SDL_Keymod mod) {
     SDL_Event e = {0}; e.type = SDL_EVENT_KEY_DOWN; e.key.key = code; e.key.mod = mod;
     e.key.windowID = SDL_GetWindowID(d->ui.window); e.key.down = true;
-    SDL_PushEvent(&e); frame(d);
+    /* Both phases update real input, layout, native snapshot and model. The
+       completed key-up state is rasterized; intermediate commands are discarded. */
+    SDL_PushEvent(&e); frame_run(d,false);
     e.type = SDL_EVENT_KEY_UP; e.key.down = false; SDL_PushEvent(&e); frame(d);
 }
 static void type(SBDesktop *d, const char *text) {
@@ -54,6 +68,7 @@ static bool same_clipboard_text(const char *actual, const char *expected) {
     return !*actual;
 }
 int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
+    timing.layout=timing.render=0; timing.frames=timing.drawn=0;
     unsigned checks = 0; char path[SB_PATH_CAP], saved[SB_PATH_CAP]; char *text = NULL;
 #define CHECK(x) do { ++checks; if (!(x)) { fprintf(stderr,"KEYBOARD FAIL %d: %s (focus=%s form=%d path=%s: %s)\n",__LINE__,#x,d->focus,d->form,d->model.path,d->message.message); return 1; } } while (0)
     frame(d); frame(d);

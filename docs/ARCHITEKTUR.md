@@ -12,7 +12,8 @@ Die vorhandenen Vorlagen und Projektgedächtnisse können weiterverwendet werden
 
 `src/markdown.c` liefert schreibgeschützte Dokumentblöcke ohne UI-Abhängigkeit.
 Titelermittlung und Leseansicht verwenden dieselben Quellbereiche; Parser und
-Titelausgabe verändern weder Dateien noch Editorinhalt. Der konkrete
+Titelausgabe verändern weder Dateien noch Editorinhalt. `src/inline.c` ergänzt
+gemeinsame Code-/Linkerkennung für Titel, Leseansicht und Sternkarte. Der konkrete
 [Markdown-Umfang](MARKDOWN.md) wird unabhängig vom Rendering geprüft.
 
 Eine eigene kleine Plattformschicht verbindet Dateizugriff und Verzeichnislisten
