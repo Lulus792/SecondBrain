@@ -68,6 +68,8 @@ int main(void) {
     example("``\r\n code \\* **literal** \r\n``"," code \\* **literal** ",0,NULL);
     example("`   `", "   ",0,NULL);
     example("eins\r\nzwei\rdrei\nvier", "eins zwei drei vier",0,NULL);
+    example("eins  \r\n  zwei\t\rdrei\n\tvier", "eins zwei drei vier",0,NULL);
+    example("` eins  \n zwei `", "eins    zwei",0,NULL);
     example("[ungültig](ziel Leerraum) [Stand](../STATE.md)","[ungültig](ziel Leerraum) Stand",1,one);
     example("&amp; &lt; &nGt; &nLt; &#x1f600; &#128;", "& < ≫⃒ ≪⃒ 😀 \xc2\x80",0,NULL);
     example("&unknown; &amp &#; &#x; &#12345678; &#x1234567;", "&unknown; &amp &#; &#x; &#12345678; &#x1234567;",0,NULL);

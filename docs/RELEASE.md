@@ -53,8 +53,9 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   Container-/Inline-Regeln und Listensemantik bleiben offen. 0.9.11 ergänzt
   gemeinsame [Hervorhebungen](INLINE_STILE.md); 0.9.14 ergänzt
   [Zeichenreferenzen und Mathematikglyphen](ENTITIES.md); 0.9.15 ergänzt
-  [E-Mail-Autolinks](AUTOLINKS.md). [Referenzlink-Integration](REFERENZLINKS_RECHERCHE.md)
-  bleibt geplant. 0.9.12 bindet
+  [E-Mail-Autolinks](AUTOLINKS.md). [Referenzlink-Integration](REFERENZLINKS.md)
+  ist ab 0.9.16 für die vorhandenen Blöcke implementiert; vollständige Container
+  und Definitionen darin bleiben offen. 0.9.12 bindet
   [native Textstile](NATIVE_TEXTSTILE.md) an. Die neuen Plattformnachweise und
   die dokumentierten weiteren Textregeln bleiben offen. 0.9.6 ergänzt
   [Tabellen](TABELLEN.md); native UIA-/AT-SPI-Matrixschnittstellen und die

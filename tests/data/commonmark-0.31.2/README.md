@@ -23,3 +23,12 @@ Autolinks: alle 19 unveränderten Beispiele 594–612 aus demselben Original.
 Text, Stile und tatsächlich gelesene Ziele werden mit der HTML-Ausgabe
 verglichen. Keine angepasste Erwartung für diese Auswahl. Ergänzende eigene
 E-Mail-Grenzfälle verwenden einen unabhängigen Regex-Vergleich.
+
+
+Referenz-Auswahl: 81 unveränderte Beispiele, einschließlich Entity-Ziel 33,
+Definitionsfälle 192–217 außer Containerfall 214, Inline-Referenzen 527–571
+und Bilder 582–591. Containerfall 218 bleibt ebenfalls offen. Zwei Roh-HTML-
+Fälle (201/536) folgen dem Literalvertrag, zwei Bildfälle (585/589) dem bereits
+bestehenden aufbereiteten Stil des Alternativtexts. Originaldaten und Lizenz
+bleiben erhalten; Text/Stile/Ziele werden mit diesen ausdrücklichen Produkt-
+verträgen verglichen. Dies behauptet keine vollständige CommonMark-Abnahme.

@@ -566,12 +566,16 @@ SBStatus sb_markdown_title(const char *text, char *out, size_t capacity) {
     SBMarkdown reader; SBMarkdownBlock block;
     sb_markdown_init(&reader,text,strlen(text),false);
     while (sb_markdown_next(&reader,&block)) {
-        if (block.kind==SB_MD_BLANK) continue;
+        if (reader.reference_limit) return sb_error(SB_LIMIT,"Markdown-Definitionen sind zu komplex.");
+        if (block.kind==SB_MD_BLANK || block.kind==SB_MD_REFERENCE) continue;
         if (block.kind!=SB_MD_HEADING) return sb_ok();
+        SBReferences references; SBStatus status=sb_references_init(&references,text,strlen(text));
         SBInline inline_reader; char *plain=NULL;
-        SBStatus status=sb_inline_init(&inline_reader,text+block.content,block.length);
+        if (status.code!=SB_OK) { sb_references_free(&references); return status; }
+        status=sb_inline_init_references(&inline_reader,text+block.content,block.length,&references);
         if (status.code==SB_OK) status=sb_inline_text(&inline_reader,0,block.length,&plain);
         sb_inline_free(&inline_reader);
+        sb_references_free(&references);
         if (status.code!=SB_OK) return status;
         size_t used=strlen(plain); if (used>=capacity) used=capacity-1;
         while (used && !sb_utf8_valid(plain,used)) --used;

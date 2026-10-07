@@ -69,9 +69,9 @@ static SBStatus edge(SBGraph *g, size_t from, size_t to) {
     g->edges[g->edge_count++] = (SBEdge){from, to};
     return sb_ok();
 }
-static SBStatus graph_links(SBGraph *graph,const SBNotes *notes,const char *from,size_t from_index,const char *text,size_t length) {
+static SBStatus graph_links(SBGraph *graph,const SBNotes *notes,const char *from,size_t from_index,const char *text,size_t length,const SBReferences *references) {
     SBStatus status=sb_ok();
-    SBInline reader; status=sb_inline_init(&reader,text,length);
+    SBInline reader; status=sb_inline_init_references(&reader,text,length,references);
     if (status.code!=SB_OK) { sb_inline_free(&reader); return status; }
     SBInlineToken token;
     while (sb_inline_next(&reader,&token)) {
@@ -112,6 +112,9 @@ SBStatus sb_graph_build(const SBProject *project, const SBNotes *notes, SBGraph 
         char *text = NULL;
         status = sb_note_load(project, notes->items[i].path, &text, NULL);
         if (status.code != SB_OK) goto fail;
+        SBReferences references;
+        status=sb_references_init(&references,text,strlen(text));
+        if (status.code!=SB_OK) { sb_references_free(&references);free(text);goto fail; }
         SBMarkdown blocks; SBMarkdownBlock block;
         sb_markdown_init(&blocks,text,strlen(text),false);
         while (sb_markdown_next(&blocks,&block)) {
@@ -120,15 +123,15 @@ SBStatus sb_graph_build(const SBProject *project, const SBNotes *notes, SBGraph 
                 size_t cursor=table.offset; SBTableRow row;
                 while (sb_table_next(&table,&cursor,&row)) for (size_t c=0;c<row.count;++c) {
                     char *cell=NULL; status=sb_table_cell_text(&table,&row.cells[c],&cell);
-                    if (status.code==SB_OK) status=graph_links(&graph,notes,notes->items[i].path,i,cell,strlen(cell));
-                    free(cell); if (status.code!=SB_OK) { free(text); goto fail; }
+                    if (status.code==SB_OK) status=graph_links(&graph,notes,notes->items[i].path,i,cell,strlen(cell),&references);
+                    free(cell); if (status.code!=SB_OK) { sb_references_free(&references);free(text); goto fail; }
                 }
             } else if (block.kind==SB_MD_TEXT || block.kind==SB_MD_HEADING) {
-                status=graph_links(&graph,notes,notes->items[i].path,i,text+block.content,block.length);
-                if (status.code!=SB_OK) { free(text); goto fail; }
+                status=graph_links(&graph,notes,notes->items[i].path,i,text+block.content,block.length,&references);
+                if (status.code!=SB_OK) { sb_references_free(&references);free(text); goto fail; }
             }
         }
-        free(text);
+        sb_references_free(&references);free(text);
     }
     sb_graph_free(out); *out = graph; return sb_ok();
 fail:

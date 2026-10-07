@@ -35,3 +35,16 @@ Die Datei bleibt unverändert. tools/make_inline_unicode.py erzeugt daraus die
 C-Bereiche für P-/S-Kategorien nach Hashprüfung. Runtime/Build benötigen den
 Generator nicht. Daten und abgeleitete Tabelle fallen unter die bereits
 mitgelieferte Unicode License V3; eigener Leser bleibt MIT-lizenzierter C-Code.
+
+
+## Referenznamen
+
+CaseFolding.txt aus Unicode 18.0.0 bleibt unverändert unter 18.0.0/.
+Original: https://www.unicode.org/Public/18.0.0/ucd/CaseFolding.txt.
+SHA-256: a004797658a457bec4dc11683e39f69249ea3b595b752dbea6721c4c9f587b0d.
+tools/make_casefold_data.py erzeugt nach Hashprüfung die vollständigen
+Standard-C-/F-Mappings in src/casefold_data.inc; S-/T-Mappings sind nicht gewählt.
+Tabelle SHA-256: cb4376660d9c92d5d55648692586459c31a929504299ece3c8a2bc003da4290a.
+Die Originaldaten und die abgeleitete Tabelle verwenden die bestehende Unicode
+License V3; eigener C-Vergleich/Definitionsleser bleibt MIT. Kein Runtime-
+Datenladen und kein Generatorbedarf beim normalen C-Build.

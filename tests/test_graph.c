@@ -77,6 +77,16 @@ int main(int argc, char **argv) {
     }
     CHECK(links==1);
     CHECK(sb_note_load(&project,note.path,&old,NULL).code==SB_OK && !strcmp(old,entity_links));sb_text_free(old);
+    const char *reference_links="# [Start][Straße]\n\n[Ziel][STRASSE] [Straße][] [Straße]\n![Bild][Straße] [Unbekannt][fake]\n\n| Quelle |\n| --- |\n| [Zelle][straße] |\n\n[straße]: f&ouml;&ouml;.md\n[STRASSE]: ../PROJECT.md\n\n```\n[fake]: ../SOURCES.md\n```\n";
+    CHECK(sb_note_load(&project,note.path,&old,&revision).code==SB_OK);sb_text_free(old);
+    CHECK(sb_note_save(&project,note.path,reference_links,revision,NULL).code==SB_OK);
+    sb_notes_free(&notes);CHECK(sb_notes_list(&project,&notes).code==SB_OK);
+    CHECK(sb_graph_build(&project,&notes,&graph).code==SB_OK);index=0;links=0;
+    while(index<notes.count && strcmp(notes.items[index].path,note.path))++index;
+    CHECK(index<notes.count && !strcmp(notes.items[index].title,"Start"));
+    for(size_t i=0;i<graph.edge_count;++i)if(graph.edges[i].from==index){++links;CHECK(!strcmp(notes.items[graph.edges[i].to].path,"knowledge/föö.md"));}
+    CHECK(links==1);
+    CHECK(sb_note_load(&project,note.path,&old,NULL).code==SB_OK && !strcmp(old,reference_links));sb_text_free(old);
     sb_graph_free(&graph); sb_notes_free(&notes);
     printf("%u graph assertions passed.\n", checks);
     return 0;

@@ -50,5 +50,6 @@ Das Raster wurde betrachtet. Aktuelle vollständige Ergebnisse stehen in
 
 Referenzlinks benötigen zusätzlich eine dokumentweite Definitionsliste und
 Unicode-Normalisierung ihrer Namen. Die [nächste Parserarbeit](REFERENZLINKS_RECHERCHE.md)
-ist recherchiert, aber noch nicht implementiert. Vollständige Container,
+ist im [gemeinsamen C-Leser](REFERENZLINKS.md) implementiert; Definitionen
+in vollständigen Containern bleiben offen. Vollständige Container,
 Bidi/Textgeometrie/IME und übrige Release-Aufgaben bleiben offen.

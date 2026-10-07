@@ -136,6 +136,7 @@ für Überschriften, Code, Absätze und [Tabellen](docs/TABELLEN.md).
 [Hervorhebungen und Inline-Code](docs/INLINE_STILE.md) bleiben dabei sichtbar;
 [Zeichenreferenzen](docs/ENTITIES.md) werden im Lesetext und in Inline-Linkzielen dekodiert. Den noch begrenzten Umfang dokumentiert
 der Vertrag; der Editor erhält den Originaltext. [E-Mail- und URI-Autolinks](docs/AUTOLINKS.md) erhalten bedienbare Ziele.
+[Referenzlinks](docs/REFERENZLINKS.md) verwenden Definitionen aus derselben Datei.
 [Gemeinsame Linkregeln](docs/INLINE_LINKS.md)
 verhindern falsche Aktionen und Sternkartenverbindungen aus Codebeispielen.
 

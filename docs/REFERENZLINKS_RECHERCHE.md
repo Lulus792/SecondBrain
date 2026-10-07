@@ -1,6 +1,8 @@
-# Nächster Parserabschnitt: Referenzlinks
+# Referenzlinks: Recherche vor der Umsetzung
 
-Stand: 7. Oktober 2026. Geplante Implementierung, noch kein Produktnachweis.
+Recherche vom 7. Oktober 2026 vor der Umsetzung. Der damalige Plan steht unten;
+Implementierung, aktueller Vertrag und offene Container-Grenzen stehen in
+[REFERENZLINKS.md](REFERENZLINKS.md).
 Originalquellen: [CommonMark 0.31.2, Definitionsblöcke](https://spec.commonmark.org/0.31.2/#link-reference-definitions)
 und [Referenzlinks](https://spec.commonmark.org/0.31.2/#links), am selben Tag gelesen.
 

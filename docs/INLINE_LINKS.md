@@ -1,6 +1,6 @@
 # Gemeinsame Linkerkennung
 
-Stand: 7. Oktober 2026, Entwicklungsschritte 0.9.5–0.9.15.
+Stand: 7. Oktober 2026, Entwicklungsschritte 0.9.5–0.9.16.
 
 Leseansicht, Titel und Sternkarte benutzen denselben eigenen C-Leser für
 Inline-Code, maskierte Satzzeichen, Inline-Links und Bildverweise. Die Sternkarte
@@ -18,8 +18,8 @@ Linkbeschriftung, Ziel und optionaler Titel werden getrennt erkannt.
 Klammern und maskierte Zeichen im Ziel sowie Ziele in Winkelklammern werden
 berücksichtigt. Verschachtelte Links aktivieren den inneren Link; Bilder erzeugen
 keine Linkaktion oder Sternkartenbeziehung. Ihre Alternativtexte werden angezeigt,
-die Bilder selbst noch nicht gerendert. Referenzlinks und vollständige
-Container-Regeln bleiben offen. Ab 0.9.15 sind [E-Mail-Autolinks](AUTOLINKS.md)
+die Bilder selbst noch nicht gerendert. [Referenzlinks](REFERENZLINKS.md) verwenden ab 0.9.16 eine gemeinsame
+dokumentweite Umgebung. Vollständige Container-Regeln bleiben offen. Ab 0.9.15 sind [E-Mail-Autolinks](AUTOLINKS.md)
 einschließlich kodierter OS-Übergabe implementiert. Ab 0.9.14
 stehen [Zeichenreferenzen](ENTITIES.md) im gemeinsamen eigenen C-Leser. Winkel-URLs
 werden ab 0.9.11 als Autolinks erkannt. Ab 0.9.11

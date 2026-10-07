@@ -6,7 +6,8 @@
 typedef struct SBInlineRun { size_t offset,width,close,short_close; } Run;
 typedef struct SBInlinePair {
     size_t open,close,parent,end,destination,length;
-    bool image,valid,has_link;
+    bool image,valid,has_link,has_reference;
+    size_t reference;
 } Pair;
 static bool punctuation(unsigned char c) {
     return (c>=33 && c<=47) || (c>=58 && c<=64) || (c>=91 && c<=96) || (c>=123 && c<=126);
@@ -115,9 +116,35 @@ static bool destination(SBInline *r,Pair *pair,size_t *budget) {
     if (!spaces(r,&p,budget) || p==r->length || r->text[p]!=')') return false;
     pair->end=p+1; return true;
 }
-SBStatus sb_inline_init(SBInline *r,const char *text,size_t length) {
+static bool reference(SBInline *r,Pair *pair,size_t *budget) {
+    if (!r->references || !r->references->count) return false;
+    size_t start=pair->open+1,length=pair->close-start,end=pair->close+1;
+    if (end<r->length && r->text[end]=='[') {
+        if (end+1<r->length && r->text[end+1]==']') end+=2;
+        else {
+            size_t p=end+1;
+            while (p<r->length && p-end<=999*4) {
+                if (!spend(budget) || r->text[p]=='[') break;
+                if (r->text[p]=='\\' && p+1<r->length && punctuation((unsigned char)r->text[p+1])) { p+=2; continue; }
+                if (r->text[p]==']') break;
+                ++p;
+            }
+            char name[SB_REFERENCE_LABEL_CAP];
+            if (p<r->length && r->text[p]==']' && sb_reference_label(r->text+end+1,p-end-1,name,sizeof(name)).code==SB_OK) {
+                start=end+1;length=p-start;end=p+1;
+            }
+        }
+    }
+    if (length>*budget) { *budget=0; return false; }
+    *budget-=length;
+    size_t index=sb_reference_find(r->references,r->text+start,length);
+    if (index==SIZE_MAX) return false;
+    pair->has_reference=true;pair->reference=index;pair->end=end;return true;
+}
+SBStatus sb_inline_init(SBInline *r,const char *text,size_t length) { return sb_inline_init_references(r,text,length,NULL); }
+SBStatus sb_inline_init_references(SBInline *r,const char *text,size_t length,const SBReferences *references) {
     if (!r) return sb_error(SB_INVALID,"Markdown-Leser fehlt.");
-    *r=(SBInline){.text=text,.length=length};
+    *r=(SBInline){.text=text,.length=length,.references=references};
     if ((!text && length) || length>SB_TEXT_LIMIT) return sb_error(SB_INVALID,"Markdown-Text ist ungültig oder zu groß.");
     for (size_t p=0;p<length;) {
         if (text[p]!='`') { ++p; continue; }
@@ -163,7 +190,7 @@ SBStatus sb_inline_init(SBInline *r,const char *text,size_t length) {
     size_t budget=length*32+64;
     for (size_t i=0;i<r->pair_count;++i) {
         Pair *pair=&r->pairs[i];
-        if (pair->close!=SIZE_MAX) pair->valid=destination(r,pair,&budget);
+        if (pair->close!=SIZE_MAX) pair->valid=destination(r,pair,&budget) || reference(r,pair,&budget);
         if (!budget) return sb_error(SB_LIMIT,"Markdown-Linkstruktur ist zu komplex.");
     }
     for (size_t i=r->pair_count;i>0;--i) {
@@ -198,11 +225,24 @@ static bool at(const SBInline *r,size_t p,size_t limit,SBInlineToken *t) {
         char decoded[8]; size_t bytes=0,consumed=entity_decode(r->text+p,limit-p,decoded,&bytes);
         if (consumed) { t->kind=SB_INLINE_ENTITY; t->length=t->content_length=consumed; return true; }
     }
+    if ((c==' ' || c=='\t') && !entity_opaque(r,p)) {
+        size_t end=p+1;
+        while (end<limit && (r->text[end]==' ' || r->text[end]=='\t')) ++end;
+        t->length=t->content_length=end-p;
+        if ((p && (r->text[p-1]=='\n' || r->text[p-1]=='\r')) ||
+            (end<r->length && (r->text[end]=='\n' || r->text[end]=='\r'))) t->content_length=0;
+        return true;
+    }
     Pair *pair=c=='[' ? find_pair(r,p) : c=='!' && p+1<limit ? find_pair(r,p+1) : NULL;
     if (pair && pair->valid && pair->end<=limit && pair->image==(c=='!')) {
         t->kind=pair->image ? SB_INLINE_IMAGE : SB_INLINE_LINK;
         t->length=pair->end-p; t->content=pair->open+1; t->content_length=pair->close-t->content;
         t->destination=pair->destination; t->destination_length=pair->length;
+        t->has_reference=pair->has_reference;t->reference=pair->reference;
+        if (pair->has_reference) {
+            const SBReferenceDefinition *definition=&r->references->items[pair->reference].source;
+            t->destination=definition->destination;t->destination_length=definition->destination_length;
+        }
         return true;
     }
     Mark *mark=r->marks_ready ? mark_at(r,p) : NULL;
@@ -300,18 +340,25 @@ SBStatus sb_inline_text(const SBInline *r,size_t offset,size_t length,char **out
 }
 SBStatus sb_inline_destination(const SBInline *r,const SBInlineToken *t,char *out,size_t capacity) {
     if (!r || !t || !out || !capacity || (t->kind!=SB_INLINE_LINK && t->kind!=SB_INLINE_IMAGE && t->kind!=SB_INLINE_AUTOLINK) ||
-        t->destination>r->length || t->destination_length>r->length-t->destination) return sb_error(SB_INVALID,"Markdown-Linkziel ist ungültig.");
+        (!t->has_reference && (t->destination>r->length || t->destination_length>r->length-t->destination))) return sb_error(SB_INVALID,"Markdown-Linkziel ist ungültig.");
+    const char *source=r->text;size_t destination=t->destination,length=t->destination_length;
+    if (t->has_reference) {
+        if (!r->references || t->reference>=r->references->count) return sb_error(SB_INVALID,"Markdown-Referenzziel ist ungültig.");
+        const SBReferenceDefinition *definition=&r->references->items[t->reference].source;
+        source=r->references->text;destination=definition->destination;length=definition->destination_length;
+        if (destination>r->references->length || length>r->references->length-destination) return sb_error(SB_INVALID,"Markdown-Referenzziel ist ungültig.");
+    }
     size_t used=0;
     if (t->kind==SB_INLINE_AUTOLINK && t->email) {
         if (capacity<=7) { *out=0; return sb_error(SB_LIMIT,"Markdown-Linkziel ist zu lang."); }
         memcpy(out,"mailto:",7); used=7;
     }
-    for (size_t i=0;i<t->destination_length;) {
-        char c=r->text[t->destination+i];
-        if (t->kind!=SB_INLINE_AUTOLINK && c=='\\' && i+1<t->destination_length && punctuation((unsigned char)r->text[t->destination+i+1])) {
-            c=r->text[t->destination+(++i)];
+    for (size_t i=0;i<length;) {
+        char c=source[destination+i];
+        if (t->kind!=SB_INLINE_AUTOLINK && c=='\\' && i+1<length && punctuation((unsigned char)source[destination+i+1])) {
+            c=source[destination+(++i)];
         } else if (t->kind!=SB_INLINE_AUTOLINK && c=='&') {
-            char decoded[8]; size_t bytes=0,consumed=entity_decode(r->text+t->destination+i,t->destination_length-i,decoded,&bytes);
+            char decoded[8]; size_t bytes=0,consumed=entity_decode(source+destination+i,length-i,decoded,&bytes);
             if (consumed) {
                 if (bytes>=capacity-used) { *out=0; return sb_error(SB_LIMIT,"Markdown-Linkziel ist zu lang."); }
                 memcpy(out+used,decoded,bytes); used+=bytes; i+=consumed; continue;

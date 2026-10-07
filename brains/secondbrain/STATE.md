@@ -34,7 +34,7 @@ Vorherige Windows-/Linux-Abnahme 37631991014 zu 9c38604 besteht in zwölf Jobs,
 einschließlich Debug/Release und Release-Paketen. Neue Mac-CI separat übernehmen;
 keinen Plattformnachweis der neuen 0.9.14 daraus ableiten.
 
-## Neue Parserarbeit 0.9.15
+## Vorheriger Paketstand 0.9.15
 
 E-Mail-Autolinks und innerer Linkvorrang sind implementiert; automatische
 Empfänger werden vor OS-Übergabe kodiert. 37 Release-Tests, 19 Originalfälle,
@@ -44,7 +44,18 @@ nicht bedient. Neues Intel/macOS-Paket besteht; dist enthält 0.9.15,
 Build 9e6cd5675f78. Eigenes Gedächtnis geladen, Raster betrachtet.
 Quellcommit 9e6cd56 ist lokal gesichert; vier GitHub-Pushes scheitern mit
 serverseitigem Internal Server Error. Neuer Plattformnachweis fehlt bis zum Push.
-Referenzlinks sind recherchiert, die dokumentweite C-Umgebung bleibt nächste Arbeit.
+Referenzlinks wurden danach in der folgenden Version integriert.
+
+## Neue Arbeit 0.9.16
+
+Gemeinsame dokumentweite Referenzen sind in Titel/Reader/Tabelle/native Inhalte/
+Graph integriert. Vollständige Standard-Unicode-Faltung, erste Definition und
+Originalbytes geprüft. Scrollschiene/Fokusrand sind mit festem Inhaltsrand
+getrennt; Raster sowie 100/200-Prozent-Geometrie betrachtet. Alle 40 abschließenden
+Release-Tests, 433 native Sanitizerassertions, 6.030 Referenz-/1.187.526 eigene
+Inlineassertions, 81 Originalfälle und 1.606 Original-Mappings bestehen lokal.
+UI-Bericht SBUI-052/053. Neuer Paketstand folgt; dist bleibt bis dahin 0.9.15.
+GitHub-Veröffentlichung und neue Plattformnachweise sind noch ausstehend.
 
 ## Nächste Arbeit und Grenzen
 

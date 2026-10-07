@@ -1,5 +1,6 @@
 #include "markdown.h"
 #include "table.h"
+#include "references.h"
 #include <string.h>
 
 typedef struct { size_t start,end,next,content; unsigned indent; } Line;
@@ -101,7 +102,8 @@ bool sb_markdown_boundary(const char *text,size_t length,size_t offset) {
 }
 void sb_markdown_init(SBMarkdown *r,const char *text,size_t length,bool literal) {
     if (!r) return;
-    *r=(SBMarkdown){.text=text ? text : "",.length=text ? length : 0,.literal=literal};
+    *r=(SBMarkdown){.text=text ? text : "",.length=text ? length : 0,.literal=literal,
+        .reference_budget=length<=SB_TEXT_LIMIT ? length*32+64 : 64};
 }
 bool sb_markdown_next(SBMarkdown *r,SBMarkdownBlock *b) {
     if (!r || !b || r->cursor>=r->length) return false;
@@ -127,6 +129,11 @@ bool sb_markdown_next(SBMarkdown *r,SBMarkdownBlock *b) {
         b->kind=SB_MD_FENCE; return true;
     }
     if (heading(r,l,b)) return true;
+    SBReferenceDefinition definition;
+    if (sb_reference_parse(r->text,r->length,l.start,&definition,&r->reference_budget)) {
+        b->kind=SB_MD_REFERENCE; b->length=definition.end-l.start; r->cursor=definition.end; return true;
+    }
+    if (!r->reference_budget) r->reference_limit=true;
     SBTable table;
     if (sb_table_parse(r->text,r->length,l.start,&table)) { b->kind=SB_MD_TABLE; b->length=table.end-l.start; r->cursor=table.end; return true; }
     if (l.indent>=4) {

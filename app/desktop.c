@@ -92,6 +92,12 @@ static void smooth_scroll(SBDesktop *d, unsigned slot, nk_uint *offset) {
     s->elastic=d->reduced_motion ? 0 : approach(s->elastic,0,1-expf(-d->seconds/0.11f),0.1f);
     if (slot!=1) d->ui.ctx->current->layout->at_y-=s->elastic;
 }
+static void scroll_gutter(SBDesktop *d) {
+    /* Keep the overlay thumb and its pointer track out of content/focus rings.
+       Reserve the same width before and after overflow to avoid reflow jumps. */
+    struct nk_panel *panel=d->ui.ctx->current->layout;
+    panel->bounds.w=fmaxf(1,panel->bounds.w-(10+6*d->ui.scale));
+}
 static void scroll_measure(SBDesktop *d, unsigned slot) {
     struct nk_panel *p=d->ui.ctx->current->layout;
     SBScroll *s=&d->scrolling[slot];
@@ -1262,7 +1268,7 @@ static void table_passive(SBDesktop *d,const char *id,const char *text,accesskit
         d->scrolling[slot].active=true; d->reveal_document[0]=0;
     }
 }
-static bool document_table(SBDesktop *d,const char *text,size_t length,size_t offset,unsigned slot,unsigned *link_number) {
+static bool document_table(SBDesktop *d,const char *text,size_t length,size_t offset,unsigned slot,unsigned *link_number,const SBReferences *references) {
     SBTable table; if (!sb_table_parse(text,length,offset,&table)) return false;
     size_t count=table.rows*table.columns;
     SBTableViewCell *cells=calloc(count,sizeof(*cells));
@@ -1272,7 +1278,7 @@ static bool document_table(SBDesktop *d,const char *text,size_t length,size_t of
         for (size_t c=0;c<table.columns;++c) {
             SBTableViewCell *cell=&cells[row_index*table.columns+c]; cell->row_offset=row.offset;
             status=sb_table_cell_text(&table,&row.cells[c],&cell->raw);
-            if (status.code==SB_OK) status=sb_inline_init(&cell->inline_reader,cell->raw,strlen(cell->raw));
+            if (status.code==SB_OK) status=sb_inline_init_references(&cell->inline_reader,cell->raw,strlen(cell->raw),references);
             if (status.code==SB_OK) { status=sb_inline_styled(&cell->inline_reader,0,strlen(cell->raw),&cell->styled); cell->plain=cell->styled.text; }
             if (status.code!=SB_OK) goto cleanup;
             SBInlineToken link; while (sb_inline_next(&cell->inline_reader,&link)) if ((link.kind==SB_INLINE_LINK || link.kind==SB_INLINE_AUTOLINK) && link.destination_length) ++cell->links;
@@ -1373,7 +1379,7 @@ cleanup:
     if (status.code!=SB_OK) { d->message=status; return false; }
     return true;
 }
-static void document(SBDesktop *d, const char *text, float width, float height) {
+static void document(SBDesktop *d, const char *text, float height) {
     struct nk_context *ctx = d->ui.ctx;
     const char *extension = d->model.source ? strrchr(d->model.source_path, '.') : NULL;
     bool whole_code = text==d->notice || (text == d->model.source && !d->model.source_directory && (!extension || strcmp(extension, ".md")));
@@ -1386,12 +1392,19 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
     struct nk_vec2 previous_padding=ctx->style.window.group_padding;
     ctx->style.window.group_padding=nk_vec2(8*d->ui.scale,10*d->ui.scale);
     if (!nk_group_begin(ctx, "Reader", NK_WINDOW_NO_SCROLLBAR)) { ctx->style.window.group_padding=previous_padding; return; }
+    scroll_gutter(d);
     unsigned slot=modal_reader(d) && (text==d->context || text==d->notice) ? 2 : 0;
     smooth_scroll(d,slot,ctx->current->layout->offset_y);
     SBMarkdown reader; SBMarkdownBlock block;
+    SBReferences references={0};
+    if (!whole_code) {
+        SBStatus status=sb_references_init(&references,text,strlen(text));
+        if (status.code!=SB_OK) { d->message=status;whole_code=true; }
+    }
     sb_markdown_init(&reader,text,strlen(text),whole_code);
     while (sb_markdown_next(&reader,&block)) {
-        if (block.kind==SB_MD_TABLE && document_table(d,text,strlen(text),block.offset,slot,&link_number)) { first_heading=false; continue; }
+        if (block.kind==SB_MD_REFERENCE) continue;
+        if (block.kind==SB_MD_TABLE && document_table(d,text,strlen(text),block.offset,slot,&link_number,&references)) { first_heading=false; continue; }
         if (block.kind==SB_MD_RULE) {
             nk_layout_row_dynamic(ctx,24*d->ui.scale,1);
             struct nk_rect bounds=nk_widget_bounds(ctx);
@@ -1416,7 +1429,7 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
         else {
             SBInline inline_reader={0}; SBStyledText styled={0}; SBStatus inline_status=sb_ok(); char *plain=NULL;
             if (!code) {
-                inline_status=sb_inline_init(&inline_reader,content,length);
+                inline_status=sb_inline_init_references(&inline_reader,content,length,&references);
                 if (inline_status.code==SB_OK) { inline_status=sb_inline_styled(&inline_reader,0,length,&styled); plain=styled.text; }
                 if (inline_status.code!=SB_OK) d->message=inline_status;
             }
@@ -1430,7 +1443,7 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
             nk_style_set_font(ctx, font);
             const char *shown = plain ? plain : content;
             size_t shown_length = plain ? strlen(plain) : length;
-            float available = fmaxf(60, width - 55);
+            float available = fmaxf(60, ctx->current->layout->bounds.w);
             float measured = font->width(font->userdata, font->height, shown, (int)shown_length);
             float lines = measured < available * 0.92f ? 1 : ceilf(measured / available) + 1;
             float text_height=plain ? sb_ui_styled_height(&d->ui,font,&styled,ctx->current->layout->bounds.w) : lines*(font->height+4);
@@ -1451,6 +1464,7 @@ static void document(SBDesktop *d, const char *text, float width, float height) 
         }
     }
     nk_style_set_font(ctx, &d->ui.normal->handle);
+    sb_references_free(&references);
     scroll_measure(d,slot);
     nk_group_end(ctx);
     ctx->style.window.group_padding=previous_padding;
@@ -1498,7 +1512,7 @@ static void detail(SBDesktop *d, float x, float y, float width, float height, nk
         }
         float remaining=ctx->current->layout->bounds.y+ctx->current->layout->bounds.h-(ctx->current->layout->at_y+ctx->current->layout->row.height);
         float body_height=fmaxf(24,remaining-(compact ? 20 : 26)*s-2*ctx->style.window.spacing.y);
-        if (d->model.source) document(d,d->model.source,width-36,body_height);
+        if (d->model.source) document(d,d->model.source,body_height);
         else if (d->model.editor && d->editing) {
             nk_style_set_font(ctx,&d->ui.body->handle);
             nk_layout_row_dynamic(ctx,body_height,1); text_target(d,"editor"); target_label(d,"Dokument bearbeiten");
@@ -1510,7 +1524,7 @@ static void detail(SBDesktop *d, float x, float y, float width, float height, nk
             }
             d->model.editor[d->text_edit.string.buffer.allocated]=0; ring(d,"editor");
             nk_style_set_font(ctx,&d->ui.normal->handle);
-        } else if (d->model.editor) document(d,d->model.editor,width-36,body_height);
+        } else if (d->model.editor) document(d,d->model.editor,body_height);
         else {
             nk_layout_row_dynamic(ctx,body_height,1);
             if (nk_group_begin(ctx,"Welcome",NK_WINDOW_NO_SCROLLBAR)) {
@@ -1572,6 +1586,7 @@ static void popup(SBDesktop *d, int width, int height) {
         nk_layout_row_dynamic(ctx,contents,1);
         bool group=nk_group_begin(ctx,"Modal contents",NK_WINDOW_NO_SCROLLBAR);
         if (group) {
+        scroll_gutter(d);
         if (d->backup_feedback_reset) { *ctx->current->layout->offset_y=0; memset(&d->scrolling[3],0,sizeof(d->scrolling[3])); d->backup_feedback_reset=false; }
         smooth_scroll(d,3,ctx->current->layout->offset_y);
         if (d->backup) {
@@ -1740,14 +1755,14 @@ static void popup(SBDesktop *d, int width, int height) {
             if (button(d,"notices-back","Zurück zur Übersicht")) { d->message=sb_ok(); d->form=SB_FORM_NOTICE_LIST; }
             if (button(d,"copy-notice",!strcmp(d->message.message,"Lizenztext kopiert.") ? "Lizenztext kopiert" : "Lizenztext kopieren"))
                 result(d,SDL_SetClipboardText(d->notice ? d->notice : "") ? sb_ok() : sb_error(SB_IO,"Die Zwischenablage ist nicht erreichbar."),"Lizenztext kopiert.");
-            document(d,d->notice ? d->notice : "",w-70,fmaxf(40,contents-48*s-44));
+            document(d,d->notice ? d->notice : "",fmaxf(40,contents-48*s-44));
             if (d->message.code!=SB_OK) { nk_layout_row_dynamic(ctx,52*s,1); native_wrap(d,d->message.message); }
         } else if (d->form == SB_FORM_CONTEXT) {
             nk_layout_row_dynamic(ctx,24*s,1); muted(d,"Gespeicherte Kerninformationen");
             nk_layout_row_dynamic(ctx, 36 * s, 1);
             if (button(d,"copy-context",!strcmp(d->message.message,"Kontext kopiert.") ? "Kontext kopiert" : "Kontext kopieren"))
                 result(d, SDL_SetClipboardText(d->context ? d->context : "") ? sb_ok() : sb_error(SB_IO, "%s", SDL_GetError()), "Kontext kopiert.");
-            document(d, d->context ? d->context : "", w - 70, fmaxf(40,contents-60*s-44));
+            document(d, d->context ? d->context : "", fmaxf(40,contents-60*s-44));
         } else {
             const char *help[] = {"Command auf macOS, Control auf Windows und Linux:",
                 "N: Neue Notiz · Umschalt+N: Neues Projekt", "S: Speichern · O: Arbeitsordner öffnen",
@@ -1922,6 +1937,7 @@ static void welcome(SBDesktop *d,int width,int height,nk_flags flags) {
         nk_uint sx=0,sy=0; nk_group_get_scroll(ctx,"WelcomeBody",&sx,&sy); smooth_scroll(d,2,&sy);
         nk_group_set_scroll(ctx,"WelcomeBody",sx,sy);
         if (nk_group_begin(ctx,"WelcomeBody",NK_WINDOW_NO_SCROLLBAR)) {
+            scroll_gutter(d);
             nk_layout_row_dynamic(ctx,60*s,1);
             native_wrap(d,"Halte Ziele, Notizen und Quellen für jedes Projekt zusammen. Die Dateien bleiben auf deinem Rechner und sind auch für eine KI lesbar.");
             nk_layout_row_dynamic(ctx,36*s,1);

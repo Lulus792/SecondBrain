@@ -429,6 +429,41 @@ int main(int argc,char **argv) {
     CHECK(!d.model.source && !strcmp(d.model.editor,mail_source));
     d.open_url=NULL;
     OK(sb_path_join(dump_path,sizeof(dump_path),root,"autolinks.bmp"));CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    char reference_source[2000];
+    snprintf(reference_source,sizeof(reference_source),"# [Referenz][strasse]\n\n[Ziel][Straße] und [Straße][].\n\n[Unbekannt][fake]\n\n| Quelle |\n| --- |\n| [Tabelle][STRASSE] |\n\n[strasse]: %sknowledge/f&ouml;&ouml;.md 'Titel'\n[STRASSE]: %sSTATE.md\n\n```\n[fake]: %sSTATE.md\n```\n",prefix,prefix,prefix);
+    strcpy(d.model.editor,reference_source);OK(sb_app_save(&d.model));d.reset_reader=true;frame(&d);frame(&d);
+    CHECK(!strcmp(d.model.title,"Referenz") && !strcmp(d.model.editor,reference_source));
+    unsigned reference_actions=0;bool reference_body=false,reference_cell=false,unresolved_reference=false;
+    for(size_t i=0;i<d.passive_count;++i) {
+        SBPassiveText *p=&d.passive[i];
+        reference_body|=p->role==ACCESSKIT_ROLE_PARAGRAPH && !strcmp(p->text,"Ziel und Straße.");
+        reference_cell|=p->role==ACCESSKIT_ROLE_CELL && !strcmp(p->text,"Tabelle");
+        unresolved_reference|=p->role==ACCESSKIT_ROLE_PARAGRAPH && !strcmp(p->text,"[Unbekannt][fake]");
+        CHECK(p->role!=ACCESSKIT_ROLE_PARAGRAPH || !strstr(p->text,"[strasse]:"));
+    }
+    for(size_t i=0;i<d.target_count;++i) if(!strncmp(d.targets[i].id,"link:",5))++reference_actions;
+    CHECK(reference_body && reference_cell && unresolved_reference && reference_actions==4);
+    for(unsigned size=0;size<2;++size) {
+        OK(sb_ui_fonts(&d.ui,size ? 2 : 1));d.reset_reader=true;frame(&d);frame(&d);
+        CHECK(d.scrolling[0].track.w>0);
+        for(size_t i=0;i<d.target_count;++i) if(!strncmp(d.targets[i].id,"link:",5))
+            CHECK(d.targets[i].bounds.x+d.targets[i].bounds.w+2*d.ui.scale<=d.scrolling[0].track.x);
+    }
+    OK(sb_ui_fonts(&d.ui,1));d.reset_reader=true;frame(&d);frame(&d);
+#ifdef __APPLE__
+    void *reference_reader=native_find(view,d.model.title,0);CHECK(reference_reader);
+    size_t reference_characters=((size_t(*)(void *,SEL))objc_msgSend)(reference_reader,sel_registerName("accessibilityNumberOfCharacters"));
+    const char *reference_native=utf8(((void *(*)(void *,SEL,NativeRange))objc_msgSend)(reference_reader,sel_registerName("accessibilityStringForRange:"),(NativeRange){0,reference_characters}));
+    CHECK(reference_native && strstr(reference_native,"Ziel und Straße.") && strstr(reference_native,"Tabelle") && !strstr(reference_native,"[strasse]:"));
+#elif defined(_WIN32) || defined(SB_ATSPI_TEST)
+    CHECK(sb_native_probe(d.ui.window,d.model.title,NULL,SB_NATIVE_READ_DOCUMENT_TEXT,native_value,sizeof(native_value),pump,&d));
+    CHECK(strstr(native_value,"Ziel und Straße.") && strstr(native_value,"Tabelle") && !strstr(native_value,"[strasse]:"));
+#endif
+    OK(sb_path_join(dump_path,sizeof(dump_path),root,"references.bmp"));CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
+    strcpy(d.focus,"link:2");link_key.key.key=SDLK_RETURN;sb_desktop_event(&d,&link_key);frame(&d);frame(&d);
+    CHECK(d.model.source && strstr(d.model.source_path,"/knowledge/föö.md"));
+    link_key.key.key=SDLK_ESCAPE;sb_desktop_event(&d,&link_key);frame(&d);frame(&d);
+    CHECK(!d.model.source && !strcmp(d.model.editor,reference_source));
     char *previous_context=d.context; d.context=malloc(80); CHECK(d.context);
     strcpy(d.context,"# Sichtbarer Projektname\n\nKontext zum Lesen.\n");
     d.form=SB_FORM_CONTEXT; frame(&d); frame(&d); bool context_heading=false;

@@ -2,7 +2,7 @@
 
 Stand: 7. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Der aktuelle Entwicklungsschritt 0.9.15 ergänzt E-Mail-Autolinks und korrigiert Linkvorrang.
+Der aktuelle Entwicklungsschritt 0.9.16 ergänzt Referenzlinks und korrigiert den Scroll-/Fokusabstand.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
 ## Abgeschlossene Grundlagen
@@ -1645,3 +1645,47 @@ keine Historie umgeschrieben. Neue Windows-/Linux-/ARM64-CI für 0.9.15 fehlt
 daher noch; frühere Abnahmen werden nicht als Nachweis dieser Änderung ausgegeben.
 Nächster Veröffentlichungsschritt ist ein normaler erneuter Push und die
 tatsächliche Plattformnachprüfung. Der vollständige Auftrag bleibt aktiv.
+
+
+## Referenzlinks und Scrollrand in 0.9.16
+
+[Gemeinsame Referenzumgebung](REFERENZLINKS.md) in eigenem C: Definitionen aus
+der ganzen Datei, erste passende Definition, volle Standard-Unicode-Faltung,
+Titel, Absätze, Tabellen, native Inhalte und Graph. Originaldateien bleiben
+unverändert. Code/Maskierungen/Inline-Vorrang bleiben erhalten. Weiche Umbruch-
+Ränder sind bereinigt; Containerdefinitionen bleiben gesondert offen.
+
+Der ursprüngliche Gesamtlauf besteht mit 40 Release-Tests (321,77 s). Das
+betrachtete Raster bestätigt danach überlagerte Link-/Fokusränder durch die
+Scrollleiste. Ein vor dem Layout reservierter Rand in Reader, Modalinhalt und
+Einstieg trennt Inhalt und Pointer-Schiene; Umbruchbreite bleibt stabil. Fünf
+gezielte Nachprüfungen bestehen (22,94 s); abschließend bestehen alle 40
+Release-Tests nach Randkorrektur (232,30 s), darunter 433 native, 60 Graph-,
+91 Text- und 111 Editorassertions. Vor-/Nach-Raster betrachtet, Abstand bei
+100/200 Prozent Schrift nachgeprüft.
+
+6.030 eigene Referenz- und 1.187.526 Inlineassertions, 81 unveränderte
+Normfälle und alle 1.606 Unicode-C-/F-Mappings bestehen unter eigener
+ASan/UBSan-Instrumentierung von references/markdown/inline/sb. Enthalten:
+3.000 begrenzte Definitions-/5.000 Inlinefälle, erhaltene Quellen, Unicode-
+Expansion, Puffer, Zahlen-/Namens-/Arbeitsgrenzen. Native Teilinstrumentierung
+besteht mit 433 Assertions nach Layoutkorrektur. Leakprüfung ist auf diesem
+macOS nicht verfügbar und deaktiviert; übrige Plattformteile und externe UI-
+Bibliotheken sind nicht vollständig instrumentiert. Vorheriger vollständiger
+0.9.15-Quellbaum scheitert an 69 der 81 Originalfälle. Roh-HTML/Bildalternativen
+und terminale Code-Serializer-Zeilenumbrüche folgen dem ausdrücklich beschriebenen
+Produktvertrag; keine vollständige CommonMark-Abnahme.
+
+Code und Daten verwenden keine neue externe Fachbibliothek. Unicode-Original
+und abgeleitete C-Tabelle sind unter der vorhandenen Unicode License V3
+zugeordnet, Hash/Generator bytegenau geprüft. Der normale Build benötigt
+keinen Datengenerator. Logs: build/references-{targeted,gutter,full,final-full}-
+check.log, references-sanitize/result.log, references-ui-sanitize/result.log
+und references-regression/result.log. UI-Bericht SBUI-052/053: /Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-07_17-42-40/UI_REVIEW.md.
+
+Neue Paket-/Plattformabnahme folgt nach dem Quellcommit. GitHub-Push des
+vorherigen 0.9.15 scheitert weiterhin serverseitig; aus älterer CI keine
+Abnahme dieser Änderung ableiten. Dist enthält bis zum neuen Paket weiterhin
+0.9.15. Vollständige Container/Definitionen darin, Bidi/Textgeometrie/IME,
+Tabellenmatrix, menschliche assistive Bedienung und weitere Release-Arbeiten
+bleiben offen. Der Gesamtauftrag bleibt aktiv, 1.0 bleibt unverändert offen.
