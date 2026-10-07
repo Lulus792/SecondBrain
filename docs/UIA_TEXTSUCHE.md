@@ -63,3 +63,18 @@ nach einem Emoji, einen Treffer am Anfang und einen begrenzten Teilbereich.
 Ausführung und entpacktes Windows-Paket werden erst anhand der neuen nativen CI
 abgenommen. Die neue Arbeit ist bis dahin noch keine bestätigte Windows-Behebung.
 Menschliche Screenreader-Bedienung und präzise Textgeometrie bleiben getrennte Abnahmen.
+
+
+Der erste Quellbuild-Lauf 37628165496 stoppt unter Windows Debug/Release schon
+im Konfigurationsschritt. Die vorhandenen Annotationen enthalten nur Exit 1;
+Ursache ist noch nicht belegt. Öffentliche REST-Logabfrage ist nicht verfügbar,
+der veröffentlichte HTML-Logverweis liefert keinen zugänglichen Detailblock.
+Ein Konfigurationswrapper erfasst jetzt beide Ausgabeströme, erhält den
+Fehlerstatus und veröffentlicht die Ursache als Annotation sowie checked-configure.log.
+Eine absichtlich fehlschlagende lokale Konfiguration bestätigt Status, Log und
+Prozent-Escaping; YAML ist mit Psych gelesen. Neuer nativer Diagnoselauf folgt.
+Dies ist Diagnoseverbesserung und keine behauptete Windows-Behebung.
+
+Das lokale Intel-Paket 0.9.13 zu 2242b5d besteht bereits mit Desktop 126,
+Tastatur 142, Sicherung 75, Neustart und CLI; Log windows-findtext-package-check.log.
+Dist bleibt vorerst bei geprüftem 0.9.12. Paketprüfung ist kein Windows-Nachweis.

@@ -1,0 +1,27 @@
+cmake_minimum_required(VERSION 3.20)
+if(NOT SB_SOURCE_DIR OR NOT SB_BUILD_DIR)
+    message(FATAL_ERROR "SB_SOURCE_DIR and SB_BUILD_DIR are required")
+endif()
+file(MAKE_DIRECTORY "${SB_BUILD_DIR}")
+execute_process(COMMAND "${CMAKE_COMMAND}" -S "${SB_SOURCE_DIR}" -B "${SB_BUILD_DIR}"
+    -DSB_BUILD_UI=ON -DSB_REQUIRE_NATIVE_ACCESSIBILITY_TESTS=ON
+    "-DCMAKE_BUILD_TYPE=${SB_BUILD_CONFIG}"
+    RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE errors)
+file(WRITE "${SB_BUILD_DIR}/checked-configure.log" "${output}${errors}")
+message("${output}${errors}")
+if(NOT result EQUAL 0)
+    foreach(stream errors output)
+        set(diagnostic "${${stream}}")
+        string(LENGTH "${diagnostic}" length)
+        if(length GREATER 3500)
+            math(EXPR start "${length}-3500")
+            string(SUBSTRING "${diagnostic}" ${start} -1 diagnostic)
+        endif()
+        string(REPLACE "%" "%25" diagnostic "${diagnostic}")
+        string(REPLACE "\r" "%0D" diagnostic "${diagnostic}")
+        string(REPLACE "\n" "%0A" diagnostic "${diagnostic}")
+        execute_process(COMMAND "${CMAKE_COMMAND}" -E echo
+            "::error title=UI configure failed (${stream})::${diagnostic}")
+    endforeach()
+    message(FATAL_ERROR "UI configure returned ${result}")
+endif()
