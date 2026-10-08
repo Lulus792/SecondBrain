@@ -2,7 +2,7 @@
 
 Stand: 8. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.24. Die neue Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.25. Die neue Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -2247,3 +2247,17 @@ Quellstand 90bdb78 ist nach origin gepusht.
 [CI 37723366327](https://github.com/Lulus792/SecondBrain/actions/runs/37723366327)
 ist gestartet; lokale entpackte Paketprüfung läuft separat. Diese laufenden
 Prüfungen werden erst nach tatsächlichem Abschluss als Nachweis übernommen.
+
+Das lokale 0.9.25-Paket 90bdb78ef4d1 besteht mit 126 Desktop-, 157 Tastatur-
+und 75 Sicherungsassertions, zwei Neustarts, CLI und Importprüfung. Installiert
+nach dist/SecondBrain; drei Lizenzsammlungen bytegleich. Eigenes Gedächtnis
+read-only geladen, Vorschau betrachtet, Dateien unverändert. Rückfallkopie:
+build/previous-dist-0.9.24-20261008-054010. Archiv-SHA-256:
+c4240faa3c373028bf025894771d9986171426ca2b155b913e7eee225a1e94dd.
+
+[CI 37723366327](https://github.com/Lulus792/SecondBrain/actions/runs/37723366327)
+zu 90bdb78 ist abgeschlossen: alle 20 Jobs inklusive acht Desktop-Varianten
+und explizit alle vier entpackten Release-Pakete bestehen. 51 lokale Prüfungen
+und neue Kompositions-/Ausschnittsregression sind damit auch im
+automatisierten nativen Umfang bestätigt. Reale IMEs und die weiteren
+1.0-Abnahmen bleiben offen.

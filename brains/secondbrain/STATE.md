@@ -13,11 +13,11 @@ kopieren. Lumen-Sternkarte, Glaskarten/Icons, direkte Pfeilnavigation, Kamerafah
 weiches Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Entwürfe, Originalbytes und erkannte Konflikte bleiben geschützt.
 
-Dist enthält **0.9.24, Build 1c2f323b0fa5**, Intel/macOS Release. Entpacktes Paket
+Dist enthält **0.9.25, Build 90bdb78ef4d1**, Intel/macOS Release. Entpacktes Paket
 besteht mit 126 Desktop-, 157 Tastatur-, 75 Sicherungsassertions, zwei Neustarts
 und CLI. Alle drei Lizenzsammlungen stimmen bytegenau mit ihren Manifesten
 überein. Eigenes Gedächtnis geladen/Raster betrachtet, Dateien unverändert.
-Rückfallkopie: build/previous-dist-0.9.23-20261008-042422.
+Rückfallkopie: build/previous-dist-0.9.24-20261008-054010.
 
 [CI 37704298271](https://github.com/Lulus792/SecondBrain/actions/runs/37704298271)
 zu 7f9acb8 besteht in allen 20 Jobs einschließlich acht Desktop-Varianten und
@@ -52,10 +52,11 @@ Fokusbestand bei Layoutänderungen. 51/51 lokale Release-Prüfungen und gezielte
 ASan/UBSan bestehen. Ein provozierter 16-Bit-Textbreitenüberlauf ist durch
 Float-Geometrie und sichtbare Textausschnitte behoben. Details: [IME](../../docs/IME.md).
 
-Quellstand 90bdb78 ist gepusht; [CI 37723366327](https://github.com/Lulus792/SecondBrain/actions/runs/37723366327)
-ist gestartet. Lokale Paketprüfung läuft mit Quellstand 90bdb78.
+[CI 37723366327](https://github.com/Lulus792/SecondBrain/actions/runs/37723366327)
+zu 90bdb78 besteht in allen 20 Jobs inklusive vier entpackter Pakete.
+Lokales Paket ist vollständig abgenommen und installiert.
 
-Nächster Schritt: laufende native 0.9.25-/Paketprüfung auswerten; Mac-Paket aktualisieren.
+Nächster Schritt: Feldzuordnung auch für normale kurze Texteingabe prüfen/verbessern.
 Weitere Release-Arbeiten: Bidi/visuelle Textgeometrie/IME, native
 Tabellenmatrix, Screenreader-/Dialog-/Geräte-/Langzeitabnahmen, volle Windows-/
 Linux-Zielvolumes und physische Persistenz. Originalverträge stehen in SOURCES.

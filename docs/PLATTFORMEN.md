@@ -884,3 +884,13 @@ Intel jeweils Desktop-Debug/Release sowie C17 und Python. Alle vier entpackten
 Release-Pakete bestehen. 134 Editorassertions prüfen echte SDL-Ankerwerte und
 Popup-/Eltern-Textfokus. Native Eingabemethoden mit echten Kompositionsfolgen,
 Bidi-/visuelle Textgeometrie und menschliche assistive Abnahmen bleiben offen.
+
+## 0.9.25: Komposition und Textausschnitte auf vier Architekturen
+
+[CI 37723366327](https://github.com/Lulus792/SecondBrain/actions/runs/37723366327)
+zu 90bdb78 besteht am 8. Oktober in allen 20 Jobs. Windows/Linux/macOS ARM64/
+Intel bestehen jeweils Desktop-Debug/Release sowie C17 und Python. Alle vier
+entpackten Release-Pakete bestehen mit Importprüfung, Bedienung, Sicherung,
+Wiederherstellung und Neustarts. Die neuen Kompositions-, Rasterausschnitts-
+und Fokusregressionen sind im tatsächlichen automatisierten Umfang bestätigt.
+Reale Eingabemethoden und menschliche assistive Abnahmen bleiben offen.
