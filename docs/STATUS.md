@@ -2,7 +2,7 @@
 
 Stand: 8. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.23. Die neue Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.24. Die neue Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -2190,11 +2190,19 @@ Originalquellen stehen in [Textdarstellung](TEXTDARSTELLUNG.md).
 Sauberer lokaler Release-Neubau besteht mit 49/49 Prüfungen (311,01 s),
 einschließlich 126 Desktop-, 157 Tastatur-, 75 Sicherungsassertions und 128
 Editorassertions. Nach abschließender Popup-Korrektur bestehen Navigation,
-Editor und Tastaturweg nochmals (3/3, 114,83 s; jetzt 134 Editorassertions). Ein erster Mischbuild scheiterte durch
+Editor und Tastaturweg nochmals (3/3, 114,83 s; jetzt 134 Editorassertions).
+Ein erster Mischbuild scheiterte durch
 während des Builds geänderte gemeinsame Struktur; anschließend alle eigenen
 UI-/Desktop-/Testobjekte neu gebaut. Lokal hängende unsignierte Buildwerkzeuge
 wurden durch isolierte lokale Kopien und System-Git ersetzt; installierte
 Werkzeuge blieben unverändert. Logs: build/ime-clean-tests.log und
-build/ime-popup-{build,tests}.log. Neuer nativer CI-/Paketnachweis folgt;
-installierte App bleibt bis zur Paketabnahme 0.9.23. IME-Preedit, Bidi und reale
+build/ime-popup-{build,tests}.log. [CI 37717307982](https://github.com/Lulus792/SecondBrain/actions/runs/37717307982)
+zu 1c2f323 läuft; C17-/Python-Jobs und Linux-Release samt Paket bestehen.
+Die übrigen nativen Desktop-Nachweise folgen.
+Das lokale entpackte Paket besteht mit 126 Desktop-, 157 Tastatur- und 75
+Sicherungsassertions, zwei Neustarts, CLI und Importprüfung. Installiert ist
+0.9.24/1c2f323b0fa5; drei Lizenzsammlungen stimmen bytegenau. Eigenes Gedächtnis
+read-only geladen und Vorschau betrachtet, Dateien unverändert. Logs:
+build/ime-package-*.log, build/ime-install.json. Rückfallkopie:
+build/previous-dist-0.9.23-20261008-042422. IME-Preedit, Bidi und reale
 Eingabemethodenabnahme sind durch diesen Anker nicht abgeschlossen.
