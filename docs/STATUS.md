@@ -3258,3 +3258,52 @@ Ungebrochener Worker-Zeilenprototyp noch nicht im produktiven Dokumentwechsel
 verwendet; voller Umbruch/Styles/Blöcke, begrenzte Job-/Speicherverwaltung,
 Retire-/Shutdown und sichtbare Integration bleiben offen. SBUI-074 und
 übrige Release-Liste bleiben aktiv.1.0 nur nach ausdrücklicher Nutzerfreigabe.
+
+## Formatierter Worker-Umbruch (0.9.45)
+
+Textsnapshots erfassen bereits vorhandene Fonts/Rollen/Stile und ihre aktuellen
+Parameter ohne vorgezogene UI-Stilerzeugung. Ein privater CPU-Kontext besitzt
+eigene Fonts, aber kein Fenster/Renderer. Er benutzt denselben Absatz-/Bidi-/
+Graphem-/Font-/Umbruchplan wie die Leseansicht. Neue Worker-Stilfonts entstehen
+aus den eigenen Basisfonts. Schriftbindung prüft auch nachträglich entstandene
+UI-Stilfonts gegen die erwarteten Parameter, statt sie ungeprüft einzusetzen.
+[Vertrag](FONT_SNAPSHOTS.md).
+
+Der Layoutjob besitzt Quellenbytes/Stilspannen, Rolle, Breite, Padding, Gap,
+Abschlusszeilenregel und Dokumentkontext. Er liefert vollständige Zeilen,
+Offsets, Positionen, Glyphen und Gesamthöhe. Bei der Übernahme müssen Quelle,
+Stile, sämtliche Layoutparameter und aktuelle Fontgeneration passen. Geometrie
+und Kennungsarrays haben getrennten Besitz auch nach Planübertragung. Abbruch
+zwischen Absätzen/Fontwahl/Umbruchzeilen; einzelne Bibliotheksaufrufe bleiben
+bis zur Rückkehr ununterbrechbar. Ein abgebrochener Plan wird nie übernommen.
+
+**69/69 lokale Release-Prüfungen bestehen (530,96s, CTest -j4)**.
+981 Worker-/Font-/Quell-/Umbruch-/Stil-/Abbruch-/Epochprüfungen bestehen:
+vier Schriftrollen, drei Größen, schmale/breite Ansichten, gemischte Scripts,
+CRLF/leere/trailing Absätze, alle Stilvarianten. Glyphen/Läufe/Offsets/Zeilen-
+positionen/Höhe stimmen mit dem UI-Plan und dessen Geometrieschnittstelle
+überein. Veränderte Breite/Kontext/Stile, Schriftneuladen, nachträglich
+veränderte Lazy-Stilfonts, ungültige Spannen und doppelte Übernahme abgewiesen.
+Vorhandene unabhängige exhaustive Umbruch-/Rasterprüfer bestehen.
+**981 neue,405 native Text-,13.708 Editor-/Cache- und590 Providerprüfungen
+bestehen außerdem unter haltendem ASan/UBSan ohne Befund.** Scope wie der
+0.9.44-Unterbau: Prepare/Font-Snapshot, UI/Text/Space/Icons, NativeText/
+Desktop/Accessibility, Caret-/Shape-/Script-/Bidi-Code, Wort-/Graphemkern,
+Bidi-Engine, vier Prüfer und SDL_ttf.c samt Hooks instrumentiert. Übrige
+externe Objekte und Kern/Modell/Dialog/Sicherung/native Rust-Bibliothek nicht
+instrumentiert; Mac-Leakprüfung aus.29 Quell-/Include-Hashes stimmen.
+Kein ThreadSanitizer- oder genereller Parallelitätsnachweis. Build ohne Tests
+besteht. Logs: `build/prepare-wrap-full-ctest.log`,
+`prepare-wrap-{job,native,editor,provider}-sanitizer.log`,
+`prepare-wrap-sanitizers/sources.json`, `prepare-wrap-no-tests-build.log`.
+
+186 ältere abgeschlossene generierte BMPs verlustfrei erhalten und
+komprimiert; entpackteSHA-256/Dateistatistik geprüft. 2700754585Bytes
+freigegeben, Projektwissen/Pakete und aktuelle Prüfdaten erhalten. Manifest:
+`build/prepare-wrap-completed-bitmap-archive.json`.
+
+**Der produktive Dokumentwechsel ist noch nicht angebunden.** Block-/Tabellen-
+breiten, begrenzte Job-/Output-/Spitzen-Speicherverwaltung, nichtblockierendes
+Retire/Shutdown und sichtbare Integration bleiben offen. SBUI-074 bleibt offen.
+Paket/neue Zielplattformen folgen, installiert bleibt zunächst0.9.44.
+Vollständiger Auftrag aktiv;1.0 weiterhin nur nach ausdrücklicher Freigabe.

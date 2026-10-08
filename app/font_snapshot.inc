@@ -36,3 +36,48 @@ TTF_Font *sb_font_snapshot_bind(const SBFontSnapshot *s,SBUi *ui,unsigned token)
     SBTextFace *face=&ui->text->faces[s->face];TTF_Font *f=token ? face->fallback[token-1] : face->font;
     return f && TTF_GetFontGeneration(f)==s->settings[token].generation ? f : NULL;
 }
+struct SBTextSnapshot {SBFontSnapshot *faces[SB_TEXT_FACES];float scale,density,heights[4];};
+SBTextSnapshot *sb_ui_text_snapshot(SBUi *ui){
+    if(!ui || !ui->text || ui->text->owner!=SDL_GetCurrentThreadID())return NULL;
+    SBTextSnapshot *s=calloc(1,sizeof(*s));if(!s)return NULL;s->scale=ui->scale;s->density=ui->density;
+    for(unsigned i=0;i<SB_TEXT_FACES;++i){SBTextFace *f=&ui->text->faces[i];if(f->font){s->faces[i]=sb_ui_font_snapshot(&f->nk.handle);if(!s->faces[i]){sb_text_snapshot_free(s);return NULL;}}if(!(i%8))s->heights[i/8]=f->nk.handle.height;}
+    return s;
+}
+void sb_text_snapshot_free(SBTextSnapshot *s){if(s){for(unsigned i=0;i<SB_TEXT_FACES;++i)sb_font_snapshot_free(s->faces[i]);free(s);}}
+SBStatus sb_text_snapshot_open(const SBTextSnapshot *s,SBUi *ui){
+    if(!s || !ui || ui->text)return sb_error(SB_INVALID,"Ungültiger Textkontext.");
+    if(!TTF_Init())return sb_error(SB_IO,"Textinitialisierung fehlgeschlagen: %s",SDL_GetError());
+    SBTextSystem *text=calloc(1,sizeof(*text));if(!text){TTF_Quit();return sb_error(SB_MEMORY,"Kein Speicher für Textkontext.");}
+    text->ui=ui;text->owner=SDL_GetCurrentThreadID();text->density=s->density;text->frame=1;text->assets=s->faces[0]->assets;SDL_AtomicIncRef(&text->assets->refs);
+    SBStatus status=sb_ok();
+    for(unsigned i=0;i<SB_TEXT_FACES && status.code==SB_OK;++i)if(s->faces[i]){
+        SBFontInstance *instance=NULL;status=sb_font_snapshot_open(s->faces[i],&instance);if(status.code!=SB_OK)break;
+        SBTextFace *f=&text->faces[i];*f=instance->face;f->owner=text;f->nk.handle.userdata=nk_handle_ptr(f);f->nk.handle.height=s->heights[i/8];f->nk.handle.width=width;
+        instance->face.font=NULL;for(unsigned j=0;j<SB_FALLBACK_COUNT;++j)instance->face.fallback[j]=NULL;sb_font_instance_free(instance);
+    }
+    if(status.code!=SB_OK){system_free(text);TTF_Quit();return status;}
+    ui->text=text;ui->scale=s->scale;ui->density=s->density;ui->font_epoch=1;
+    ui->normal=&text->faces[0].nk;ui->body=&text->faces[8].nk;ui->heading=&text->faces[16].nk;ui->code=&text->faces[24].nk;
+    return sb_ok();
+}
+unsigned sb_ui_font_token(SBUi *ui,const TTF_Font *font){
+    if(ui && ui->text && ui->text->owner==SDL_GetCurrentThreadID() && font)for(unsigned i=0;i<SB_TEXT_FACES;++i){SBTextFace *f=&ui->text->faces[i];if(f->font==font)return i*8;for(unsigned j=0;j<SB_FALLBACK_COUNT;++j)if(f->fallback[j]==font)return i*8+j+1;}return UINT_MAX;
+}
+static bool font_settings_match(TTF_Font *f,const SBFontSettings *expected){
+    if(!f || TTF_GetFontSize(f)!=expected->size || TTF_GetFontStyle(f)!=expected->style || TTF_GetFontHinting(f)!=expected->hinting || TTF_GetFontOutline(f)!=expected->outline || TTF_GetFontKerning(f)!=expected->kerning || TTF_GetFontSDF(f)!=expected->sdf)return false;
+    const char *language=sb_ttf_font_language(f);return (!language && !expected->language) || (language && expected->language && !strcmp(language,expected->language));
+}
+TTF_Font *sb_text_snapshot_bind(const SBTextSnapshot *s,SBUi *ui,unsigned token){
+    if(!s || !ui || s->scale!=ui->scale || s->density!=ui->density || token>=SB_TEXT_FACES*8)return NULL;unsigned face=token/8;
+    /* Validate all captured font generations before creating uncaptured styles. */
+    for(unsigned i=0;i<SB_TEXT_FACES;++i)if(s->faces[i])for(unsigned j=0;j<8;++j)if(!sb_font_snapshot_bind(s->faces[i],ui,j))return NULL;
+    if(s->faces[face])return sb_font_snapshot_bind(s->faces[face],ui,token%8);
+    if(!ui || !ui->text)return NULL;
+    const struct nk_user_font *base=&ui->text->faces[(face/8)*8].nk.handle;
+    sb_ui_text_style(ui,base,face%8);SBTextFace *f=&ui->text->faces[face];
+    unsigned slot=token%8,flags=face%8;const SBFontSnapshot *parent=s->faces[(face/8)*8];
+    SBFontSettings expected=(!slot && (flags&SB_TEXT_CODE)) ? s->faces[24]->settings[0] : parent->settings[slot];
+    if(!slot && (flags&SB_TEXT_CODE))expected.size=parent->settings[0].size;
+    expected.style=(flags&SB_TEXT_BOLD ? TTF_STYLE_BOLD : 0)|(flags&SB_TEXT_ITALIC ? TTF_STYLE_ITALIC : 0);
+    TTF_Font *font=slot ? f->fallback[slot-1] : f->font;return font_settings_match(font,&expected) ? font : NULL;
+}

@@ -1,8 +1,9 @@
 # Schriftbesitz für die Textvorbereitung
 
-Stand: 8. Oktober 2026, Unterbau ab 0.9.44. Der Prototyp wird noch nicht vom
-Dokumentwechsel aufgerufen. Er bereitet eine ungebrochene Zeile vor; vollständige
-Dokumentstruktur, Umbruch und sichtbare Ladezustände bleiben weitere Integration.
+Stand: 8. Oktober 2026, Unterbau ab 0.9.44, formatierter Umbruch ab 0.9.45.
+Der Prototyp wird noch nicht vom Dokumentwechsel aufgerufen. Er bereitet nun
+auch formatierte Texte mit Absätzen und Umbruch vor; vollständige
+Dokumentstruktur und sichtbare Ladezustände bleiben weitere Integration.
 [Gesamtvertrag](READER_VORBEREITUNG.md).
 
 ## Unveränderliche Ressourcen
@@ -53,6 +54,22 @@ Jobs deshalb zunächst zur nichtblockierenden Abschlussprüfung zurückstellen.
 
 ## Tatsächlicher Prüfweg und Grenzen
 
+Ab 0.9.45 erfasst ein Textsnapshot alle bereits vorhandenen Rollen/Stilfonts,
+ohne zuvor unbenutzte UI-Varianten zu erzeugen. Ein CPU-Kontext öffnet private
+Fonts auf seinem Thread, besitzt keine Fenster/Renderer und benutzt denselben
+Layoutalgorithmus wie die Leseansicht. Neue Stilvarianten entstehen dort aus
+den eigenen Basisfonts. Bei der UI-Bindung müssen nachträglich entstandene
+Stilfonts den erwarteten Parametern entsprechen; fremd veränderte Varianten
+werden nicht ungeprüft eingesetzt.
+
+Ein Layoutjob besitzt Quellenbytes und Stilspannen sowie Rolle, Breite,
+Innenabstände, Zeilenabstand, Abschlusszeilenregel und Dokumentkontext. Er liefert
+Zeilen, Quellenoffsets, Positionen und Gesamthöhe. Seine Fontkennungen werden
+einmalig an aktuelle UI-Fonts gebunden. Die Freigabe seiner Kennungsarrays bleibt
+auch nach Übertragen des Plans unabhängig vom Planbesitz. Abbruch wird zwischen
+Absätzen, in der Fontwahl und zwischen Umbruchzeilen berücksichtigt; einzelne
+Bibliotheksaufrufe können dennoch erst nach ihrer Rückkehr beendet werden.
+
 Der neue Prüfer vergleicht die vollständigen Glyphen-/Lauf-/Font-/Metrikwerte
 mit dem normalen UI-Plan bei 100/150/200 Prozent Schrift, Latein/Ligaturen/
 Akzenten, Hebräisch, Arabisch, Emoji und allen Stilvarianten. Spracheinstellung,
@@ -61,8 +78,8 @@ Abbruch, ungültiges UTF-8, Snapshotfreigabe und Schriftneuladen sind erfasst.
 Fremdthread-Erfassung/Bindung wird abgewiesen.
 
 Dieser Unterbau ist kein Nachweis eines flüssigen langen Dokumentwechsels.
-Es fehlen insbesondere eine begrenzte Jobverwaltung, vollständiger Umbruch mit
-mehreren Styles/Blöcken, Output-/Spitzen-Speicherabnahme großer Texte, nicht-
+Es fehlen insbesondere eine begrenzte Jobverwaltung, Dokumentblöcke/Tabellen
+mit ihren jeweiligen Breiten, Output-/Spitzen-Speicherabnahme großer Texte, nicht-
 blockierende Erholung/Shutdown und Integration in den sichtbaren Framepfad.
 Der Job akzeptiert höchstens die vorhandene Textgrenze; die Fontdaten-Grenze
 ist kein allgemeines 64-MiB-Limit aller Bibliotheks-/Glyphenallokationen.

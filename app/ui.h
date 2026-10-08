@@ -31,6 +31,7 @@ typedef struct SBEditNativeCache SBEditNativeCache;
 typedef struct {
     SBTextSystem *text;
     uint64_t font_epoch;
+    SDL_AtomicInt *layout_cancel; /* CPU preparation contexts only. */
     SBStyledCache *styled_cache;
     bool styled_cache_disabled;
     SDL_Window *window;
@@ -88,6 +89,12 @@ void sb_ui_text_aligned(struct nk_context *ctx,const char *text,size_t length,nk
 float sb_ui_wrap_height(struct nk_context *ctx,const struct nk_user_font *font,const char *text,size_t length,float width);
 /* Returned spans are owned by the caller; text remains borrowed. */
 bool sb_ui_styled_spans(const SBStyledText *text,SBTextSpan **spans,size_t *count);
+typedef struct {SBShapedLine shape;float y;size_t source_offset;} SBStyledLine;
+typedef struct {SBStyledLine *lines;size_t count,capacity;float height;} SBStyledPlan;
+/* Same CPU layout as rendering; no context/window/renderer is needed. */
+bool sb_ui_styled_plan(SBUi *ui,const struct nk_user_font *font,const SBStyledText *text,
+    float width,struct nk_vec2 padding,float gap,bool terminal_line,SBStyledPlan *out);
+void sb_ui_styled_plan_free(SBStyledPlan *plan);
 void sb_ui_styled_cache_clear(SBUi *ui);
 float sb_ui_styled_height(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,float width);
 void sb_ui_styled_draw(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text);

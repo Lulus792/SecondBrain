@@ -22,6 +22,14 @@ void sb_font_instance_free(SBFontInstance *instance);
 TTF_Font *sb_font_instance_select(SBFontInstance *instance,const char *text,size_t length,TTF_Font *previous);
 unsigned sb_font_instance_token(const SBFontInstance *instance,const TTF_Font *font);
 TTF_Font *sb_font_snapshot_bind(const SBFontSnapshot *snapshot,SBUi *ui,unsigned token);
+typedef struct SBTextSnapshot SBTextSnapshot;
+/* CPU-only context for the same layout code. Snapshot capture/binding on UI;
+   context creation/use/free on one worker thread, without window/renderer. */
+SBTextSnapshot *sb_ui_text_snapshot(SBUi *ui);
+void sb_text_snapshot_free(SBTextSnapshot *snapshot);
+SBStatus sb_text_snapshot_open(const SBTextSnapshot *snapshot,SBUi *context);
+unsigned sb_ui_font_token(SBUi *context,const TTF_Font *font);
+TTF_Font *sb_text_snapshot_bind(const SBTextSnapshot *snapshot,SBUi *ui,unsigned token);
 bool sb_ui_shaped_draw_canvas(SBUi *ui,struct nk_command_buffer *canvas,const SBShapedLine *line,float x,float baseline,struct nk_color color);
 bool sb_ui_shaped_draw(SBUi *ui,const SBShapedLine *line,float x,float baseline,struct nk_color color);
 #endif

@@ -100,3 +100,10 @@ Ressourcen, private Worker-Fonts, eigene Textkopie, Abbruch und geprüftes
 Übernehmen einer ungebrochenen Zeile. Der produktive Dokumentwechsel benutzt
 ihn noch nicht. Vollständiger Umbruch/Styles/Blöcke, begrenzte Jobverwaltung und
 sichtbare Integration bleiben der nächste Teil desselben Umsetzungsauftrags.
+
+Ab 0.9.45 bereitet ein CPU-Kontext zusätzlich formatierte Texte mit Umbruch,
+Graphemen, Bidi, Absätzen und Abschlusszeilen vor. Er teilt den Layoutalgorithmus
+mit der Leseansicht. Rolle/Breite/Abstände, exakte Stile und Fontzustand werden
+vor der Übernahme geprüft. Der produktive Dokumentwechsel ruft auch diesen
+erweiterten Prototyp noch nicht auf; Block-/Tabellenbreiten, Jobverwaltung,
+Speichergrenzen und sichtbare Integration bleiben offen.

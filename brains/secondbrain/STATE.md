@@ -55,9 +55,18 @@ weitere Zielplattformen bleiben offen.
 Der produktive Wechsel ist noch nicht angebunden; das Ergebnis ist bislang
 eine ungebrochene Zeile. SBUI-074 bleibt offen.
 
+## Formatierter Umbruch im Worker (0.9.45)
+
+Privater CPU-Textkontext teilt Absatz-/Graphem-/Bidi-/Font-/Umbruchalgorithmus
+mit der UI. Fertige Pläne tragen gleiche Glyphen, Zeilen, Offsets und Höhen.
+981 neue Parameter-/Stil-/Abbruch-/Epochprüfungen,69/69 lokale Release-Prüfungen
+(530,96s) und981/405/13.708/590 unter ASan/UBSan bestehen. Scope/Hashes in STATUS.
+Build ohne Tests besteht. [Vertrag](../../docs/FONT_SNAPSHOTS.md).
+Paket/Zielplattformen folgen; der sichtbare Dokumentwechsel ist nicht angebunden.
+
 ## Nächste Arbeiten
 
-Vorbereitung auf vollständigen Umbruch/Styles/Blöcke erweitern, Job-/Output-/
+Vorbereitung auf Dokumentblöcke/Tabellen erweitern, Job-/Output-/
 Speichergrenzen und nichtblockierende Retireverwaltung prüfen und in den langen
 Wechsel integrieren. Native Zeichenrechtecke für weitere
 Felder und Leseblöcke integrieren.

@@ -1,8 +1,8 @@
 /* Shared paragraph analysis, logical wrapping and actual glyph geometry. */
 #include "scripts.h"
 #include <SDL3_ttf/SDL_ttf.h>
-typedef struct {SBShapedLine shape;float y;size_t source_offset;} StyledLine;
-typedef struct {StyledLine *lines;size_t count,capacity;float height;} StyledPlan;
+typedef SBStyledLine StyledLine;
+typedef SBStyledPlan StyledPlan;
 static void styled_plan_free(StyledPlan *plan){for(size_t i=0;i<plan->count;++i)sb_shape_line_free(&plan->lines[i].shape);free(plan->lines);memset(plan,0,sizeof(*plan));}
 static bool styled_line_add(StyledPlan *plan,SBShapedLine *line,SBUi *ui,const struct nk_user_font *base,float gap) {
     if(plan->count==plan->capacity){size_t next=plan->capacity ? plan->capacity*2 : 16;StyledLine *grown=realloc(plan->lines,next*sizeof(*grown));if(!grown)return false;plan->lines=grown;plan->capacity=next;}
@@ -47,6 +47,7 @@ static bool styled_fonts(SBUi *ui,const struct nk_user_font *base,const SBStyled
     while(style<text->count && text->spans[style].offset+text->spans[style].length<=start)++style;
     SBGrapheme reader={.text=text->text+start,.length=length};SBGraphemeBoundary b;sb_grapheme_next(&reader,&b);
     while(sb_grapheme_next(&reader,&b)) {
+        if(ui->layout_cancel && SDL_GetAtomicInt(ui->layout_cancel)){free(fonts);sb_script_plan_free(&scripts);return false;}
         while(style<text->count && text->spans[style].offset+text->spans[style].length<=start+previous)++style;
         while(script+1<scripts.count && scripts.spans[script].byte+scripts.spans[script].length<=previous)++script;
         const struct nk_user_font *face=sb_ui_text_style(ui,base,style<text->count ? text->spans[style].style : 0);
@@ -86,6 +87,7 @@ static bool styled_paragraph(SBUi *ui,const struct nk_user_font *base,const SBSt
     }
     size_t begin=0;
     while(success && begin<terminal) {
+        if(ui->layout_cancel && SDL_GetAtomicInt(ui->layout_cancel)){success=false;break;}
         size_t low=begin+1,high=low;SBShapedLine trial={0};
         if(prefix){size_t lo=begin+1,hi=terminal+1;
             while(lo<hi){size_t mid=lo+(hi-lo)/2;if(prefix[mid]-prefix[begin]<=available)lo=mid+1;else hi=mid;}
@@ -120,12 +122,17 @@ static bool styled_paragraph(SBUi *ui,const struct nk_user_font *base,const SBSt
 static bool styled_build(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,float width,struct nk_vec2 padding,float gap,bool terminal_line,StyledPlan *plan) {
     SBStyledText display={.text=text->text};if(!sb_ui_styled_spans(text,&display.spans,&display.count))return false;
     size_t length=strlen(text->text),start=0;bool ok=true;float available=fmaxf(1,width-2*padding.x);
-    while(start<length && ok){size_t end=styled_paragraph_end(text->text,start,length);ok=styled_paragraph(ui,base,&display,start,end-start,available,gap,plan);start=end;}
+    while(start<length && ok){if(ui->layout_cancel && SDL_GetAtomicInt(ui->layout_cancel)){ok=false;break;}size_t end=styled_paragraph_end(text->text,start,length);ok=styled_paragraph(ui,base,&display,start,end-start,available,gap,plan);start=end;}
     const char *last=text->text+length;
     bool trailing=terminal_line && length && sb_bidi_separator(SDL_StepBackUTF8(text->text,&last));
     if(ok && (!length || trailing)){SBShapedLine empty={0};ok=styled_line_add(plan,&empty,ui,base,gap);if(ok)plan->lines[plan->count-1].source_offset=length;}
     free(display.spans);if(!ok){styled_plan_free(plan);return false;}plan->height+=2*padding.y;return true;
 }
+bool sb_ui_styled_plan(SBUi *ui,const struct nk_user_font *font,const SBStyledText *text,float width,struct nk_vec2 padding,float gap,bool terminal_line,SBStyledPlan *out){
+    if(!ui || !font || sb_ui_font_owner(font)!=ui || !text || !text->text || !out || out->lines || out->count || out->capacity || !isfinite(width) || width<=0 || !isfinite(padding.x) || !isfinite(padding.y) || padding.x<0 || padding.y<0 || !isfinite(gap) || gap<0)return false;
+    return styled_build(ui,font,text,width,padding,gap,terminal_line,out);
+}
+void sb_ui_styled_plan_free(SBStyledPlan *plan){if(plan)styled_plan_free(plan);}
 #define SB_STYLED_SETS 512
 #define SB_STYLED_WAYS 4
 #define SB_STYLED_BYTES (32u*1024u*1024u)
