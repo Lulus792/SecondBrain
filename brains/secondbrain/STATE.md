@@ -12,11 +12,11 @@ Lumen-Sternkarte, Glaskarten/Icons, direkte Pfeilnavigation, Kamerafahrt,
 weiches Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert: **0.9.33, Build d48ee9bf7075**, Intel/macOS Release.
+Installiert: **0.9.34, Build 4eda9dbfce37**, Intel/macOS Release.
 Entpacktes Paket besteht mit 126/157/75 Assertions, zwei Prozessneustarts,
 Produktions-CLI und Runtime-Importprüfung. Lizenzbündel exakt, eigenes Gedächtnis
 beim Laden unverändert, installierte Ansicht betrachtet. Rückfallkopie:
-`/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.28-20261008-082929`.
+`/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.33-20261008-104353`.
 
 ## Geprüfte Fortschritte
 
@@ -69,7 +69,8 @@ Float-Bildpositionen erhalten Zwischenstände beim Scrollen. Lokal 56/56
 Release-Prüfungen, 105 gezielte ASan/UBSan-Reader-Assertions, frischer UI-Build
 mit BUILD_TESTING=OFF und 32/32 separat gebaute Kernprüfungen bestehen.
 SheenBidi-Lizenz ist in App und Paketen integriert. Neue Plattform-/Paketabnahme
-steht aus; installierter Build bleibt 0.9.33. Native Metal-Messung zeigt
+folgt gesondert für Windows/Linux/Apple Silicon; Intel-Mac-Paket und
+Installation 0.9.34 bestehen. Native Metal-Messung zeigt
 Scroll-Median 1,87 ms und Wechsel-Median 14,03 ms; erster langer Wechsel
 bleibt mit 123,30 ms ein offener Ausreißer (zuvor 237,01 ms im neuen Plan). Details: STATUS/GLYPHENGEOMETRIE.
 
@@ -83,7 +84,7 @@ OS-Mindestversionen; vollständige SDK-/Systemruntime-Zuordnung.
 
 Nächster Textschritt: gemeinsame Glyphengeometrie auch für Editor, Suche,
 Formulare/einfache Labels, Cursor, Auswahl, IME und native Provider verwenden.
-Neue Reader-Plattform-/Paketabnahme prüfen.
+Neue Reader-CI 37751197759 prüfen; Intel-Mac-Paketabnahme besteht.
 
 Eigener Code MIT. Signaturkonten fehlen; vertraulicher Sicherheitskanal ist
 angefragt. Vollständiger Auftrag bleibt aktiv. **1.0 erst nach ausdrücklicher

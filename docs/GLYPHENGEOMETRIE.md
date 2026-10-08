@@ -5,7 +5,8 @@ Stand: 8. Oktober 2026. Der neue C-Plan verbindet die geprüfte
 gemeinsamer Grundlinie. Ab dem Entwicklungsschritt 0.9.34 benutzt die formatierte
 Leseansicht diesen Plan für Umbruch, Höhe und Rasterung. Editor, einfache
 Bedienelementtexte und native Textrechtecke benutzen ihn noch nicht.
-Die installierte App bleibt bis zur gesonderten Paketabnahme bei 0.9.33.
+Die installierte Intel-Mac-App 0.9.34 besteht die gesonderte Paketabnahme;
+neue native Plattformnachweise folgen in STATUS.
 
 ## Grundlage
 

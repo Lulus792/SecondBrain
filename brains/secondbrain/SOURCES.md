@@ -1,6 +1,6 @@
 # SecondBrain Quellen
 
-Zuletzt eingesehen: 7. Oktober 2026. Relative Verweise erwarten diese Instanz
+Zuletzt eingesehen: 8. Oktober 2026. Relative Verweise erwarten diese Instanz
 unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 
 ## Auftrag und Arbeitsweise

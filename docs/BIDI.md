@@ -2,7 +2,7 @@
 
 Stand: 8. Oktober 2026. Der C-Absatz-/Zeilenplan ist ab 0.9.34 mit der formatierten Leseansicht
 verbunden. Editor und native Zeichenrechtecke benötigen weiterhin die Integration. Die installierte
-App bleibt 0.9.33 / d48ee9bf7075. Dies ist ein Umsetzungsschritt für die offenen
+Intel-Mac-App ist nach Paketabnahme 0.9.34 / 4eda9dbfce37. Dies ist ein Umsetzungsschritt für die offenen
 Textaufgaben, kein Nachweis fertiger gemischter Schreibrichtungen in der App.
 
 ## Originale und Entscheidung

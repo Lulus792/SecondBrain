@@ -2,7 +2,7 @@
 
 Stand: 8. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.33. Die neue Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.34. Die neue Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -2519,3 +2519,22 @@ bleibt offen. Profile `build/reader-native-{baseline,detailed,final}.log`;
 der Prüfer zeigt nun auch die Kostenbestandteile seines langsamsten Frames.
 Eine reale Projektaufnahme mit der neuen Leseansicht wurde betrachtet;
 alle Dateien des eigenen Projektgedächtnisses blieben dabei bytegleich.
+
+## Paket und Installation der Reader-Integration
+
+0.9.34 / **4eda9dbfce37**, sauberer Intel/macOS-Release-Build: das frisch
+erstellte und unter einem Unicode-Pfad entpackte Paket besteht Runtime-Prüfung,
+126 Desktop-, 157 Tastatur- und 75 Sicherungs-Assertions, zwei isolierte
+Prozessneustarts und Produktions-CLI-Sicherung/Wiederherstellung. Beide
+SheenBidi-Lizenzen entsprechen dem festgelegten Originalhash. Archiv-SHA-256:
+`102ef29282b3f55b25dccdfa7eceac9a2afde64c6d8180d5a725874316b165c7`.
+
+Installiert unter `dist/SecondBrain`; sämtliche Dateien entsprechen dem
+geprüften Paket. Aufnahme der installierten Leseansicht betrachtet, Dateien
+des eigenen Projektgedächtnisses dabei unverändert. Rückfallkopie:
+`build/previous-dist-0.9.33-20261008-104353`. Dieser Nachweis ersetzt keine
+frische Maschine und keine menschliche native Eingabe-/Screenreader-Abnahme.
+Neue Plattformprüfung zu demselben Code:
+[CI 37751197759](https://github.com/Lulus792/SecondBrain/actions/runs/37751197759),
+noch nicht als vollständiger Erfolg abgenommen. 1.0 und die übrigen
+[Release-Aufgaben](RELEASE.md) bleiben offen.
