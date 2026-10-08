@@ -44,3 +44,5 @@ file(READ "${SB_C_SOURCE}/Cargo.lock" lock)
 string(REPLACE "name = \"accesskit_windows\"\nversion = \"0.35.1\"\nsource = \"registry+https://github.com/rust-lang/crates.io-index\"\nchecksum = \"ce63f35d6bdcf59f26b76b3379063f738e6412cef46999cc772d46aa3de35adb\"\n"
     "name = \"accesskit_windows\"\nversion = \"0.35.1\"\n" lock "${lock}")
 file(WRITE "${SB_C_SOURCE}/Cargo.lock" "${lock}")
+
+include("${CMAKE_CURRENT_LIST_DIR}/PrepareAccessKitWindowsTable.cmake")

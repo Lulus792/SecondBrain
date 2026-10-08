@@ -2340,3 +2340,14 @@ nach tatsächlichem Abschluss.
 zu 7f5b634 besteht in allen 20 Jobs, ausdrücklich einschließlich vier
 entpackter Pakete unter Windows x64, Linux x64 und macOS Intel/ARM64.
 Menschliche Screenreader-/Geräteabnahme bleibt getrennt offen.
+
+## Windows-Tabellenmatrix in 0.9.29
+
+Grid/GridItem und Table/TableItem sind in den festgelegten UI-Adapter
+integriert. Offizieller Windows-Zielcheck mit unverändertem Lockfile besteht
+(29,71 Sekunden erster, 1,26 Sekunden abschließender Lauf). Hashgebundene
+Quellvorbereitung, Idempotenz und unbekannte Quellen sind nachgeprüft.
+Vier lokale Mac-Release-Nachprüfungen bestehen (63,78 Sekunden); diese
+belegen keine Windows-Ausführung. Native Windows-Matrixabnahme folgt.
+Installiert bleibt das vollständig abgenommene 0.9.28-Paket.
+[Vertrag und Originalquellen](TABELLEN.md).

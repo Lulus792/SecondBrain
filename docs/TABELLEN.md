@@ -115,3 +115,38 @@ dem nativen Baum und prüft ungültige Indizes. Die Vorprüfung am alten
 Getter scheiterte an der Zeilenzahl. Windows UIA Grid/Table und Linux
 AT-SPI Table/TableCell bleiben offen; dies ist kein VoiceOver-Nutzertest.
 Primärvertrag: [Apple NSAccessibilityProtocol](https://developer.apple.com/documentation/appkit/nsaccessibilityprotocol/accessibilitycell(forcolumn:row:)).
+
+## Windows-Matrix, Entwicklungsschritt 0.9.29
+
+Die eigene UI-Ergänzung im festgelegten AccessKit-Windows-Adapter stellt
+Grid/GridItem sowie Table/TableItem bereit. Nullbasierte logische Indizes,
+Spannen, Tabellenbezug und Spalten-/Zeilenheader verwenden die von C
+veröffentlichten Metadaten. Leere und außerhalb des Ausschnitts liegende
+Zellen bleiben abfragbar; ungültige Indizes werden abgewiesen. Die Methoden
+verwenden die bestehenden Kontext-/Baumprüfungen, keine separate Kopie der
+fachlichen Daten. Dimensionen und Zellindizes sind in die vorhandenen
+UIA-Eigenschaftsänderungen eingebunden. Markdown-Dateien bleiben unverändert.
+
+Vor Umsetzung erneut gelesen: Microsoft
+[Grid](https://learn.microsoft.com/en-us/windows/win32/winauto/uiauto-implementinggrid),
+[GridItem](https://learn.microsoft.com/en-us/windows/win32/winauto/uiauto-implementinggriditem),
+[Table](https://learn.microsoft.com/en-us/windows/win32/winauto/uiauto-implementingtable) und
+[TableItem](https://learn.microsoft.com/en-us/windows/win32/winauto/uiauto-implementingtableitem).
+Die Rust-Ergänzung liegt ausschließlich in der erlaubten UI-Bibliothek;
+Anwendung und fachlicher Kern bleiben C17. Originale Lizenzen und Cargo-
+Paketversionen werden erhalten.
+
+Original node.rs-SHA256: `160ff7058edfcb84b8651d4f0111e8839cd1e63c2f08bb309ef65c9e028efb67`.
+Vorbereitete node.rs-SHA256: `3368a6cdfec3e48784404e37604c295a3ba239e8f16e8e358ce24023bebed877`.
+Vorbereitung, unveränderte Wiederholung und Abweisung einer unbekannten
+Quelle ohne Änderung ihrer Bytes sind lokal geprüft.
+
+Die native Windows-Prüfung verlangt die Matrix jetzt verbindlich. Sie
+vergleicht alle zwölf Zellen einer 4×3-Tabelle mit dem nativen Baum,
+Koordinaten/Spannen, Tabellenidentität, drei echte Headerbeziehungen und
+ungültige Indizes; danach erneut in schmaler Ansicht bei 200 Prozent Schrift.
+Der bisher erfolgreiche reine Baumtest kann diese Prüfung nicht ersetzen.
+Lokale Prüfung für das Windows-Ziel mit offizieller Rust-Toolchain und
+festem Lockfile besteht; tatsächlicher Windows-Build und Ausführung folgen
+über die native CI. AT-SPI-Matrix und menschliche Screenreader-Bedienung
+bleiben offene Release-Arbeit.

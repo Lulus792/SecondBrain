@@ -74,7 +74,8 @@ Sanitizer bestehen mit 135/124/36 Assertions. Paket vollständig geprüft und
 installiert; [CI 37730572189](https://github.com/Lulus792/SecondBrain/actions/runs/37730572189)
 läuft. Neue Plattformnachweise erst nach Abschluss.
 
-Nächster Schritt: 0.9.28-CI auswerten; weitere Release-Arbeiten fortsetzen.
+Nächster Schritt: native Windows-Matrixabnahme für 0.9.29; anschließend
+AT-SPI-Tabellenmatrix und weitere Release-Arbeiten.
 Weitere Release-Arbeiten: Bidi/visuelle Textgeometrie/IME, native
 Tabellenmatrix, Screenreader-/Dialog-/Geräte-/Langzeitabnahmen, volle Windows-/
 Linux-Zielvolumes und physische Persistenz. Originalverträge stehen in SOURCES.
@@ -88,3 +89,9 @@ abschließende Produkttext-Bereinigung nach den festgelegten Voraussetzungen.
 zu 7f5b634 besteht in allen 20 Jobs, ausdrücklich einschließlich vier
 entpackter Pakete unter Windows x64, Linux x64 und macOS Intel/ARM64.
 Menschliche Screenreader-/Geräteabnahme bleibt getrennt offen.
+
+0.9.29 ergänzt Windows Grid/GridItem und Table/TableItem ohne neue Cargo-
+Abhängigkeiten. Feste Quellvorbereitung mit Hashschutz ist geprüft; offizielle
+Prüfung für Windows-Ziel und Lockfile besteht. Native C-Prüfung kontrolliert
+Zellidentität, Header, Leerzellen, Indizes und schmale 200%-Ansicht.
+Tatsächlicher Windows-Build/Ausführung folgen; installiert bleibt 0.9.28.

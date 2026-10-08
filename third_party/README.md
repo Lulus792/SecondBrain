@@ -226,3 +226,9 @@ Die [Rust-Laufzeitsammlung](../docs/RUST_RUNTIME_NACHWEIS.md) ergänzt ab 0.9.22
 der beiden geprüften Compilerstände. Original-Archive und einzelne Payloads
 sind durch Hashes zugeordnet. Abweichende Toolchains und die vollständige
 Zuordnung tatsächlich gelinkter SDK-/Systemanteile bleiben offen.
+
+Die eigene Windows-UI-Ergänzung für native Tabellen liegt in
+`ui/accesskit_windows_table.rs` und `ui/accesskit_windows_table_patterns.rs`.
+Sie steht unter der eigenen MIT-Lizenz, ergänzt ausschließlich den
+festgelegten UI-Adapter und erhält dessen Original-Lizenzen und Lockfile.
+Vorbereitung und Prüfvertrag: [Tabellen](../docs/TABELLEN.md).

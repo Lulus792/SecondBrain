@@ -69,6 +69,89 @@ static wchar_t *wide(const char *s) {
     if (p && !MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,s,-1,p,count)) { free(p); return NULL; }
     return p;
 }
+static int table_array_length(IUIAutomationElementArray *array) {
+    int length=0;
+    return !array ? 0 : SUCCEEDED(IUIAutomationElementArray_get_Length(array,&length)) ? length : -1;
+}
+static bool table_same(IUIAutomation *client,IUIAutomationElement *a,IUIAutomationElement *b) {
+    BOOL equal=FALSE;
+    return a && b && SUCCEEDED(IUIAutomation_CompareElements(client,a,b,&equal)) && equal;
+}
+static bool table_matrix(IUIAutomation *client,IUIAutomationElement *table,char *out,size_t capacity) {
+    IUIAutomationGridPattern *grid=NULL; IUIAutomationTablePattern *pattern=NULL;
+    IUIAutomationCondition *all=NULL; IUIAutomationElementArray *tree_rows=NULL,*headers=NULL,*row_headers=NULL;
+    int rows=0,columns=0; enum RowOrColumnMajor major=RowOrColumnMajor_Indeterminate;
+    bool success=false;
+    HRESULT hr=IUIAutomationElement_GetCurrentPatternAs(table,UIA_GridPatternId,&IID_IUIAutomationGridPattern,(void **)&grid);
+    if(FAILED(hr) || !grid)goto done;
+    hr=IUIAutomationElement_GetCurrentPatternAs(table,UIA_TablePatternId,&IID_IUIAutomationTablePattern,(void **)&pattern);
+    if(FAILED(hr) || !pattern)goto done;
+    if(FAILED(IUIAutomationGridPattern_get_CurrentRowCount(grid,&rows)) || FAILED(IUIAutomationGridPattern_get_CurrentColumnCount(grid,&columns)) || rows<1 || rows>65536 || columns<1 || columns>64)goto done;
+    if(FAILED(IUIAutomationTablePattern_get_CurrentRowOrColumnMajor(pattern,&major)) || major!=RowOrColumnMajor_RowMajor)goto done;
+    if(FAILED(IUIAutomationTablePattern_GetCurrentColumnHeaders(pattern,&headers)) || table_array_length(headers)!=columns)goto done;
+    if(FAILED(IUIAutomationTablePattern_GetCurrentRowHeaders(pattern,&row_headers)) || table_array_length(row_headers)!=0)goto done;
+    if(FAILED(IUIAutomation_CreateTrueCondition(client,&all)))goto done;
+    if(FAILED(IUIAutomationElement_FindAll(table,TreeScope_Children,all,&tree_rows)) || table_array_length(tree_rows)!=rows)goto done;
+    for(int r=0;r<rows;++r) {
+        IUIAutomationElement *row=NULL; IUIAutomationElementArray *tree_cells=NULL;
+        hr=IUIAutomationElementArray_GetElement(tree_rows,r,&row);
+        if(SUCCEEDED(hr))hr=IUIAutomationElement_FindAll(row,TreeScope_Children,all,&tree_cells);
+        bool valid=SUCCEEDED(hr) && table_array_length(tree_cells)==columns;
+        for(int c=0;valid && c<columns;++c) {
+            IUIAutomationElement *cell=NULL,*tree_cell=NULL,*owner=NULL,*header=NULL,*associated=NULL;
+            IUIAutomationGridItemPattern *item=NULL; IUIAutomationTableItemPattern *table_item=NULL;
+            IUIAutomationElementArray *cell_headers=NULL,*cell_rows=NULL;
+            int item_row=-1,item_column=-1,row_span=0,column_span=0;
+            hr=IUIAutomationGridPattern_GetItem(grid,r,c,&cell);
+            if(SUCCEEDED(hr))hr=IUIAutomationElementArray_GetElement(tree_cells,c,&tree_cell);
+            valid=SUCCEEDED(hr) && table_same(client,cell,tree_cell);
+            if(valid)hr=IUIAutomationElement_GetCurrentPatternAs(cell,UIA_GridItemPatternId,&IID_IUIAutomationGridItemPattern,(void **)&item);
+            valid=valid && SUCCEEDED(hr) && item;
+            if(valid)valid=SUCCEEDED(IUIAutomationGridItemPattern_get_CurrentRow(item,&item_row)) && SUCCEEDED(IUIAutomationGridItemPattern_get_CurrentColumn(item,&item_column)) &&
+                SUCCEEDED(IUIAutomationGridItemPattern_get_CurrentRowSpan(item,&row_span)) && SUCCEEDED(IUIAutomationGridItemPattern_get_CurrentColumnSpan(item,&column_span)) &&
+                item_row==r && item_column==c && row_span==1 && column_span==1 && SUCCEEDED(IUIAutomationGridItemPattern_get_CurrentContainingGrid(item,&owner)) && table_same(client,owner,table);
+            if(valid)hr=IUIAutomationElement_GetCurrentPatternAs(cell,UIA_TableItemPatternId,&IID_IUIAutomationTableItemPattern,(void **)&table_item);
+            valid=valid && SUCCEEDED(hr) && table_item;
+            if(valid)valid=SUCCEEDED(IUIAutomationTableItemPattern_GetCurrentColumnHeaderItems(table_item,&cell_headers)) && table_array_length(cell_headers)==1 &&
+                SUCCEEDED(IUIAutomationElementArray_GetElement(cell_headers,0,&associated)) && SUCCEEDED(IUIAutomationElementArray_GetElement(headers,c,&header)) && table_same(client,associated,header);
+            if(valid && r==0)valid=table_same(client,header,tree_cell);
+            if(valid)valid=SUCCEEDED(IUIAutomationTableItemPattern_GetCurrentRowHeaderItems(table_item,&cell_rows)) && table_array_length(cell_rows)==0;
+            if(!valid)fprintf(stderr,"Windows table cell failed at %d,%d: hr=0x%08lx, coordinates=%d,%d, span=%d,%d, headers=%d\n",r,c,(unsigned long)hr,item_row,item_column,row_span,column_span,table_array_length(cell_headers));
+            if(cell_rows)IUIAutomationElementArray_Release(cell_rows);
+            if(cell_headers)IUIAutomationElementArray_Release(cell_headers);
+            if(table_item)IUIAutomationTableItemPattern_Release(table_item);
+            if(item)IUIAutomationGridItemPattern_Release(item);
+            if(associated)IUIAutomationElement_Release(associated);
+            if(header)IUIAutomationElement_Release(header);
+            if(owner)IUIAutomationElement_Release(owner);
+            if(tree_cell)IUIAutomationElement_Release(tree_cell);
+            if(cell)IUIAutomationElement_Release(cell);
+        }
+        if(tree_cells)IUIAutomationElementArray_Release(tree_cells);
+        if(row)IUIAutomationElement_Release(row);
+        if(!valid)goto done;
+    }
+    const int invalid_rows[]={-1,rows,0,0},invalid_columns[]={0,0,-1,columns};
+    for(unsigned i=0;i<4;++i) {
+        IUIAutomationElement *invalid=NULL;
+        hr=IUIAutomationGridPattern_GetItem(grid,invalid_rows[i],invalid_columns[i],&invalid);
+        bool valid=hr==E_INVALIDARG && !invalid;
+        if(invalid)IUIAutomationElement_Release(invalid);
+        if(!valid)goto done;
+    }
+    if(capacity)snprintf(out,capacity,"%d:%d:%d:%d",rows,columns,rows*columns,columns);
+    success=true;
+done:
+    if(!success)fprintf(stderr,"Windows table matrix failed: rows=%d columns=%d headers=%d row-headers=%d hr=0x%08lx\n",rows,columns,table_array_length(headers),table_array_length(row_headers),(unsigned long)hr);
+    if(row_headers)IUIAutomationElementArray_Release(row_headers);
+    if(headers)IUIAutomationElementArray_Release(headers);
+    if(tree_rows)IUIAutomationElementArray_Release(tree_rows);
+    if(all)IUIAutomationCondition_Release(all);
+    if(pattern)IUIAutomationTablePattern_Release(pattern);
+    if(grid)IUIAutomationGridPattern_Release(grid);
+    return success;
+}
+
 static bool query(Probe *p) {
     if (FAILED(CoInitializeEx(NULL,COINIT_MULTITHREADED))) return false;
     IUIAutomation *client=NULL; IUIAutomationElement *root=NULL,*element=NULL;
@@ -113,6 +196,8 @@ static bool query(Probe *p) {
         }
         if (rows) IUIAutomationElementArray_Release(rows);
         if (all) IUIAutomationCondition_Release(all);
+    } else if (p->operation==SB_NATIVE_READ_TABLE_MATRIX) {
+        success=table_matrix(client,element,p->output,p->capacity);
     } else if (p->operation==SB_NATIVE_READ_TABLE_SIZE) {
         IUIAutomationGridPattern *pattern=NULL; int rows=0,columns=0;
         hr=IUIAutomationElement_GetCurrentPatternAs(element,UIA_GridPatternId,&IID_IUIAutomationGridPattern,(void **)&pattern);
