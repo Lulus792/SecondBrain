@@ -3062,3 +3062,29 @@ der kalte lange Dokumentwechsel bleiben offen. Paket und neue Plattform-
 prüfung folgen; installiert bleibt zunächst 0.9.41. Vorherige CI37804528961
 zu e6739d7 am 8. Oktober erneut über GitHub API als queued bestätigt.
 Vollständiger Release-Auftrag aktiv; 1.0 nur nach ausdrücklicher Freigabe.
+
+## Geprüftes Geometriepaket 0.9.42 installiert
+
+Sauberer Intel/macOS-Release-Build **0.9.42 / 53a96c0a3fb7**. Das entpackte
+Paket besteht 126 Desktop-, 158 Tastatur- und 75 Sicherungs-Assertions,
+zwei isolierte Neustarts und die produktive CLI-Sicherung/Wiederherstellung
+mit Unicode-Pfaden. Runtime-/Lizenz-/Versionsprüfung besteht.
+Protokoll: `build/native-geometry-package-check.log`. Archiv:
+`build/native-geometry-release-package/SecondBrain-0.9.42-Darwin-x86_64.tar.gz`,
+SHA-256 `87364aa9ca277b2bc8ad27e2fe91c4300bd5b74e76c9ada91463794458da190d`.
+
+Alle 94 installierten Dateien entsprechen bytegleich dem geprüften Paket.
+Vorige 0.9.41 erhalten unter `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.41-20261008-183748`.
+Eigene Instanz mit installierter App geladen und Ansicht betrachtet;
+Gedächtnisdateien unverändert. Nachweise: `build/native-geometry-install-proof.json`,
+`build/native-geometry-installed-brain.png`. Weitere 69 ältere abgeschlossene
+generierte BMPs nach entpacktem SHA-256/Dateistatistik-Abgleich verlustfrei
+komprimiert; 1.214.588.391 Bytes freigegeben. Manifest:
+`build/native-geometry-completed-bitmap-archive-3.json`.
+
+53a96c0 normal nach origin gepusht. Neue
+[CI 37809561484](https://github.com/Lulus792/SecondBrain/actions/runs/37809561484)
+zuletzt queued; kein neuer Gesamt-Plattformnachweis für diesen Quellstand.
+Weitere native Geometrie-/Cacheintegration, kaltes langes Layout und echte
+assistive/IME-/HiDPI-/Geräteabnahmen sowie die übrige Release-Liste bleiben
+offen. Vollständiger Auftrag aktiv; 1.0 nur nach Nutzerfreigabe.

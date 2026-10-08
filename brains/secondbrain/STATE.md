@@ -12,9 +12,9 @@ Lumen-Sternkarte, Glaskarten/Icons, direkte Pfeilnavigation, Kamerafahrt,
 weiches Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert: **0.9.41 / e6739d7916d9**, sauberer Intel/macOS-Release-Build.
-94 Dateien entsprechen dem geprüften entpackten Paket. Vorherige Version 0.9.40:
-`/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.40-20261008-175850`.
+Installiert: **0.9.42 / 53a96c0a3fb7**, sauberer Intel/macOS-Release-Build.
+94 Dateien entsprechen dem geprüften entpackten Paket. Vorherige Version 0.9.41:
+`/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.41-20261008-183748`.
 Installierte Ansicht betrachtet; Laden verändert keine Gedächtnisdatei.
 
 ## Geprüfter aktueller Fortschritt
@@ -100,7 +100,9 @@ in der nativen Abbildung ist durch die Fenstertransformation korrigiert.
 590 Adapter-/Providerprüfungen bestehen, dieselben drei Prüfer auch unter
 haltendem ASan/UBSan. Build ohne Tests besteht.
 [Vertrag](../../docs/NATIVE_TEXTGEOMETRIE.md), Scope und Nachweise in STATUS.
-Paket/neue Zielplattformprüfung folgen; installiert bleibt vorerst 0.9.41.
+Intel/macOS-Paket und Installation bestehen: 126 Desktop-, 158 Tastatur-,
+75 Sicherungs-Assertions, zwei Neustarts sowie CLI-/Runtime-/Lizenzprüfungen.
+Neue CI37809561484 zu53a96c0 zuletzt queued; weitere Zielplattformen offen.
 Andere Felder/Leseansicht und Metadaten-Wiederverwendung bleiben weitere
 Integrationen. Reale assistive/IME-/HiDPI-Abnahme bleibt offen.
 
