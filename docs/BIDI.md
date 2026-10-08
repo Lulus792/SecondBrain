@@ -92,6 +92,17 @@ Windows-/Linux-Nachweise dieses neuen Schritts folgen erst nach tatsächlichen
 CI-Läufen. BidiCharacterTest prüft L3/L4 und P1 ausdrücklich nicht; eigene
 CRLF-/Spiegelprüfungen ergänzen einen Teil dieser Lücke.
 
+[Lauf 37740652510](https://github.com/Lulus792/SecondBrain/actions/runs/37740652510)
+bestätigt die neue Prüfung in Linux Debug/Release und macOS ARM Debug/Release
+sowie Intel Release. Die drei entsprechenden entpackten Release-Pakete
+bestehen. Windows erreicht wegen umgewandelter Repository-Zeilenenden die
+neue Tabellen-Hashprüfung nicht erfolgreich; dies ist ein Configure-Fehler,
+kein bestandener Windows-Layouttest. Explizite Git-Dateiregeln erhalten jetzt
+die LF-Ausgabe der erzeugten C-Tabellen und die Originalbytes der Unicode-
+Dateien. Tatsächlich ausgeführte Git-Checkoutfilter mit `core.autocrlf=true`
+bestätigen alle zwölf Eingabe-/Tabellenhashes. Native Windows-Abnahme folgt
+mit dem korrigierten Quellstand.
+
 ## Verbleibende Integration
 
 Die gemeinsame Absatzanalyse muss vor Schrift-, Script- und Stilaufteilung

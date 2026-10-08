@@ -25,6 +25,10 @@ beim Laden unverändert, installierte Ansicht betrachtet. Rückfallkopie:
   dokumentierten Teilscope und bytegenaue Neugenerierung ebenfalls.
   32/32 Kernprüfungen ohne UI bestehen. Noch nicht an die sichtbare App
   angeschlossen; [Vertrag/Nachweise](../../docs/BIDI.md).
+- Erste neue CI bestätigt Linux Debug/Release sowie Mac ARM Debug/Release
+  und Intel Release. Windows scheitert noch beim Checkout-abhängigen C-Tabellen-
+  Hash. Explizite LF-/Originalbyte-Regeln und zwölf Git-Checkoutfilter-Hashes
+  mit Windows-autocrlf sind geprüft; native Nachprüfung folgt.
 - Erneute gezielte macOS-Release-Nachprüfung des Nutzerfeedbacks:
   135 Bewegungs-/Layout- und 144 Navigations-Assertions, darunter alle vier
   vorherigen Listen-/Leseansichten nach Leerung, erneutem Tippen und Escape.
