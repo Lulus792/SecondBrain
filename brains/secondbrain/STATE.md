@@ -1,3 +1,5 @@
+# SecondBrain: aktueller Stand
+
 Stand: 8. Oktober 2026. Maßgebliche Originale: [STATUS](../../docs/STATUS.md),
 [Release-Liste](../../docs/RELEASE.md), [Quellen](SOURCES.md).
 Frühere Fortschritte und Abnahmen: [Journal](journal/2026-10-08.md).
@@ -10,12 +12,12 @@ Lumen-Sternkarte, Glaskarten/Icons, direkte Pfeilnavigation, Kamerafahrt,
 weiches Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert: **0.9.42 / 53a96c0a3fb7**, sauberer Intel/macOS-Release-Build.
+Installiert: **0.9.43 / fe2436a7e57a**, sauberer Intel/macOS-Release-Build.
 94 Dateien entsprechen dem geprüften Paket, Gedächtnis beim Laden unverändert.
-Vorige 0.9.41: `build/previous-dist-0.9.41-20261008-183748`.
+Vorige 0.9.42: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.42-20261008-190720`.
 Paketprüfung: 126 Desktop-, 158 Tastatur-, 75 Sicherungs-Assertions, zwei
 Neustarts, produktive CLI sowie Runtime-/Lizenz-/Version.
-CI37809561484 zu53a96c0 zuletzt queued; kein neuer Gesamt-Plattformnachweis.
+CI37813553485 zufe2436a zuletzt queued; kein neuer Gesamt-Plattformnachweis.
 
 ## Aktueller geprüfter Fortschritt (0.9.43)
 
@@ -29,7 +31,8 @@ Text- und 590 Providerprüfungen bestehen, dieselben drei Prüfer auch unter
 haltendem ASan/UBSan. Scope/Hashnachweise in STATUS. Build ohne Tests besteht.
 Vier abwechselnde lokale Profilpaare: nativer Export des vorbereiteten
 67-KB-Editors 34,53→6,71ms; keine allgemeine Bildraten-/Kaltlayout-Abnahme.
-Neues Paket und Zielplattformprüfungen folgen; installiert vorerst0.9.42.
+Sauberes Intel/macOS-Paket und Installation bestehen; neue Zielplattformprüfungen
+bleiben offen. Die oben genannten Paketprüfungen gehören zu0.9.43.
 
 ## Nächste Arbeiten
 

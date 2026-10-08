@@ -3138,3 +3138,27 @@ Native Geometrie anderer Felder/Leseblöcke, Exporte über der Cachegrenze,
 kaltes langes Layout, reale Eingabe-/assistive-/Geräte-/HiDPI-Abnahme und
 übrige Release-Liste bleiben offen. Vollständiger Auftrag aktiv; 1.0 nur
 nach ausdrücklicher Nutzerfreigabe.
+
+## Geprüftes Wiederverwendungspaket 0.9.43 installiert
+
+Sauberer Intel/macOS-Release-Build **0.9.43 / fe2436a7e57a**. Das entpackte
+Paket besteht 126 Desktop-, 158 Tastatur- und 75 Sicherungs-Assertions,
+zwei isolierte Neustarts, produktive CLI-Sicherung/Wiederherstellung mit
+Unicode-Pfaden und Runtime-/Lizenz-/Versionsprüfung.
+Protokoll: `build/native-memo-package-check.log`. Archiv:
+`build/native-memo-release-package/SecondBrain-0.9.43-Darwin-x86_64.tar.gz`,
+SHA-256 `49fe2d74d55ff2f2546c0d26b829acbc3c6b6b0414720653174e3d0147d2bd3e`.
+
+Alle 94 installierten Dateien entsprechen bytegleich dem geprüften Paket.
+Vorige 0.9.42 erhalten unter `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.42-20261008-190720`.
+Eigene Instanz mit installierter App geladen, Ansicht betrachtet, Gedächtnis
+beim Laden unverändert. Nachweise: `build/native-memo-install-proof.json`,
+`build/native-memo-installed-brain.png`. Beim Verdichten des Projektstands
+versehentlich entfernten ursprünglichen Dokumenttitel wiederhergestellt.
+
+fe2436a normal nach origin gepusht. Neue
+[CI37813553485](https://github.com/Lulus792/SecondBrain/actions/runs/37813553485)
+zuletzt queued; kein neuer Gesamt-Plattformnachweis für diesen Quellstand.
+Weitere Felder/Leseblöcke, kalter langer Wechsel, große Exporte, reale
+assistive/IME-/Geräteabnahme und übrige Release-Liste bleiben offen.
+Vollständiger Auftrag aktiv; 1.0 nur nach ausdrücklicher Nutzerfreigabe.
