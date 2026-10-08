@@ -866,3 +866,12 @@ Debug/Release, C17 und Python. Alle vier Release-Pakete sind entpackt geprüft.
 Die Root-/Registry-/Quellhinweise der Rust-Laufzeit und die 24 Lizenzressourcen
 sind damit im automatisierten Umfang nachgeprüft. Die danach ergänzte native
 Importprüfung erhält ihren eigenen folgenden CI-Nachweis.
+
+## 0.9.23: Runtime-Prüfung auf allen Paketarchitekturen
+
+[CI 37704298271](https://github.com/Lulus792/SecondBrain/actions/runs/37704298271)
+zu 7f9acb8 besteht am 8. Oktober in allen 20 Jobs. Windows/Linux/macOS ARM64/
+Intel bestehen jeweils Desktop-Debug/Release; alle vier entpackten Release-
+Pakete bestehen mit der neuen Importprüfung. Die statische MSVC-CRT-Konfiguration
+besteht auch unter Windows-Release. C17- und Python-Matrix bestehen. Frische
+Nutzerrechner, Mindestversionen und menschliche Abnahmen bleiben offen.

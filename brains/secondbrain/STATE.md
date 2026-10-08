@@ -13,14 +13,14 @@ kopieren. Lumen-Sternkarte, Glaskarten/Icons, direkte Pfeilnavigation, Kamerafah
 weiches Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Entwürfe, Originalbytes und erkannte Konflikte bleiben geschützt.
 
-Dist enthält **0.9.22, Build 4e6f15c86d71**, Intel/macOS Release. Entpacktes Paket
+Dist enthält **0.9.23, Build 7f9acb87ea30**, Intel/macOS Release. Entpacktes Paket
 besteht mit 126 Desktop-, 157 Tastatur-, 75 Sicherungsassertions, zwei Neustarts
 und CLI. Alle drei Lizenzsammlungen stimmen bytegenau mit ihren Manifesten
 überein. Eigenes Gedächtnis geladen/Raster betrachtet, Dateien unverändert.
-Rückfallkopie: build/previous-dist-0.9.21-20261008-004632.
+Rückfallkopie: build/previous-dist-0.9.22-20261008-020609.
 
-[CI 37697739324](https://github.com/Lulus792/SecondBrain/actions/runs/37697739324)
-zu 4e6f15c besteht in allen 20 Jobs einschließlich acht Desktop-Varianten und
+[CI 37704298271](https://github.com/Lulus792/SecondBrain/actions/runs/37704298271)
+zu 7f9acb8 besteht in allen 20 Jobs einschließlich acht Desktop-Varianten und
 vier entpackter Release-Pakete. Frühere Windows-TEMP- und Kontrollpunkt-
 Synchronisationsfehler sind im tatsächlichen Umfang nachgeprüft.
 
@@ -28,9 +28,10 @@ Synchronisationsfehler sind im tatsächlichen Umfang nachgeprüft.
 
 [Runtime-Importprüfung](../../docs/PAKET_LAUFZEIT.md) ist am entpackten Paket
 angebunden. Echtes Shared-Library-Fixture erkennt eine entfernte Bibliothek;
-Mac-Paketprüfung samt Bedienabläufen besteht. 38 Python-Fälle bestehen mit
-explizitem Skip der lokalen Windows-Kategorieprobe. Neuer nativer Windows-/
-Linux-Scannerlauf folgt. Keine frische Nutzerrechner-/Mindestversionsabnahme
+Alle vier Release-Paketprüfungen bestehen. 39 Python-Fälle bestehen mit
+explizitem Skip der lokalen Windows-Kategorieprobe. Native Windows-CI bestätigt
+die statische MSVC-CRT der UI-DLL; Scanner stoppt an der OS-Systemgrenze und
+behält separate Redistributables sichtbar. Keine frische Nutzerrechner-/Mindestversionsabnahme
 allein aus Systempfaden, CI oder Binärmetadaten ableiten.
 
 [Rust-Quelleninventur](../../docs/RUST_RUNTIME_NACHWEIS.md) umfasst geprüfte
@@ -39,8 +40,8 @@ Windows/Linux-Cargo zeigen in der ausgeführten CI 1.98.1/48a229c. Vollständige
 Zuordnung tatsächlich gelinkter SDK-/Systemanteile und abweichender Toolchains
 bleibt offen; zusammengesetzte Lizenzbedingungen sind erhalten.
 
-Nächster Schritt: neue native Importberichte auswerten und nötigen Paketbedarf
-auflösen. Dann weitere Release-Arbeiten: Bidi/visuelle Textgeometrie/IME, native
+Nächster Schritt: Texteingabe und native IME-Positionierung prüfen/verbessern.
+Weitere Release-Arbeiten: Bidi/visuelle Textgeometrie/IME, native
 Tabellenmatrix, Screenreader-/Dialog-/Geräte-/Langzeitabnahmen, volle Windows-/
 Linux-Zielvolumes und physische Persistenz. Originalverträge stehen in SOURCES.
 Support/Beitragsregeln und Wartungsablauf sind veröffentlicht; vertraulicher
@@ -48,12 +49,3 @@ Sicherheitskanal ist angefragt. Eigener Code MIT, Signaturkonten fehlen.
 
 Der vollständige Auftrag bleibt aktiv. 1.0 erst nach ausdrücklicher Freigabe;
 abschließende Produkttext-Bereinigung nach den festgelegten Voraussetzungen.
-
-Neue CI b901333: Windows-App-Prüfungen bestehen, Release-Paketprüfung scheitert.
-Direkte Runtime-Fehlerannotation ergänzt/geprüft; aktuelle Ursache/Behebung
-und vollständiger Plattformnachweis bleiben ausstehend.
-
-0.9.23 vorbereitet: konkrete VCRUNTIME140-Abhängigkeit der UI-DLL aus CI
-e4feaf6. Statische MSVC-CRT und korrekte OS-Rekursionsgrenze implementiert;
-32 Kern-/39 Python-Fälle lokal geprüft. Windows-Verknüpfung/Paketabnahme
-bleiben ausstehend. Installierte Mac-App bleibt 0.9.22.

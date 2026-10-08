@@ -2,8 +2,8 @@
 
 Stand: 8. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.22. Aktuell werden die Windows-CI-
-Nachprüfung und die Lizenzanteile der Rust-UI-Laufzeit weitergeführt.
+Die installierte Intel/macOS-App ist 0.9.23. Die neue Windows-Laufzeitprüfung
+besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
 ## Abgeschlossene Grundlagen
@@ -2154,9 +2154,23 @@ aus zu weit verfolgten Windows-Systemimports. Resolver stoppt nun an der
 OS-Grenze und behält separat redistributable CRTs ausdrücklich im Bericht.
 CMake-Politikprüfung mit beiden Pfadtrennern besteht lokal; die MSVC-UI-DLL
 erhält explizites Ziel und +crt-static. DLL-/Allocator-/C-ABI-Grenzen bleiben
-erhalten. Tatsächliche neue Windows-Verknüpfung und Paketabnahme stehen aus.
+erhalten. Der native Nachweis ist im folgenden Absatz festgehalten.
 
 32/32 lokale Release-Kernprüfungen (24,93 s), 39 Python-Fälle (7,71 s;
 eine native Windows-Kategorieprobe lokal ausgelassen) und das echte Shared-
 Library-Fixture bestehen. Logs: build/static-crt-{policy-check,python-check,
-core-check}.log. Die installierte Mac-App bleibt 0.9.22; neue CI folgt.
+core-check}.log.
+
+[CI 37704298271](https://github.com/Lulus792/SecondBrain/actions/runs/37704298271)
+zu 7f9acb8 besteht in allen 20 Jobs einschließlich acht Desktop-Varianten und
+aller vier entpackten Release-Pakete. Der Windows-Resolver behält externe
+Redistributables als Fehler sichtbar; die statische CRT-Konfiguration besteht
+diesen Prüfpfad. Keine externe Visual-C++-Runtime ist darin erforderlich.
+
+Lokales Intel/macOS-Paket 0.9.23/7f9acb87ea30 besteht mit 126 Desktop-,
+157 Tastatur- und 75 Sicherungsassertions, zwei Neustarts und produktiver CLI.
+Versions-/Lizenzinventur: 4/4 Prüfungen. Alle drei Lizenzsammlungen stimmen
+bytegenau; Installation und read-only Gedächtnis-Snapshot verändern keine
+Gedächtnisdateien. Logs: build/crt-package-*.log, build/crt-install.json.
+Rückfallkopie: build/previous-dist-0.9.22-20261008-020609. Die Vorschau wurde
+betrachtet. Mindest-OS-, Geräte- und menschliche Abnahmen bleiben gesondert offen.

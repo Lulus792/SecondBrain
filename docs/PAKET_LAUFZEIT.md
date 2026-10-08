@@ -76,6 +76,10 @@ gesonderte Toolchain-Variante.
 
 Grundlagen: [Rust CRT-Verknüpfung](https://doc.rust-lang.org/reference/linkage.html#static-and-dynamic-c-runtimes)
 und [zielbezogene Cargo-Flags](https://doc.rust-lang.org/cargo/reference/config.html#targettriplerustflags).
-Ob die beabsichtigte Verknüpfung erreicht ist, bestätigt erst der gebaute
-Windows-Importbericht mit anschließender Paket-/UI-Abnahme. Der native Nachweis
-zu 0.9.23 steht aus; eine lokale Mac-Kompilierung belegt ihn nicht.
+[CI 37704298271](https://github.com/Lulus792/SecondBrain/actions/runs/37704298271)
+zu 7f9acb8 bestätigt die neue Konfiguration mit erfolgreicher Windows-Release-
+Importprüfung und anschließender Paket-/UI-Abnahme. Alle 20 Jobs und alle vier
+entpackten Release-Pakete bestehen. Im geprüften Windows-Paket bleibt keine
+externe Visual-C++-Runtime erforderlich. Der lokale 0.9.23-Mac-Importbericht
+steht in build/crt-package-check/runtime-dependencies.json. Optionale dynamische
+Imports und frische Nutzerrechner sind davon nicht abgedeckt.
