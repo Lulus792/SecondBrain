@@ -111,6 +111,7 @@ build/app/secondbrain --workspace brains --project secondbrain
 | Zoomen / Kamera zurücksetzen | +, − / Pos1 |
 | Lesebereich scrollen | Bild auf / Bild ab |
 | Vorherige / nächste Überschrift in der Leseansicht | Alt+Bild auf / Bild ab |
+| Wortweise bewegen / Auswahl erweitern | Option (Mac) bzw. Strg + Links/Rechts; zusätzlich Umschalt |
 | Aktionen öffnen / darin wechseln | Umschalt+F10 / Pfeile auf und ab |
 | Speichern / Suche / Bearbeiten | Command/Control+S / F / E |
 | Neue Notiz / neues Projekt | Command/Control+N / Umschalt+N |
@@ -119,7 +120,8 @@ build/app/secondbrain --workspace brains --project secondbrain
 Command gilt auf macOS, Control auf Windows und Linux. Tab verlässt auch den
 Editor; Ctrl+I fügt dort einen Tabulator ein.
 Zusammengesetzte Zeichen werden beim Bewegen, Auswählen und Löschen als Einheit
-behandelt. [Eingabevertrag und Grenzen](docs/GRAPHEME.md). Mit der Maus: Ziehen dreht die
+behandelt. [Eingabevertrag und Grenzen](docs/GRAPHEME.md). [Wortbewegung und Doppelklick](docs/WORTNAVIGATION.md)
+folgen ab 0.9.40 gemeinsamen Unicode-Segmenten. Mit der Maus: Ziehen dreht die
 Sternkarte, Umschalt+Ziehen verschiebt sie, das Mausrad zoomt. Über einer Karte
 scrollt es den Inhalt. Weitere Kürzel stehen in der eingebauten Hilfe und im
 [Tastaturvertrag](docs/UI_TASTATUR.md).

@@ -549,8 +549,9 @@ nk_sdl_handle_event(struct nk_context* ctx, SDL_Event *evt)
         case SDL_EVENT_MOUSE_BUTTON_UP: /* MOUSEBUTTONUP & MOUSEBUTTONDOWN share same routine */
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
             {
-                const int x = evt->button.x, y = evt->button.y;
+                const float x = evt->button.x, y = evt->button.y;
                 const int down = evt->button.down;
+                nk_input_motion(ctx,x,y);
                 switch(evt->button.button)
                 {
                     case SDL_BUTTON_LEFT:

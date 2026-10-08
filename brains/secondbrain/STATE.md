@@ -64,11 +64,23 @@ Intel/macOS-Paket und Installation bestehen: 126 Desktop-, 158 Tastatur-,
 75 Sicherungs-Assertions, zwei Neustarts und CLI-/Runtime-/Lizenzprüfungen.
 Neue CI 37789106642 auf a24beb5 zuletzt queued; weitere Zielsysteme offen.
 
+## Wortbedienung (0.9.40)
+
+Eigene Unicode-18-Default-Wortsegmente im vorhandenen Textcache: Option-Pfeile
+auf Mac, Strg auf Windows/Linux, Shift-Auswahl und Doppelklick ohne Folge-Leerraum.
+Mac-Command-Pfeile bedienen Zeilengrenzen; Key-up und aktuelle Klickposition
+sind geprüft. 67/67 lokale Release-Prüfungen, 125.569 Kern- und 126 UI-Assertions
+unter haltendem ASan/UBSan bestehen; Build ohne Tests ebenso.
+[Vertrag](../../docs/WORTNAVIGATION.md); Scope und Grenzen in STATUS.
+Neue native Plattform-/Paketabnahme folgt, installiert zunächst weiterhin39.
+Die Wiederverwendung geformter Zeilen brachte im alternierenden Vergleich
+keinen Layoutgewinn und wurde entfernt. Kalter langer Wechsel bleibt offen.
+
 ## Nächste Arbeiten
 
 Erstes Layout langer Dokumente weiter optimieren. Native Zeichenrechtecke
-an tatsächliche Glyphen-/Zeilenpläne anbinden; Unicode-Wortregeln und reale
-Eingabemethoden prüfen. Weitere offene Release-Arbeiten: menschliche
+an tatsächliche Glyphen-/Zeilenpläne anbinden; native Wort-/Unicode-Bedienung
+und reale Eingabemethoden prüfen. Weitere offene Release-Arbeiten: menschliche
 VoiceOver/NVDA/Orca-, Dialog-, Geräte-, Mehrmonitor-/Langzeitabnahme; volle
 Windows-/Linux-Zielvolumes und physische Persistenz; frische Rechner und
 OS-Mindestversionen; vollständige SDK-/Systemruntime-Zuordnung.

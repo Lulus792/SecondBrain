@@ -1,11 +1,12 @@
 /* One unchanged source/layout for editor drawing, navigation and IME. */
 #include "carets.h"
 typedef struct {SBShapedLine shape;SBCaretPlan carets;size_t byte,length;int first,last,next;} SBEditLine;
-typedef struct {char *text;uint32_t *bytes;size_t length,count,capacity,memory;int characters;SBEditLine *lines;const struct nk_user_font *font;float row,requested_row;bool single;uint64_t hash,stamp;} SBEditPlan;
+typedef struct {int first,last;bool significant;} SBEditWord;
+typedef struct {char *text;uint32_t *bytes;size_t length,count,capacity,memory;int characters;SBEditLine *lines;SBEditWord *words;size_t word_count,word_capacity;const struct nk_user_font *font;float row,requested_row;bool single;uint64_t hash,stamp;} SBEditPlan;
 #define SB_EDIT_WAYS 8
 #define SB_EDIT_BUDGET (64u*1024u*1024u)
 struct SBEditCache {SBEditPlan entries[SB_EDIT_WAYS],scratch;size_t bytes;uint64_t stamp;};
-static void edit_plan_free(SBEditPlan *p){for(size_t i=0;i<p->count;++i){sb_shape_line_free(&p->lines[i].shape);sb_caret_plan_free(&p->lines[i].carets);}free(p->lines);free(p->text);free(p->bytes);memset(p,0,sizeof(*p));}
+static void edit_plan_free(SBEditPlan *p){for(size_t i=0;i<p->count;++i){sb_shape_line_free(&p->lines[i].shape);sb_caret_plan_free(&p->lines[i].carets);}free(p->lines);free(p->text);free(p->bytes);free(p->words);memset(p,0,sizeof(*p));}
 void sb_ui_edit_cache_clear(SBUi *ui){if(!ui->edit_cache)return;for(unsigned i=0;i<SB_EDIT_WAYS;++i)edit_plan_free(&ui->edit_cache->entries[i]);edit_plan_free(&ui->edit_cache->scratch);free(ui->edit_cache);ui->edit_cache=NULL;}
 static void edit_cache_frame_end(SBUi *ui){if(ui->edit_cache)edit_plan_free(&ui->edit_cache->scratch);}
 static int edit_character(const SBEditPlan *p,size_t byte){int lo=0,hi=p->characters;while(lo<hi){int m=lo+(hi-lo)/2;if(p->bytes[m]<byte)lo=m+1;else hi=m;}return lo;}
@@ -21,6 +22,14 @@ static bool edit_build(SBUi *ui,SBEditPlan *p){
     if(p->length>SB_TEXT_LIMIT || !sb_utf8_valid(p->text,p->length))return false;
     p->characters=nk_utf_len(p->text,(int)p->length);p->bytes=malloc(((size_t)p->characters+1)*sizeof(*p->bytes));if(!p->bytes)return false;
     size_t at=0;for(int i=0;i<p->characters;++i){p->bytes[i]=(uint32_t)at;nk_rune cp;int n=nk_utf_decode(p->text+at,&cp,(int)(p->length-at));if(n<=0)return false;at+=(size_t)n;}p->bytes[p->characters]=(uint32_t)p->length;
+    SBWord words;SBWordBoundary boundary;size_t first=0;
+    if(!sb_word_init(&words,p->text,p->length))return false;
+    while(sb_word_next(&words,&boundary)){
+        if(boundary.characters>first){
+            if(p->word_count==p->word_capacity){size_t next=p->word_capacity ? p->word_capacity*2 : 16;SBEditWord *grown=realloc(p->words,next*sizeof(*grown));if(!grown)return false;p->words=grown;p->word_capacity=next;}
+            p->words[p->word_count++]=(SBEditWord){(int)first,(int)boundary.characters,boundary.significant};
+        }first=boundary.characters;
+    }
     size_t start=0;
     do{size_t end=start;
         while(end<p->length){const char *cp_at=p->text+end;uint32_t cp=SDL_StepUTF8(&cp_at,NULL);end=(size_t)(cp_at-p->text);if(sb_bidi_separator(cp)){if(cp=='\r' && end<p->length && p->text[end]=='\n')++end;break;}}
@@ -40,7 +49,7 @@ static bool edit_build(SBUi *ui,SBEditPlan *p){
         start=end;
         if(p->single || (start==p->length && visible==end))break;
     }while(start<=p->length);
-    p->memory=p->length+1+((size_t)p->characters+1)*sizeof(*p->bytes)+p->capacity*sizeof(*p->lines);
+    p->memory=p->length+1+((size_t)p->characters+1)*sizeof(*p->bytes)+p->capacity*sizeof(*p->lines)+p->word_capacity*sizeof(*p->words);
     for(size_t i=0;i<p->count;++i){SBEditLine *l=&p->lines[i];p->memory+=l->shape.capacity*sizeof(SBShapeGlyph)+l->shape.run_capacity*sizeof(SBShapeRun)+l->carets.capacity*sizeof(SBCaret)+l->carets.count*sizeof(SBCaretIndex)+l->carets.cluster_capacity*sizeof(SBCaretCluster);}
     return true;
 }
@@ -70,9 +79,41 @@ static int sb_ui_edit_locate(struct nk_text_edit *edit,float x,float y,const str
     if(y>=p->count*row){size_t last=p->count-1;SBCaret c;if(sb_caret_find(&p->lines[last].carets,p->lines[last].length,SB_CARET_AFTER,p->lines[last].shape.base_level,&c))return edit_remember(p,edit,last,c);}
     size_t line=(size_t)NK_CLAMP(0,floorf(y/row),(float)(p->count-1));SBCaret point;if(!sb_caret_nearest(&p->lines[line].carets,x*ui->density,p->lines[line].shape.base_level,&point))return -1;return edit_remember(p,edit,line,point);
 }
-static int sb_ui_edit_key(struct nk_text_edit *edit,int key,int shift,const struct nk_user_font *font,float row){
-    if(key!=NK_KEY_LEFT && key!=NK_KEY_RIGHT && key!=NK_KEY_UP && key!=NK_KEY_DOWN && key!=NK_KEY_TEXT_LINE_START && key!=NK_KEY_TEXT_LINE_END)return 0;
+static int sb_ui_edit_select_word(struct nk_text_edit *edit,const struct nk_user_font *font,float row,float x,float y){
     SBEditPlan *p=edit_plan(edit,font,row);SBUi *ui=sb_ui_font_owner(font);if(!p || !ui)return 0;
+    if(!p->word_count){edit->cursor=edit->select_start=edit->select_end=0;return 1;}
+    size_t line=(size_t)NK_CLAMP(0,floorf(y/p->row),(float)(p->count-1));SBEditLine *l=&p->lines[line];
+    int character=NK_CLAMP(0,edit->cursor,p->characters);float point=x*ui->density;
+    for(size_t i=0;i<l->carets.cluster_count;++i){SBCaretCluster c=l->carets.clusters[i];
+        if(point>=fminf(c.left,c.right) && point<fmaxf(c.left,c.right)){character=edit_character(p,l->byte+c.byte);break;}}
+    size_t lo=0,hi=p->word_count;while(lo<hi){size_t mid=lo+(hi-lo)/2;if(p->words[mid].first<=character)lo=mid+1;else hi=mid;}
+    SBEditWord word=p->words[lo ? lo-1 : 0];
+    edit->select_start=sb_ui_grapheme_index(edit,word.first,-2);edit->cursor=edit->select_end=sb_ui_grapheme_index(edit,word.last,2);
+    edit->visual_valid=0;edit->has_preferred_x=0;return 1;
+}
+static int sb_ui_edit_key(struct nk_text_edit *edit,int key,int shift,const struct nk_user_font *font,float row){
+    if(key!=NK_KEY_LEFT && key!=NK_KEY_RIGHT && key!=NK_KEY_UP && key!=NK_KEY_DOWN && key!=NK_KEY_TEXT_LINE_START && key!=NK_KEY_TEXT_LINE_END && key!=NK_KEY_TEXT_WORD_LEFT && key!=NK_KEY_TEXT_WORD_RIGHT)return 0;
+    SBEditPlan *p=edit_plan(edit,font,row);SBUi *ui=sb_ui_font_owner(font);if(!p || !ui)return 0;
+    if(key==NK_KEY_TEXT_WORD_LEFT || key==NK_KEY_TEXT_WORD_RIGHT){
+        bool left=key==NK_KEY_TEXT_WORD_LEFT;int cursor=NK_CLAMP(0,edit->cursor,p->characters);
+        if(!shift && edit->select_start!=edit->select_end)cursor=left ? NK_MIN(edit->select_start,edit->select_end) : NK_MAX(edit->select_start,edit->select_end);
+        else{
+            if(shift && edit->select_start==edit->select_end)edit->select_start=cursor;
+            size_t lo=0,hi=p->word_count;
+            if(left){while(lo<hi){size_t mid=lo+(hi-lo)/2;if(p->words[mid].first<cursor)lo=mid+1;else hi=mid;}while(lo && !p->words[lo-1].significant)--lo;cursor=lo ? p->words[lo-1].first : 0;}
+            else{
+#ifdef __APPLE__
+                while(lo<hi){size_t mid=lo+(hi-lo)/2;if(p->words[mid].last<=cursor)lo=mid+1;else hi=mid;}while(lo<p->word_count && !p->words[lo].significant)++lo;cursor=lo<p->word_count ? p->words[lo].last : p->characters;
+#else
+                while(lo<hi){size_t mid=lo+(hi-lo)/2;if(p->words[mid].first<=cursor)lo=mid+1;else hi=mid;}while(lo<p->word_count && !p->words[lo].significant)++lo;cursor=lo<p->word_count ? p->words[lo].first : p->characters;
+#endif
+            }
+        }
+        edit->cursor=sb_ui_grapheme_index(edit,NK_CLAMP(0,cursor,p->characters),left ? -2 : 2);
+        edit->visual_valid=0;edit->has_preferred_x=0;
+        if(shift)edit->select_end=edit->cursor;else edit->select_start=edit->select_end=edit->cursor;
+        return 1;
+    }
     if(shift && edit->select_start==edit->select_end)edit->select_start=edit->cursor;
     if(!shift && edit->select_start!=edit->select_end && (key==NK_KEY_LEFT || key==NK_KEY_RIGHT)){
         int a=NK_CLAMP(0,NK_MIN(edit->select_start,edit->select_end),p->characters),b=NK_CLAMP(0,NK_MAX(edit->select_start,edit->select_end),p->characters);size_t ra=edit_line_at(p,a),rb=edit_line_at(p,b);SBCaret ca,cb;

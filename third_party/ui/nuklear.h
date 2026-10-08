@@ -28794,6 +28794,12 @@ nk_do_edit(nk_flags *state, struct nk_command_buffer *out,
         is_hovered = (char)nk_input_is_mouse_hovering_rect(in, area);
         if (select_all) {
             nk_textedit_select_all(edit);
+#ifdef NK_TEXTEDIT_SELECT_WORD_CUSTOM
+        } else if (is_hovered && in->mouse.buttons[NK_BUTTON_DOUBLE].down &&
+            in->mouse.buttons[NK_BUTTON_DOUBLE].clicked) {
+            nk_textedit_click(edit, mouse_x, mouse_y, font, row_height);
+            NK_TEXTEDIT_SELECT_WORD_CUSTOM(edit,font,row_height,mouse_x,mouse_y);
+#endif
         } else if (is_hovered && in->mouse.buttons[NK_BUTTON_LEFT].down &&
             in->mouse.buttons[NK_BUTTON_LEFT].clicked) {
             nk_textedit_click(edit, mouse_x, mouse_y, font, row_height);
@@ -28803,8 +28809,14 @@ nk_do_edit(nk_flags *state, struct nk_command_buffer *out,
             cursor_follow = nk_true;
         } else if (is_hovered && in->mouse.buttons[NK_BUTTON_RIGHT].clicked &&
             in->mouse.buttons[NK_BUTTON_RIGHT].down) {
+#ifdef NK_TEXTEDIT_SELECT_WORD_CUSTOM
+            if (!NK_TEXTEDIT_SELECT_WORD_CUSTOM(edit,font,row_height,mouse_x,mouse_y)) {
+#endif
             nk_textedit_key(edit, NK_KEY_TEXT_WORD_LEFT, nk_false, font, row_height);
             nk_textedit_key(edit, NK_KEY_TEXT_WORD_RIGHT, nk_true, font, row_height);
+#ifdef NK_TEXTEDIT_SELECT_WORD_CUSTOM
+            }
+#endif
             cursor_follow = nk_true;
         }
 

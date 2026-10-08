@@ -2865,3 +2865,68 @@ Quellstand a24beb5 ist normal nach origin gepusht. Neue
 war bei der Abfrage queued; weitere Zielsysteme sind für diesen Schritt
 noch nicht abgenommen. Die vollständige Release-Liste bleibt offen,
 1.0 bleibt bis zur ausdrücklichen Nutzerfreigabe unverändert.
+
+## Unicode-Wörter und vertraute Textbedienung (0.9.40)
+
+Eigene Default-Wortgrenzen nach Unicode 18.0.0/UAX #29 Revision 49 sind im
+C-Kern implementiert. Der vorhandene Text-/Glyphenplan hält Wortsegmente mit
+Speicherbudget und Invalidierung. Wortbewegung überspringt nicht navigierbare
+Segmente, Auswahl bleibt auf ganzen Graphemen. macOS erhält Option-Wortpfeile
+und Command-Zeilenpfeile; Windows/Linux behalten Strg und nächsten Wortanfang
+als rechtes Ziel. Modifikator vor Pfeil loslassen hinterlässt keine hängende
+Taste; fremde Fensterereignisse werden ignoriert.
+Doppelklick und bisherige rechte Wortauswahl verwenden die tatsächliche
+Graphemfläche und Unicode-Segmentgrenzen. Der SDL-Adapter übernimmt die
+float-Buttonposition auch ohne vorheriges Motion-Ereignis.
+[Vertrag und Grenzen](WORTNAVIGATION.md). Keine zusätzliche Bibliothek.
+
+**67/67 lokale Release-Prüfungen bestehen (379,44 s)**.
+Wortkern: 125.569 Assertions gegen alle 1.944 offiziellen Testfälle, leere/
+ungültige Daten, lange Kombination und 200.000 Regional Indicators.
+UI: 126 Assertions bei 100/150/200 Prozent, Glyphen-/Wortbewegung, Auswahl,
+Doppelklick am rechten Buchstabenrand, Löschung/Undo, Sourcebyte-Erhalt,
+Modifier-Key-up, fremdes Fenster und mehrzeilige Mac-Zeilenbefehle.
+Die neue Reader-Grenzprüfung besteht mit 147 Assertions einschließlich
+exakter/knapp zu enger Gesamtbreite; diese bleibt nach der Untersuchung erhalten.
+Ein anschließender Wortkern-/Datenlauf besteht nach Verschärfung der
+Korpus-Anzahl auf exakt 1.944. UI-Build ohne Tests besteht.
+Protokolle: `build/word-full-ctest.log`, `word-full-lasttest.log`,
+`word-core-final.log`, `word-no-tests-build.log`.
+
+**125.569 Kern- und 126 UI-Assertions bestehen unter haltendem ASan/UBSan
+ohne Befund**. Kerninstrumentierung: word.c, grapheme.c, Kernprüfer.
+UIinstrumentierung: UI/Text/Renderer, Carets/Shape/Script/Bidi, Bidi-Engine,
+Wort-/Graphemkern, UI-Prüfer und SDL_ttf.c samt Hooks. Weitere externe Objekte
+und übriger fachlicher Kern sind nicht instrumentiert; macOS-Leakprüfung aus.
+Quellhashes der UI-Instrumentierung abgeglichen.
+Protokolle: `build/word-sanitizers/`, `word-sanitizers-build.log`.
+
+Neue Plattform-/Paketabnahme folgt; installiert zunächst weiter 0.9.39.
+Die 0.9.39-CI 37789106642 hat bei erneuter Abfrage 12 erfolgreiche Jobs,
+acht nicht abgeschlossen, keinen fehlgeschlagenen Job. Die neue Wort-UI wurde
+auf diesem Mac geprüft; bedingte Windows-/Linux-Tastenwege brauchen ihre eigene
+native Abnahme. Native Wort-/Zeichenrechtecke, sprachabhängige Bidi-/Wörterbuch-
+Bedienung, echte IME/Screenreader und alle übrigen Release-Aufgaben bleiben offen.
+
+## Untersuchung des ersten langen Dokumentwechsels
+
+Isolierte, eingefrorene Kopie des Projektgedächtnisses; Quellbytes vor/nach
+Profilen unverändert. Versuch: fertig geformte einzeilige Absätze und passende
+Zeilenkandidaten wiederverwenden. 180 kalte Geometriefälle für Absatzgrenzen,
+Stile, Leerzeichen, Emoji und verschiedene Schriftsysteme liefern bytegleiche
+Geometrie; SHA-256 `88652c00242383430421226ca06158f7b47d49b871e71f6cc776c61c4b0d9e72`
+(262.299 Ausgabebytes). Gezielte Shape-Aufrufe: 4.502 → 3.844.
+Drei abwechselnde Softwarepaare zeigen trotzdem **57,74 → 58,07 ms Median
+des größten Wechsel-Layouts**, somit keinen belastbaren Gewinn im
+Dokumentablauf. Native Einzelstichprobe 64,17 → 62,25 ms ebenfalls kein
+allgemeiner Leistungsnachweis. Die experimentelle Wiederverwendung wurde
+vollständig entfernt; app/styled_text.inc ist gegenüber HEAD unverändert.
+Die kalte Layoutarbeit bleibt eine offene Aufgabe.
+Protokolle: `build/paragraph-fastpath/paired.json`, `geometry-{before,after}.log`,
+`count-{before,after}.log`, `fixture-hashes.json`. Voller Release-Auftrag bleibt
+aktiv; 1.0 weiterhin ausschließlich nach ausdrücklicher Freigabe.
+
+Zusätzlich bestehen 39 Python-Unittest-Fälle (8,53 s), einer nach vorhandener
+Plattformbedingung übersprungen. Die Wortdatentabellen entsprechen nach erneuter
+Hash-/Erzeugungsprüfung den festgelegten Originalen. Protokoll:
+`build/word-python-unittest.log`.

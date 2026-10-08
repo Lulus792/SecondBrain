@@ -73,8 +73,13 @@ int main(int argc,char **argv) {
         for(unsigned script=0;script<2;++script){const char *sequence=sequences[script];SBTextSpan one={0,strlen(sequence),0};SBStyledText sample={.text=(char *)sequence,.spans=&one,.count=1};
             SBTextParagraph *bidi=NULL;CHECK(sb_bidi_paragraph_create(sequence,strlen(sequence),SB_BIDI_AUTO_LTR,&bidi).code==SB_OK);
             TTF_Font *font=sb_ui_cluster_font(base,sequence,strlen(sequence),NULL);CHECK(font!=NULL);
-            for(unsigned w=0;w<3;++w){float width=30+35*w;WrapProbe probe={.paragraph=bidi,.font={0,strlen(sequence),font,script ? TAG('A','r','a','b') : TAG('L','a','t','n')},.density=ui.density,.available=width-2*ui.ctx->style.text.padding.x,.valid=true};
-                CHECK(sb_ui_styled_geometry(&ui,base,&sample,width,check_wrap,&probe));CHECK(probe.valid && probe.next==strlen(sequence) && probe.lines>1);}
+            SBShapeFontSpan face={0,strlen(sequence),font,script ? TAG('A','r','a','b') : TAG('L','a','t','n')};SBShapedLine whole={0};
+            CHECK(sb_shape_line(bidi,0,strlen(sequence),&face,1,&whole).code==SB_OK);
+            float exact=whole.advance/ui.density+2*ui.ctx->style.text.padding.x;
+            const float widths[]={30,65,100,exact-0.01f,exact,exact+1};
+            for(unsigned w=0;w<sizeof(widths)/sizeof(*widths);++w){float width=widths[w];WrapProbe probe={.paragraph=bidi,.font=face,.density=ui.density,.available=width-2*ui.ctx->style.text.padding.x,.valid=true};
+                CHECK(sb_ui_styled_geometry(&ui,base,&sample,width,check_wrap,&probe));CHECK(probe.valid && probe.next==strlen(sequence) && (w<4 ? probe.lines>1 : probe.lines==1));}
+            sb_shape_line_free(&whole);
             sb_bidi_paragraph_free(bidi);
         }
     }

@@ -60,3 +60,23 @@ Tabellen verwenden die bestehende Unicode License V3. Anders als die eigene
 Graphemsegmentierung verwendet der UI-Absatzalgorithmus eine externe C-UI-
 Bibliothek; der fachliche Kern bleibt ohne externe Bibliotheken.
 [Vertrag und tatsächliche Nachweise](../../docs/BIDI.md).
+
+## Wortgrenzen und Tastatureingabe (0.9.40)
+
+WordBreakProperty.txt und WordBreakTest.txt stammen unverändert aus
+https://www.unicode.org/Public/18.0.0/ucd/auxiliary/. UAX #29 Revision 49
+wurde am 8. Oktober 2026 gelesen. Eigener C-Code in src/word.c implementiert
+die Default-Wortgrenzen; keine externe Unicode-Bibliothek.
+tools/make_word_data.py erzeugt die Wort-, Emoji- und Buchstaben-/Zahlbereiche
+nach Hashprüfung. Auch der originale Testbestand ist festgelegt. Python wird
+nur für bewusste Entwickleraktualisierung und Prüfungen verwendet.
+
+Die UI unterscheidet navigierbare Segmente mit Buchstaben, Zahlen,
+Identifier-Verbindern oder Emoji von sonstigen Segmenten. Das ist eine eigene
+Navigation auf den normativen Grenzen; es ist keine Wörterbuchanalyse.
+Die vorhandene Unicode License V3 wird weiterhin mitgeliefert.
+
+Zusätzliche SHA-256 der Originale:
+
+- `WordBreakProperty.txt`: `8dbfa17063e11084201f33c3e76d485d3b9166930c71db8e39ed1c9234171aec`
+- `WordBreakTest.txt`: `3dd70c071781276067c680d87303f60434adce7b067bd063194af374edad86a5`

@@ -284,3 +284,17 @@ Command-Buffer, Widgetrechteck, Padding, Farbe und Font. Eigene Fonts verwenden
 für allgemeine umgebrochene Texte denselben Absatz-/Glyphenplan wie der Reader;
 ohne Hook beziehungsweise bei fremden Fonts bleibt Nuklears Originalweg erhalten.
 [Vertrag, Cachepolitik und Grenzen](../docs/WRAPPED_TEXT.md).
+
+## Wortauswahl und Plattformtasten ab 0.9.40
+
+Eigene C-Wortgrenzen nach Unicode 18.0.0/UAX #29 Revision 49 ergänzen die
+vorhandenen Grapheme. Quellen, Hashes und Lizenz in [unicode/README.md](unicode/README.md).
+Die Textgeometrie behält die Segmentgrenzen im vorhandenen, begrenzten
+Edit-Cache. Cursor und Auswahl verwenden weiterhin ganze Grapheme.
+Nuklear erhält den optionalen Hook `NK_TEXTEDIT_SELECT_WORD_CUSTOM`:
+Doppelklick und die bestehende rechte Wortauswahl benutzen die tatsächliche
+Cluster-/Wortgeometrie. Der SDL-UI-Adapter übernimmt die float-Koordinaten
+eines Buttons als aktuelle Mausposition. Die eigene UI behandelt Option-/
+Command-Pfeile auf macOS sowie Strg-Pfeile auf Windows/Linux und löscht
+auf Key-up auch bei inzwischen gelöstem Modifikator den passenden Tastenzustand.
+Original-Lizenztexte bleiben erhalten. Keine neue UI- oder Fachbibliothek.

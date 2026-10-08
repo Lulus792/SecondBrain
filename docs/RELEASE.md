@@ -194,3 +194,13 @@ einen scrollbaren Meldungskörper von festem Titel, Schließen und Entscheidunge
 Große Schrift, lange Konfliktmeldungen, Scrollgrenzen und Tab ohne Positionsreset
 sind lokal geprüft. Die neue Plattform-/Paketabnahme und reale native Bedienung
 bleiben gesondert; dieser Schritt schließt die vollständige Release-Liste nicht.
+
+## Wortbedienung vom 8. Oktober
+
+Ab 0.9.40 sind eigene Unicode-18-Defaultgrenzen mit lokalen Kern-/UI-/
+Sanitizerprüfungen an Wortbewegung, Shift-Auswahl und Doppelklick angebunden.
+Mac erhält Option-/Command-Pfeile. [Vertrag](WORTNAVIGATION.md). Native
+Wort-/Zeichenrechtecke, sprachabhängige gemischte Schreibrichtungen, Wörterbuch-
+Segmentierung und tatsächliche assistive/IME-/Geräteabnahme bleiben getrennt.
+Die untersuchte Zeilenwiederverwendung beschleunigte den kalten langen Wechsel
+nicht und wurde entfernt; dieser Leistungsschritt bleibt offen.

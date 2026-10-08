@@ -143,3 +143,6 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 
 - [Schutzdialog](../../docs/SCHUTZDIALOG.md): feste Kopf-/Aktionsfläche, eigener
   Meldungsscrollweg und sicherer Fokus-/Abbruchvertrag ab 0.9.39.
+
+- [Wortnavigation](../../docs/WORTNAVIGATION.md): eigene Unicode-Defaultgrenzen,
+  UI-Wortauswahl, Plattformtasten, Originaldaten und gesonderte native Grenzen ab40.

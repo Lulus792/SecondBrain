@@ -1,4 +1,5 @@
 #include "grapheme.h"
+#include "word.h"
 struct nk_text_edit;
 static int sb_ui_grapheme_index(struct nk_text_edit *,int,int);
 void sb_ui_grapheme_clamp(struct nk_text_edit *);
@@ -28,9 +29,11 @@ static void sb_ui_composition_mark(struct nk_command_buffer *,struct nk_text_edi
 #define NK_TEXTEDIT_CARET_CUSTOM sb_ui_input_caret
 static int sb_ui_edit_locate(struct nk_text_edit *,float,float,const struct nk_user_font *,float);
 static int sb_ui_edit_key(struct nk_text_edit *,int,int,const struct nk_user_font *,float);
+static int sb_ui_edit_select_word(struct nk_text_edit *,const struct nk_user_font *,float,float,float);
 static int sb_ui_edit_render(struct nk_command_buffer *,struct nk_text_edit *,const struct nk_style_edit *,const struct nk_user_font *,struct nk_rect,struct nk_rect,struct nk_rect,unsigned int,struct nk_input *,unsigned int,float,int,int);
 #define NK_TEXTEDIT_LOCATE_CUSTOM sb_ui_edit_locate
 #define NK_TEXTEDIT_KEY_CUSTOM sb_ui_edit_key
+#define NK_TEXTEDIT_SELECT_WORD_CUSTOM sb_ui_edit_select_word
 #define NK_TEXTEDIT_RENDER_CUSTOM sb_ui_edit_render
 static int sb_ui_plain_clamp(const struct nk_user_font *,const char *,int,float,int *,float *,unsigned int *,int);
 #define NK_TEXT_CLAMP_CUSTOM sb_ui_plain_clamp
@@ -356,6 +359,21 @@ void sb_ui_event(SBUi *ui, const SDL_Event *event) {
         return;
     }
     if (event->type == SDL_EVENT_KEY_DOWN || event->type == SDL_EVENT_KEY_UP) {
+        if(copy.key.key==SDLK_LEFT || copy.key.key==SDLK_RIGHT){
+            if(SDL_GetWindowFromEvent(&copy)!=ui->window)return;
+            bool left=copy.key.key==SDLK_LEFT,down=copy.type==SDL_EVENT_KEY_DOWN;
+            enum nk_keys plain=left ? NK_KEY_LEFT : NK_KEY_RIGHT,word=left ? NK_KEY_TEXT_WORD_LEFT : NK_KEY_TEXT_WORD_RIGHT,line=left ? NK_KEY_TEXT_LINE_START : NK_KEY_TEXT_LINE_END;
+            nk_input_key(ui->ctx,NK_KEY_SHIFT,(copy.key.mod&SDL_KMOD_SHIFT)!=0);
+            if(!down){nk_input_key(ui->ctx,plain,false);nk_input_key(ui->ctx,word,false);nk_input_key(ui->ctx,line,false);}
+            else{
+#ifdef __APPLE__
+                enum nk_keys selected=(copy.key.mod&SDL_KMOD_GUI) ? line : (copy.key.mod&(SDL_KMOD_ALT|SDL_KMOD_CTRL)) ? word : plain;
+#else
+                enum nk_keys selected=(copy.key.mod&SDL_KMOD_CTRL) ? word : plain;
+#endif
+                nk_input_key(ui->ctx,plain,selected==plain);nk_input_key(ui->ctx,word,selected==word);nk_input_key(ui->ctx,line,selected==line);
+            }return;
+        }
 #ifdef __APPLE__
         if (copy.key.mod & SDL_KMOD_GUI) copy.key.mod |= SDL_KMOD_CTRL;
 #endif
