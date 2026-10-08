@@ -25,10 +25,14 @@ beim Laden unverändert, installierte Ansicht betrachtet. Rückfallkopie:
   dokumentierten Teilscope und bytegenaue Neugenerierung ebenfalls.
   32/32 Kernprüfungen ohne UI bestehen. Noch nicht an die sichtbare App
   angeschlossen; [Vertrag/Nachweise](../../docs/BIDI.md).
-- Erste neue CI bestätigt Linux Debug/Release sowie Mac ARM Debug/Release
-  und Intel Release. Windows scheitert noch beim Checkout-abhängigen C-Tabellen-
-  Hash. Explizite LF-/Originalbyte-Regeln und zwölf Git-Checkoutfilter-Hashes
-  mit Windows-autocrlf sind geprüft; native Nachprüfung folgt.
+- Geformter C-Zeilenplan erhält vollständigen Zeilenkontext, Glyphen-/Quell-
+  positionen und RTL-Schriftteile. 380 Assertions bei drei Größen, Raster-
+  vorschau, ASan/UBSan im Teilscope und neun Release-Nachprüfungen bestehen.
+  Produktive Einbindung bleibt offen; [Vertrag](../../docs/GLYPHENGEOMETRIE.md).
+- Korrigierte Bidi-CI zu 23837f1: alle acht nativen UI-Testschritte und vier
+  entpackten Pakete bestehen, einschließlich Windows Debug/Release.
+  19 Jobs erfolgreich; Intel-Debug scheitert erst am Artefakt-Upload mit
+  GitHub-DNS-Fehler nach bestandenen Tests. Neue Glyphenplan-Abnahme folgt.
 - Erneute gezielte macOS-Release-Nachprüfung des Nutzerfeedbacks:
   135 Bewegungs-/Layout- und 144 Navigations-Assertions, darunter alle vier
   vorherigen Listen-/Leseansichten nach Leerung, erneutem Tippen und Escape.

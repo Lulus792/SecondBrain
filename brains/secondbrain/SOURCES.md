@@ -38,6 +38,9 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Bidi-Grundlage](../../docs/BIDI.md): eigener UTF-8-Absatzplan, Unicode-18-
   Daten, gefundene Bibliotheks-/Generatorfehler, lokale Abnahme und verbleibende
   gemeinsame Renderer-/Editor-/native Anbindung.
+- [Geformte Glyphenpositionen](../../docs/GLYPHENGEOMETRIE.md): gemeinsamer
+  C-Zeilenplan, kontextuelle Stil-/Schriftteile, Unicode-18-Spiegelanbindung,
+  Raster-/Sanitizer-Nachweise und ausstehende produktive Einbindung.
 - [Lizenzansicht](../../docs/LIZENZEN.md): Originaltexte in der App, Bedienwege und Prüfgrenzen.
 - [MIT-Lizenz](../../LICENSE): gewählte Lizenz des eigenen Codes.
 - [UI-Abhängigkeiten](../../third_party/README.md): Herkunft, Versionen, Lizenzen, Anpassungen.

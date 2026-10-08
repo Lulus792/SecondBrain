@@ -142,6 +142,11 @@ gefunden und berücksichtigt. Er ist zunächst im UI-Prüfbuild integriert;
 sichtbare Renderer-/Editor-/native Geometrie bleiben der nächste gemeinsame
 Schritt. Die installierte Anwendung verwendet diese Grundlage noch nicht.
 
+Der folgende [C-Glyphenplan](GLYPHENGEOMETRIE.md) verbindet Richtungen mit
+kontextuell geformten Schrift-/Stilteilen, Quellclustern und Rastermetriken.
+Er ist lokal einschließlich Sanitizer und Rastervorschau geprüft. Die gemeinsame
+sichtbare Renderer-/Editor-/native Anbindung ist weiterhin erforderlich.
+
 ## Vorläufige Komposition ab 0.9.25
 
 [IME-Anbindung](IME.md) ergänzt unterstrichenen, vorläufigen Text direkt im

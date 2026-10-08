@@ -6,6 +6,14 @@ C-Kern enthält keine externen Bibliotheken.
 In Vorbereitung: [Bidi-Absatzlayout](ui/bidi18/README.md) mit SheenBidi 3.0.0
 und aktualisierten Unicode-18-Bidi-Daten. Der neue C-Plan ist aktuell nur im
 UI-Prüfbuild eingebunden, noch keine zusätzliche Abhängigkeit des App-Pakets.
+Ein eigener [Glyphenplan](../docs/GLYPHENGEOMETRIE.md) nutzt den neuen,
+hashgeprüften C-Hook `ui/ttf_shape.h` / `ui/ttf_shape.inc` in SDL_ttf 3.2.2.
+Er ergänzt kontextgebundene Glyphenpositionen; die übrigen Textfunktionen bleiben
+unverändert. Der Originalquelltext SHA-256
+`25a42804b18809e5c4b2eb8ed787701551d0c680aff774b7d8c54486c0d42d38`
+wird mit einem markierten Include erweitert. Bekannte vorbereitete Quellen
+werden wiedererkannt, fremde Änderungen zurückgewiesen. Hook: eigener Code MIT;
+SDL_ttf: vorhandene mitgelieferte zlib-Lizenz. Keine neue Runtime-Bibliothek.
 
 ## SDL3
 

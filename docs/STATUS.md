@@ -2441,3 +2441,26 @@ dokumentierten Teilscope. Erneute Generierung liefert identische Tabellen.
 Produktiver Renderer, Editor und native Zeichenrechtecke sind noch nicht an
 diesen Plan angebunden; installierte App und Version bleiben unverändert.
 Neue native Plattformprüfungen folgen. [Vertrag und Prüfgrenzen](BIDI.md).
+
+Korrigierte [CI 37742283681](https://github.com/Lulus792/SecondBrain/actions/runs/37742283681)
+zu 23837f1 bestätigt alle acht nativen UI-Testschritte in Debug/Release sowie
+vier entpackte Pakete. Windows-Hash-/Checkoutfehler behoben. 19 Jobs erfolgreich;
+Intel-Mac-Debug scheitert erst am Artefakt-Upload (`ENOTFOUND`) nach bestandenen
+UI-Prüfungen. Kein vollständig grüner 20-Job-Lauf; neue Glyphenabnahme bleibt separat.
+
+## Kontextgebundene Glyphenpositionen
+
+Der neue C-Zeilenplan verbindet die vorhandene Absatzanalyse mit HarfBuzz-
+Glyphenpositionen im vollständigen logischen Zeilenkontext. RTL-Schriftteile,
+Stilgrenzen, Grundlinien und Quellcluster werden zusammengeführt; Fontzustand
+und Originaltext bleiben erhalten. Die geprüfte Unicode-18-Spiegelung wird
+bufferlokal übergeben. Der Plan bleibt zunächst im UI-Prüfbuild; bestehender
+Renderer, Editor und native Zeichenrechtecke sind noch anzubinden.
+
+Intel/macOS Release: 380 neue Assertions bei drei Fontgrößen bestehen,
+einschließlich arabischem Joining über einen Stilwechsel und echten
+Glyphenrastermaßen. Aus denselben Positionen gezeichnete Mischtextvorschau
+betrachtet. Der dokumentierte ASan-/UBSan-Teilscope besteht ebenfalls.
+Neun gezielte Release-Prüfungen bestehen (27,49 s); vier Quellvorbereitungs-
+zustände mit Erhalt beziehungsweise Zurückweisung sind geprüft. Neue native
+Plattformabnahme folgt. [Vertrag, Originale und Grenzen](GLYPHENGEOMETRIE.md).

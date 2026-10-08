@@ -103,6 +103,15 @@ Dateien. Tatsächlich ausgeführte Git-Checkoutfilter mit `core.autocrlf=true`
 bestätigen alle zwölf Eingabe-/Tabellenhashes. Native Windows-Abnahme folgt
 mit dem korrigierten Quellstand.
 
+[Korrigierter Lauf 37742283681](https://github.com/Lulus792/SecondBrain/actions/runs/37742283681)
+zu 23837f1 bestätigt alle acht nativen UI-Prüfschritte in Debug/Release auf
+Windows, Linux und beiden Macs sowie alle vier entpackten Release-Pakete.
+Der Windows-Configure-Fehler ist damit in diesem Umfang nachgeprüft.
+19 Jobs enden erfolgreich; Intel-Mac-Debug scheitert erst am anschließenden
+Artefakt-Upload (`ENOTFOUND`), nachdem seine UI-Prüfungen bestanden sind.
+Deshalb ist dies ein erfolgreicher Plattform-Testnachweis, kein vollständig
+grüner 20-Job-Lauf. Der nachfolgende Glyphenplan benötigt eine eigene neue Abnahme.
+
 ## Verbleibende Integration
 
 Die gemeinsame Absatzanalyse muss vor Schrift-, Script- und Stilaufteilung
