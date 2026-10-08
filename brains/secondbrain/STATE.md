@@ -115,3 +115,10 @@ widersprüchlichen XML. Linux-Zielcheck (2,64 s) und zwei Mac-Nachprüfungen
 0.9.32 korrigiert eine zweite übersehene schmale Linux-Baumerwartung auf
 direkte Zellen. Die tatsächlichen Matrixabfragen bestehen bis dahin in
 0.9.31-Release; zwei lokale Mac-Nachprüfungen bestehen. Neue CI folgt.
+
+[CI 37736031017](https://github.com/Lulus792/SecondBrain/actions/runs/37736031017)
+zu e479642 besteht in allen 20 Jobs und vier entpackten Paketen. Die echte
+Linux-Matrix einschließlich Headern, Eltern, Indizes, Leerzellen und Spannen
+besteht damit in Debug/Release bei 100/200 Prozent. Die zuvor gefundenen
+Signatur-/Baumerwartungsfehler sind in diesem Umfang nachgeprüft. Menschliche
+Screenreader-Bedienung und tatsächliche Textgeometrie bleiben offen.
