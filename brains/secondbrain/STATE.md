@@ -83,3 +83,8 @@ Sicherheitskanal ist angefragt. Eigener Code MIT, Signaturkonten fehlen.
 
 Der vollständige Auftrag bleibt aktiv. 1.0 erst nach ausdrücklicher Freigabe;
 abschließende Produkttext-Bereinigung nach den festgelegten Voraussetzungen.
+
+[CI 37730572189](https://github.com/Lulus792/SecondBrain/actions/runs/37730572189)
+zu 7f5b634 besteht in allen 20 Jobs, ausdrücklich einschließlich vier
+entpackter Pakete unter Windows x64, Linux x64 und macOS Intel/ARM64.
+Menschliche Screenreader-/Geräteabnahme bleibt getrennt offen.

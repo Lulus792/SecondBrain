@@ -2335,3 +2335,8 @@ Archiv-SHA256: `503e088233a6428739b72c2e54237342e42f2ecea09d483be7dde46b33e7fc5b
 [CI 37730572189](https://github.com/Lulus792/SecondBrain/actions/runs/37730572189)
 zu diesem Quellstand läuft; neue Windows-/Linux-/ARM64-Nachweise folgen erst
 nach tatsächlichem Abschluss.
+
+[CI 37730572189](https://github.com/Lulus792/SecondBrain/actions/runs/37730572189)
+zu 7f5b634 besteht in allen 20 Jobs, ausdrücklich einschließlich vier
+entpackter Pakete unter Windows x64, Linux x64 und macOS Intel/ARM64.
+Menschliche Screenreader-/Geräteabnahme bleibt getrennt offen.
