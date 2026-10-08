@@ -2,7 +2,7 @@
 
 Stand: 8. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.35. Die neue Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.39. Die neue Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -2843,3 +2843,25 @@ verlustfrei komprimiert; vor Entfernen jeder Rohdatei wurden entpackte Bytes,
 SHA-256 und unveränderte Dateistatistik geprüft. 5.456.355.978 Bytes freigegeben.
 Aktive Prüfverzeichnisse, Projektdateien und Anwendungspakete unberührt.
 Manifest: `build/guard-completed-bitmap-archive.json`.
+
+## Geprüftes Paket 0.9.39 installiert
+
+Sauberer Intel/macOS-Release-Build **0.9.39 / a24beb51119a**. Das entpackte
+Paket besteht 126 Desktop-, 158 Tastatur- und 75 Sicherungs-Assertions, zwei
+isolierte Prozessneustarts und die produktive CLI-Sicherung/Wiederherstellung.
+Runtime-/Lizenz-/Versionsprüfungen bestehen. Protokoll:
+`build/guard-package-check.log`. Archiv:
+`build/guard-release-package/SecondBrain-0.9.39-Darwin-x86_64.tar.gz`,
+SHA-256 `667bcc826537311ea541b98d31cd313dcf75a84b13be73e54cd6bcf9adee9341`.
+
+Alle 94 installierten Dateien entsprechen bytegleich dem geprüften Paket.
+Die vorherige 0.9.37 ist unter `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.37-20261008-160515`
+erhalten. Eigene Projektinstanz mit installierter App geladen und Raster
+betrachtet; sämtliche Gedächtnisdateien dabei unverändert. Nachweis:
+`build/guard-install-proof.json`, `build/guard-installed-brain.png`.
+
+Quellstand a24beb5 ist normal nach origin gepusht. Neue
+[CI 37789106642](https://github.com/Lulus792/SecondBrain/actions/runs/37789106642)
+war bei der Abfrage queued; weitere Zielsysteme sind für diesen Schritt
+noch nicht abgenommen. Die vollständige Release-Liste bleibt offen,
+1.0 bleibt bis zur ausdrücklichen Nutzerfreigabe unverändert.
