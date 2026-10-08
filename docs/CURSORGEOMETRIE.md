@@ -2,8 +2,9 @@
 
 Stand: 8. Oktober 2026. Die neue C-Geometrie ergänzt den
 [Glyphenplan](GLYPHENGEOMETRIE.md) um Cursorpunkte, Mauszuordnung und visuelle
-Auswahlflächen. Sie ist zunächst als gemeinsame Grundlage geprüft. Der
-produktive Editor und die nativen Zeichenrechtecke verwenden sie noch nicht;
+Auswahlflächen. Ab 0.9.35 verwenden Editor und Eingabefelder diese gemeinsame Grundlage;
+[EDITORGEOMETRIE.md](EDITORGEOMETRIE.md) nennt die Anbindung. Native Zeichenrechtecke
+verwenden sie noch nicht;
 die installierte App bleibt 0.9.34 / 4eda9dbfce37.
 
 ## Warum der bisherige Einzelzeichenweg nicht genügt
@@ -90,7 +91,7 @@ Konkrete Gesamt-/Sanitizer- und Plattformnachweise stehen in [STATUS](STATUS.md)
 ## Nächste Integration
 
 Nuklear-Eingabe, Maus, Pfeile, vertikale Bewegung, Caret, Auswahl und Zeichnung
-müssen diese Geometrie gemeinsam verwenden. Dazu gehören Suche/Formulare, lange
+verwenden ab 0.9.35 diese Geometrie gemeinsam. Dazu gehören Suche/Formulare, lange
 Zeilen, Zeilenwechsel, Schrift-/Dichte-Invaliderung, IME-Komposition und native
 Zeichenrechtecke. Die neue C-Grundlage allein ist kein fertiger Editor und ersetzt
 keine echte Eingabemethoden- oder menschliche Screenreader-Abnahme.

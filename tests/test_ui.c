@@ -11,6 +11,9 @@ static bool equal(struct nk_text_edit *edit, const char *text) {
     int length = nk_str_len_char(&edit->string);
     return (size_t)length == strlen(text) && !memcmp(nk_str_get_const(&edit->string), text, (size_t)length);
 }
+static bool inspect_line(void *user,const char *text,size_t length,size_t offset,const SBShapedLine *line,const SBCaretPlan *carets,float y){
+    (void)user;(void)offset;(void)y;if(length==strlen(expected_line) && !memcmp(text,expected_line,length) && line->count && carets->count)complete_line=true;return true;
+}
 static void editor_frame(SBUi *ui,struct nk_text_edit *edit,enum nk_keys key,bool down,bool shift,const char *text) {
     nk_input_begin(ui->ctx);
     nk_input_key(ui->ctx,NK_KEY_SHIFT,shift); if (key!=NK_KEY_NONE) nk_input_key(ui->ctx,key,down);
@@ -22,11 +25,8 @@ static void editor_frame(SBUi *ui,struct nk_text_edit *edit,enum nk_keys key,boo
     }
     nk_end(ui->ctx);
     if (expected_line) {
-        const struct nk_command *command; complete_line=false;
-        nk_foreach(command,ui->ctx) if (command->type==NK_COMMAND_TEXT) {
-            const struct nk_command_text *drawn=(const struct nk_command_text *)command;
-            if ((size_t)drawn->length==strlen(expected_line) && !memcmp(drawn->string,expected_line,strlen(expected_line))) complete_line=true;
-        }
+        complete_line=false;
+        sb_ui_edit_geometry(ui,edit,ui->ctx->style.font,ui->ctx->style.font->height+ui->ctx->style.edit.row_padding,false,inspect_line,NULL);
     }
     sb_ui_draw(ui); SDL_RenderPresent(ui->renderer);
 }

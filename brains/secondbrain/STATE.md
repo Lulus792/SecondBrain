@@ -84,6 +84,19 @@ bestehen; gerasterte Geometrievorschau betrachtet. [Vertrag und Grenzen](../../d
 Noch keine neue produktive Editor-/IME-/native Anbindung. Installiert bleibt
 das paketgeprüfte 0.9.34 / 4eda9dbfce37; neue Cursor-CI folgt separat.
 
+## Produktive Editor-Anbindung (0.9.35)
+
+Gemeinsame Glyphen-/Cursorgeometrie arbeitet jetzt in Editor, Suche und Feldern:
+Zeichnung, Auswahl, Maus, Pfeile, vertikale Position, Schriftwechsel und IME-
+Markierungen. Original/Undo bleiben logisch erhalten. Pixelreferenz bei drei
+Schriftgrößen, Float-Cursor, Maus, RTL-/Ligaturschritte, CRLF und IME-Anker geprüft.
+Eine gefundene SDL_ttf-Nullzeigerarithmetik an leeren Bitmaps ist hashgeprüft
+korrigiert und mit haltendem UBSan vor/nach reproduziert.
+60/60 lokale Release-Prüfungen und UI-Build ohne Tests bestehen; eigene neue
+Plattform-/Paketabnahme folgt. Installiert bleibt bis dahin 0.9.34.
+[Vertrag und Grenzen](../../docs/EDITORGEOMETRIE.md).
+Die vorige Cursorgrundlage zu 13e9e08 besteht inzwischen alle 20 Jobs/vier Pakete.
+
 ## Nächste Arbeiten
 
 0.9.34 ist vollständig im dokumentierten automatisierten Umfang abgenommen.
@@ -92,8 +105,9 @@ menschliche VoiceOver/NVDA/Orca-, Dialog-, Geräte-, Mehrmonitor-/Langzeitabnahm
 volle Windows-/Linux-Zielvolumes und physische Persistenz; frische Rechner und
 OS-Mindestversionen; vollständige SDK-/Systemruntime-Zuordnung.
 
-Nächster Textschritt: geprüfte Glyphen-/Cursorgeometrie gemeinsam für Editor, Suche,
-Formulare/einfache Labels, Cursor, Auswahl, IME und native Provider verwenden.
+Nächster Textschritt: gemeinsame Geometrie an einfache Labels/Schaltflächentexte
+und native Zeichenrechtecke anbinden; Unicode-Wortregeln, größere reale Dateien
+und echte Eingabe-/Screenreader-Abnahme weiterführen.
 Reader-CI 37751197759 und Intel-Mac-Paketabnahme bestehen.
 
 Eigener Code MIT. Signaturkonten fehlen; vertraulicher Sicherheitskanal ist

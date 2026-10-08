@@ -3,8 +3,8 @@
 Stand: 8. Oktober 2026. Der neue C-Plan verbindet die geprüfte
 [Bidi-Absatzanalyse](BIDI.md) mit echten Glyphenpositionen, Schriftbereichen und
 gemeinsamer Grundlinie. Ab dem Entwicklungsschritt 0.9.34 benutzt die formatierte
-Leseansicht diesen Plan für Umbruch, Höhe und Rasterung. Editor, einfache
-Bedienelementtexte und native Textrechtecke benutzen ihn noch nicht.
+Leseansicht diesen Plan für Umbruch, Höhe und Rasterung. Ab 0.9.35 benutzen ihn auch [Editor und Eingabefelder](EDITORGEOMETRIE.md).
+Einfache Bedienelementtexte und native Textrechtecke benötigen die Anbindung.
 Die installierte Intel-Mac-App 0.9.34 besteht die gesonderte Paketabnahme;
 neue native Plattformnachweise folgen in STATUS.
 
@@ -144,3 +144,21 @@ bleibt ein eigener Release-Schritt; die Reader-Integration schließt ihn nicht a
 Quellgrenzen zu visuellen Punkten, Ligaturpositionen und Auswahlflächen.
 Sie verwendet die vorbereiteten Graphemgrenzen und tatsächlichen Glyphen
 dieses Plans; Editor-/IME-/native Anbindung bleibt anschließend erforderlich.
+
+## Korrektur leerer Bitmaps in SDL_ttf
+
+Die instrumentierte SDL_ttf-Hauptdatei meldete bei den bestehenden UI-Prüfungen
+eine Pointer-Overflow-UB: der Rastermakro verschiebt den fehlenden Pixelpuffer
+einer leeren Glyphe um seine SIMD-Ausrichtung. Ein eigener Leerzeichen-Test
+reproduziert dies mit dem bisherigen Objekt und haltendem UBSan (Exit 134).
+Die eigene UI-Korrektur überspringt Bitmaps ohne Breite/Höhe vor dieser
+Zeigeroperation; Glyphenpositionen und Advances bleiben erhalten.
+
+Die Quellvorbereitung erkennt ausschließlich die festgelegte Originalquelle,
+den bisherigen Original-plus-Hook-Stand und den korrigierten Stand. Korrigierte
+Hauptdatei ohne Hookmarker: SHA-256
+`effab05fe248deadc02a1259ca640fa9c785909c3398ae16b13a1fabbe9c1b9e`.
+Fünf Fixtures bestätigen Vorbereitung, Upgrade, Idempotenz und unveränderte
+Abweisung geänderter/abgeschnittener Quellen. Korrekturfragment:
+`third_party/ui/ttf_empty_glyph_guard.inc`. Originalhash und Lizenz bleiben
+maßgeblich; [Umsetzungsnachweise](STATUS.md).

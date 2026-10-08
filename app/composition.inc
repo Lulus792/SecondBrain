@@ -195,25 +195,7 @@ static struct nk_text_edit *sb_ui_composition_display(struct nk_text_edit *edit)
 static void sb_ui_composition_mark(struct nk_command_buffer *out,struct nk_text_edit *edit,const struct nk_style_edit *style,const struct nk_user_font *font,struct nk_rect area,float row_height) {
     SBUi *ui=edit->display_userdata.ptr;SBComposition *c=ui ? ui->composition : NULL;
     if(!c || !c->active || edit!=c->visual)return;
-    const char *text=c->render_text;size_t bytes=strlen(text),at=0,line_begin=0;int index=0,line_index=0,line=0;
-    while(at<=bytes) {
-        if(at==bytes || text[at]=='\n') {
-            int first=NK_MAX(line_index,c->marked_start),last=NK_MIN(index,c->marked_end);
-            if(first<last) {
-                size_t a=composition_byte(text+line_begin,at-line_begin,first-line_index);
-                size_t b=composition_byte(text+line_begin,at-line_begin,last-line_index);
-                float x=area.x-edit->scrollbar.x;
-                float left=x+font->width(font->userdata,font->height,text+line_begin,(int)a);
-                float right=x+font->width(font->userdata,font->height,text+line_begin,(int)b);
-                float y=area.y+line*row_height-edit->scrollbar.y+(row_height+font->height)/2+1;
-                left=fmaxf(left,out->clip.x);right=fminf(right,out->clip.x+out->clip.w);
-                if(right>left && y>=out->clip.y && y<=out->clip.y+out->clip.h)
-                    nk_stroke_line(out,left,y,right,y,1,style->text_normal);
-            }
-            if(at==bytes)break;
-            ++at;++index;++line;line_begin=at;line_index=index;
-        } else {nk_rune rune;at+=(size_t)nk_utf_decode(text+at,&rune,(int)(bytes-at));++index;}
-    }
+    sb_ui_edit_mark(out,edit,style,font,area,row_height,c->marked_start,c->marked_end);
 }
 static void sb_ui_composition_frame_end(SBUi *ui) {
     SBComposition *c=ui->composition;if(!c)return;

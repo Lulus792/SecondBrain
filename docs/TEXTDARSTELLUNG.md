@@ -164,3 +164,11 @@ beschreiben ihren jeweiligen historischen Stand. Editor, Suche, Formulare,
 einfache Labels und native Zeichenrechtecke bleiben anschließend umzusetzen.
 Neue native Plattformabnahme und installierte Version werden getrennt in STATUS
 dokumentiert.
+
+## Editor und Eingabefelder ab 0.9.35
+
+[EDITORGEOMETRIE.md](EDITORGEOMETRIE.md) bindet die geformte Zeile samt
+Cursorpunkten an Zeichnung, Auswahl, Maus, Pfeile und IME-Markierung an.
+Die vorigen Abschnitte beschreiben ihren jeweiligen historischen Stand.
+Einfache Labels/Schaltflächentexte, native Zeichenrechtecke, vollständige
+Unicode-Wortnavigation und reale Eingabe-/Screenreader-Abnahme bleiben offen.

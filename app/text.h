@@ -9,6 +9,7 @@ void sb_ui_text_draw(struct nk_draw_list *list, const struct nk_command_text *co
 const struct nk_user_font *sb_ui_text_style(SBUi *ui,const struct nk_user_font *base,unsigned style);
 size_t sb_ui_text_fit(const struct nk_user_font *font,const char *value,size_t length,float available,float *measured);
 bool sb_ui_text_metrics(const struct nk_user_font *font,const char *value,size_t length,float *ascent,float *descent);
+SBUi *sb_ui_font_owner(const struct nk_user_font *font);
 TTF_Font *sb_ui_cluster_font(const struct nk_user_font *font,const char *value,size_t length,TTF_Font *previous);
 bool sb_ui_shaped_draw(SBUi *ui,const SBShapedLine *line,float x,float baseline,struct nk_color color);
 #endif

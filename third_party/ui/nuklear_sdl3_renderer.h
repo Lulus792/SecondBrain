@@ -265,13 +265,27 @@ nk_sdl_render(struct nk_context* ctx, enum nk_anti_aliasing AA)
         /* convert shapes into vertices */
         nk_buffer_init(&vbuf, &sdl->allocator, NK_BUFFER_DEFAULT_INITIAL_SIZE);
         nk_buffer_init(&ebuf, &sdl->allocator, NK_BUFFER_DEFAULT_INITIAL_SIZE);
-        nk_convert(&sdl->ctx, &sdl->ogl.cmds, &vbuf, &ebuf, &config);
+        if(nk_convert(&sdl->ctx, &sdl->ogl.cmds, &vbuf, &ebuf, &config)!=NK_CONVERT_SUCCESS){
+            nk_clear(&sdl->ctx);nk_buffer_clear(&sdl->ogl.cmds);
+            nk_buffer_free(&vbuf);nk_buffer_free(&ebuf);return;
+        }
 
         /* iterate over and execute each draw command */
         offset = (const nk_draw_index*)nk_buffer_memory_const(&ebuf);
 
+        /* Clip at backing-pixel boundaries. Integer logical SDL clips lost
+           half-point caret/selection edges on Retina and left seams between
+           adjacent color clips. Converted vertices are frame-local. */
+        float saved_scale_x=1,saved_scale_y=1;
+        SDL_GetRenderScale(sdl->renderer,&saved_scale_x,&saved_scale_y);
+        {
+            struct nk_sdl_vertex *v=nk_buffer_memory(&vbuf);
+            nk_size count=vbuf.needed/sizeof(*v);
+            for(nk_size i=0;i<count;++i){v[i].position[0]*=saved_scale_x;v[i].position[1]*=saved_scale_y;}
+        }
         clipping_enabled = SDL_RenderClipEnabled(sdl->renderer);
         SDL_GetRenderClipRect(sdl->renderer, &saved_clip);
+        SDL_SetRenderScale(sdl->renderer,1,1);
 
         /* Ensure alpha blending is enabled for geometry rendering. */
         saved_blend = SDL_BLENDMODE_INVALID;
@@ -284,10 +298,10 @@ nk_sdl_render(struct nk_context* ctx, enum nk_anti_aliasing AA)
 
             {
                 SDL_Rect r;
-                r.x = cmd->clip_rect.x;
-                r.y = cmd->clip_rect.y;
-                r.w = cmd->clip_rect.w;
-                r.h = cmd->clip_rect.h;
+                r.x = (int)SDL_floorf(cmd->clip_rect.x*saved_scale_x);
+                r.y = (int)SDL_floorf(cmd->clip_rect.y*saved_scale_y);
+                r.w = (int)SDL_floorf((cmd->clip_rect.x+cmd->clip_rect.w)*saved_scale_x)-r.x;
+                r.h = (int)SDL_floorf((cmd->clip_rect.y+cmd->clip_rect.h)*saved_scale_y)-r.y;
                 SDL_SetRenderClipRect(sdl->renderer, &r);
             }
 
@@ -312,6 +326,7 @@ nk_sdl_render(struct nk_context* ctx, enum nk_anti_aliasing AA)
             SDL_SetRenderDrawBlendMode(sdl->renderer, saved_blend);
         }
 
+        SDL_SetRenderScale(sdl->renderer,saved_scale_x,saved_scale_y);
         SDL_SetRenderClipRect(sdl->renderer, &saved_clip);
         if (!clipping_enabled) {
             SDL_SetRenderClipRect(sdl->renderer, NULL);

@@ -850,14 +850,14 @@ NK_API void nk_input_begin(struct nk_context*);
  *
  * \details
  * ```c
- * void nk_input_motion(struct nk_context *ctx, int x, int y);
+ * void nk_input_motion(struct nk_context *ctx, float x, float y);
  * ```
  *
  * \param[in] ctx   Must point to a previously initialized `nk_context` struct
  * \param[in] x     Must hold an integer describing the current mouse cursor x-position
  * \param[in] y     Must hold an integer describing the current mouse cursor y-position
  */
-NK_API void nk_input_motion(struct nk_context*, int x, int y);
+NK_API void nk_input_motion(struct nk_context*, float x, float y);
 
 /**
  * \brief Mirrors the state of a specific key to nuklear
@@ -878,7 +878,7 @@ NK_API void nk_input_key(struct nk_context*, enum nk_keys, nk_bool down);
  *
  * \details
  * ```c
- * void nk_input_button(struct nk_context *ctx, enum nk_buttons btn, int x, int y, nk_bool down);
+ * void nk_input_button(struct nk_context *ctx, enum nk_buttons btn, float x, float y, nk_bool down);
  * ```
  *
  * \param[in] ctx     Must point to a previously initialized `nk_context` struct
@@ -887,7 +887,7 @@ NK_API void nk_input_key(struct nk_context*, enum nk_keys, nk_bool down);
  * \param[in] y       Must contain an integer describing mouse cursor y-position on click up/down
  * \param[in] down    Must be 0 for key is up and 1 for key is down
  */
-NK_API void nk_input_button(struct nk_context*, enum nk_buttons, int x, int y, nk_bool down);
+NK_API void nk_input_button(struct nk_context*, enum nk_buttons, float x, float y, nk_bool down);
 
 /**
  * \brief Copies the last mouse scroll value to nuklear.
@@ -4607,6 +4607,10 @@ struct nk_text_edit {
     struct nk_rect caret_bounds;
     struct nk_rect caret_clip;
     nk_handle display_userdata;
+    int visual_cursor;
+    unsigned long long visual_hash;
+    float visual_x;
+    unsigned char visual_affinity,visual_level,visual_valid;
 
     int cursor;
     int select_start;
@@ -4734,8 +4738,7 @@ struct nk_command {
 
 struct nk_command_scissor {
     struct nk_command header;
-    short x, y;
-    unsigned short w, h;
+    float x, y, w, h;
 };
 
 struct nk_command_line {
@@ -4766,9 +4769,7 @@ struct nk_command_rect {
 
 struct nk_command_rect_filled {
     struct nk_command header;
-    unsigned short rounding;
-    short x, y;
-    unsigned short w, h;
+    float rounding, x, y, w, h;
     struct nk_color color;
 };
 
@@ -5797,6 +5798,10 @@ struct nk_edit_state {
     unsigned int old;
     int active, prev;
     int cursor;
+    int visual_cursor;
+    unsigned long long visual_hash;
+    float visual_x;
+    unsigned char visual_affinity,visual_level,visual_valid;
     int sel_start;
     int sel_end;
     struct nk_scroll scrollbar;
@@ -9385,10 +9390,10 @@ nk_push_scissor(struct nk_command_buffer *b, struct nk_rect r)
         nk_command_buffer_push(b, NK_COMMAND_SCISSOR, sizeof(*cmd));
 
     if (!cmd) return;
-    cmd->x = (short)r.x;
-    cmd->y = (short)r.y;
-    cmd->w = (unsigned short)NK_MAX(0, r.w);
-    cmd->h = (unsigned short)NK_MAX(0, r.h);
+    cmd->x = r.x;
+    cmd->y = r.y;
+    cmd->w = NK_MAX(0, r.w);
+    cmd->h = NK_MAX(0, r.h);
 }
 NK_API void
 nk_stroke_line(struct nk_command_buffer *b, float x0, float y0,
@@ -9464,7 +9469,7 @@ nk_fill_rect(struct nk_command_buffer *b, struct nk_rect rect,
         const struct nk_rect *clip = &b->clip;
         if (!NK_INTERSECT(rect.x, rect.y, rect.w, rect.h,
             clip->x, clip->y, clip->w, clip->h)) return;
-        /* Huge, square text selections are clipped before 16-bit packing. */
+        /* Clip huge square selections before geometry conversion. */
         if (rounding==0 && (rect.x<-32768 || rect.y<-32768 || rect.x>32767 || rect.y>32767 || rect.w>65535 || rect.h>65535)) {
             float right=NK_MIN(rect.x+rect.w,clip->x+clip->w),bottom=NK_MIN(rect.y+rect.h,clip->y+clip->h);
             rect.x=NK_MAX(rect.x,clip->x);rect.y=NK_MAX(rect.y,clip->y);
@@ -9476,11 +9481,11 @@ nk_fill_rect(struct nk_command_buffer *b, struct nk_rect rect,
     cmd = (struct nk_command_rect_filled*)
         nk_command_buffer_push(b, NK_COMMAND_RECT_FILLED, sizeof(*cmd));
     if (!cmd) return;
-    cmd->rounding = (unsigned short)rounding;
-    cmd->x = (short)rect.x;
-    cmd->y = (short)rect.y;
-    cmd->w = (unsigned short)NK_MAX(0, rect.w);
-    cmd->h = (unsigned short)NK_MAX(0, rect.h);
+    cmd->rounding = rounding;
+    cmd->x = rect.x;
+    cmd->y = rect.y;
+    cmd->w = NK_MAX(0, rect.w);
+    cmd->h = NK_MAX(0, rect.h);
     cmd->color = c;
 }
 NK_API void
@@ -18344,7 +18349,7 @@ nk_input_end(struct nk_context *ctx)
     }
 }
 NK_API void
-nk_input_motion(struct nk_context *ctx, int x, int y)
+nk_input_motion(struct nk_context *ctx, float x, float y)
 {
     struct nk_input *in;
     NK_ASSERT(ctx);
@@ -18371,7 +18376,7 @@ nk_input_key(struct nk_context *ctx, enum nk_keys key, nk_bool down)
     in->keyboard.keys[key].down = down;
 }
 NK_API void
-nk_input_button(struct nk_context *ctx, enum nk_buttons id, int x, int y, nk_bool down)
+nk_input_button(struct nk_context *ctx, enum nk_buttons id, float x, float y, nk_bool down)
 {
     struct nk_mouse_button *btn;
     struct nk_input *in;
@@ -27453,6 +27458,9 @@ NK_INTERN int
 nk_textedit_locate_coord(struct nk_text_edit *edit, float x, float y,
     const struct nk_user_font *font, float row_height)
 {
+#ifdef NK_TEXTEDIT_LOCATE_CUSTOM
+    {int result=NK_TEXTEDIT_LOCATE_CUSTOM(edit,x,y,font,row_height);if(result>=0)return result;}
+#endif
     struct nk_text_edit_row r;
     int n = edit->string.len;
     float base_y = 0, prev_x;
@@ -27871,6 +27879,10 @@ NK_LIB void
 nk_textedit_key(struct nk_text_edit *state, enum nk_keys key, int shift_mod,
     const struct nk_user_font *font, float row_height)
 {
+#ifdef NK_TEXTEDIT_KEY_CUSTOM
+    if(NK_TEXTEDIT_KEY_CUSTOM(state,key,shift_mod,font,row_height))return;
+#endif
+    state->visual_valid=0;
 retry:
     switch (key)
     {
@@ -28475,6 +28487,7 @@ nk_textedit_clear_state(struct nk_text_edit *state, enum nk_text_edit_type type,
    state->has_preferred_x = 0;
    state->preferred_x = 0;
    state->cursor_at_end_of_line = 0;
+   state->visual_valid = 0;
    state->initialized = 1;
    state->single_line = (unsigned char)(type == NK_TEXT_EDIT_SINGLE_LINE);
    state->mode = NK_TEXT_EDIT_MODE_VIEW;
@@ -28898,6 +28911,9 @@ nk_do_edit(nk_flags *state, struct nk_command_buffer *out,
 
 
     area.w = NK_MAX(0, area.w - style->cursor_size);
+#ifdef NK_TEXTEDIT_RENDER_CUSTOM
+    if(NK_TEXTEDIT_RENDER_CUSTOM(out,edit,style,font,area,clip,bounds,flags,in,*state,row_height,cursor_follow,edit!=original_edit))goto edit_custom_done;
+#endif
     if (edit->active)
     {
         int total_lines = 1;
@@ -29238,6 +29254,9 @@ nk_do_edit(nk_flags *state, struct nk_command_buffer *out,
             area.y - edit->scrollbar.y, 0, begin, l, row_height, font,
             background_color, text_color, nk_false);
     }
+#ifdef NK_TEXTEDIT_RENDER_CUSTOM
+edit_custom_done:
+#endif
 #ifdef NK_TEXTEDIT_MARKED_CUSTOM
     NK_TEXTEDIT_MARKED_CUSTOM(out,edit,style,font,area,row_height);
 #endif
@@ -29315,6 +29334,8 @@ nk_edit_string(struct nk_context *ctx, nk_flags flags,
         edit->scrollbar.x = (float)win->edit.scrollbar.x;
         edit->scrollbar.y = (float)win->edit.scrollbar.y;
         edit->active = nk_true;
+        edit->visual_cursor=win->edit.visual_cursor;edit->visual_hash=win->edit.visual_hash;edit->visual_x=win->edit.visual_x;
+        edit->visual_affinity=win->edit.visual_affinity;edit->visual_level=win->edit.visual_level;edit->visual_valid=win->edit.visual_valid;
     } else edit->active = nk_false;
 
     max = NK_MAX(1, max);
@@ -29327,6 +29348,8 @@ nk_edit_string(struct nk_context *ctx, nk_flags flags,
 
     if (edit->active) {
         win->edit.cursor = edit->cursor;
+        win->edit.visual_cursor=edit->visual_cursor;win->edit.visual_hash=edit->visual_hash;win->edit.visual_x=edit->visual_x;
+        win->edit.visual_affinity=edit->visual_affinity;win->edit.visual_level=edit->visual_level;win->edit.visual_valid=edit->visual_valid;
         win->edit.sel_start = edit->select_start;
         win->edit.sel_end = edit->select_end;
         win->edit.mode = edit->mode;
@@ -29380,6 +29403,7 @@ nk_edit_buffer(struct nk_context *ctx, nk_flags flags,
     } else edit->active = nk_false;
     edit->mode = win->edit.mode;
 
+    edit->single_line=(unsigned char)((flags&NK_EDIT_MULTILINE)==0);
     filter = (!filter) ? nk_filter_default: filter;
     prev_state = (unsigned char)edit->active;
     in = (flags & NK_EDIT_READ_ONLY) ? 0: in;

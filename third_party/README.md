@@ -36,6 +36,11 @@ der mitgelieferten Nuklear-LICENSE. Die Quellen sind im Repository enthalten.
 
 Lokale Anpassungen des Nuklear-Headers:
 
+- Ab 0.9.35 verwenden die eigenen Eingabe-/Zeichnungshooks den gemeinsamen
+  [Editorplan](../docs/EDITORGEOMETRIE.md); Affinität bleibt in Feldzuständen
+  erhalten, Maus-/Scissor-/Füllrechtecke behalten Float-Werte. Der SDL-Renderer
+  setzt Clips an Backing-Pixelgrenzen und stellt Maßstab/Clip danach wieder her.
+
 - UTF-8-Einfügen arbeitet mit Byte-Längen und Unicode-Zeichenpositionen.
 - Vor einer Auswahlersetzung wird Speicher reserviert; bei ungültigem Text oder
   fehlender Kapazität bleibt die bisherige Auswahl erhalten. Diese Korrektur
@@ -256,3 +261,10 @@ Sie ergänzt ausschließlich die festgelegten externen UI-Adapter, unter
 der eigenen MIT-Lizenz; ursprüngliche Lizenzen und Cargo-Versionen bleiben
 erhalten. Der [Tabellenvertrag](../docs/TABELLEN.md) beschreibt den nativen
 Baum, die Schnittstellen und die getrennten Ausführungsnachweise.
+
+Ab 0.9.35 korrigiert `ttf_empty_glyph_guard.inc` im festgelegten SDL_ttf-
+Rastermakro die Zeigerarithmetik bei leeren Bitmaps. Die Quellvorbereitung
+prüft Original- und korrigierten Hash sowie den eigenen Hookmarker; unbekannte
+Dateien werden unverändert abgewiesen. [Befund/Nachweise](../docs/GLYPHENGEOMETRIE.md).
+Die Korrektur ist eigener MIT-lizenzierter UI-Code; die ursprüngliche Datei
+bleibt der festgelegten SDL_ttf-Lizenz zugeordnet.

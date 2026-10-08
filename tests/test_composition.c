@@ -10,12 +10,16 @@ static SDL_Event input(SBUi *ui,const char *s){SDL_Event e={0};e.type=SDL_EVENT_
 static SDL_Event key(SBUi *ui,SDL_Keycode k){SDL_Event e={0};e.type=SDL_EVENT_KEY_DOWN;e.key.windowID=SDL_GetWindowID(ui->window);e.key.key=k;e.key.down=true;return e;}
 static bool drawn,captured;
 static const char *capture_path;
+typedef struct {const char *expected;bool matched;} DisplayProbe;
+static bool inspect_display(void *user,const char *text,size_t length,size_t offset,const SBShapedLine *line,const SBCaretPlan *carets,float y){
+ DisplayProbe *p=user;(void)offset;(void)y;if(length==strlen(p->expected) && !memcmp(text,p->expected,length) && line->count && carets->count)p->matched=true;return true;
+}
 static void frame(SBUi *ui,struct nk_text_edit *edit,const SDL_Event *events,size_t count,const char *expected){
  nk_input_begin(ui->ctx);SDL_Event queued;while(SDL_PollEvent(&queued))sb_ui_event(ui,&queued);
  for(size_t i=0;i<count;++i)sb_ui_event(ui,&events[i]);nk_input_end(ui->ctx);
  nk_begin(ui->ctx,"IME",nk_rect(0,0,1000,640),NK_WINDOW_NO_SCROLLBAR);
  nk_layout_row_dynamic(ui->ctx,400,1);nk_edit_focus(ui->ctx,NK_EDIT_BOX);nk_edit_buffer(ui->ctx,NK_EDIT_BOX,edit,nk_filter_default);nk_end(ui->ctx);
- drawn=false;if(expected){const struct nk_command *command;nk_foreach(command,ui->ctx)if(command->type==NK_COMMAND_TEXT){const struct nk_command_text *t=(const struct nk_command_text *)command;if((size_t)t->length==strlen(expected) && !memcmp(t->string,expected,strlen(expected)))drawn=true;}}
+ drawn=false;if(expected){DisplayProbe probe={.expected=expected};sb_ui_edit_geometry(ui,edit,ui->ctx->style.font,ui->ctx->style.font->height+ui->ctx->style.edit.row_padding,true,inspect_display,&probe);drawn=probe.matched;}
  nk_sdl_update_TextInput(ui->ctx);sb_ui_draw(ui);if(expected && capture_path){captured=sb_ui_capture(ui,capture_path).code==SB_OK;capture_path=NULL;}SDL_RenderPresent(ui->renderer);
 }
 int main(int argc,char **argv){
@@ -24,6 +28,9 @@ int main(int argc,char **argv){
  capture_path=argv[2];short undo=edit.undo.undo_point;SDL_Rect original,marked;int offset;CHECK(SDL_GetTextInputArea(ui.window,&original,&offset));
  SDL_Event e=editing(&ui,"日本語",3,0);frame(&ui,&edit,&e,1,"Before 日本語after");CHECK(drawn);CHECK(equal(&edit,"Before after"));CHECK(edit.cursor==7 && edit.undo.undo_point==undo);
  CHECK(SDL_GetTextInputArea(ui.window,&marked,&offset) && marked.x>original.x);
+ SDL_Rect preedit_start,preedit_selected;e=editing(&ui,"日本語",1,0);frame(&ui,&edit,&e,1,NULL);CHECK(SDL_GetTextInputArea(ui.window,&preedit_start,&offset));
+ e=editing(&ui,"日本語",1,1);frame(&ui,&edit,&e,1,NULL);CHECK(SDL_GetTextInputArea(ui.window,&preedit_selected,&offset));CHECK(preedit_start.x==preedit_selected.x && preedit_start.y==preedit_selected.y && equal(&edit,"Before after") && edit.undo.undo_point==undo);
+ e=editing(&ui,"日本語",3,0);frame(&ui,&edit,&e,1,NULL);
  e=key(&ui,SDLK_LEFT);frame(&ui,&edit,&e,1,NULL);CHECK(edit.cursor==7 && equal(&edit,"Before after"));
  e=key(&ui,SDLK_RETURN);frame(&ui,&edit,&e,1,NULL);CHECK(equal(&edit,"Before after"));
  CHECK(captured);

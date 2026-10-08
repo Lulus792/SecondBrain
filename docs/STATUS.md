@@ -2577,3 +2577,54 @@ Neue native Plattformprüfung dieser Cursorgrundlage folgt nach Veröffentlichun
 Die installierte App bleibt bewusst beim vollständig paketgeprüften
 0.9.34 / 4eda9dbfce37. Die neue Geometrie wird noch nicht als fertige
 Cursorbedienung der App ausgegeben; dazu ist die gemeinsame Editor-Anbindung nötig.
+
+## Gemeinsame produktive Editor-/Feldgeometrie (0.9.35)
+
+[EDITORGEOMETRIE.md](EDITORGEOMETRIE.md) bindet die geformte Zeile und ihre
+Cursorpunkte an Editor, Suche und Formularfelder an: Zeichnung, Auswahl, Maus,
+visuelle Pfeile, vertikale Zielposition, CRLF, Affinität nach Schriftwechsel
+und IME-Markierung verwenden denselben Plan. Original-/Undo-Daten bleiben
+logisch. Die Einbindung ersetzt nicht die noch offenen nativen Zeichenrechtecke
+oder reale Eingabemethoden-/Screenreader-Abnahme.
+
+Lokale unabhängige Raster-/Glyphenprüfung: 86 Assertions bei 100/150/200 Prozent,
+darunter pixelidentische Darstellung mit separat festgelegten Font-/Script-
+bereichen und logisch zusammenhängender, visuell getrennter Auswahl. Gezeichnete
+Float-Cursorpunkte, Mauskoordinaten, Ligatur-/RTL-Schritte, vertikale Bewegung,
+CRLF und gewählte Seite nach Schriftwechsel bestehen. Die erweiterte IME-Prüfung
+besteht mit 39 Assertions; Original und Undo bleiben erhalten, die markierte
+Länge verschiebt den angeforderten Eingabeanker nicht. Die Darstellung wurde
+anhand der tatsächlichen Pixelaufnahme betrachtet.
+
+Ein UI-Sanitizerlauf fand in SDL_ttf 3.2.2 eine Pointer-Overflow-UB an einer
+leeren Glyphenbitmap. Der isolierte Leerzeichen-Test reproduziert sie mit dem
+bisherigen Objekt und haltendem UBSan (Exit 134). Nach eigener, hashgeprüfter
+Korrektur besteht derselbe Test mit 2.523 Assertions und haltendem UBSan.
+Fünf Quellfixtures bestehen: Original, Upgrade, Idempotenz und unveränderte
+Abweisung geänderter/abgeschnittener Quellen. [Genauer Befund](GLYPHENGEOMETRIE.md).
+
+Ein frischer UI-Release-Build mit BUILD_TESTING=OFF besteht und meldet 0.9.35.
+Installiert bleibt bis zur sauberen Paketabnahme 0.9.34 / 4eda9dbfce37. Die
+vorausgehende Cursorgrundlage zu 13e9e08 besteht inzwischen alle **20 Jobs**
+inklusive vier entpackter Pakete: [CI 37755747754](https://github.com/Lulus792/SecondBrain/actions/runs/37755747754).
+Das belegt die vorige Grundlage, nicht die neue produktive Editor-Anbindung.
+
+Schlussprüfung nach der Bitmapkorrektur: **60/60 lokale Release-Prüfungen
+bestehen (302,81 s)**. Der neue Quellvorbereitungstest und der Leerbitmap-Test
+sind enthalten. Gezielte ASan/UBSan-Prüfungen verwenden jetzt haltendes UBSan;
+86 Editor-/Pixel-/Geometrie- und 39 IME-Assertions bestehen ohne Befund.
+Instrumentiert sind eigener UI-/Editor-/Renderer-Code, Glyphen-/Cursor-/Script-/
+Bidi-Code, Bidi-Engine, Prüfer und die vollständige SDL_ttf.c mit eigenen Hooks
+und Bitmapkorrektur. Kern, SDL/HarfBuzz/FreeType und weitere SDL_ttf-Objekte
+sind nicht instrumentiert; macOS-Leakprüfung ist abgeschaltet. Quellhashes
+und Protokolle: lokal build/editor-sanitizers/sources.json und *-final.log.
+
+Die bestehende Editor-/Undo-/Kapazitätsprüfung besteht ebenfalls mit 134
+Assertions unter haltendem ASan/UBSan ohne Befund. Eine aktuelle große
+Editoransicht des eigenen PROJECT.md wurde gerastert und betrachtet; alle
+Projektgedächtnisdateien blieben dabei bytegleich. Native Metal-Stichprobe auf
+diesem Intel-Mac, 1336×840, 16 Notizen und je 60 warme Frames: Scroll-Median
+1,95 ms, Kamera 12,36 ms, Dokumentwechsel 14,24 ms/p95 25,66 ms. Der erste
+lange Wechsel bleibt bei 124,08 ms ein offener Ausreißer. Das belegt die
+benannte Stichprobe, keine globale Bildrate oder Langzeit-/Geräteabnahme.
+Protokoll: build/editor-native-profile.log.

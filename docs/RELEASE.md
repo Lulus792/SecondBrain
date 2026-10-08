@@ -149,3 +149,12 @@ Sanitizer und UI-Build ohne Tests bestehen; [Nachweise](STATUS.md).
 Die offene Textaufgabe betrifft weiterhin Editor, Suche/Formulare/einfache Labels,
 visuelle Carets/Auswahl/IME, native Zeichenrechtecke und reale assistive Abnahme.
 Die neue Reader-Integration benötigt außerdem ihre eigene Plattform-/Paketabnahme.
+
+## Editorfortschritt vom 8. Oktober
+
+Ab 0.9.35 verwendet die produktive Eingabe einen gemeinsamen Glyphen-/Cursorplan
+für Darstellung, Auswahl, Maus, Pfeile und IME-Markierung. Die vorhandene
+logische Speicherung und Undo bleiben erhalten. [Umfang/Nachweise](EDITORGEOMETRIE.md).
+Native Zeichenrechtecke, einfache Label-/Schaltflächentexte, Unicode-Wortregeln,
+große reale Dateien sowie reale Eingabe-/Screenreader-Abnahme bleiben offen.
+Die neue Plattform-/Paketabnahme wird in STATUS gesondert dokumentiert.

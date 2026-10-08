@@ -124,3 +124,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Cursorgeometrie](../../docs/CURSORGEOMETRIE.md): tatsächliche Glyphen-/GDEF-
   Positionen, Bidi-Affinität, Maus-/Auswahlregeln, Indizes und offene Editor-/
   IME-/native Integration.
+
+- [Produktive Editor-/Feldgeometrie](../../docs/EDITORGEOMETRIE.md): gemeinsamer
+  Plan für Cursor/Auswahl/Maus/Pfeile/IME, Backing-Pixelclips, Cache und
+  verbleibende native/Unicode-/Leistungsabnahme.

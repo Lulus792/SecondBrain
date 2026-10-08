@@ -14,6 +14,7 @@ struct nk_rect;
 struct nk_command_buffer;
 struct nk_style_edit;
 struct nk_user_font;
+struct nk_input;
 static void sb_ui_input_caret(struct nk_context *,struct nk_text_edit *);
 static void sb_ui_composition_prepare(struct nk_context *,struct nk_text_edit *,unsigned int,unsigned int);
 static struct nk_text_edit *sb_ui_composition_display(struct nk_text_edit *);
@@ -22,12 +23,19 @@ static void sb_ui_composition_mark(struct nk_command_buffer *,struct nk_text_edi
 #define NK_TEXTEDIT_DISPLAY_CUSTOM sb_ui_composition_display
 #define NK_TEXTEDIT_MARKED_CUSTOM sb_ui_composition_mark
 #define NK_TEXTEDIT_CARET_CUSTOM sb_ui_input_caret
+static int sb_ui_edit_locate(struct nk_text_edit *,float,float,const struct nk_user_font *,float);
+static int sb_ui_edit_key(struct nk_text_edit *,int,int,const struct nk_user_font *,float);
+static int sb_ui_edit_render(struct nk_command_buffer *,struct nk_text_edit *,const struct nk_style_edit *,const struct nk_user_font *,struct nk_rect,struct nk_rect,struct nk_rect,unsigned int,struct nk_input *,unsigned int,float,int,int);
+#define NK_TEXTEDIT_LOCATE_CUSTOM sb_ui_edit_locate
+#define NK_TEXTEDIT_KEY_CUSTOM sb_ui_edit_key
+#define NK_TEXTEDIT_RENDER_CUSTOM sb_ui_edit_render
 #define NK_DRAW_TEXT_CUSTOM sb_ui_text_draw
 #define NK_IMPLEMENTATION
 #define NK_SDL3_RENDERER_IMPLEMENTATION
 #include "ui.h"
 #include "text.h"
 #include "styled_text.inc"
+#include "edit_geometry.inc"
 #define SDL_MAIN_HANDLED
 #include <SDL3/SDL_main.h>
 #include "platform.h"
@@ -113,10 +121,20 @@ static int sb_ui_grapheme_text(struct nk_text_edit *edit,const char *text,int le
     }
     int inserted=nk_textedit_paste(edit,filtered,used);
     if (!inserted) { edit->cursor=cursor; edit->select_start=start; edit->select_end=end; }
+    if(inserted)edit->visual_valid=0;
     free(filtered);return inserted;
 }
 
 #include "composition.inc"
+
+bool sb_ui_edit_geometry(SBUi *ui,struct nk_text_edit *edit,const struct nk_user_font *font,float row,bool display,SBEditGeometryVisitor visitor,void *user){
+    if(!ui || !edit || !visitor || sb_ui_font_owner(font)!=ui)return false;
+    if(display && ui->composition && ui->composition->active && ui->composition->visual && edit->display_userdata.ptr==ui)edit=ui->composition->visual;
+    SBEditPlan *plan=edit_plan(edit,font,row);if(!plan)return false;
+    for(size_t i=0;i<plan->count;++i){SBEditLine *line=&plan->lines[i];if(!visitor(user,plan->text+line->byte,line->length,line->byte,&line->shape,&line->carets,i*plan->row))return false;}
+    return true;
+}
+
 
 float sb_ui_wrap_height(struct nk_context *ctx,const struct nk_user_font *font,const char *text,size_t length,float width) {
     struct nk_vec2 padding=ctx->style.text.padding;
@@ -365,7 +383,7 @@ void sb_ui_draw(SBUi *ui) {
     SDL_SetRenderLogicalPresentation(ui->renderer,width,height,SDL_LOGICAL_PRESENTATION_STRETCH);
     SDL_SetRenderDrawColor(ui->renderer,ui->dark ? 28 : 255,ui->dark ? 29 : 255,ui->dark ? 33 : 255,255);SDL_RenderClear(ui->renderer);
     if (!sb_space_draw(&ui->space,ui->renderer,width,height)) {SDL_SetRenderDrawColor(ui->renderer,7,14,26,255);SDL_RenderClear(ui->renderer);}
-    nk_sdl_render(ui->ctx,NK_ANTI_ALIASING_ON);sb_ui_text_frame_end(ui);
+    nk_sdl_render(ui->ctx,NK_ANTI_ALIASING_ON);sb_ui_text_frame_end(ui);edit_cache_frame_end(ui);
     if (ui->transitioning && ui->outgoing_texture) {
         SDL_FRect dest=ui->outgoing_bounds,source={dest.x*ui->snapshot_width/width,dest.y*ui->snapshot_height/height,dest.w*ui->snapshot_width/width,dest.h*ui->snapshot_height/height};
         float opacity=1-ui->transition;opacity=opacity*opacity;SDL_SetTextureAlphaModFloat(ui->outgoing_texture,opacity);

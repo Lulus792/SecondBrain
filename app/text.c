@@ -37,6 +37,7 @@ typedef struct {
 #define SB_MEASURE_CACHE_ENTRIES 4096
 #define SB_MEASURE_CACHE_LENGTH 2048
 struct SBTextSystem {
+    SBUi *ui;
     SDL_Renderer *renderer;
     TTF_TextEngine *surface_engine;
     float density;
@@ -181,6 +182,7 @@ static float width(nk_handle handle, float height, const char *value, int length
     while (run_next(&runs,&run)) { int w=0,h=0; if (!TTF_GetStringSize(run.font,value+run.start,run.end-run.start,&w,&h)) return 0; total+=w; }
     float measured=(float)total/face->owner->density;if(memo){memo->width=measured;memo->width_ready=true;}return measured;
 }
+SBUi *sb_ui_font_owner(const struct nk_user_font *font){if(!font || font->width!=width)return NULL;SBTextFace *face=font->userdata.ptr;return face && face->owner ? face->owner->ui : NULL;}
 static TTF_Font *open_font(const char *path, float logical_height, float density) {
     TTF_Font *font=TTF_OpenFont(path,logical_height*density);
     if (!font) return NULL;
@@ -198,7 +200,7 @@ SBStatus sb_ui_text_fonts(SBUi *ui, float scale, float density) {
     if (first && !TTF_Init()) return sb_error(SB_IO,"Textdarstellung: %s",SDL_GetError());
     SBTextSystem *next=calloc(1,sizeof(*next));
     if (!next) { if (first) TTF_Quit(); return sb_error(SB_MEMORY,"Textdarstellung benötigt mehr Speicher."); }
-    next->renderer=ui->renderer; next->density=density; next->frame=1;
+    next->ui=ui;next->renderer=ui->renderer; next->density=density; next->frame=1;
     char folder[SB_PATH_CAP],path[SB_PATH_CAP];
     snprintf(folder,sizeof(folder),"%s",ui->font_path);
     char *slash=strrchr(folder,'/');
@@ -219,7 +221,7 @@ SBStatus sb_ui_text_fonts(SBUi *ui, float scale, float density) {
         face->nk.handle.height=heights[i]*scale;
         face->nk.handle.width=width;
     }
-    sb_ui_styled_cache_clear(ui);system_free(ui->text); ui->text=next;
+    sb_ui_edit_cache_clear(ui);sb_ui_styled_cache_clear(ui);system_free(ui->text); ui->text=next;
     ui->normal=&next->faces[0].nk; ui->body=&next->faces[8].nk;
     ui->heading=&next->faces[16].nk; ui->code=&next->faces[24].nk;
     ui->scale=scale; ui->density=density;
@@ -392,6 +394,7 @@ void sb_ui_text_frame_end(SBUi *ui) {
     ++text->frame;
 }
 void sb_ui_text_free(SBUi *ui) {
+    sb_ui_edit_cache_clear(ui);
     sb_ui_styled_cache_clear(ui);
     if (ui->text) { system_free(ui->text); ui->text=NULL; TTF_Quit(); }
 }

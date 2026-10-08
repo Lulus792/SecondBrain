@@ -19,11 +19,13 @@
 #include "space.h"
 #include "inline.h"
 #include "shaped.h"
+#include "carets.h"
 
 void sb_ui_grapheme_clamp(struct nk_text_edit *edit);
 typedef struct SBTextSystem SBTextSystem;
 typedef struct SBStyledCache SBStyledCache;
 typedef struct SBComposition SBComposition;
+typedef struct SBEditCache SBEditCache;
 typedef struct {
     SBTextSystem *text;
     SBStyledCache *styled_cache;
@@ -43,6 +45,7 @@ typedef struct {
     unsigned char input_mode;
     struct nk_vec2 input_scrollbar;
     SBComposition *composition;
+    SBEditCache *edit_cache;
     SBStatus input_status;
     bool pointer_text;
     struct nk_context *ctx;
@@ -94,5 +97,12 @@ bool sb_ui_styled_geometry(SBUi *ui,const struct nk_user_font *base,const SBStyl
 SBStatus sb_ui_capture(SBUi *ui, const char *path);
 void sb_ui_shutdown(SBUi *ui);
 void sb_ui_reset_editor(SBUi *ui);
+void sb_ui_edit_cache_clear(SBUi *ui);
+/* Borrowed source and geometry only during the callback; x/glyph metrics in
+   backing pixels, y in local window points. display includes current IME. */
+typedef bool (*SBEditGeometryVisitor)(void *user,const char *source,size_t length,
+    size_t offset,const SBShapedLine *line,const SBCaretPlan *carets,float y);
+bool sb_ui_edit_geometry(SBUi *ui,struct nk_text_edit *edit,const struct nk_user_font *font,
+    float row,bool display,SBEditGeometryVisitor visitor,void *user);
 
 #endif
