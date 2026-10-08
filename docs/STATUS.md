@@ -3236,3 +3236,25 @@ Job-/Output-/Spitzen-Speichergrenzen und nichtblockierende Retire-/Shutdown-
 Integration bleiben offen. SBUI-074 ist damit nicht geschlossen. Neue Paket-/
 Zielplattformabnahme folgt; installiert bleibt zunächst0.9.43. Vollständiger
 Auftrag aktiv;1.0 weiterhin nur nach ausdrücklicher Nutzerfreigabe.
+
+## Geprüftes Font-/Jobpaket0.9.44 installiert
+
+Sauberer Intel/macOS-Release-Build **0.9.44 /0455e5a276f8**. Das entpackte
+Paket besteht126 Desktop-,158 Tastatur- und75 Sicherungs-Assertions, zwei
+isolierte Neustarts, produktive CLI-Sicherung/Wiederherstellung mit Unicode-
+Pfaden sowie Runtime-/Lizenz-/Version. Log:`build/prepare-package-check.log`.
+Archiv:`build/prepare-release-package/SecondBrain-0.9.44-Darwin-x86_64.tar.gz`,
+SHA-256:`0d309f76ac86b9acd26120105d985d4628753c2b00ebbaf8f399842a1a544884`.
+
+Alle 95 installierten Dateien entsprechen bytegleich dem geprüften Paket.
+Vorige0.9.43 erhalten unter `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.43-20261008-202002`.
+Eigene Instanz geladen, Ansicht betrachtet, Gedächtnis beim Laden unverändert.
+Nachweise:`build/prepare-install-proof.json`, `prepare-installed-brain.png`.
+0455e5a normal nach origin gepusht. Neue
+[CI37822760493](https://github.com/Lulus792/SecondBrain/actions/runs/37822760493)
+zuletzt queued; kein neuer Gesamt-Plattformnachweis für diesen Quellstand.
+
+Ungebrochener Worker-Zeilenprototyp noch nicht im produktiven Dokumentwechsel
+verwendet; voller Umbruch/Styles/Blöcke, begrenzte Job-/Speicherverwaltung,
+Retire-/Shutdown und sichtbare Integration bleiben offen. SBUI-074 und
+übrige Release-Liste bleiben aktiv.1.0 nur nach ausdrücklicher Nutzerfreigabe.

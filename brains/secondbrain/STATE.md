@@ -12,12 +12,12 @@ Lumen-Sternkarte, Glaskarten/Icons, direkte Pfeilnavigation, Kamerafahrt,
 weiches Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert: **0.9.43 / fe2436a7e57a**, sauberer Intel/macOS-Release-Build.
-94 Dateien entsprechen dem geprüften Paket, Gedächtnis beim Laden unverändert.
-Vorige 0.9.42: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.42-20261008-190720`.
+Installiert: **0.9.44 / 0455e5a276f8**, sauberer Intel/macOS-Release-Build.
+95 Dateien entsprechen dem geprüften Paket, Gedächtnis beim Laden unverändert.
+Vorige 0.9.43: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.43-20261008-202002`.
 Paketprüfung: 126 Desktop-, 158 Tastatur-, 75 Sicherungs-Assertions, zwei
 Neustarts, produktive CLI sowie Runtime-/Lizenz-/Version.
-CI37813553485 zufe2436a zuletzt queued; kein neuer Gesamt-Plattformnachweis.
+CI37822760493 zu0455e5a zuletzt queued; kein neuer Gesamt-Plattformnachweis.
 
 ## Aktueller geprüfter Fortschritt (0.9.43)
 
@@ -32,13 +32,13 @@ haltendem ASan/UBSan. Scope/Hashnachweise in STATUS. Build ohne Tests besteht.
 Vier abwechselnde lokale Profilpaare: nativer Export des vorbereiteten
 67-KB-Editors 34,53→6,71ms; keine allgemeine Bildraten-/Kaltlayout-Abnahme.
 Sauberes Intel/macOS-Paket und Installation bestehen; neue Zielplattformprüfungen
-bleiben offen. Die oben genannten Paketprüfungen gehören zu0.9.43.
+bleiben offen. Die oben genannten Paketprüfungen gehören zu0.9.44.
 
 ## Neue Diagnose des langen Wechsels
 
 Ein reiner Breitenmessversuch erhielt Geometrie, zeigte im alternierenden
 Vergleich keinen Gewinn (75,32→85,14ms Layoutmedian) und wurde vollständig
-entfernt. Produktcode/Installation bleiben0.9.43. Der
+entfernt. Der experimentelle Breitenmessweg ist weiterhin entfernt. Der
 [Vorbereitungsvertrag](../../docs/READER_VORBEREITUNG.md) folgt neu gelesenen
 Apple Loading/Motion und dem festgelegten SDL_ttf-Fontthreadvertrag.
 Neue UI-Diagnose SBUI-074; die Vorbereitung ist noch nicht integriert.
@@ -50,7 +50,8 @@ umgesetzt. Vor einmaliger Übernahme werden Source/Kontext/Fontbindung geprüft.
 69/69 lokale Release-Prüfungen (596,74s),393 neue Job-/Fontprüfungen bestehen.
 Dieselben393 plus405 native Text-,13.708 Editor- und590 Providerprüfungen auch
 unter haltendemASan/UBSan; Scope/Hashes in STATUS. Build ohne Tests besteht.
-[Vertrag](../../docs/FONT_SNAPSHOTS.md). Paket/Zielplattformen folgen.
+[Vertrag](../../docs/FONT_SNAPSHOTS.md). Intel/macOS-Paket/Installation bestehen;
+weitere Zielplattformen bleiben offen.
 Der produktive Wechsel ist noch nicht angebunden; das Ergebnis ist bislang
 eine ungebrochene Zeile. SBUI-074 bleibt offen.
 
