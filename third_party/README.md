@@ -10,7 +10,8 @@ Die originale Apache-2.0-Lizenz liegt unter `licenses/SheenBidi.txt` und wird
 mitgeliefert; Quelle und Hash stehen im Bidi-Manifest.
 Ein eigener [Glyphenplan](../docs/GLYPHENGEOMETRIE.md) nutzt den neuen,
 hashgeprüften C-Hook `ui/ttf_shape.h` / `ui/ttf_shape.inc` in SDL_ttf 3.2.2.
-Er ergänzt kontextgebundene Glyphenpositionen; die übrigen Textfunktionen bleiben
+Er ergänzt kontextgebundene Glyphenpositionen und die Abfrage originaler
+GDEF-Ligaturpositionen für die [Cursorgrundlage](../docs/CURSORGEOMETRIE.md); die übrigen Textfunktionen bleiben
 unverändert. Der Originalquelltext SHA-256
 `25a42804b18809e5c4b2eb8ed787701551d0c680aff774b7d8c54486c0d42d38`
 wird mit einem markierten Include erweitert. Bekannte vorbereitete Quellen

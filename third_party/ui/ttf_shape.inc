@@ -1,8 +1,9 @@
 /* SecondBrain UI extension to pinned SDL_ttf 3.2.2. Own code: MIT.
    Borrows the existing HarfBuzz/FreeType state; changes no font setting or
-   SDL_ttf text cache. The main renderer is connected in a subsequent step. */
+   SDL_ttf text cache. The styled reader uses this shared geometry. */
 #include "ttf_shape.h"
 #if TTF_USE_HARFBUZZ
+#include <hb-ot.h>
 static hb_codepoint_t sb_ttf_mirror(hb_unicode_funcs_t *funcs,hb_codepoint_t cp,void *data) {
     SBTTFMirror *mirror=data;Uint32 paired=(*mirror)(cp);(void)funcs;
     return paired && paired<=0x10ffff && !(paired>=0xd800 && paired<=0xdfff) ? paired : cp;
@@ -65,5 +66,22 @@ bool sb_ttf_shape_range(TTF_Font *font,const char *context,size_t length,
 #else
     (void)rtl;(void)script;(void)mirror;
     return SDL_SetError("Contextual shaping requires HarfBuzz");
+#endif
+}
+
+bool sb_ttf_ligature_carets(TTF_Font *font,Uint32 glyph,bool rtl,float *positions,
+    size_t capacity,size_t *count) {
+    TTF_CHECK_FONT(font,false);
+    if(!count || capacity>UINT_MAX || capacity>SIZE_MAX/sizeof(Sint32) || (capacity && !positions))return SDL_SetError("Invalid ligature caret output");
+#if TTF_USE_HARFBUZZ
+    unsigned wanted=(unsigned)capacity;
+    hb_position_t *values=wanted ? SDL_malloc(wanted*sizeof(*values)) : NULL;
+    if(wanted && !values)return SDL_OutOfMemory();
+    *count=hb_ot_layout_get_ligature_carets(font->hb_font,rtl ? HB_DIRECTION_RTL : HB_DIRECTION_LTR,glyph,0,&wanted,values);
+    for(unsigned i=0;i<wanted;++i)positions[i]=(float)values[i]/64.0f;
+    SDL_free(values);return true;
+#else
+    (void)glyph;(void)rtl;(void)positions;(void)capacity;
+    return SDL_SetError("Ligature carets require HarfBuzz");
 #endif
 }

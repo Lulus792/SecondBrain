@@ -120,3 +120,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   freie Suchflächen, Anfangsgeometrie und erneute Apple-Originale am 8. Oktober.
 - [Tabellenmatrix](../../docs/TABELLEN.md): native Mac-Matrix, verbleibende
   Windows-/Linux-Anbindung und getrennte Screenreader-Abnahme.
+
+- [Cursorgeometrie](../../docs/CURSORGEOMETRIE.md): tatsächliche Glyphen-/GDEF-
+  Positionen, Bidi-Affinität, Maus-/Auswahlregeln, Indizes und offene Editor-/
+  IME-/native Integration.

@@ -30,6 +30,7 @@ typedef struct {
 /* Resolves this logical line using its existing paragraph, then subdivides
    visual runs by fonts/scripts without re-running paragraph direction.
    Shapes against the complete line context, preserving joining across styles.
+   An empty paragraph accepts zero spans and yields an empty line.
    Output must be empty. Pixel geometry is at the supplied fonts' density. */
 SBStatus sb_shape_line(const SBTextParagraph *paragraph,size_t byte,size_t length,
     const SBShapeFontSpan *spans,size_t count,SBShapedLine *out);
@@ -39,5 +40,8 @@ SBStatus sb_shape_paragraph_create(const SBTextParagraph *paragraph,
     const SBShapeFontSpan *spans,size_t count,SBShapeParagraph **out);
 SBStatus sb_shape_paragraph_line(const SBShapeParagraph *paragraph,size_t byte,size_t length,SBShapedLine *out);
 void sb_shape_paragraph_free(SBShapeParagraph *paragraph);
+/* Immutable source/boundaries borrowed for geometry consumers. */
+const SBTextParagraph *sb_shape_paragraph_bidi(const SBShapeParagraph *paragraph);
+const uint32_t *sb_shape_paragraph_boundaries(const SBShapeParagraph *paragraph,size_t *count);
 void sb_shape_line_free(SBShapedLine *line);
 #endif

@@ -23,4 +23,8 @@ typedef Uint32 (*SBTTFMirror)(Uint32 codepoint);
 bool sb_ttf_shape_range(TTF_Font *font,const char *context,size_t length,
     size_t byte,size_t range,bool rtl,Uint32 script,SBTTFMirror mirror,SBTTFShape *out);
 void sb_ttf_shape_free(SBTTFShape *shape);
+/* Original font GDEF caret coordinates in backing pixels. Reports the total
+   count, writes at most capacity positions. No shape or font state changes. */
+bool sb_ttf_ligature_carets(TTF_Font *font,Uint32 glyph,bool rtl,float *positions,
+    size_t capacity,size_t *count);
 #endif

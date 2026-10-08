@@ -32,7 +32,8 @@ beim Laden unverändert, installierte Ansicht betrachtet. Rückfallkopie:
   entpackten Pakete bestehen, einschließlich Windows Debug/Release.
   19 Jobs erfolgreich; Intel-Debug scheitert erst am Artefakt-Upload mit
   GitHub-DNS-Fehler nach bestandenen Tests. Der folgende Glyphenplan zu
-  1906c3d besteht alle 20 Jobs/vier Pakete; neue Reader-CI folgt separat.
+  1906c3d besteht alle 20 Jobs/vier Pakete; die folgende Reader-CI zu
+  4eda9db besteht inzwischen ebenfalls alle 20 Jobs/vier Pakete.
 - Erneute gezielte macOS-Release-Nachprüfung des Nutzerfeedbacks:
   135 Bewegungs-/Layout- und 144 Navigations-Assertions, darunter alle vier
   vorherigen Listen-/Leseansichten nach Leerung, erneutem Tippen und Escape.
@@ -68,23 +69,32 @@ ganze Grapheme, Stil-/Schriftwahl und denselben Umbruch für Höhe/Rasterung.
 Float-Bildpositionen erhalten Zwischenstände beim Scrollen. Lokal 56/56
 Release-Prüfungen, 105 gezielte ASan/UBSan-Reader-Assertions, frischer UI-Build
 mit BUILD_TESTING=OFF und 32/32 separat gebaute Kernprüfungen bestehen.
-SheenBidi-Lizenz ist in App und Paketen integriert. Neue Plattform-/Paketabnahme
-folgt gesondert für Windows/Linux/Apple Silicon; Intel-Mac-Paket und
-Installation 0.9.34 bestehen. Native Metal-Messung zeigt
+SheenBidi-Lizenz ist in App und Paketen integriert. Neue Plattform-/Paketabnahme zu 4eda9db besteht mit allen 20 Jobs/vier
+Paketen; Intel-Mac-Installation 0.9.34 besteht. Native Metal-Messung zeigt
 Scroll-Median 1,87 ms und Wechsel-Median 14,03 ms; erster langer Wechsel
 bleibt mit 123,30 ms ein offener Ausreißer (zuvor 237,01 ms im neuen Plan). Details: STATUS/GLYPHENGEOMETRIE.
 
+## Geprüfte Cursorgrundlage
+
+Gemeinsamer C-Plan für Graphem-/Glyphenpunkte, echte GDEF-Ligaturpositionen,
+Bidi-Affinität, Maustreffer und Auswahlflächen. Indizierte Abfragen, leere
+LTR-/RTL-Absätze und als solche markierte proportionale Annäherungen.
+Lokal 402.874 Assertions, gezielte ASan/UBSan und 57/57 Release-Prüfungen
+bestehen; gerasterte Geometrievorschau betrachtet. [Vertrag und Grenzen](../../docs/CURSORGEOMETRIE.md).
+Noch keine neue produktive Editor-/IME-/native Anbindung. Installiert bleibt
+das paketgeprüfte 0.9.34 / 4eda9dbfce37; neue Cursor-CI folgt separat.
+
 ## Nächste Arbeiten
 
-0.9.33 ist vollständig im dokumentierten automatisierten Umfang abgenommen.
+0.9.34 ist vollständig im dokumentierten automatisierten Umfang abgenommen.
 Weitere Release-Arbeiten: Bidi/visuelle/native Textgeometrie und reale Eingabemethoden;
 menschliche VoiceOver/NVDA/Orca-, Dialog-, Geräte-, Mehrmonitor-/Langzeitabnahme;
 volle Windows-/Linux-Zielvolumes und physische Persistenz; frische Rechner und
 OS-Mindestversionen; vollständige SDK-/Systemruntime-Zuordnung.
 
-Nächster Textschritt: gemeinsame Glyphengeometrie auch für Editor, Suche,
+Nächster Textschritt: geprüfte Glyphen-/Cursorgeometrie gemeinsam für Editor, Suche,
 Formulare/einfache Labels, Cursor, Auswahl, IME und native Provider verwenden.
-Neue Reader-CI 37751197759 prüfen; Intel-Mac-Paketabnahme besteht.
+Reader-CI 37751197759 und Intel-Mac-Paketabnahme bestehen.
 
 Eigener Code MIT. Signaturkonten fehlen; vertraulicher Sicherheitskanal ist
 angefragt. Vollständiger Auftrag bleibt aktiv. **1.0 erst nach ausdrücklicher

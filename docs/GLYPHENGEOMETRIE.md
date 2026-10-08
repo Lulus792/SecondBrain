@@ -137,3 +137,10 @@ Daraus folgen visuelle Carets, Klickzuordnung, Auswahl, IME und native
 Zeichenrechtecke. Dazu gehören Ligatur-/Graphempositionen und Cursor-Affinität an
 Richtungsgrenzen. Reale Eingabe-, Geräte-, Leistungs- und Screenreader-Abnahme
 bleibt ein eigener Release-Schritt; die Reader-Integration schließt ihn nicht ab.
+
+## Gemeinsame Cursorpunkte als nächster Schritt
+
+[CURSORGEOMETRIE.md](CURSORGEOMETRIE.md) beschreibt die neue Zuordnung von
+Quellgrenzen zu visuellen Punkten, Ligaturpositionen und Auswahlflächen.
+Sie verwendet die vorbereiteten Graphemgrenzen und tatsächlichen Glyphen
+dieses Plans; Editor-/IME-/native Anbindung bleibt anschließend erforderlich.

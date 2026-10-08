@@ -2538,3 +2538,42 @@ Neue Plattformprüfung zu demselben Code:
 [CI 37751197759](https://github.com/Lulus792/SecondBrain/actions/runs/37751197759),
 noch nicht als vollständiger Erfolg abgenommen. 1.0 und die übrigen
 [Release-Aufgaben](RELEASE.md) bleiben offen.
+
+## Vollständige Plattformabnahme der Leseansicht
+
+Die neue Reader-Integration zu **4eda9db** besteht inzwischen alle
+**20 Jobs einschließlich vier entpackter Plattformpakete**:
+[CI 37751197759](https://github.com/Lulus792/SecondBrain/actions/runs/37751197759).
+Windows/Linux sowie Intel- und Apple-Silicon-Mac laufen in Debug/Release;
+die jeweiligen Release-Jobs bestätigen ihre tatsächlich ausgeführte Paketprüfung.
+Das schließt die oben noch laufende automatisierte Abnahme dieser Version ab,
+keine menschliche Geräte-, Eingabe-, Leistungs- oder Screenreader-Abnahme.
+
+## Cursor-, Affinitäts- und Auswahlgrundlage
+
+Am 8. Oktober ergänzt [CURSORGEOMETRIE.md](CURSORGEOMETRIE.md) den gemeinsamen
+Zeilenplan: Cursorpunkte aus Graphem-/Glyphengrenzen, tatsächliche GDEF-Ligatur-
+positionen, explizite Bidi-Seiten, Maustreffer und getrennte Auswahlflächen.
+Indizes vermeiden normale Vollscans bei Positionsabfragen; leere LTR-/RTL-Absätze
+sind im vorbereiteten Plan unterstützt. Proportionale Ligatur-Annäherungen bleiben
+als solche erkennbar. Editor-/IME-/native Integration ist noch nicht abgeschlossen.
+
+Lokaler Intel/macOS-Release-Build: **57/57 Prüfungen bestehen (336,21 s)**.
+Die neue Cursorprüfung besteht mit **402.874 Assertions** bei 18/27/36 Punkten,
+einschließlich Isolaten, Richtungsgrenzen, Ligaturen/Akzenten, Emoji und
+RTL-Fortsetzungszeilen. 100.000 kombinierte Quell-/Maus-/Schrittabfragen in einer
+20.000-Zeichen-Zeile benötigen im Gesamtlauf 74,092 ms; dies ist kein
+plattformübergreifender Editor-Leistungsnachweis. Vorschau aus tatsächlichen
+Glyphenbildern betrachtet und unter docs/images/caret-plan.png dokumentiert.
+
+Gezielte ASan/UBSan-Prüfung besteht mit denselben 402.874 Assertions.
+Instrumentiert sind Cursor-/Glyphen-/Bidi-C-Code, vollständige Bidi-Engine, Prüfer
+und die vollständige SDL_ttf.c einschließlich der eigenen Hooks. Kern, SDL-,
+HarfBuzz-/FreeType- und weitere SDL_ttf-Objekte sind nicht instrumentiert;
+macOS-Leakprüfung ist abgeschaltet. Quellhashes/Protokoll lokal unter
+`build/caret-sanitizers/sources.json` und `test.log`.
+
+Neue native Plattformprüfung dieser Cursorgrundlage folgt nach Veröffentlichung.
+Die installierte App bleibt bewusst beim vollständig paketgeprüften
+0.9.34 / 4eda9dbfce37. Die neue Geometrie wird noch nicht als fertige
+Cursorbedienung der App ausgegeben; dazu ist die gemeinsame Editor-Anbindung nötig.
