@@ -136,3 +136,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Gemeinsamer allgemeiner Umbruch](../../docs/WRAPPED_TEXT.md): Absatzkontext,
   tatsächliche Höhen, Widgetclips, Abschluss-/Cachepolitik und unabhängige
   Referenzprüfung ab 0.9.37.
+
+- [Beschriftungen und verdeckte Buttons](../../docs/BESCHRIFTUNGEN.md):
+  graphemgebundene Kürzung/Puffer, erhaltene Tastaturziele, Hoverclips und
+  verbleibendes kaltes Dokumentlayout ab 0.9.38.

@@ -1,4 +1,6 @@
 #include "desktop.h"
+#include "text.h"
+#include "grapheme.h"
 #include "platform.h"
 #include "icons.h"
 #include "version.h"
@@ -278,11 +280,18 @@ static void target(SBDesktop *d, const char *id) {
         }
     }
 }
+static void caption_copy(char *out,size_t capacity,const char *text){
+    if(!capacity)return;out[0]=0;if(!text)return;
+    size_t length=strlen(text),fitting=0;SBGrapheme reader;SBGraphemeBoundary boundary;
+    if(!sb_grapheme_init(&reader,text,length))return;
+    if(length<capacity)fitting=length;
+    else while(sb_grapheme_next(&reader,&boundary) && boundary.byte<capacity)fitting=boundary.byte;
+    memcpy(out,text,fitting);out[fitting]=0;
+}
 static void target_label(SBDesktop *d, const char *label) {
     if (!d->target_count) return;
     char *out=d->targets[d->target_count-1].label;
-    snprintf(out,SB_NAME_CAP,"%s",label);
-    while (*out && !sb_utf8_valid(out,strlen(out))) out[strlen(out)-1]=0;
+    caption_copy(out,SB_NAME_CAP,label);
 }
 static void tooltip_at(SBDesktop *d,const char *text,struct nk_rect anchor) {
     struct nk_context *ctx=d->ui.ctx;
@@ -290,10 +299,10 @@ static void tooltip_at(SBDesktop *d,const char *text,struct nk_rect anchor) {
     d->hover_claimed=true; Uint64 now=SDL_GetTicksNS();
     uint64_t hash=sb_hash(text,strlen(text));
     if (d->hover_hash!=hash || !d->hover_label[0] || memcmp(&anchor,&d->hover_bounds,sizeof(anchor))) {
-        snprintf(d->hover_label,sizeof(d->hover_label),"%s",text);d->hover_bounds=anchor;d->hover_hash=hash;d->hover_started=now;return;
+        caption_copy(d->hover_label,sizeof(d->hover_label),text);d->hover_bounds=anchor;d->hover_hash=hash;d->hover_started=now;return;
     }
     if (now-d->hover_started<350000000u) return;
-    snprintf(d->hint_text,sizeof(d->hint_text),"%s",text);d->hint_anchor=anchor;d->hint_group=d->focus_group;d->hint_visible=true;
+    caption_copy(d->hint_text,sizeof(d->hint_text),text);d->hint_anchor=anchor;d->hint_group=d->focus_group;d->hint_visible=true;
 }
 static void draw_hint(SBDesktop *d) {
     const char *text=d->hint_text;struct nk_rect anchor=d->hint_anchor;
@@ -352,6 +361,7 @@ static bool button(SBDesktop *d, const char *id, const char *label) {
     struct nk_rect bounds = nk_widget_bounds(d->ui.ctx);
     target(d, id); target_label(d,!strcmp(id,"new-note") ? "Neue Notiz" : !strcmp(id,"new-project") ? "Neues Projekt" : !strcmp(id,"filter") ? "Wissensbereich wählen" : label);
     struct nk_rect clip = d->ui.ctx->current->layout->clip;
+    bool paint=bounds.x<clip.x+clip.w && bounds.x+bounds.w>clip.x && bounds.y<clip.y+clip.h && bounds.y+bounds.h>clip.y;
     bool clear=!strcmp(id,"clear-search");
     if (!clear && bounds.y >= clip.y && bounds.y+bounds.h <= clip.y+clip.h) glass(d,bounds,9);
     SBIcon icon=sb_icon_for(id);
@@ -368,18 +378,18 @@ static bool button(SBDesktop *d, const char *id, const char *label) {
     bool clicked=nk_button_label(d->ui.ctx,"") != 0;
     d->ui.ctx->style.button=old_button;
     struct nk_command_buffer *canvas=nk_window_get_canvas(d->ui.ctx);
-    if (icon!=SB_ICON_NONE) {
+    if (paint && icon!=SB_ICON_NONE) {
         float size=fminf(18*d->ui.scale,bounds.h-12);
         sb_icon_draw(canvas,icon,nk_rect(only ? bounds.x+(bounds.w-size)/2 : bounds.x+12*d->ui.scale,bounds.y+(bounds.h-size)/2,size,size),d->ui.ctx->style.text.color);
     }
-    if (!only) {
+    if (paint && !only) {
         char shown[SB_NAME_CAP];
         float inset=(icon==SB_ICON_NONE ? 16 : 40)*d->ui.scale;
         compact_label(d,label,shown,sizeof(shown),bounds.w-inset-12);
         struct nk_rect text=nk_rect(bounds.x+inset,bounds.y+(bounds.h-d->ui.normal->handle.height)/2,bounds.w-inset-10,d->ui.normal->handle.height);
         nk_draw_text(canvas,text,shown,(int)strlen(shown),&d->ui.normal->handle,nk_rgba(0,0,0,0),d->ui.ctx->style.text.color);
     }
-    if (nk_input_is_mouse_hovering_rect(&d->ui.ctx->input,bounds)) tooltip_at(d,label,bounds);
+    if (paint && nk_input_is_mouse_hovering_rect(&d->ui.ctx->input,clip) && nk_input_is_mouse_hovering_rect(&d->ui.ctx->input,bounds)) tooltip_at(d,label,bounds);
     ring(d, id);
     return clicked || activation(d, id);
 }
@@ -1109,18 +1119,23 @@ static void muted(SBDesktop *d, const char *text) {
     nk_label_colored(d->ui.ctx, text, NK_TEXT_LEFT,
                      d->ui.contrast ? d->ui.ctx->style.text.color : d->ui.dark ? nk_rgb(164, 169, 181) : nk_rgb(99, 108, 123));
 }
-static void compact_label(SBDesktop *d, const char *text, char *out, size_t capacity, float width) {
-    struct nk_user_font *font = &d->ui.normal->handle;
-    snprintf(out, capacity, "%s", text);
-    while (out[0] && !sb_utf8_valid(out, strlen(out))) out[strlen(out) - 1] = 0;
-    if (font->width(font->userdata, font->height, out, (int)strlen(out)) <= width) return;
-    size_t length = strlen(out);
-    while (length) {
-        --length;
-        while (length && ((unsigned char)out[length] & 0xc0) == 0x80) --length;
-        out[length] = 0;
-        if (length + 4 <= capacity && font->width(font->userdata, font->height, out, (int)length) +
-            font->width(font->userdata, font->height, "…", 3) <= width) { strcat(out, "…"); return; }
+static void compact_label(SBDesktop *d,const char *text,char *out,size_t capacity,float width){
+    if(!capacity)return;out[0]=0;if(!text || width<=0)return;
+    const struct nk_user_font *font=&d->ui.normal->handle;size_t length=strlen(text);
+    if(length<capacity && font->width(font->userdata,font->height,text,(int)length)<=width){memcpy(out,text,length+1);return;}
+    float ellipsis=font->width(font->userdata,font->height,"…",3);if(capacity<4 || ellipsis>width)return;
+    size_t limit=0;SBGrapheme reader;SBGraphemeBoundary boundary;
+    if(!sb_grapheme_init(&reader,text,length))return;
+    while(sb_grapheme_next(&reader,&boundary) && boundary.byte<=capacity-4)limit=boundary.byte;
+    float measured=0;size_t fitting=sb_ui_text_fit(font,text,limit,fmaxf(0,width-ellipsis),&measured);
+    /* Verify the combined display string: kerning and script resolution can
+       differ from summing two independently measured substrings. */
+    for(;;){memcpy(out,text,fitting);memcpy(out+fitting,"…",4);
+        if(font->width(font->userdata,font->height,out,(int)(fitting+3))<=width)return;
+        if(!fitting){out[0]=0;return;}
+        size_t previous=0;sb_grapheme_init(&reader,text,length);
+        while(sb_grapheme_next(&reader,&boundary) && boundary.byte<fitting)previous=boundary.byte;
+        fitting=previous;
     }
 }
 static void native_lines(SBDesktop *d,const char *text) {
@@ -1362,12 +1377,11 @@ static void document_links(SBDesktop *d,SBInline *inline_reader,unsigned *link_n
     SBInlineToken link;
     while (sb_inline_next(inline_reader,&link)) {
         if ((link.kind!=SB_INLINE_LINK && link.kind!=SB_INLINE_AUTOLINK) || !link.destination_length) continue;
-        char destination[SB_PATH_CAP],label[SB_NAME_CAP],tag[100]; char *full_label=NULL;
+        char destination[SB_PATH_CAP],tag[100]; char *full_label=NULL;
         SBStatus status=sb_inline_destination(inline_reader,&link,destination,sizeof(destination));
         if (status.code==SB_OK) status=sb_inline_text(inline_reader,link.content,link.content_length,&full_label);
         if (status.code!=SB_OK) { d->message=status; free(full_label); continue; }
-        snprintf(label,sizeof(label),"%s",*full_label ? full_label : destination); free(full_label);
-        while (label[0] && !sb_utf8_valid(label,strlen(label))) label[strlen(label)-1]=0;
+        const char *label=*full_label ? full_label : destination;
         nk_style_set_font(ctx,&d->ui.normal->handle);
         if (placement) {
             nk_layout_space_push(ctx,nk_rect(placement->x,placement->y,placement->w,32*d->ui.scale));
@@ -1375,7 +1389,7 @@ static void document_links(SBDesktop *d,SBInline *inline_reader,unsigned *link_n
         } else nk_layout_row_dynamic(ctx,32*d->ui.scale,1);
         snprintf(tag,sizeof(tag),"link:%u",(*link_number)++);
         size_t before=d->target_count;
-        bool pressed=button(d,tag,label);
+        bool pressed=button(d,tag,label);free(full_label);
         if (d->target_count>before && parent) snprintf(d->targets[d->target_count-1].parent,sizeof(d->targets[0].parent),"%s",parent);
         if (pressed) {
             if (web_reference(destination) || mail_reference(destination)) {

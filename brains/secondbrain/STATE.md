@@ -41,6 +41,16 @@ Native Metal-Stichprobe auf diesem Intel-Mac: Scroll-Median 1,88 ms,
 Wechsel 14,00 ms/p95 22,91 ms; erster langer Wechsel 107,58 ms, davon
 95,40 ms Layout. Keine allgemeine Bildraten- oder Langzeitabnahme.
 
+## Beschriftungsfortschritt (0.9.38)
+
+Verdeckte Buttons behalten Tastaturziele/Aktivierung ohne visuelle Textmessung.
+Label-/Hinweispuffer und Kürzung erhalten ganze Grapheme. 63/63 lokale Release-
+Prüfungen, 36 Desktop-Assertions unter haltendem ASan/UBSan und Build ohne Tests
+bestehen. 80 lange Testlabels: 19.500 → 1.040 Breitenabfragen; der gesamte kalte
+Dokumentwechsel bleibt im abwechselnden Softwarevergleich nahezu unverändert
+(98,68 → 98,44 ms Layoutmedian). Neue Plattform-/Paketabnahme folgt;
+installiert bleibt 0.9.37. [Vertrag](../../docs/BESCHRIFTUNGEN.md).
+
 ## Nächste Arbeiten
 
 Erstes Layout langer Dokumente weiter optimieren. Native Zeichenrechtecke

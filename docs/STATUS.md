@@ -2764,3 +2764,39 @@ build/wrap-bitmap-archive.json und build/wrap-workflow-bitmap-archive.json.
 Anwendungspakete, Rückfallkopien und Projektdateien bleiben erhalten.
 Die installierte Produktions-CLI liest den verdichteten aktuellen Projektkontext;
 relative Links in STATE und WRAPPED_TEXT sind geprüft.
+
+## Verdeckte Buttons und lange Beschriftungen (0.9.38)
+
+Die Desktop-Kürzung verwendet ganze Grapheme und die vorhandene geformte
+Breitenmessung; Präfix plus Auslassungszeichen wird als tatsächlicher String
+nachgeprüft. Linklabels bleiben bis zur Buttonerzeugung vollständig vorhanden.
+Begrenzte Ziel-/Hoverpuffer enden ebenfalls an Graphemgrenzen. Verdeckte Buttons
+behalten ihre Tastaturziele und Aktivierung, erzeugen jedoch weder Icons noch
+visuelle Textmessung. Hoverhinweise verlangen zusätzlich den Panelclip.
+[Vertrag und Leistungsgrenzen](BESCHRIFTUNGEN.md).
+
+**63/63 lokale Release-Prüfungen bestehen (352,54 s)**. Der neue echte
+Desktopfall besteht mit 36 Assertions: Familien-Emoji, feste Puffer, sichtbarer/
+verdeckter Link, Aktivierung, Scroll-/Hoverclip und unveränderter Entwurf.
+Dieselben 36 Assertions bestehen unter haltendem ASan/UBSan ohne Befund.
+Instrumentiert sind desktop.c, UI-/Text-/Renderer-/Glyphen-/Cursor-/Script-/
+Bidi-Code, Bidi-Engine, Prüfer und SDL_ttf.c. Andere Desktopobjekte, Modell,
+fachlicher Kern, SDL/HarfBuzz/FreeType und weitere externe Objekte sind nicht
+instrumentiert; macOS-Leakprüfung ist abgeschaltet.
+UI-Build ohne Tests besteht und meldet 0.9.38. Protokolle: lokal
+build/caption-full-ctest.log, build/caption-sanitizers/ und
+build/caption-no-tests-build.log.
+
+Teilfunktionsprobe: 80 unterschiedliche überlange ASCII-Labels auf 90 Einheiten,
+19.500 → 1.040 Breitenabfragen und 331,084 → 14,776 ms im selben instrumentierten
+Fontsystem. Kontrollierter abwechselnder Softwarevergleich des Dokumentablaufs:
+Median des kalten Layouts 98,68 → 98,44 ms; der große Wechsel bleibt offen.
+Die experimentelle reine Messung/spätere Glyphenerzeugung bringt unter wechselnder
+nativer Last keinen belastbaren Gewinn und wurde vor diesem Schritt vollständig
+entfernt. Sie ist kein Teil des veröffentlichten Anwendungscodes.
+Protokolle: build/caption-micro.log, build/caption-paired-profile.json;
+Diagnose: build/layout-trace/ und build/layout-trace-measured.log.
+
+Installiert bleibt das paketgeprüfte 0.9.37 / 47a5a4392418. 0.9.38 benötigt
+seine eigene neue Plattform-/Paketabnahme. Der vollständige Release-Auftrag
+bleibt aktiv; 1.0 bleibt bis zur ausdrücklichen Nutzerfreigabe gesperrt.

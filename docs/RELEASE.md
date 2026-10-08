@@ -177,3 +177,12 @@ Sanitizerprüfungen bestehen; [Umfang](WRAPPED_TEXT.md). Native Zeichenrechtecke
 Unicode-Wortbefehle, vollständige Unicode-Zeilenbruchregeln und echte assistive/
 IME-/Geräte-/Leistungsabnahmen bleiben offen. Neue Plattform-/Paketabnahme folgt
 in STATUS. Die vorherige 0.9.36-CI besteht inzwischen alle 20 Jobs/vier Pakete.
+
+## Ergänzende Beschriftungsprüfung vom 8. Oktober
+
+Ab 0.9.38 entfallen visuelle Messungen verdeckter Buttons; ihre Tastaturziele
+bleiben erhalten. Label-/Hinweispuffer und Auslassungszeichen berücksichtigen
+Grapheme. Lokale Gesamt-/Desktop-/Sanitizerprüfung besteht;
+[Umfang und Grenzen](BESCHRIFTUNGEN.md). Das kalte Layout langer Dokumente ist
+damit nicht abgeschlossen. Eine weitere Vorbereitung muss Abbruch, Datei-/
+Schriftwechsel, Font-Threadbesitz und unveränderte Zeilen-/Scrollgeometrie erhalten.
