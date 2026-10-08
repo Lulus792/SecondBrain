@@ -1,5 +1,10 @@
 /* One unchanged source/layout for editor drawing, navigation and IME. */
 #include "carets.h"
+/* One original-source export, independent of edit-plan eviction and scrolling.
+   A larger export remains complete but is not retained between frames. */
+#define SB_EDIT_NATIVE_BUDGET (32u*1024u*1024u)
+struct SBEditNativeCache {char *source;size_t length;uint64_t hash;const struct nk_user_font *font;float row,density;bool single;SBNativeText text;};
+static void edit_native_cache_clear(SBUi *ui){if(ui->edit_native_cache){free(ui->edit_native_cache->source);sb_native_text_free(&ui->edit_native_cache->text);free(ui->edit_native_cache);ui->edit_native_cache=NULL;}}
 typedef struct {SBShapedLine shape;SBCaretPlan carets;size_t byte,length;int first,last,next;} SBEditLine;
 typedef struct {int first,last;bool significant;} SBEditWord;
 typedef struct {char *text;uint32_t *bytes;size_t length,count,capacity,memory;int characters;SBEditLine *lines;SBEditWord *words;size_t word_count,word_capacity;const struct nk_user_font *font;float row,requested_row;bool single;uint64_t hash,stamp;} SBEditPlan;
@@ -7,7 +12,7 @@ typedef struct {char *text;uint32_t *bytes;size_t length,count,capacity,memory;i
 #define SB_EDIT_BUDGET (64u*1024u*1024u)
 struct SBEditCache {SBEditPlan entries[SB_EDIT_WAYS],scratch;size_t bytes;uint64_t stamp;};
 static void edit_plan_free(SBEditPlan *p){for(size_t i=0;i<p->count;++i){sb_shape_line_free(&p->lines[i].shape);sb_caret_plan_free(&p->lines[i].carets);}free(p->lines);free(p->text);free(p->bytes);free(p->words);memset(p,0,sizeof(*p));}
-void sb_ui_edit_cache_clear(SBUi *ui){ui->edit_paint.edit=NULL;if(!ui->edit_cache)return;for(unsigned i=0;i<SB_EDIT_WAYS;++i)edit_plan_free(&ui->edit_cache->entries[i]);edit_plan_free(&ui->edit_cache->scratch);free(ui->edit_cache);ui->edit_cache=NULL;}
+void sb_ui_edit_cache_clear(SBUi *ui){ui->edit_paint.edit=NULL;edit_native_cache_clear(ui);if(!ui->edit_cache)return;for(unsigned i=0;i<SB_EDIT_WAYS;++i)edit_plan_free(&ui->edit_cache->entries[i]);edit_plan_free(&ui->edit_cache->scratch);free(ui->edit_cache);ui->edit_cache=NULL;}
 static void edit_cache_frame_end(SBUi *ui){if(ui->edit_cache)edit_plan_free(&ui->edit_cache->scratch);}
 static int edit_character(const SBEditPlan *p,size_t byte){int lo=0,hi=p->characters;while(lo<hi){int m=lo+(hi-lo)/2;if(p->bytes[m]<byte)lo=m+1;else hi=m;}return lo;}
 static void edit_tabs(SBShapedLine *shape,const char *source){

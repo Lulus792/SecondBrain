@@ -27,6 +27,7 @@ typedef struct SBTextSystem SBTextSystem;
 typedef struct SBStyledCache SBStyledCache;
 typedef struct SBComposition SBComposition;
 typedef struct SBEditCache SBEditCache;
+typedef struct SBEditNativeCache SBEditNativeCache;
 typedef struct {
     SBTextSystem *text;
     SBStyledCache *styled_cache;
@@ -47,6 +48,7 @@ typedef struct {
     struct nk_vec2 input_scrollbar;
     SBComposition *composition;
     SBEditCache *edit_cache;
+    SBEditNativeCache *edit_native_cache;
     struct {struct nk_text_edit *edit;const struct nk_user_font *font;uint64_t hash;float row;struct nk_rect area,clip;struct nk_vec2 scroll;} edit_paint;
     SBStatus input_status;
     bool pointer_text;

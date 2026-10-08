@@ -3088,3 +3088,53 @@ zuletzt queued; kein neuer Gesamt-Plattformnachweis für diesen Quellstand.
 Weitere native Geometrie-/Cacheintegration, kaltes langes Layout und echte
 assistive/IME-/HiDPI-/Geräteabnahmen sowie die übrige Release-Liste bleiben
 offen. Vollständiger Auftrag aktiv; 1.0 nur nach Nutzerfreigabe.
+
+## Begrenzte native Editor-Wiederverwendung (0.9.43)
+
+Die UI behält einen ursprünglichen nativen Editorplan mit eigenem 32-MiB-
+Budget für Objekt, Quellenbytes und tatsächliche Laufkapazität. Exakte Quelle,
+Schrift, Zeilenhöhe, Dichte und Eingabemodus bestätigen die Wiederverwendung;
+ein Hash allein genügt nicht. Scroll-/Cursor-/Auswahländerungen brauchen keine
+neue Unicode-/Wortsegmentierung. Jeder Export bleibt eine eigene Kopie mit
+aktueller Feld-/Scrollposition. Schriftneuladen leert die Wiederverwendung.
+Über der Speichergrenze bleiben Exporte vollständig ohne zusätzliche dauerhafte
+Kopie; fehlende Cacheallokation verwirft keine vollständige Ausgabe.
+[Vertrag](NATIVE_TEXTGEOMETRIE.md).
+
+Vier abwechselnde Paare derselben lokalen Profilfixture, je13 Exporte:
+Median der Laufmediane bei 5.040 Bytes /601 Läufen **2,48→0,15 ms**, bei
+67.200 Bytes /8.001 Läufen **34,53→6,71 ms**. Der vorherige statisch
+gebundene Prüfer und der neue Prüfer verwenden dieselbe Quelle/Schrift.
+Gemessen wird ausschließlich der Export nach vorbereiteter Editorzeichnung,
+keine vollständige Bildzeit und kein Gewinn beim kalten langen Readerlayout.
+Die erste Cachefüllung benötigt weiter Aufbereitung und eine zusätzliche Kopie.
+Nachweise einschließlich Binär-/Fixture-/Log-Hashes:
+`build/native-export-profile/paired.json`, `paired.log`, `profile.c`.
+
+**68/68 lokale Release-Prüfungen bestehen (684,64 s, CTest -j4)**.
+13.708 Editor-/Geometrie-/Eigentums-/Cacheprüfungen, 405 native Text- und
+590 Adapter-/Mac-Providerprüfungen bestehen. Ausgaben bleiben nach
+Veränderung anderer Ausgaben, Glyphenplanverdrängung, Cacheleeren und
+Schriftwechsel gültig. Gleiche Quellenlänge mit geändertem Inhalt ersetzt
+den Plan. 13.000 kurze Absätze überschreiten das Cachebudget und behalten
+trotzdem alle Quellenbytes und den leeren Schlussabsatz.
+**Dieselben drei Prüfer bestehen unter haltendem ASan/UBSan ohne Befund**.
+Instrumentiert: UI/Text/Space/Icons, NativeText, Desktop/Accessibility, Caret-/
+Shape-/Script-/Bidi-Code, Wort-/Graphemkern, Bidi-Engine, alle drei Prüfer und
+SDL_ttf.c samt Hooks. Übrige externe Objekte, Kern-/Modell-/Dialog-/
+Sicherungscode und native Rust-Bibliothek nicht instrumentiert; Mac-Leakprüfung
+abgeschaltet. Quellhashes aller23 erfassten Quellen/UI-Includes stimmen.
+Build ohne Tests besteht. Logs: `build/native-memo-full-ctest.log`,
+`native-memo-{native,editor,provider}-sanitizer.log`,
+`native-memo-sanitizers/sources.json`, `native-memo-no-tests-build.log`.
+
+438 ältere abgeschlossene generierte BMPs verlustfrei komprimiert; entpackte
+SHA-256 und unveränderte Dateistatistik vor Rohdateientfernung geprüft.
+5627190903 Bytes freigegeben. Pakete, Projektwissen und laufende Prüfdaten
+unberührt. Manifeste: `build/native-memo-completed-bitmap-archive{,-2}.json`.
+
+Paket/neue Zielplattformen folgen, installiert bleibt zunächst0.9.42.
+Native Geometrie anderer Felder/Leseblöcke, Exporte über der Cachegrenze,
+kaltes langes Layout, reale Eingabe-/assistive-/Geräte-/HiDPI-Abnahme und
+übrige Release-Liste bleiben offen. Vollständiger Auftrag aktiv; 1.0 nur
+nach ausdrücklicher Nutzerfreigabe.

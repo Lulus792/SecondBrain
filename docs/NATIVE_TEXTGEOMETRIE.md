@@ -1,6 +1,6 @@
 # Native Zeichenrechtecke im Editor
 
-Stand: 8. Oktober 2026, Umsetzung ab 0.9.42.
+Stand: 8. Oktober 2026, Umsetzung ab 0.9.42, Wiederverwendung ab 0.9.43.
 
 Der Notizeditor veröffentlicht Zeichenpositionen und Breiten aus dem tatsächlich
 gezeichneten Glyphen-/Cursorplan. Schriftmessung wird dafür nicht ein zweites Mal
@@ -35,6 +35,30 @@ native Metadatenabbildung erhalten. Ein Graphem über 255 UTF-8-Bytes benötigt
 weiterhin skalare native Teilstücke; hierfür wird keine unzutreffende genaue
 Geometrie veröffentlicht.
 
+## Wiederverwendung unveränderter Metadaten
+
+Ab 0.9.43 hält die UI höchstens einen nativen Editorplan mit einem eigenen
+Speicherbudget von 32 MiB. Die Grenze zählt Cacheobjekt, vollständige Quelle
+und tatsächlich behaltene Laufkapazität. Der Glyphenplancache hat weiterhin
+sein separates Budget. Größere Exporte bleiben vollständig, werden aber nicht
+zusätzlich für Folgebilder behalten. Eine fehlgeschlagene Cacheallokation
+verwirft keine bereits vollständig vorbereitete Ausgabe.
+
+Der Schlüssel umfasst die exakten Quellenbytes, Schriftidentität, Zeilenhöhe,
+Pixeldichte und ein-/mehrzeiligen Eingabemodus. Ein Hash dient nur zur schnellen
+Vorauswahl; ein vollständiger Bytevergleich bestätigt die Quelle. Reine
+Cursor-, Auswahl- und Scrolländerungen segmentieren Unicode und Wörter nicht
+erneut. Der gespeicherte Plan verwendet einen Ursprung bei null; jede Ausgabe
+erhält die aktuelle gezeichnete Feld-/Scrollposition. Die vertikale Berechnung
+behält die Rechenreihenfolge des Renderers bei.
+
+Ausgaben besitzen ihre Laufarrays selbst. Veränderung oder Freigabe einer
+Ausgabe verändert den Cache nicht. Auch die Verdrängung eines Glyphenplans
+durch andere Felder lässt diese Ausgaben gültig. Schriftneuladen und das
+Leeren des Editorcaches entfernen die native Wiederverwendung und den zuletzt
+gezeichneten Feldverweis. Während IME-Komposition bleibt der ursprüngliche
+Quellenvertrag unverändert.
+
 ## Prüfungen und weitere Arbeit
 
 Ein unabhängig vorbereiteter Schrift-/Bidi-/Cursorplan prüft Zeichenpositionen,
@@ -50,9 +74,9 @@ Fehler auf dem Retina-Display; die Fenstertransformation korrigiert ihn.
 Dies ersetzt keine menschliche VoiceOver- oder Vergrößerungsabnahme.
 
 Die neue genaue Geometrie gilt für den Notizeditor. Leseansicht und andere
-Eingabefelder benötigen weitere Integration. Wiederverwendung der exportierten
-Geometriemetadaten bei unverändertem Layout und die Leistung großer realer
-Editorinhalte sind weitere Aufgaben. Vollständige Plattform-, IME- und
+Eingabefelder benötigen weitere Integration. Die Leistung großer realer
+Editorinhalte, Exporte über der Cachegrenze und das erste lange Dokumentlayout
+sind weitere Aufgaben. Vollständige Plattform-, IME- und
 Screenreader-Abnahmen bleiben offen. Ausgeführte Nachweise stehen in
 [STATUS](STATUS.md).
 

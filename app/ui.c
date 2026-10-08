@@ -142,12 +142,10 @@ bool sb_ui_edit_geometry(SBUi *ui,struct nk_text_edit *edit,const struct nk_user
     for(size_t i=0;i<plan->count;++i){SBEditLine *line=&plan->lines[i];if(!visitor(user,plan->text+line->byte,line->length,line->byte,&line->shape,&line->carets,i*plan->row))return false;}
     return true;
 }
-bool sb_ui_edit_native(SBUi *ui,struct nk_text_edit *edit,SBNativeText *out){
-    if(!ui || !edit || !out || ui->edit_paint.edit!=edit)return false;
-    SBEditPlan *p=edit_plan(edit,ui->edit_paint.font,ui->edit_paint.row);if(!p || p->hash!=ui->edit_paint.hash)return false;
+static bool edit_native_build(SBUi *ui,const SBEditPlan *p,SBNativeText *out){
     SBNativeCharBox *boxes=NULL;size_t count=0,capacity=0;bool ok=true;
     for(size_t i=0;i<p->count && ok;++i){SBEditLine *l=&p->lines[i];
-        float x=ui->edit_paint.area.x-ui->edit_paint.scroll.x,y=ui->edit_paint.area.y+i*p->row-ui->edit_paint.scroll.y;
+        float x=0,y=i*p->row;
         size_t extra=l->carets.cluster_count+(l->next>l->last || !l->length ? 1 : 0);
         if(count+extra>capacity){size_t next=capacity ? capacity*2 : 32;if(next<count+extra)next=count+extra;SBNativeCharBox *grown=realloc(boxes,next*sizeof(*grown));if(!grown){ok=false;break;}boxes=grown;capacity=next;}
         for(size_t j=0;j<l->carets.cluster_count;++j){SBCaretCluster c=l->carets.clusters[j];boxes[count++]=(SBNativeCharBox){l->byte+c.byte,c.length,x+c.left/ui->density,y,(c.right-c.left)/ui->density,p->row,c.level};}
@@ -157,6 +155,33 @@ bool sb_ui_edit_native(SBUi *ui,struct nk_text_edit *edit,SBNativeText *out){
     }
     if(ok)ok=sb_native_text_geometry(p->text,p->length,NULL,0,boxes,count,out).code==SB_OK;
     free(boxes);return ok;
+}
+static bool edit_native_copy(const SBNativeText *source,SBNativeText *out){
+    SBNativeText copy=*source;copy.capacity=copy.count;copy.runs=malloc(copy.count*sizeof(*copy.runs));if(!copy.runs)return false;
+    memcpy(copy.runs,source->runs,copy.count*sizeof(*copy.runs));*out=copy;return true;
+}
+bool sb_ui_edit_native(SBUi *ui,struct nk_text_edit *edit,SBNativeText *out){
+    if(!ui || !edit || !out || ui->edit_paint.edit!=edit)return false;
+    SBEditPlan *p=edit_plan(edit,ui->edit_paint.font,ui->edit_paint.row);if(!p || p->hash!=ui->edit_paint.hash)return false;
+    SBEditNativeCache *memo=ui->edit_native_cache;
+    bool reuse=memo && memo->hash==p->hash && memo->length==p->length && memo->font==p->font && memo->row==p->row && memo->density==ui->density && memo->single==p->single && !memcmp(memo->source,p->text,p->length);
+    if(reuse){if(!edit_native_copy(&memo->text,out))return false;}
+    else{
+        if(!edit_native_build(ui,p,out))return false;
+        /* The source and actual retained run capacity both count toward the
+           budget. Cache allocation failure never rejects a complete export. */
+        if(p->length+1+sizeof(SBEditNativeCache)<SB_EDIT_NATIVE_BUDGET && out->count<=(SB_EDIT_NATIVE_BUDGET-p->length-1-sizeof(SBEditNativeCache))/sizeof(*out->runs)){
+            SBEditNativeCache *next=calloc(1,sizeof(*next));
+            if(next){next->source=malloc(p->length+1);
+                if(next->source && edit_native_copy(out,&next->text)){
+                    memcpy(next->source,p->text,p->length+1);next->length=p->length;next->hash=p->hash;next->font=p->font;next->row=p->row;next->density=ui->density;next->single=p->single;
+                    edit_native_cache_clear(ui);ui->edit_native_cache=next;
+                }else{free(next->source);sb_native_text_free(&next->text);free(next);}}
+        }
+    }
+    float x=ui->edit_paint.area.x-ui->edit_paint.scroll.x;
+    for(size_t i=0;i<out->count;++i)if(out->runs[i].geometry){out->runs[i].x+=x;out->runs[i].y=ui->edit_paint.area.y+out->runs[i].y-ui->edit_paint.scroll.y;}
+    return true;
 }
 
 

@@ -224,3 +224,13 @@ korrigiert den auf dem Intel/Retina-Mac bestätigten Skalierungsfehler.
 [Vertrag und Prüfgrenzen](NATIVE_TEXTGEOMETRIE.md). Weitere Felder und die
 Leseansicht, Wiederverwendung unveränderter Geometriemetadaten, neue native
 Zielplattformprüfungen und reale assistive/IME-/HiDPI-Abnahmen bleiben offen.
+
+## Wiederverwendung nativer Editorpläne vom 8. Oktober
+
+Ab 0.9.43 werden native Editor-Metadaten bei unverändertem Quellen-/Schrift-/
+Zeilenplan mit einem eigenen 32-MiB-Budget wiederverwendet. Scroll- und
+Cursoränderungen benötigen keine neue Unicode-/Wortaufbereitung. Ausgaben
+behalten eigenes Eigentum; übergroße Exporte bleiben vollständig ohne
+zusätzliche dauerhafte Kopie. [Vertrag](NATIVE_TEXTGEOMETRIE.md).
+Dies schließt weder das erste lange Layout noch die Integration weiterer
+Felder/Leseblöcke oder reale Geräte-/Eingabe-/Screenreader-Abnahmen ab.

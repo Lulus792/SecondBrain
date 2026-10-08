@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 static unsigned checks;
 #define CHECK(x) do{++checks;if(!(x)){fprintf(stderr,"EDIT GEOMETRY %d: %s (%s)\n",__LINE__,#x,SDL_GetError());return 1;}}while(0)
 #define TAG(a,b,c,d) (((uint32_t)(a)<<24)|((uint32_t)(b)<<16)|((uint32_t)(c)<<8)|(uint32_t)(d))
@@ -48,6 +49,30 @@ static int native_scroll(SBUi *ui){
     CHECK(after.runs[0].y<field.y); /* Offscreen source remains available to native text navigation. */
     sb_native_text_free(&before);sb_native_text_free(&after);nk_textedit_free(&edit);return 0;
 }
+static int native_cache_lifetime(SBUi *ui){
+    const char *source="AV ffi é אב12גד ببب 👩‍💻";struct nk_text_edit edit;nk_textedit_init_default(&edit);edit.mode=NK_TEXT_EDIT_MODE_INSERT;CHECK(nk_textedit_paste(&edit,source,(int)strlen(source)));actual(ui,&edit);
+    SBNativeText first={0},second={0};CHECK(sb_ui_edit_native(ui,&edit,&first) && ui->edit_native_cache);CHECK(sb_ui_edit_native(ui,&edit,&second));CHECK(first.runs!=second.runs && first.count==second.count && !memcmp(first.runs,second.runs,first.count*sizeof(*first.runs)));
+    uint64_t original=sb_hash((const char *)first.runs,first.count*sizeof(*first.runs));second.runs[0].x=12345;second.runs[0].lengths[0]=0;sb_native_text_free(&second);
+    CHECK(sb_ui_edit_native(ui,&edit,&second));CHECK(sb_hash((const char *)second.runs,second.count*sizeof(*second.runs))==original);sb_native_text_free(&second);
+    /* Other fields evict glyph plans without invalidating owned exports. */
+    for(unsigned i=0;i<12;++i){struct nk_text_edit other;char value[32];snprintf(value,sizeof(value),"Other field %u",i);nk_textedit_init_default(&other);other.mode=NK_TEXT_EDIT_MODE_INSERT;CHECK(nk_textedit_paste(&other,value,(int)strlen(value)));actual(ui,&other);nk_textedit_free(&other);}
+    actual(ui,&edit);CHECK(sb_ui_edit_native(ui,&edit,&second));CHECK(second.count==first.count && sb_hash((const char *)second.runs,second.count*sizeof(*second.runs))==original);sb_native_text_free(&second);
+    /* A fresh layout produces the same snapshot as reuse. */
+    sb_ui_edit_cache_clear(ui);CHECK(!ui->edit_native_cache && !sb_ui_edit_native(ui,&edit,&second));CHECK(sb_hash((const char *)first.runs,first.count*sizeof(*first.runs))==original);
+    actual(ui,&edit);CHECK(sb_ui_edit_native(ui,&edit,&second));CHECK(second.count==first.count && sb_hash((const char *)second.runs,second.count*sizeof(*second.runs))==original);sb_native_text_free(&second);
+    /* Same-length edits must replace source units, even without a resize. */
+    nk_str_clear(&edit.string);edit.cursor=edit.select_start=edit.select_end=0;CHECK(nk_textedit_paste(&edit,"WW",2));actual(ui,&edit);CHECK(sb_ui_edit_native(ui,&edit,&second));float wide=second.runs[0].width;sb_native_text_free(&second);
+    nk_str_clear(&edit.string);edit.cursor=edit.select_start=edit.select_end=0;CHECK(nk_textedit_paste(&edit,"ii",2));actual(ui,&edit);CHECK(sb_ui_edit_native(ui,&edit,&second));CHECK(second.runs[0].width<wide && second.runs[0].span.length==2);sb_native_text_free(&second);
+    CHECK(sb_ui_fonts(ui,1).code==SB_OK);CHECK(!ui->edit_native_cache && !sb_ui_edit_native(ui,&edit,&second));actual(ui,&edit);CHECK(sb_ui_edit_native(ui,&edit,&second));CHECK(second.runs[0].width<wide);sb_native_text_free(&second);
+    sb_native_text_free(&first);nk_textedit_free(&edit);return 0;
+}
+static int native_cache_budget(SBUi *ui){
+    /* Many short paragraphs exceed retained native metadata capacity while
+       the small source remains a valid complete editable document. */
+    size_t lines=13000,length=lines*2;char *source=malloc(length+1);CHECK(source);for(size_t i=0;i<lines;++i){source[2*i]='x';source[2*i+1]='\n';}source[length]=0;
+    sb_ui_edit_cache_clear(ui);struct nk_text_edit edit;nk_textedit_init_default(&edit);edit.mode=NK_TEXT_EDIT_MODE_INSERT;CHECK(nk_textedit_paste(&edit,source,(int)length));edit.cursor=edit.select_start=edit.select_end=0;multi(ui,&edit,NK_KEY_NONE,false);SBNativeText native={0};CHECK(sb_ui_edit_native(ui,&edit,&native));CHECK(!ui->edit_native_cache && native.count==lines+1);
+    size_t bytes=0;for(size_t i=0;i<native.count;++i){CHECK(native.runs[i].span.offset==bytes && native.runs[i].geometry);bytes+=native.runs[i].span.length;}CHECK(bytes==length && !native.runs[native.count-1].characters);sb_native_text_free(&native);nk_textedit_free(&edit);free(source);return 0;
+}
 typedef struct {SBCaret before,after;bool valid;} AffinityProbe;
 static bool inspect_affinity(void *user,const char *source,size_t length,size_t offset,const SBShapedLine *line,const SBCaretPlan *carets,float y){AffinityProbe *p=user;(void)source;(void)length;(void)offset;(void)y;p->valid=sb_caret_find(carets,3,SB_CARET_BEFORE,line->base_level,&p->before) && sb_caret_find(carets,3,SB_CARET_AFTER,line->base_level,&p->after);return p->valid;}
 static int font_affinity(SBUi *ui){const char *source="AB אב CD";struct nk_text_edit edit;nk_textedit_init_default(&edit);edit.mode=NK_TEXT_EDIT_MODE_INSERT;CHECK(nk_textedit_paste(&edit,source,(int)strlen(source)));edit.cursor=edit.select_start=edit.select_end=3;actual(ui,&edit);AffinityProbe old={0};CHECK(sb_ui_edit_geometry(ui,&edit,&ui->normal->handle,70,false,inspect_affinity,&old));CHECK(old.valid && old.before.x>old.after.x);edit.visual_valid=1;edit.visual_cursor=3;edit.visual_hash=sb_hash(source,strlen(source));edit.visual_affinity=old.before.affinity;edit.visual_level=old.before.level;edit.visual_x=old.before.x;actual(ui,&edit);CHECK(sb_ui_fonts(ui,1.5f).code==SB_OK);actual(ui,&edit);AffinityProbe resized={0};CHECK(sb_ui_edit_geometry(ui,&edit,&ui->normal->handle,70,false,inspect_affinity,&resized));CHECK(resized.valid && fabsf(edit.caret_bounds.x-field.x-resized.before.x/ui->density)<0.01f && resized.before.x>resized.after.x);CHECK(edit.cursor==3);nk_textedit_free(&edit);return 0;}
@@ -78,5 +103,5 @@ int main(int argc,char **argv){CHECK(argc==3);SBUi ui;CHECK(sb_ui_init(&ui,argv[
         key(&ui,&edit,NK_KEY_LEFT,false);CHECK(edit.cursor==hebrew_start+1);CHECK((size_t)nk_str_len_char(&edit.string)==length && !memcmp(nk_str_get_const(&edit.string),source,length));
         actual(&ui,&edit);if(scale==2)CHECK(sb_ui_capture(&ui,argv[2]).code==SB_OK);
         nk_textedit_free(&edit);sb_caret_plan_free(&carets);sb_shape_line_free(&line);sb_shape_paragraph_free(paragraph);sb_bidi_paragraph_free(bidi);
-    }CHECK(!vertical(&ui));CHECK(!native_scroll(&ui));CHECK(!font_affinity(&ui));sb_ui_shutdown(&ui);printf("%u integrated field glyph/pixel/ligature/bidi/native-scroll assertions passed.\n",checks);return 0;
+    }CHECK(!vertical(&ui));CHECK(!native_scroll(&ui));CHECK(!font_affinity(&ui));CHECK(!native_cache_lifetime(&ui));CHECK(!native_cache_budget(&ui));sb_ui_shutdown(&ui);printf("%u integrated field glyph/pixel/ligature/bidi/native-scroll/cache assertions passed.\n",checks);return 0;
 }
