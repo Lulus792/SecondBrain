@@ -111,3 +111,7 @@ bestehen. Tatsächlicher Linux-Build und native Matrixprüfung folgen.
 Debug/Release. 0.9.31 folgt dem echten GNOME-C-Client/ATK-Server statt der
 widersprüchlichen XML. Linux-Zielcheck (2,64 s) und zwei Mac-Nachprüfungen
 (14,12 s) bestehen; neuer nativer Lauf folgt. Installiert bleibt 0.9.28.
+
+0.9.32 korrigiert eine zweite übersehene schmale Linux-Baumerwartung auf
+direkte Zellen. Die tatsächlichen Matrixabfragen bestehen bis dahin in
+0.9.31-Release; zwei lokale Mac-Nachprüfungen bestehen. Neue CI folgt.

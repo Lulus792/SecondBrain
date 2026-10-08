@@ -639,7 +639,11 @@ int main(int argc,char **argv) {
     CHECK(native_rows && ((size_t(*)(void *,SEL))objc_msgSend)(native_rows,sel_registerName("count"))==4);
 #elif defined(_WIN32) || defined(SB_ATSPI_TEST)
     CHECK(sb_native_probe(d.ui.window,"Tabelle",NULL,SB_NATIVE_READ_TABLE_TREE,native_value,sizeof(native_value),pump,&d));
+#ifdef _WIN32
     CHECK(!strcmp(native_value,"4:3"));
+#else
+    CHECK(!strcmp(native_value,"cells:12"));
+#endif
 #endif
     OK(sb_path_join(dump_path,sizeof(dump_path),root,"table-stacked.bmp")); CHECK(sb_ui_capture(&d.ui,dump_path).code==SB_OK);
     char last_cell[100]={0};

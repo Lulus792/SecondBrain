@@ -2381,3 +2381,12 @@ Lauf folgt. Installiert bleibt das vollständig geprüfte 0.9.28-Paket.
 Die identische Linux-Debug-Diagnose ist geprüft. Abschließender Linux-
 Zielcheck besteht (2,64 Sekunden), zwei Mac-Release-Nachprüfungen bestehen
 (14,12 Sekunden). Die neue native Abnahme bleibt bis zum Abschluss offen.
+
+0.9.31-Linux-Release erreicht erfolgreich sämtliche Matrix-/Header-/
+Eltern-/Spannenprüfungen bei 100/200 Prozent. Eine zweite alte Erwartung
+für den reinen Baumtest in der schmalen Ansicht war noch auf Zeilencontainer
+festgelegt; 0.9.32 korrigiert sie auf die vorgesehenen zwölf direkten Zellen.
+Matrixanforderungen bleiben unverändert; neue vollständige native Abnahme folgt.
+
+Die zwei lokalen Mac-Release-Nachprüfungen zum korrigierten schmalen
+Baumtest bestehen (16,62 Sekunden). Native Linux-Abnahme folgt gesondert.
