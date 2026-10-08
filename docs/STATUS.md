@@ -2293,3 +2293,8 @@ instrumentiert, macOS-Leaks ausgeschaltet. Mausablauf 126, Tastatur 157 und
 Sicherung 75 Assertions bestehen. Logs: build/ordinary-input-complete-tests.log,
 ordinary-input-resumed-tests.log und ordinary-input-sanitizer-*.log.
 Neue native CI-/Paketprüfung folgt; installiert bleibt 0.9.25.
+
+Quellstand 598af64 ist nach origin gepusht.
+[CI 37727294396](https://github.com/Lulus792/SecondBrain/actions/runs/37727294396)
+ist gestartet; lokale entpackte Paketprüfung läuft separat. Nachweise erst
+nach tatsächlichem Abschluss übernehmen. Installiert bleibt 0.9.25.

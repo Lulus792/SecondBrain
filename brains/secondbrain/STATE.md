@@ -62,7 +62,10 @@ Prüfungen bestehen am selben Quellstand (16 vor, 35 nach Platzbereinigung);
 gezielte ASan/UBSan bestehen mit 36/7/119 Assertions. Mausfokus und Layout
 bei Schriftwechsel sind nachgeprüft. Native CI-/Paketabnahme folgen.
 
-Nächster Schritt: 0.9.26 nativ und als Paket abnehmen; Mac-Paket aktualisieren.
+Quellstand 598af64 gepusht; [CI 37727294396](https://github.com/Lulus792/SecondBrain/actions/runs/37727294396)
+ist gestartet. Lokale Paketprüfung läuft mit demselben Quellstand.
+
+Nächster Schritt: laufende 0.9.26-CI-/Paketprüfung auswerten; Mac-Paket aktualisieren.
 Weitere Release-Arbeiten: Bidi/visuelle Textgeometrie/IME, native
 Tabellenmatrix, Screenreader-/Dialog-/Geräte-/Langzeitabnahmen, volle Windows-/
 Linux-Zielvolumes und physische Persistenz. Originalverträge stehen in SOURCES.
