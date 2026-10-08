@@ -51,6 +51,17 @@ Dokumentwechsel bleibt im abwechselnden Softwarevergleich nahezu unverändert
 (98,68 → 98,44 ms Layoutmedian). Neue Plattform-/Paketabnahme folgt;
 installiert bleibt 0.9.37. [Vertrag](../../docs/BESCHRIFTUNGEN.md).
 
+## Schutzdialog (0.9.39)
+
+Fester Titel/Schließen und feste Entscheidungen neben einem eigenen scrollbaren
+Meldungskörper. Große Schrift, lange Konflikttexte und Tab ohne Scrollreset
+sind mit 199 Desktop-Assertions und denselben 199 unter haltendem ASan/UBSan
+geprüft. Gesamtlauf 63/64; alter Tastatur-Fokusvertrag angepasst, vollständiger
+Nachlauf mit 158 Assertions bestanden. Alle 64 Prüfungen dadurch abgedeckt,
+kein einzelner grüner 64/64-Lauf. Build ohne Tests besteht.
+[Vertrag](../../docs/SCHUTZDIALOG.md), Details/Sanitizergrenzen in STATUS.
+Neue Plattform-/Paketabnahme folgt; installiert zunächst weiter 0.9.37.
+
 ## Nächste Arbeiten
 
 Erstes Layout langer Dokumente weiter optimieren. Native Zeichenrechtecke

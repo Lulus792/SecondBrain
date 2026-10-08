@@ -2800,3 +2800,46 @@ Diagnose: build/layout-trace/ und build/layout-trace-measured.log.
 Installiert bleibt das paketgeprüfte 0.9.37 / 47a5a4392418. 0.9.38 benötigt
 seine eigene neue Plattform-/Paketabnahme. Der vollständige Release-Auftrag
 bleibt aktiv; 1.0 bleibt bis zur ausdrücklichen Nutzerfreigabe gesperrt.
+
+## Schutzdialog mit festen Aktionen und eigenem Scrollweg (0.9.39)
+
+Große Schrift und lange Konfliktmeldungen bleiben im Dialog für ungespeicherte
+Änderungen erreichbar. Titel und Schließen stehen im festen Kopf, sämtliche
+Entscheidungen darunter außerhalb der Scrollgruppe. Der Meldungskörper verwendet
+Slot 3 für Mausrad, Bildtasten und Overlay-Schiene. Tab erhält dessen Position;
+nur eine neu geöffnete, noch nicht vermessene Gruppe wird zurückgesetzt.
+Escape/Schließen erhalten Entwurf und Originalrevision. Default bleibt Speichern.
+[Vertrag](SCHUTZDIALOG.md). UI-Nachprüfung SBUI-073 mit Vorher-/Nachher-Bildern:
+`/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-08_15-49-00/UI_REVIEW.md`.
+
+Die erste Bildnachprüfung deckte einen Tab-Reset auf; der dazu laufende alte
+Gesamtlauf wurde bewusst abgebrochen. Nach Korrektur bestehen **63/64 lokale
+Release-Prüfungen (550,39 s)**. Ein vorhandener Tastaturtest erwartete die alte
+Umschalt+Tab-Reihenfolge ohne Kopf-Schließen. Der Test prüft jetzt auch dieses
+sichere Ziel; **vollständiger Tastatur-Nachlauf bestanden (56,95 s), 158 Assertions**.
+Damit sind alle 64 Prüfungen abgedeckt; dies ist kein einzelner grüner 64/64-Lauf.
+199 neue echte Desktop-Assertions bestehen: 780×520 tatsächliche Mindestgröße,
+100/150/200 Prozent App-Schrift, drei/vier Aktionen, sichtbare feste Rechtecke,
+Wheel-/Page-/Thumb-Eingabe, stabile Grenze, Tab-Position, Escape/Schließen,
+Entwurfs-/Revisionserhalt, erneuter Einstieg und Speichern vor Beenden.
+
+Dieselben **199 Assertions bestehen unter haltendem ASan/UBSan ohne Befund**.
+Instrumentiert: desktop.c, UI/Text/Renderer, Caret-/Shape-/Script-/Bidi-Code,
+Bidi-Engine, Prüfer und SDL_ttf.c samt Hooks. Andere Desktopobjekte, Modell,
+fachlicher Kern und weitere externe Objekte sind nicht instrumentiert;
+macOS-Leakprüfung aus. UI-Build ohne Tests besteht, Version 0.9.39.
+Protokolle: `build/guard-final-ctest.log`, `guard-final-full-lasttest.log`,
+`guard-keyboard-final.log`, `guard-sanitizers-final.log`, `guard-sanitizers/`,
+`guard-no-tests-final-build.log`. Quellhashes des Sanitizerumfangs sind abgeglichen.
+
+Neue Plattform-/Paketabnahme folgt; installiert zunächst weiter 0.9.37.
+0.9.38-CI 37783531947: bei erneuter Abfrage sieben erfolgreiche Jobs,
+13 noch nicht abgeschlossen, keiner fehlgeschlagen; kein vollständiger Nachweis.
+Reale native Bedienung/Trackpads und Screenreader bleiben offen. 1.0 ist nicht
+freigegeben. Der gesamte Release-Auftrag bleibt aktiv.
+
+377 ältere, abgeschlossene generierte Accessibility-/Interaktions-BMPs wurden
+verlustfrei komprimiert; vor Entfernen jeder Rohdatei wurden entpackte Bytes,
+SHA-256 und unveränderte Dateistatistik geprüft. 5.456.355.978 Bytes freigegeben.
+Aktive Prüfverzeichnisse, Projektdateien und Anwendungspakete unberührt.
+Manifest: `build/guard-completed-bitmap-archive.json`.

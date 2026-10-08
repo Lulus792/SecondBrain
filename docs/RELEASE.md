@@ -186,3 +186,11 @@ Grapheme. Lokale Gesamt-/Desktop-/Sanitizerprüfung besteht;
 [Umfang und Grenzen](BESCHRIFTUNGEN.md). Das kalte Layout langer Dokumente ist
 damit nicht abgeschlossen. Eine weitere Vorbereitung muss Abbruch, Datei-/
 Schriftwechsel, Font-Threadbesitz und unveränderte Zeilen-/Scrollgeometrie erhalten.
+
+## Schutzdialog vom 8. Oktober
+
+Ab 0.9.39 trennt der [Schutzdialog](SCHUTZDIALOG.md) ungespeicherter Änderungen
+einen scrollbaren Meldungskörper von festem Titel, Schließen und Entscheidungen.
+Große Schrift, lange Konfliktmeldungen, Scrollgrenzen und Tab ohne Positionsreset
+sind lokal geprüft. Die neue Plattform-/Paketabnahme und reale native Bedienung
+bleiben gesondert; dieser Schritt schließt die vollständige Release-Liste nicht.

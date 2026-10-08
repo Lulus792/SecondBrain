@@ -140,3 +140,6 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Beschriftungen und verdeckte Buttons](../../docs/BESCHRIFTUNGEN.md):
   graphemgebundene Kürzung/Puffer, erhaltene Tastaturziele, Hoverclips und
   verbleibendes kaltes Dokumentlayout ab 0.9.38.
+
+- [Schutzdialog](../../docs/SCHUTZDIALOG.md): feste Kopf-/Aktionsfläche, eigener
+  Meldungsscrollweg und sicherer Fokus-/Abbruchvertrag ab 0.9.39.

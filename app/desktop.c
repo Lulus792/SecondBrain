@@ -141,13 +141,12 @@ static void scroll_measure(SBDesktop *d, unsigned slot) {
     nk_fill_rect(nk_window_get_canvas(d->ui.ctx),s->thumb,2,ink);
 }
 static unsigned scroll_slot(SBDesktop *d, float x, float y, bool pointer) {
-    if (d->model.guard) return 4;
-    if (d->form != SB_FORM_NONE) {
+    if (d->model.guard || d->form != SB_FORM_NONE) {
         if (pointer) {
             struct nk_rect r=d->modal_bounds;
             if (x<r.x || x>=r.x+r.w || y<r.y || y>=r.y+r.h) return 4;
         }
-        return modal_reader(d) ? 2 : 3;
+        return !d->model.guard && modal_reader(d) ? 2 : 3;
     }
     if (!d->model.has_project) {
         if (pointer) {
@@ -942,7 +941,8 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
     if (event->type==SDL_EVENT_MOUSE_BUTTON_DOWN && event->button.button==SDL_BUTTON_LEFT) {
         for (unsigned i=0;i<4;++i) {
             SBScroll *s=&d->scrolling[i];
-            if (!d->model.guard && (d->form==SB_FORM_NONE ? i<2 : modal_reader(d) ? i==2 : i==3) && s->used && s->maximum>0 && inside(event->button.x,event->button.y,s->track)) {
+            bool owns_scroll=d->model.guard ? i==3 : d->form==SB_FORM_NONE ? i<2 : modal_reader(d) ? i==2 : i==3;
+            if (owns_scroll && s->used && s->maximum>0 && inside(event->button.x,event->button.y,s->track)) {
                 d->keyboard=false;
                 if (inside(event->button.x,event->button.y,s->thumb)) { s->dragging=true; s->grab=event->button.y-s->thumb.y; }
                 else s->pending+=(event->button.y<s->thumb.y ? -1 : 1)*s->height*0.9f;
@@ -1859,26 +1859,37 @@ static void popup(SBDesktop *d, int width, int height) {
     ctx->style.window.group_padding=nk_vec2(8*d->ui.scale,6*d->ui.scale);
     ctx->style.window.spacing=nk_vec2(8*d->ui.scale,4*d->ui.scale);
     float s = d->ui.scale, w = fminf(width - 40.0f, 580 * s), h = fminf(height - 40.0f, 680 * s);
-    if (d->model.guard) {
+    if(d->model.guard){
         const char *guard_text="Dieses Dokument enthält ungespeicherte Änderungen. Speichere sie vor dem Wechsel oder behalte die Bearbeitung bei.";
-        float text_width=w-2*ctx->style.window.padding.x;
-        float guard_height=sb_ui_wrap_height(ctx,&d->ui.normal->handle,guard_text,strlen(guard_text),text_width);
-        float error_height=d->message.message[0] ? sb_ui_wrap_height(ctx,&d->ui.normal->handle,d->message.message,strlen(d->message.message),text_width) : 0;
+        const struct nk_user_font *font=&d->ui.normal->handle;float gap=ctx->style.window.spacing.y;
+        float row=fmaxf(36,font->height+12*s),header=32*s;
         unsigned actions=d->message.code==SB_CONFLICT ? 4 : 3;
-        h=fminf(height-40.0f,guard_height+error_height+actions*(36*s+ctx->style.window.spacing.y)+2*ctx->style.window.padding.y+44*s+2*ctx->style.window.spacing.y);
-        d->modal_bounds=nk_rect((width-w)/2,(height-h)/2,w,h);
-        glass(d, nk_rect((width-w)/2, (height-h)/2, w, h), 28);
-        if (nk_begin(ctx, "Änderungen erhalten", nk_rect((width - w) / 2, (height - h) / 2, w, h),
-                     NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
-            passive_add(d,"modal-title","Änderungen erhalten",ACCESSKIT_ROLE_HEADING,nk_rect((width-w)/2,(height-h)/2,w,32*s));
-            nk_layout_row_dynamic(ctx,guard_height,1);native_wrap(d,guard_text);
-            nk_layout_row_dynamic(ctx, 36 * s, 1);
-            if (button(d, "guard-save", "Speichern und weiter")) command(d, SB_CMD_GUARD_SAVE);
-            if (button(d, "guard-discard", "Änderungen verwerfen")) command(d, SB_CMD_GUARD_DISCARD);
-            if (button(d, "guard-cancel", "Weiter bearbeiten")) command(d, SB_CMD_GUARD_CANCEL);
-            if (d->message.code == SB_CONFLICT)
-                if (button(d, "guard-copy", "Eigene Fassung als neue Notiz sichern")) command(d, SB_CMD_COPY);
-            if(error_height>0) {nk_layout_row_dynamic(ctx,error_height,1);native_wrap(d,d->message.message);}
+        float footer=actions*row+(actions-1)*gap;
+        float shell=2*ctx->style.window.padding.y+header+footer+3*gap;
+        float text_width=fmaxf(1,w-2*ctx->style.window.padding.x-2*ctx->style.window.group_padding.x-(10+6*s));
+        float info=sb_ui_wrap_height(ctx,font,guard_text,strlen(guard_text),text_width);
+        float error=d->message.message[0] ? sb_ui_wrap_height(ctx,font,d->message.message,strlen(d->message.message),text_width) : 0;
+        float content=info+(error ? gap+error : 0)+4*ctx->style.window.group_padding.y;
+        h=fminf(height-40.0f,shell+content);d->modal_bounds=nk_rect((width-w)/2,(height-h)/2,w,h);
+        glass(d,d->modal_bounds,16);
+        if(nk_begin(ctx,"Änderungen erhalten",d->modal_bounds,NK_WINDOW_NO_SCROLLBAR)){
+            float available=ctx->current->layout->bounds.w;
+            nk_layout_row_begin(ctx,NK_STATIC,header,2);
+            nk_layout_row_push(ctx,available-32*s-ctx->style.window.spacing.x);passive_add(d,"modal-title","Änderungen erhalten",ACCESSKIT_ROLE_HEADING,nk_widget_bounds(ctx));nk_label(ctx,"Änderungen erhalten",NK_TEXT_LEFT);
+            nk_layout_row_push(ctx,32*s);if(button(d,"cancel","Schließen"))command(d,SB_CMD_GUARD_CANCEL);nk_layout_row_end(ctx);
+            nk_layout_row_dynamic(ctx,fmaxf(1,h-shell),1);
+            if(!d->scrolling[3].measured)nk_group_set_scroll(ctx,"Guard contents",0,0);
+            if(nk_group_begin(ctx,"Guard contents",NK_WINDOW_NO_SCROLLBAR)){
+                scroll_gutter(d);smooth_scroll(d,3,ctx->current->layout->offset_y);
+                float inner=ctx->current->layout->bounds.w;
+                nk_layout_row_dynamic(ctx,sb_ui_wrap_height(ctx,font,guard_text,strlen(guard_text),inner),1);native_wrap(d,guard_text);
+                if(error){nk_layout_row_dynamic(ctx,sb_ui_wrap_height(ctx,font,d->message.message,strlen(d->message.message),inner),1);native_wrap(d,d->message.message);}
+                scroll_measure(d,3);nk_group_end(ctx);
+            }
+            nk_layout_row_dynamic(ctx,row,1);if(button(d,"guard-save","Speichern und weiter"))command(d,SB_CMD_GUARD_SAVE);
+            nk_layout_row_dynamic(ctx,row,1);if(button(d,"guard-discard","Änderungen verwerfen"))command(d,SB_CMD_GUARD_DISCARD);
+            if(actions==4){nk_layout_row_dynamic(ctx,row,1);if(button(d,"guard-copy","Eigene Fassung als neue Notiz sichern"))command(d,SB_CMD_COPY);}
+            nk_layout_row_dynamic(ctx,row,1);if(button(d,"guard-cancel","Weiter bearbeiten"))command(d,SB_CMD_GUARD_CANCEL);
         }
         nk_end(ctx);ctx->style.window=original_window;return;
     }

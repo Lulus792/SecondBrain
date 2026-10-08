@@ -149,6 +149,7 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
     CHECK(d->star != before && !strcmp(d->model.path,saved));
     CHECK(d->model.guard && sb_app_dirty(&d->model));
     CHECK(!strcmp(d->focus,"guard-save"));
+    key(d,SDLK_TAB,SDL_KMOD_SHIFT); CHECK(!strcmp(d->focus,"cancel") && d->model.guard && sb_app_dirty(&d->model));
     key(d,SDLK_TAB,SDL_KMOD_SHIFT); CHECK(!strcmp(d->focus,"guard-cancel"));
     key(d,SDLK_RETURN,0); CHECK(!d->model.guard && sb_app_dirty(&d->model));
     key(d,SDLK_RETURN,0); CHECK(d->model.guard);
