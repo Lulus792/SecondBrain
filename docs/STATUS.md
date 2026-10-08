@@ -2628,3 +2628,12 @@ diesem Intel-Mac, 1336×840, 16 Notizen und je 60 warme Frames: Scroll-Median
 lange Wechsel bleibt bei 124,08 ms ein offener Ausreißer. Das belegt die
 benannte Stichprobe, keine globale Bildrate oder Langzeit-/Geräteabnahme.
 Protokoll: build/editor-native-profile.log.
+
+Der erste neue CI-Lauf zu 178128e meldet Fehler in den sechs Python-Jobs: der
+neue Quellfixture-Starter führte seine Arbeit auch beim unittest-Import aus.
+Der Starter ist jetzt importfrei hinter __main__; lokal bestehen die allgemeine
+Testsammlung (39 Tests, ein systembedingter Skip) und alle fünf direkten
+Quellfixtures. Anwendungscode und das geprüfte Anwendungsarchiv sind unverändert.
+Der erste Paketlauf scheitert beim Sicherungsablauf während voller Platte; eine
+frische vollständige Paketprüfung folgt nach verlustfreier Kompression alter
+Testaufnahmen. Projektdateien und Rückfallkopien bleiben erhalten. Neue CI folgt.
