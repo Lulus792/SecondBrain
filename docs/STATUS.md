@@ -2424,3 +2424,20 @@ zu d48ee9b ist vollständig abgeschlossen: alle 20 Jobs und vier entpackte
 Pakete bestehen. Die neue Linux-Cargo-Cacheprüfung und die native Matrix
 sind in Debug/Release bestätigt. Die ursprünglichen 0.9.30/31-Fehler
 bleiben dokumentiert; dieser spätere Quellstand ist die erfolgreiche Abnahme.
+
+## Neue C-Bidi-Grundlage für die verbleibende Textarbeit
+
+Am 8. Oktober ist ein eigener UTF-8-Absatz-/Zeilenplan im UI-Prüfbuild ergänzt.
+Die begrenzte UI-Bibliothek SheenBidi 3.0.0 erhält aktualisierte Unicode-18-
+Bidi-/Paarungsdaten. Ein entdeckter UTF-8-Laufgrenzenfehler wird durch skalare
+Analyse mit expliziter Byteabbildung vermieden; der Generator verwendet für
+neue Spiegelpartner 32-Bit-Abstände. Originaltext bleibt unverändert.
+
+Lokaler Intel-Mac-Release: 861.948 normative Richtungsfälle, 438 Spiegelpaare,
+alle Unicode-Positionen und eigene Bereichs-/Absatzprüfungen bestehen
+(36.859.513 Assertions, 1,96 s). Derselbe Bestand besteht mit ASan/UBSan im
+dokumentierten Teilscope. Erneute Generierung liefert identische Tabellen.
+32/32 separate Kernprüfungen ohne UI bestehen (16,32 s).
+Produktiver Renderer, Editor und native Zeichenrechtecke sind noch nicht an
+diesen Plan angebunden; installierte App und Version bleiben unverändert.
+Neue native Plattformprüfungen folgen. [Vertrag und Prüfgrenzen](BIDI.md).

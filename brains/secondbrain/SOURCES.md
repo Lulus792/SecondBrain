@@ -35,6 +35,9 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Grapheme](../../docs/GRAPHEME.md): eigener C-Algorithmus, Zeicheneinheiten, Unicode-Daten und Prüfgrenzen.
 - [IME-Komposition](../../docs/IME.md): Originalquellen, vorläufige Anzeige, Eingabeordnung und Prüfgrenzen.
 - [Textdarstellung](../../docs/TEXTDARSTELLUNG.md): UI-Schriftrollen, geformte Textläufe, Fallback und verbleibende Textarbeit.
+- [Bidi-Grundlage](../../docs/BIDI.md): eigener UTF-8-Absatzplan, Unicode-18-
+  Daten, gefundene Bibliotheks-/Generatorfehler, lokale Abnahme und verbleibende
+  gemeinsame Renderer-/Editor-/native Anbindung.
 - [Lizenzansicht](../../docs/LIZENZEN.md): Originaltexte in der App, Bedienwege und Prüfgrenzen.
 - [MIT-Lizenz](../../LICENSE): gewählte Lizenz des eigenen Codes.
 - [UI-Abhängigkeiten](../../third_party/README.md): Herkunft, Versionen, Lizenzen, Anpassungen.

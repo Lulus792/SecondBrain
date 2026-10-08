@@ -20,6 +20,11 @@ beim Laden unverändert, installierte Ansicht betrachtet. Rückfallkopie:
 
 ## Geprüfte Fortschritte
 
+- Neue C-Bidi-Grundlage im UI-Prüfbuild: 861.948 Unicode-18-Richtungsfälle,
+  438 Spiegelpaare und alle Unicode-Positionen bestehen; ASan/UBSan im
+  dokumentierten Teilscope und bytegenaue Neugenerierung ebenfalls.
+  32/32 Kernprüfungen ohne UI bestehen. Noch nicht an die sichtbare App
+  angeschlossen; [Vertrag/Nachweise](../../docs/BIDI.md).
 - Erneute gezielte macOS-Release-Nachprüfung des Nutzerfeedbacks:
   135 Bewegungs-/Layout- und 144 Navigations-Assertions, darunter alle vier
   vorherigen Listen-/Leseansichten nach Leerung, erneutem Tippen und Escape.
@@ -55,6 +60,10 @@ Weitere Release-Arbeiten: Bidi/visuelle/native Textgeometrie und reale Eingabeme
 menschliche VoiceOver/NVDA/Orca-, Dialog-, Geräte-, Mehrmonitor-/Langzeitabnahme;
 volle Windows-/Linux-Zielvolumes und physische Persistenz; frische Rechner und
 OS-Mindestversionen; vollständige SDK-/Systemruntime-Zuordnung.
+
+Nächster Textschritt: geprüften Absatzplan vor Schrift-/Stilaufteilung und
+Umbruch anbinden, anschließend endgültige Glyphengeometrie für Cursor,
+Auswahl, IME und native Provider gemeinsam verwenden. Neue CI-Abnahme prüfen.
 
 Eigener Code MIT. Signaturkonten fehlen; vertraulicher Sicherheitskanal ist
 angefragt. Vollständiger Auftrag bleibt aktiv. **1.0 erst nach ausdrücklicher

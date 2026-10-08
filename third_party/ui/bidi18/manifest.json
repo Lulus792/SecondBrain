@@ -1,0 +1,22 @@
+{
+  "unicode": "18.0.0",
+  "uax9_revision": 52,
+  "library": "SheenBidi 3.0.0",
+  "archive_sha256": "86c56014034739ba39a24c23eb00323b0bf6f737354f665786015fca842af786",
+  "inputs": {
+    "BidiBrackets.txt": "4b3b62e4a14b84ee752808c810c602534921c09a4a1bf78cfbee566d66c125b3",
+    "BidiCharacterTest.txt": "045b24d2c8ab066951bd32fe8c6b4de34647f72b5b1c7df0265f24ab53573e01",
+    "BidiMirroring.txt": "cd54810ebf52f0e61a730c8b9cb25975de6c85f6d788a559b416afd548923fd6",
+    "BidiTest.txt": "9af2f882a4ab50912e388f069a673b94eacd82fa6d07d20a3ff7f3c759e905aa",
+    "DerivedBidiClass.txt": "d9e23222522551348ea1ccfbb4f62efbf98982afb95840f8959c08ed992c5607",
+    "DerivedCoreProperties.txt": "09c928886a178fcafd93c29e4bd59073a058e5a100b716d425cb563ab50f68c9",
+    "DerivedGeneralCategory.txt": "d6b151d2d40ee9b1876d26f417980f45ffae47b6055ccf7203cb31f07a030f94",
+    "PropList.txt": "f438f532e8737bb8a2702126cdf9c4af5e357c58c7acf9d9eb2fc7c1a1d955d6",
+    "PropertyValueAliases.txt": "06c4c8eaf7b0bf34abe73b113da1215bd784ac254d4c223600b90267caa4bbbd",
+    "Scripts.txt": "0071fd81b6aeae25f6e8bce8efec3066a6476a91b49bdb2f52dc76e817862a6a"
+  },
+  "outputs": {
+    "BidiTypeLookup.c": "f9adf88bdf38c128e7fcbed4676a65319a74d48f006eb0c30ea2f7b22f410e53",
+    "PairingLookup.c": "62beb17d7e0ce594a1ea65b7e0a3fe800934b5d6574234c4e8c52c8f23fce31f"
+  }
+}

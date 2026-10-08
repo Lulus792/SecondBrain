@@ -133,6 +133,15 @@ Popup-Korrektur 3/3 (134 Editorassertions). Der native Plattformnachweis folgt
 im Umsetzungsstand. Dieser Schritt implementiert keine Preedit-Komposition,
 keine Bidi-Abbildung und keine neue native Zeichenrechteck-Schnittstelle.
 
+## Geprüfte Bidi-Grundlage am 8. Oktober
+
+Der [eigene C-Absatz-/Zeilenplan](BIDI.md) verwendet aktualisierte Unicode-18-
+Bidi-Daten und besteht 861.948 normative Richtungsfälle. Bei der Anbindung
+wurden eine UTF-8-Laufgrenze und zu kleine Spiegelabstände im UI-Datengenerator
+gefunden und berücksichtigt. Er ist zunächst im UI-Prüfbuild integriert;
+sichtbare Renderer-/Editor-/native Geometrie bleiben der nächste gemeinsame
+Schritt. Die installierte Anwendung verwendet diese Grundlage noch nicht.
+
 ## Vorläufige Komposition ab 0.9.25
 
 [IME-Anbindung](IME.md) ergänzt unterstrichenen, vorläufigen Text direkt im

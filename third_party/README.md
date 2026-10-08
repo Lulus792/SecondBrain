@@ -3,6 +3,10 @@
 Diese Abhängigkeiten werden ausschließlich in das UI-Ziel eingebunden. Der
 C-Kern enthält keine externen Bibliotheken.
 
+In Vorbereitung: [Bidi-Absatzlayout](ui/bidi18/README.md) mit SheenBidi 3.0.0
+und aktualisierten Unicode-18-Bidi-Daten. Der neue C-Plan ist aktuell nur im
+UI-Prüfbuild eingebunden, noch keine zusätzliche Abhängigkeit des App-Pakets.
+
 ## SDL3
 
 SDL3 3.2.30 wird statisch gebaut oder aus einer vorhandenen passenden

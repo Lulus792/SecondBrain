@@ -48,3 +48,15 @@ Tabelle SHA-256: cb4376660d9c92d5d55648692586459c31a929504299ece3c8a2bc003da4290
 Die Originaldaten und die abgeleitete Tabelle verwenden die bestehende Unicode
 License V3; eigener C-Vergleich/Definitionsleser bleibt MIT. Kein Runtime-
 Datenladen und kein Generatorbedarf beim normalen C-Build.
+
+## Bidi-Absatzlayout (UI)
+
+Die unveränderten Unicode-18-Originale BidiTest, BidiCharacterTest,
+BidiMirroring, BidiBrackets, DerivedBidiClass, PropList, PropertyValueAliases
+und Scripts ergänzen die vorhandenen Daten. Herkunft: derselbe UCD-18-Ordner;
+DerivedBidiClass stammt aus `extracted/`. Die Hashes sämtlicher benötigter
+Eingaben stehen in `../ui/bidi18/manifest.json`. Eigenschaftsdaten und abgeleitete
+Tabellen verwenden die bestehende Unicode License V3. Anders als die eigene
+Graphemsegmentierung verwendet der UI-Absatzalgorithmus eine externe C-UI-
+Bibliothek; der fachliche Kern bleibt ohne externe Bibliotheken.
+[Vertrag und tatsächliche Nachweise](../../docs/BIDI.md).
