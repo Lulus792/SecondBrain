@@ -12,9 +12,9 @@ Lumen-Sternkarte, Glaskarten/Icons, direkte Pfeilnavigation, Kamerafahrt,
 weiches Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert: **0.9.40 / 5b56e3542b38**, sauberer Intel/macOS-Release-Build.
-94 Dateien entsprechen dem geprüften entpackten Paket. Vorherige Version 0.9.39:
-`/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.39-20261008-171309`.
+Installiert: **0.9.41 / e6739d7916d9**, sauberer Intel/macOS-Release-Build.
+94 Dateien entsprechen dem geprüften entpackten Paket. Vorherige Version 0.9.40:
+`/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.40-20261008-175850`.
 Installierte Ansicht betrachtet; Laden verändert keine Gedächtnisdatei.
 
 ## Geprüfter aktueller Fortschritt
@@ -83,10 +83,12 @@ keinen Layoutgewinn und wurde entfernt. Kalter langer Wechsel bleibt offen.
 Begrenzte Graphem-/Wortläufe und native lauflokale Auswahl werden auf
 Editor-Skalarpositionen abgebildet. Metadaten behalten Kontext über Stil-/
 Laufgrenzen und werden bei reiner Geometrieänderung wiederverwendet.
-68/68 Release-Prüfungen,388 Assertions unter haltendem ASan/UBSan und
+68/68 Release-Prüfungen, 388 Assertions unter haltendem ASan/UBSan und
 Build ohne Tests bestehen. Echte Mac-Providerauswahl über Laufgrenzen geprüft.
 [Vertrag](../../docs/NATIVE_TEXTLAEUFE.md), Scope/Nachweise in STATUS.
-Neue Plattform-/Paketabnahme folgt, installiert zunächst40. Glyphenrechtecke
+Intel/macOS-Paket und Installation bestehen: 126 Desktop-, 158 Tastatur-,
+75 Sicherungs-Assertions, zwei Neustarts und CLI-/Runtime-/Lizenzprüfungen.
+Neue CI 37804528961 auf e6739d7 zuletzt queued, weitere Zielsysteme offen. Glyphenrechtecke
 und Sonderfall sehr langer nativer Grapheme bleiben offen.
 
 ## Nächste Arbeiten

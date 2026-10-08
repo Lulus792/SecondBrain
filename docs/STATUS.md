@@ -2,7 +2,7 @@
 
 Stand: 8. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.40. Die neue Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.41. Die neue Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -2941,7 +2941,7 @@ Archiv: `build/word-release-package/SecondBrain-0.9.40-Darwin-x86_64.tar.gz`,
 SHA-256 `76d30c7f8146a554fd080c4661ac78ff6312a07eb3a5ef6aebbf4cf3be742b17`.
 
 Alle 94 installierten Dateien entsprechen bytegleich dem geprüften Paket.
-Vorige0.9.39 erhalten unter `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.39-20261008-171309`.
+Vorige 0.9.39 erhalten unter `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.39-20261008-171309`.
 Eigene Projektinstanz mit installierter App geladen, Ansicht betrachtet,
 Gedächtnisdateien unverändert. Nachweis: `build/word-install-proof.json`,
 `build/word-installed-brain.png`.
@@ -2954,7 +2954,7 @@ Native Textgeometrie, reale Bedienabnahmen, langer kalter Wechsel und alle
 
 ## Begrenzte native Graphem-/Wortläufe (0.9.41)
 
-AccessKit erhält höchstens255 auswählbare Einheiten je Textlauf. Normale
+AccessKit erhält höchstens 255 auswählbare Einheiten je Textlauf. Normale
 Grapheme/Emoji und CRLF sind je eine Einheit. Stil-/Zeilenwechsel und lange
 Läufe erhalten neue stabile Quellenoffset-Identitäten; ein abschließendes
 Zeilenende erhält einen leeren Schlusslauf. Wortanfänge verwenden ganzen
@@ -2970,7 +2970,7 @@ Neue Lauf-/Wort-/Graphem-/Auswahl-/Cacheprüfung:388 Assertions.
 Der echte macOS-Provider wählt zusätzlich über mehrere Läufe aus: UTF-16-
 Bereich250..315 entspricht Editor-Skalar250..311 und erhält Akzent/Familien-
 Emoji. Vorhandene native Provider-/Text-/Stil-/Strukturprüfungen bestehen.
-**Dieselben388 Assertions bestehen unter haltendem ASan/UBSan ohne Befund**.
+**Dieselben 388 Assertions bestehen unter haltendem ASan/UBSan ohne Befund**.
 Instrumentiert sind native_text.c, accessibility.c, UI/Text/Renderer,
 Caret-/Shape-/Script-/Bidi-Code, Bidi-Engine, Wort-/Graphemkern, Prüfer und
 SDL_ttf.c samt Hooks. Weitere externe Objekte und übriger Kern/Modell-/
@@ -2979,15 +2979,15 @@ Quellhashes der Instrumentierung abgeglichen. Build ohne Tests besteht.
 Protokolle: `build/native-text-full-ctest.log`, `native-text-full-lasttest.log`,
 `native-text-provider.log`, `native-text-sanitizers/`, `native-text-no-tests-build.log`.
 
-Originaler AccessKit-Vertrag0.25.1 (Commitce8164ba92995cfa86005b6259115e08c8244253)
+Originaler AccessKit-Vertrag 0.25.1 (Commit ce8164ba92995cfa86005b6259115e08c8244253)
 erneut aus Primärquelle gelesen; Download entspricht lokaler Cratequelle bytegleich,
 SHA-256 f77ed125614c6e735141bdc5fe8551cfc8dbc2d16ffccf4d52880c2c2bdfeffd.
-Sehr lange Grapheme über255 UTF-8-Bytes benötigen native skalare Teilstücke;
+Sehr lange Grapheme über 255 UTF-8-Bytes benötigen native skalare Teilstücke;
 Quellenbytes bleiben erhalten und die UI klemmt ihre Auswahl weiterhin.
 Native Zeichenpositionen/-breiten/Glyphenrechtecke sind noch nicht angebunden.
 Die Laufrechtecke bleiben die vorhandenen Elementflächen. Reale assistive/
 sprachabhängige/IME-/Geräteabnahmen und neue Plattform-/Paketabnahme folgen.
-Installiert bleibt zunächst0.9.40. Der volle Release-Auftrag bleibt aktiv;
+Installiert bleibt zunächst 0.9.40. Der volle Release-Auftrag bleibt aktiv;
 1.0 nur nach ausdrücklicher Nutzerfreigabe.
 
 104 ältere abgeschlossene generierte BMPs verlustfrei komprimiert, SHA-256,
@@ -2995,3 +2995,25 @@ entpackte Bytes und unveränderte Dateistatistik vor jeder Rohdateientfernung
 geprüft. 1476949328 Bytes freigegeben; laufende Prüfungen,
 Projektdateien und Pakete unberührt. Manifest:
 `build/native-text-completed-bitmap-archive.json`.
+
+## Geprüftes natives Textpaket 0.9.41 installiert
+
+Sauberer Intel/macOS-Release-Build **0.9.41 / e6739d7916d9**. Das entpackte
+Paket besteht 126 Desktop-, 158 Tastatur- und 75 Sicherungs-Assertions, zwei
+isolierte Neustarts und produktive CLI-Sicherung/Wiederherstellung.
+Runtime-/Lizenz-/Versionsprüfungen bestehen. Protokoll:
+`build/native-text-package-check.log`. Archiv:
+`build/native-text-release-package/SecondBrain-0.9.41-Darwin-x86_64.tar.gz`,
+SHA-256 `95cb0ddd31322594a248511db81adb0a1b45cc8fd391809910527b88b43b52cf`.
+
+Alle 94 installierten Dateien entsprechen bytegleich dem geprüften Paket.
+Vorige 0.9.40 erhalten unter `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.40-20261008-175850`.
+Eigene Instanz mit installierter App geladen, Ansicht betrachtet,
+Gedächtnisdateien unverändert. Nachweis:
+`build/native-text-install-proof.json`, `build/native-text-installed-brain.png`.
+
+Quellstand e6739d7 normal nach origin gepusht. Neue
+[CI 37804528961](https://github.com/Lulus792/SecondBrain/actions/runs/37804528961)
+zuletzt queued; für diesen Schritt kein neuer Gesamt-Plattformnachweis.
+Weitere Textgeometrie/assistive Abnahme, kalter langer Wechsel und alle
+übrigen Release-Arbeiten bleiben offen. 1.0 nur nach Nutzerfreigabe.
