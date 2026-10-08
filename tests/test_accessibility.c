@@ -595,15 +595,17 @@ int main(int argc,char **argv) {
     CHECK(!((void *(*)(void *,SEL,long,long))objc_msgSend)(native_table,sel_registerName("accessibilityCellForColumn:row:"),0,4));
 #elif defined(_WIN32) || defined(SB_ATSPI_TEST)
     CHECK(sb_native_probe(d.ui.window,"Tabelle",NULL,SB_NATIVE_READ_TABLE_TREE,native_value,sizeof(native_value),pump,&d));
+#ifdef _WIN32
     CHECK(!strcmp(native_value,"4:3"));
-    /* Windows now requires real Grid/Table patterns; AT-SPI remains open. */
+#else
+    CHECK(!strcmp(native_value,"cells:12"));
+#endif
+    /* Matrix interfaces are required separately from the native tree. */
     bool table_pattern=sb_native_probe(d.ui.window,"Tabelle",NULL,SB_NATIVE_READ_TABLE_SIZE,native_value,sizeof(native_value),pump,&d);
     if (table_pattern) CHECK(!strcmp(native_value,"4:3"));
-#ifdef _WIN32
     CHECK(table_pattern);
     CHECK(sb_native_probe(d.ui.window,"Tabelle",NULL,SB_NATIVE_READ_TABLE_MATRIX,native_value,sizeof(native_value),pump,&d));
     CHECK(!strcmp(native_value,"4:3:12:3"));
-#endif
     printf("Native table matrix interface: %s (tree checked separately).\n",table_pattern ? "available" : "unavailable; release gate open");
 #endif
 #if defined(__APPLE__) || defined(_WIN32) || defined(SB_ATSPI_TEST)
@@ -619,7 +621,7 @@ int main(int argc,char **argv) {
     OK(sb_ui_fonts(&d.ui,2)); CHECK(SDL_SetWindowSize(d.ui.window,780,560)); frame(&d); frame(&d);
     CHECK(!strcmp(d.model.editor,table_source));
     for (size_t i=0;i<d.passive_count;++i) if (d.passive[i].role==ACCESSKIT_ROLE_TABLE) CHECK(!strcmp(d.passive[i].id,table_id));
-#ifdef _WIN32
+#if defined(_WIN32) || defined(SB_ATSPI_TEST)
     CHECK(sb_native_probe(d.ui.window,"Tabelle",NULL,SB_NATIVE_READ_TABLE_MATRIX,native_value,sizeof(native_value),pump,&d));
     CHECK(!strcmp(native_value,"4:3:12:3"));
 #endif

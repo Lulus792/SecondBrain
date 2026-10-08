@@ -101,3 +101,8 @@ zu 23b0b76 besteht in allen 20 Jobs und vier entpackten Paketen. Die neue
 Windows-Matrixprüfung besteht damit nativ in Debug und Release einschließlich
 zwölf Zellen, Headerbeziehungen, ungültiger Indizes und 200%-Ansicht.
 AT-SPI-Matrix und menschliche Tabellenbedienung bleiben offen.
+
+0.9.30 ergänzt Table/TableCell unter Linux, direkte native Zellindizes mit
+transparenten Row-Containern sowie übereinstimmende Eltern/Cache-/
+Änderungswege. Linux-Zielcheck, Quellvorbereitung und vier Mac-Nachprüfungen
+bestehen. Tatsächlicher Linux-Build und native Matrixprüfung folgen.

@@ -16,6 +16,57 @@
 static DBusConnection *cache_connection;
 static char *cache_owner;
 static unsigned cache_added,cache_removed,cache_invalid;
+static bool atspi_same(AtspiAccessible *a,AtspiAccessible *b) {
+    if(!a || !b)return false;
+    AtspiObject *x=ATSPI_OBJECT(a),*y=ATSPI_OBJECT(b);
+    return x->app && y->app && !g_strcmp0(x->app->bus_name,y->app->bus_name) && !g_strcmp0(x->path,y->path);
+}
+static void atspi_header_array_free(GPtrArray *array) {
+    if(!array)return;
+    for(guint i=0;i<array->len;++i)if(g_ptr_array_index(array,i))g_object_unref(g_ptr_array_index(array,i));
+    g_ptr_array_free(array,TRUE);
+}
+static bool atspi_matrix(AtspiAccessible *element,char *output,size_t capacity) {
+    GError *error=NULL;AtspiTable *table=atspi_accessible_get_table_iface(element);
+    if(!table)return false;
+    int rows=atspi_table_get_n_rows(table,&error),columns=error ? 0 : atspi_table_get_n_columns(table,&error);
+    bool valid=!error && rows>0 && rows<=65536 && columns>0 && columns<=64 && rows<=65536/columns;
+    if(valid)valid=atspi_accessible_get_child_count(element,&error)==rows*columns && !error;
+    for(int r=0;valid && r<rows;++r)for(int c=0;valid && c<columns;++c) {
+        int index=r*columns+c,cr=-1,cc=-1,rs=0,cs=0;
+        AtspiAccessible *cell=atspi_table_get_accessible_at(table,r,c,&error),*tree_cell=NULL,*parent=NULL,*owner=NULL,*header=NULL,*tree_header=NULL;
+        AtspiTableCell *item=NULL;GPtrArray *headers=NULL,*row_headers=NULL;
+        if(cell && !error)tree_cell=atspi_accessible_get_child_at_index(element,index,&error);
+        valid=!error && atspi_same(cell,tree_cell);
+        if(valid)valid=atspi_table_get_index_at(table,r,c,&error)==index && !error && atspi_table_get_row_at_index(table,index,&error)==r && !error && atspi_table_get_column_at_index(table,index,&error)==c && !error;
+        if(valid) { parent=atspi_accessible_get_parent(cell,&error);valid=!error && atspi_same(parent,element) && atspi_accessible_get_index_in_parent(cell,&error)==index && !error; }
+        if(valid)item=atspi_accessible_get_table_cell(cell);
+        valid=valid && item;
+        if(valid){atspi_table_cell_get_position(item,&cr,&cc,&error);valid=!error && cr==r && cc==c;}
+        if(valid){atspi_table_cell_get_row_column_span(item,&cr,&cc,&rs,&cs,&error);valid=!error && cr==r && cc==c && rs==1 && cs==1;}
+        if(valid)valid=atspi_table_get_row_extent_at(table,r,c,&error)==1 && !error && atspi_table_get_column_extent_at(table,r,c,&error)==1 && !error;
+        if(valid){owner=atspi_table_cell_get_table(item,&error);valid=!error && atspi_same(owner,element);}
+        if(valid){header=atspi_table_get_column_header(table,c,&error);tree_header=error ? NULL : atspi_accessible_get_child_at_index(element,c,&error);valid=!error && atspi_same(header,tree_header);}
+        if(valid){headers=atspi_table_cell_get_column_header_cells(item,&error);valid=!error && headers && headers->len==1 && atspi_same(g_ptr_array_index(headers,0),header);}
+        if(valid){row_headers=atspi_table_cell_get_row_header_cells(item,&error);valid=!error && row_headers && row_headers->len==0;}
+        if(valid){gboolean selected=TRUE;valid=atspi_table_get_row_column_extents_at_index(table,index,&cr,&cc,&rs,&cs,&selected,&error) && !error && cr==r && cc==c && rs==1 && cs==1 && !selected;}
+        if(!valid)fprintf(stderr,"AT-SPI matrix cell failed %d,%d: %s; position=%d,%d span=%d,%d\n",r,c,error ? error->message : "identity or interface",cr,cc,rs,cs);
+        atspi_header_array_free(row_headers);atspi_header_array_free(headers);
+        if(tree_header)g_object_unref(tree_header);if(header)g_object_unref(header);
+        if(owner)g_object_unref(owner);if(parent)g_object_unref(parent);
+        if(item)g_object_unref(item);if(tree_cell)g_object_unref(tree_cell);if(cell)g_object_unref(cell);
+    }
+    const int invalid_rows[]={-1,rows,0,0},invalid_columns[]={0,0,-1,columns};
+    for(unsigned i=0;valid && i<4;++i) {
+        AtspiAccessible *cell=atspi_table_get_accessible_at(table,invalid_rows[i],invalid_columns[i],&error);
+        valid=!error && !cell && atspi_table_get_index_at(table,invalid_rows[i],invalid_columns[i],&error)==-1 && !error;
+        if(cell)g_object_unref(cell);
+    }
+    if(valid && capacity)snprintf(output,capacity,"%d:%d:%d:%d",rows,columns,rows*columns,columns);
+    if(error){fprintf(stderr,"AT-SPI matrix failed: %s\n",error->message);g_error_free(error);}
+    g_object_unref(table);return valid;
+}
+
 static void close_atspi(void) {
     if (cache_connection) { dbus_connection_close(cache_connection); dbus_connection_unref(cache_connection); }
     g_free(cache_owner); (void)atspi_exit();
@@ -351,17 +402,12 @@ static bool query(Probe *p) {
             if (component) success=atspi_component_scroll_to(component,ATSPI_SCROLL_ANYWHERE,&error);
             if (component) g_object_unref(component);
         } else if (p->operation==SB_NATIVE_READ_TABLE_TREE) {
-            int rows=atspi_accessible_get_child_count(element,&error),columns=-1;
-            bool valid=!error && atspi_accessible_get_role(element,NULL)==ATSPI_ROLE_TABLE;
-            for (int r=0;valid && r<rows;++r) {
-                AtspiAccessible *row=atspi_accessible_get_child_at_index(element,r,&error);
-                int count=row ? atspi_accessible_get_child_count(row,&error) : 0;
-                valid=row && !error && atspi_accessible_get_role(row,NULL)==ATSPI_ROLE_TABLE_ROW && (columns<0 || columns==count);
-                columns=count; if (row) g_object_unref(row);
-            }
-            if (valid && rows>0 && columns>0 && p->capacity) {
-                snprintf(p->output,p->capacity,"%d:%d",rows,columns); success=true;
-            }
+            int count=atspi_accessible_get_child_count(element,&error);bool valid=!error && count>0;
+            for(int i=0;valid && i<count;++i){AtspiAccessible *cell=atspi_accessible_get_child_at_index(element,i,&error);AtspiRole role=cell ? atspi_accessible_get_role(cell,&error) : ATSPI_ROLE_INVALID;
+                valid=!error && cell && (role==ATSPI_ROLE_TABLE_CELL || role==ATSPI_ROLE_COLUMN_HEADER);if(cell)g_object_unref(cell);}
+            if(valid && p->capacity){snprintf(p->output,p->capacity,"cells:%d",count);success=true;}
+        } else if (p->operation==SB_NATIVE_READ_TABLE_MATRIX) {
+            success=atspi_matrix(element,p->output,p->capacity);
         } else if (p->operation==SB_NATIVE_READ_TABLE_SIZE) {
             AtspiTable *table=atspi_accessible_get_table_iface(element);
             if (table) {

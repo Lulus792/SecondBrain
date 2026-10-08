@@ -2357,3 +2357,15 @@ zu 23b0b76 besteht in allen 20 Jobs und vier entpackten Paketen. Die neue
 Windows-Matrixprüfung besteht damit nativ in Debug und Release einschließlich
 zwölf Zellen, Headerbeziehungen, ungültiger Indizes und 200%-Ansicht.
 AT-SPI-Matrix und menschliche Tabellenbedienung bleiben offen.
+
+## Linux-Tabellenmatrix in 0.9.30
+
+Table/TableCell und ein konsistenter direkter AT-SPI-Zellbaum sind im
+festgelegten UI-Adapter ergänzt. Offizieller Linux-Zielcheck mit festem
+Lockfile besteht (67 Sekunden erster Lauf, 3,24 Sekunden letzte Änderung).
+Quellvorbereitung, unveränderte Wiederholung und Abweisung einer unbekannten
+Filterquelle bestehen. Vier Mac-Release-Nachprüfungen bestehen (56,10 Sekunden).
+Die nativen libatspi-Aufrufe sind an den Original-Headern und ihrer
+Speicherownership geprüft. Dies ist noch keine Linux-Ausführung; die neue
+strikte native Matrixprüfung folgt in CI. Installiert bleibt 0.9.28.
+[Vertrag und Quellen](TABELLEN.md).

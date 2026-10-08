@@ -232,3 +232,10 @@ Die eigene Windows-UI-Ergänzung für native Tabellen liegt in
 Sie steht unter der eigenen MIT-Lizenz, ergänzt ausschließlich den
 festgelegten UI-Adapter und erhält dessen Original-Lizenzen und Lockfile.
 Vorbereitung und Prüfvertrag: [Tabellen](../docs/TABELLEN.md).
+
+Die Linux-Tabellenergänzung liegt in `ui/accesskit_atspi_table.rs`,
+`ui/accesskit_atspi_table_filter.rs` und `ui/accesskit_unix_table.rs`.
+Sie ergänzt ausschließlich die festgelegten externen UI-Adapter, unter
+der eigenen MIT-Lizenz; ursprüngliche Lizenzen und Cargo-Versionen bleiben
+erhalten. Der [Tabellenvertrag](../docs/TABELLEN.md) beschreibt den nativen
+Baum, die Schnittstellen und die getrennten Ausführungsnachweise.

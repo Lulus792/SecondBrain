@@ -150,3 +150,35 @@ Lokale Prüfung für das Windows-Ziel mit offizieller Rust-Toolchain und
 festem Lockfile besteht; tatsächlicher Windows-Build und Ausführung folgen
 über die native CI. AT-SPI-Matrix und menschliche Screenreader-Bedienung
 bleiben offene Release-Arbeit.
+
+## AT-SPI-Matrix, Entwicklungsschritt 0.9.30
+
+Der festgelegte Linux-UI-Adapter erhält Table und TableCell nach den
+offiziellen [GNOME-Table](https://raw.githubusercontent.com/GNOME/at-spi2-core/main/xml/Table.xml)-
+und [TableCell](https://raw.githubusercontent.com/GNOME/at-spi2-core/main/xml/TableCell.xml)-
+Protokollen, vor Umsetzung am 8. Oktober erneut gelesen. Dimensionen,
+Zellzugriff, Index-/Spannenabfragen, Headerbeziehungen, Beschreibungen und
+Tabellenbezug kommen weiterhin aus dem C-publizierten Modell. Die
+schreibgeschützte Ansicht bietet keine Zeilen-/Spaltenauswahl; dazugehörige
+Abfragen liefern leere Auswahl und Änderungsversuche false. Fehlende
+Caption/Summary besitzen die protokollgemäße Nullreferenz.
+
+AT-SPI-Indizes müssen direkt mit GetChildAtIndex funktionieren. Deshalb
+sind die C-Zeilencontainer ausschließlich im Linux-Provider transparent:
+Tabelle → Zelle/Kopf → Text/Aktion. Vorhandene gefilterte Baumwege verwenden
+dieselbe Regel für Kinder, Eltern, Indizes, Cache und Änderungssignale.
+Die vollständige C-Struktur und macOS-/Windows-Darstellung bleiben erhalten.
+Außerhalb des sichtbaren Ausschnitts liegende Zellen bleiben abfragbar.
+
+Table/TableCell werden mit dem Objekt registriert und beim Entfernen
+wieder abgemeldet. Alte Kontexte und ungültige Metadaten behalten die
+bestehenden Fehlerwege. Ungültige Matrixindizes liefern Nullreferenz/-1.
+Die Schnittstellen ändern weder die Dateien noch den Editor.
+
+Quellvorbereitung, unveränderte Wiederholung und Abweisung unbekannter
+Filterquellen sind geprüft. Offizieller Linux-Zielcheck mit festem Lockfile
+besteht; das ist keine Linux-Ausführung. Native Prüfung verlangt alle zwölf
+Zellen inklusive Leerzellen, direkte Baum-/Elternidentität, drei echte Header,
+Koordinaten, Spannen und Indizes bei 100/200 Prozent. Die tatsächliche
+Linux-CI-Ausführung folgt. Menschliche Screenreader- und Geräteabnahme
+bleibt auch nach erfolgreicher Clientprüfung offen.

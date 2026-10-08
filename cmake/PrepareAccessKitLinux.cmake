@@ -6,7 +6,8 @@ if(bus_hash STREQUAL "ed7f35016b3df2cd2ebcaa2ca8a401e36b3b609c51155d45e8b241c975
     string(REPLACE "\"AddAccessible\", &item" "\"AddAccessible\", &(item,)" text "${text}")
     string(REPLACE "\"RemoveAccessible\", &reference" "\"RemoveAccessible\", &(reference,)" text "${text}")
     file(WRITE "${bus}" "${text}")
-elseif(NOT bus_hash STREQUAL "52ff001b67b5121afe964bb745132ece5648ae367744cec0a87edd12281ffdf8")
+elseif(NOT bus_hash STREQUAL "52ff001b67b5121afe964bb745132ece5648ae367744cec0a87edd12281ffdf8" AND
+       NOT bus_hash STREQUAL "9e75f7c7ce60fcca1ec2ad46dda85b38371367b3c7ce540e04bd3f4b84597859")
     message(FATAL_ERROR "Unrecognized AccessKit Unix cache source; refusing an unverified patch")
 endif()
 set(node_source "${SB_ATSPI_SOURCE}/src/node.rs")
@@ -16,7 +17,8 @@ if(node_hash STREQUAL "8fafcc4f13a061cc46ea070a7b4e240027487f8f5507d75c449253c95
     string(REPLACE "        let mut attributes = HashMap::new();\n        if let Some(placeholder) = self.placeholder() {"
         "        let mut attributes = HashMap::new();\n        if let Some(level) = self.0.level().and_then(|level| level.checked_add(1)) {\n            attributes.insert(\"level\", level.to_string());\n        }\n        if let Some(placeholder) = self.placeholder() {" node_text "${node_text}")
     file(WRITE "${node_source}" "${node_text}")
-elseif(NOT node_hash STREQUAL "32f8e038ed152668c190a3acd672485b60e0e9c9abd017fc746bf3d502c47dd1")
+elseif(NOT node_hash STREQUAL "32f8e038ed152668c190a3acd672485b60e0e9c9abd017fc746bf3d502c47dd1" AND
+       NOT node_hash STREQUAL "cdb02d7b49d51b74f2933f7a8905eee6e46b9b77300d1e8dc8963366469f46e5")
     message(FATAL_ERROR "Unrecognized AccessKit AT-SPI level source; refusing an unverified patch")
 endif()
 file(READ "${SB_C_SOURCE}/Cargo.toml" manifest)
@@ -45,3 +47,5 @@ file(READ "${SB_C_SOURCE}/Cargo.lock" common_lock)
 string(REPLACE "name = \"accesskit_atspi_common\"\nversion = \"0.21.0\"\nsource = \"registry+https://github.com/rust-lang/crates.io-index\"\nchecksum = \"52c182f9c282ac9c5638d876d551d15e5f7d397ec263349a0c6a2b61595dd5e4\"\n"
     "name = \"accesskit_atspi_common\"\nversion = \"0.21.0\"\n" common_lock "${common_lock}")
 file(WRITE "${SB_C_SOURCE}/Cargo.lock" "${common_lock}")
+
+include("${CMAKE_CURRENT_LIST_DIR}/PrepareAccessKitLinuxTable.cmake")
