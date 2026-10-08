@@ -37,10 +37,10 @@ Abnahme exotischer Fonts mit nichtmonotonen Präfixfortschritten steht aus.
 
 ## Verbleibende Arbeiten
 
-Der allgemeine Widget-Umbruch zerlegt weiterhin logische Teilstrings. Deren
-Folgezeilen brauchen noch dieselbe ursprüngliche Absatzrichtung und einen
-zusammenhängenden Umbruchplan für Höhe und Rasterung. Dieser Schritt ist daher
-keine vollständige Bidi-Abnahme aller umgebrochenen Hinweise oder Codeblöcke.
+Ab 0.9.37 verwendet auch der [allgemeine Widgetumbruch](WRAPPED_TEXT.md) einen
+zusammenhängenden Absatzplan für Höhe und Rasterung. Dessen Nachweise und
+weiteren Grenzen stehen im eigenen Vertrag; der hier dokumentierte Schritt
+0.9.36 allein belegt diese spätere Integration nicht.
 Native Zeichenrechtecke, reale Eingabemethoden, Unicode-Wortnavigation im Editor,
 Screenreader und große reale Daten bleiben eigene Aufgaben.
 

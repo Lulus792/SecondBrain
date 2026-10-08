@@ -111,9 +111,9 @@ static SBGlyphTexture *glyph_texture(SBTextSystem *text,const SBShapedLine *line
     SDL_SetTextureBlendMode(e->texture,SDL_BLENDMODE_BLEND);SDL_SetTextureScaleMode(e->texture,SDL_SCALEMODE_LINEAR);
     e->next=text->glyphs[bucket];text->glyphs[bucket]=e;text->glyph_bytes+=e->bytes;return e;
 }
-bool sb_ui_shaped_draw(SBUi *ui,const SBShapedLine *line,float x,float baseline,struct nk_color color) {
-    if(!ui || !ui->text || !line)return false;
-    struct nk_command_buffer *canvas=nk_window_get_canvas(ui->ctx);struct nk_rect clip=canvas->clip;float density=ui->text->density;
+bool sb_ui_shaped_draw_canvas(SBUi *ui,struct nk_command_buffer *canvas,const SBShapedLine *line,float x,float baseline,struct nk_color color) {
+    if(!ui || !ui->text || !line || !canvas)return false;
+    struct nk_rect clip=canvas->clip;float density=ui->text->density;
     float left=0,right=0,top=0,bottom=0;bool ink=false;
     for(size_t i=0;i<line->count;++i){const SBShapeGlyph *g=&line->glyphs[i];if(!g->width || !g->height)continue;
         float gx=floorf(g->x+g->left),gy=floorf(g->y-g->top);
@@ -129,6 +129,9 @@ bool sb_ui_shaped_draw(SBUi *ui,const SBShapedLine *line,float x,float baseline,
             struct nk_image handle=nk_image_ptr(image->texture);nk_draw_image(canvas,nk_rect(x+at/density,baseline+y/density,w/density,h/density),&handle,color);at+=w;}
         y+=h;
     }return true;
+}
+bool sb_ui_shaped_draw(SBUi *ui,const SBShapedLine *line,float x,float baseline,struct nk_color color){
+    return ui && ui->ctx && ui->ctx->current ? sb_ui_shaped_draw_canvas(ui,nk_window_get_canvas(ui->ctx),line,x,baseline,color) : false;
 }
 static SBMeasureCache *measure_entry(SBTextFace *face,const char *value,size_t length) {
     if(length>SB_MEASURE_CACHE_LENGTH)return NULL;

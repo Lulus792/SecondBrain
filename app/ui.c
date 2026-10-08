@@ -15,6 +15,9 @@ struct nk_command_buffer;
 struct nk_style_edit;
 struct nk_user_font;
 struct nk_input;
+struct nk_text;
+static int sb_ui_plain_wrap(struct nk_command_buffer *,struct nk_rect,const char *,int,const struct nk_text *,const struct nk_user_font *);
+#define NK_WIDGET_TEXT_WRAP_CUSTOM sb_ui_plain_wrap
 static void sb_ui_input_caret(struct nk_context *,struct nk_text_edit *);
 static void sb_ui_composition_prepare(struct nk_context *,struct nk_text_edit *,unsigned int,unsigned int);
 static struct nk_text_edit *sb_ui_composition_display(struct nk_text_edit *);
@@ -154,35 +157,62 @@ static int sb_ui_plain_clamp(const struct nk_user_font *font,const char *value,i
     }
     *glyphs=nk_utf_len(value,(int)fitting);return (int)fitting;
 }
-float sb_ui_wrap_height(struct nk_context *ctx,const struct nk_user_font *font,const char *text,size_t length,float width) {
-    struct nk_vec2 padding=ctx->style.text.padding;
-    float available=width-2*padding.x; if (available<1) available=1;
-    int done=0,lines=0; nk_rune separator=' ';
-    while ((size_t)done<length) {
-        int glyphs=0; float measured=0;
-        int fitting=nk_text_clamp(font,text+done,(int)length-done,available,&glyphs,&measured,&separator,1);
-        if (fitting<=0) break;
-        done+=fitting; ++lines;
-    }
-    if (!lines) lines=1;
-    return lines*(font->height+2*padding.y)+3*padding.y+2;
+/* The same immutable paragraph plan measures and paints plain wrapped text.
+   Callers may pass a nonterminated source slice; the copy is strictly bounded. */
+typedef struct {SBStyledText text;SBTextSpan span;} SBWrappedSource;
+static bool wrapped_source(const char *value,size_t length,SBWrappedSource *source){
+    memset(source,0,sizeof(*source));if(!value || length==SIZE_MAX)return false;
+    source->text.text=malloc(length+1);if(!source->text.text)return false;
+    memcpy(source->text.text,value,length);source->text.text[length]=0;
+    source->span=(SBTextSpan){0,length,0};source->text.spans=length ? &source->span : NULL;source->text.count=length ? 1 : 0;return true;
 }
-void sb_ui_text_aligned(struct nk_context *ctx,const char *text,size_t length,nk_flags alignment) {
-    struct nk_rect bounds; nk_widget(&bounds,ctx);
-    const struct nk_user_font *font=ctx->style.font; struct nk_vec2 pad=ctx->style.text.padding;
-    float width=bounds.w-2*pad.x,y=bounds.y+pad.y; int done=0; nk_rune separator=' ';
-    if (width<1) return;
-    while ((size_t)done<length) {
-        int glyphs=0; float measured=0;
-        int fitting=nk_text_clamp(font,text+done,(int)length-done,width,&glyphs,&measured,&separator,1);
-        if (fitting<=0) break;
-        measured=font->width(font->userdata,font->height,text+done,fitting);
-        float x=bounds.x+pad.x;
-        if (alignment&NK_TEXT_ALIGN_RIGHT) x+=NK_MAX(0,width-measured);
-        else if (alignment&NK_TEXT_ALIGN_CENTERED) x+=NK_MAX(0,(width-measured)/2);
-        nk_draw_text(nk_window_get_canvas(ctx),nk_rect(x,y,width,font->height),text+done,fitting,font,nk_rgba(0,0,0,0),ctx->style.text.color);
-        done+=fitting; y+=font->height+2*pad.y;
+static const StyledPlan *wrapped_plan(SBUi *ui,const struct nk_user_font *font,const SBWrappedSource *source,float width,struct nk_vec2 padding,StyledPlan *fresh){
+    StyledMemo *memo=styled_memo(ui,font,&source->text,width,padding,2*padding.y,true);
+    if(memo)return &memo->plan;
+    return styled_build(ui,font,&source->text,width,padding,2*padding.y,true,fresh) ? fresh : NULL;
+}
+static bool wrapped_paint(SBUi *ui,struct nk_command_buffer *canvas,struct nk_rect bounds,const char *value,size_t length,const struct nk_user_font *font,struct nk_vec2 padding,struct nk_color color,nk_flags alignment){
+    SBWrappedSource source;StyledPlan fresh={0};if(!wrapped_source(value,length,&source))return false;
+    const StyledPlan *plan=wrapped_plan(ui,font,&source,bounds.w,padding,&fresh);
+    if(!plan){free(source.text.text);return false;}
+    struct nk_rect old=canvas->clip;
+    float x=fmaxf(old.x,bounds.x),y=fmaxf(old.y,bounds.y),right=fminf(old.x+old.w,bounds.x+bounds.w),bottom=fminf(old.y+old.h,bounds.y+bounds.h);
+    bool ok=true;
+    if(right>x && bottom>y){
+        nk_push_scissor(canvas,nk_rect(x,y,right-x,bottom-y));float available=fmaxf(1,bounds.w-2*padding.x);
+        for(size_t i=0;i<plan->count;++i){const StyledLine *line=&plan->lines[i];float measured=line->shape.advance/ui->density,shift=0;
+            if(alignment&NK_TEXT_ALIGN_RIGHT)shift=fmaxf(0,available-measured);else if(alignment&NK_TEXT_ALIGN_CENTERED)shift=fmaxf(0,(available-measured)/2);
+            if(!sb_ui_shaped_draw_canvas(ui,canvas,&line->shape,bounds.x+padding.x+shift,bounds.y+padding.y+line->y+line->shape.ascent/ui->density,color))ok=false;
+        }
+        nk_push_scissor(canvas,old);
     }
+    styled_plan_free(&fresh);free(source.text.text);return ok;
+}
+static int sb_ui_plain_wrap(struct nk_command_buffer *canvas,struct nk_rect bounds,const char *value,int length,const struct nk_text *style,const struct nk_user_font *font){
+    SBUi *ui=sb_ui_font_owner(font);if(!ui || !canvas || !style || !value || length<0)return 0;
+    /* A resource failure is reported instead of repainting a second layout on
+       top of any glyphs that have already been submitted. */
+    if(!wrapped_paint(ui,canvas,bounds,value,(size_t)length,font,style->padding,style->text,NK_TEXT_LEFT))ui->input_status=sb_error(SB_MEMORY,"Textlayout konnte nicht vorbereitet werden.");
+    return 1;
+}
+float sb_ui_wrap_height(struct nk_context *ctx,const struct nk_user_font *font,const char *text,size_t length,float width){
+    SBUi *ui=sb_ui_font_owner(font);if(!ui || ui->ctx!=ctx)return 0;
+    SBWrappedSource source;StyledPlan fresh={0};if(!wrapped_source(text,length,&source))return 0;
+    const StyledPlan *plan=wrapped_plan(ui,font,&source,width,ctx->style.text.padding,&fresh);float height=plan ? plan->height : font->height+4*ctx->style.text.padding.y;
+    if(!plan)ui->input_status=sb_error(SB_MEMORY,"Textlayout konnte nicht vorbereitet werden.");
+    styled_plan_free(&fresh);free(source.text.text);return height;
+}
+void sb_ui_text_aligned(struct nk_context *ctx,const char *text,size_t length,nk_flags alignment){
+    struct nk_rect bounds;if(nk_widget(&bounds,ctx)==NK_WIDGET_INVALID)return;
+    const struct nk_user_font *font=ctx->style.font;SBUi *ui=sb_ui_font_owner(font);if(!ui || ui->ctx!=ctx)return;
+    if(!wrapped_paint(ui,nk_window_get_canvas(ctx),bounds,text,length,font,ctx->style.text.padding,ctx->style.text.color,alignment))ui->input_status=sb_error(SB_MEMORY,"Textlayout konnte nicht vorbereitet werden.");
+}
+bool sb_ui_wrap_geometry(SBUi *ui,const struct nk_user_font *font,const char *text,size_t length,float width,SBStyledGeometryVisitor visitor,void *user){
+    if(!ui || sb_ui_font_owner(font)!=ui || !visitor)return false;
+    SBWrappedSource source;StyledPlan fresh={0};if(!wrapped_source(text,length,&source))return false;
+    const StyledPlan *plan=wrapped_plan(ui,font,&source,width,ui->ctx->style.text.padding,&fresh);bool ok=plan!=NULL;
+    if(plan)for(size_t i=0;i<plan->count && ok;++i)ok=visitor(user,&plan->lines[i].shape,plan->lines[i].source_offset,plan->lines[i].y);
+    styled_plan_free(&fresh);free(source.text.text);return ok;
 }
 static void paste(nk_handle user, struct nk_text_edit *edit) {
     char *text;

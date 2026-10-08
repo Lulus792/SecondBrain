@@ -276,3 +276,11 @@ Glyphenplan auch für unformatierte Textkommandos. Der lokale optionale
 `NK_TEXT_CLAMP_CUSTOM`-Hook kürzt anhand tatsächlich geformter Breiten und ganzer
 Grapheme; ohne Hook bleibt Nuklears ursprüngliche Funktion erhalten.
 [Umfang und offene Umbrucharbeit](../docs/PLAIN_TEXT.md).
+
+## Allgemeiner Widgetumbruch ab 0.9.37
+
+Der eigene optionale `NK_WIDGET_TEXT_WRAP_CUSTOM`-Hook erhält den tatsächlichen
+Command-Buffer, Widgetrechteck, Padding, Farbe und Font. Eigene Fonts verwenden
+für allgemeine umgebrochene Texte denselben Absatz-/Glyphenplan wie der Reader;
+ohne Hook beziehungsweise bei fremden Fonts bleibt Nuklears Originalweg erhalten.
+[Vertrag, Cachepolitik und Grenzen](../docs/WRAPPED_TEXT.md).

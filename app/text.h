@@ -11,5 +11,6 @@ size_t sb_ui_text_fit(const struct nk_user_font *font,const char *value,size_t l
 bool sb_ui_text_metrics(const struct nk_user_font *font,const char *value,size_t length,float *ascent,float *descent);
 SBUi *sb_ui_font_owner(const struct nk_user_font *font);
 TTF_Font *sb_ui_cluster_font(const struct nk_user_font *font,const char *value,size_t length,TTF_Font *previous);
+bool sb_ui_shaped_draw_canvas(SBUi *ui,struct nk_command_buffer *canvas,const SBShapedLine *line,float x,float baseline,struct nk_color color);
 bool sb_ui_shaped_draw(SBUi *ui,const SBShapedLine *line,float x,float baseline,struct nk_color color);
 #endif

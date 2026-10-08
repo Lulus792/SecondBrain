@@ -93,6 +93,8 @@ void sb_ui_styled_aligned(SBUi *ui,const struct nk_user_font *base,const SBStyle
    is in backing pixels; y is local window points. source_offset + glyph.byte
    addresses the styled display text, not the original Markdown source. */
 typedef bool (*SBStyledGeometryVisitor)(void *user,const SBShapedLine *line,size_t source_offset,float y);
+/* Plain wrapped source slices keep paragraph context and explicit terminal lines. */
+bool sb_ui_wrap_geometry(SBUi *ui,const struct nk_user_font *font,const char *text,size_t length,float width,SBStyledGeometryVisitor visitor,void *user);
 bool sb_ui_styled_geometry(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,float width,SBStyledGeometryVisitor visitor,void *user);
 SBStatus sb_ui_capture(SBUi *ui, const char *path);
 void sb_ui_shutdown(SBUi *ui);

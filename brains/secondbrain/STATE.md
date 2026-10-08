@@ -109,19 +109,30 @@ Projektansicht betrachtet, beim Laden alle Gedächtnisdateien bytegleich.
 Installiert bleibt 0.9.35 bis zur neuen Plattform-/Paketabnahme.
 [Vertrag/Restumfang](../../docs/PLAIN_TEXT.md), [Nachweise](../../docs/STATUS.md).
 
+## Allgemeiner Absatzumbruch (0.9.37)
+
+Einfache Hinweise/Labels und Codeblöcke behalten jetzt Richtungs-/Schriftkontext
+über Folgezeilen. Höhe und Zeichnung teilen den Plan; eigene Widgetclips und
+getrennte Cachepolitik für Reader/einfache Texte sind geprüft. 62/62 lokale
+Release-Prüfungen, 623 unabhängige Geometrie-/Pixel-Assertions unter haltendem
+ASan/UBSan und UI-Build ohne Tests bestehen. RTL-Aufnahme und aktuelle Anlegekarten
+betrachtet. Installiert bleibt vor neuer Paketabnahme 0.9.35.
+[Vertrag](../../docs/WRAPPED_TEXT.md), [Nachweise](../../docs/STATUS.md).
+
 ## Nächste Arbeiten
 
 0.9.34 ist auf allen Plattformen im dokumentierten automatisierten Umfang
 abgenommen. 0.9.35 besteht inzwischen alle 20 Plattformjobs/vier Pakete. 0.9.36 ist lokal
 mit 61/61 Prüfungen, Pixelreferenz, gezieltem Sanitizer und UI-Build ohne Tests
-geprüft; seine neue Plattform-/Paketabnahme folgt.
+geprüft und besteht inzwischen alle 20 Jobs/vier Pakete (CI 37769203269).
+0.9.37 ist lokal geprüft; seine neue Plattform-/Paketabnahme folgt.
 Weitere Release-Arbeiten: Bidi/visuelle/native Textgeometrie und reale Eingabemethoden;
 menschliche VoiceOver/NVDA/Orca-, Dialog-, Geräte-, Mehrmonitor-/Langzeitabnahme;
 volle Windows-/Linux-Zielvolumes und physische Persistenz; frische Rechner und
 OS-Mindestversionen; vollständige SDK-/Systemruntime-Zuordnung.
 
-Nächster Textschritt: allgemeinen Widgetumbruch an zusammenhängenden
-Absatzkontext anbinden, danach native Zeichenrechtecke; Unicode-Wortregeln, größere reale Dateien
+Nächster Textschritt: native Zeichenrechtecke an die tatsächlichen
+Glyphen-/Zeilenpläne anbinden; Unicode-Wortregeln, größere reale Dateien
 und echte Eingabe-/Screenreader-Abnahme weiterführen.
 Reader-CI 37751197759 und Intel-Mac-Paketabnahme bestehen.
 

@@ -24148,6 +24148,9 @@ nk_widget_text_wrap(struct nk_command_buffer *o, struct nk_rect b,
     const char *string, int len, const struct nk_text *t,
     const struct nk_user_font *f)
 {
+#ifdef NK_WIDGET_TEXT_WRAP_CUSTOM
+    if (NK_WIDGET_TEXT_WRAP_CUSTOM(o,b,string,len,t,f)) return;
+#endif
     float width;
     int glyphs = 0;
     int fitting = 0;

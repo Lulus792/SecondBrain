@@ -2698,3 +2698,33 @@ Offen bleiben zusammenhängender Absatzkontext beim allgemeinen Widgetumbruch,
 native Zeichenrechtecke, Unicode-Wortbefehle, echte Eingabe-/Screenreader-Abnahme
 und reale Leistungs-/Gerätefälle. Der vollständige Release-Auftrag bleibt offen;
 1.0 ist weiterhin bis zur ausdrücklichen Nutzerfreigabe gesperrt.
+
+## Allgemeiner Absatzumbruch angeschlossen (0.9.37)
+
+Einfache umgebrochene Labels/Hinweise, ausgerichtete Texte und unformatierte
+Codeblöcke verwenden jetzt einen gemeinsamen Absatz-/Glyphenplan für Höhe und
+Zeichnung. Folgezeilen behalten Richtungs-/Schriftkontext; explizite CRLF-/leere
+Absätze bleiben erhalten. Widgetclips begrenzen die Zeichnung. Layoutcache-
+Schlüssel trennen Padding, Zeilenabstand und Abschlussregel von der bestehenden
+Reader-Regel. [Vertrag und erneute Apple-Grundlagen](WRAPPED_TEXT.md).
+
+**62/62 lokale Release-Prüfungen bestehen (294,76 s)**. Die neue unabhängige
+Referenz probiert alle Graphemendpunkte und vergleicht tatsächliche Glyphen,
+Offsets, Richtung, Höhe und Pixelbilder bei drei Größen/zwei Breiten.
+623 Assertions bestehen auch unter haltendem ASan/UBSan ohne Befund. Instrumentiert
+sind eigener UI-/Text-/Renderer-/Glyphen-/Cursor-/Script-/Bidi-Code, Bidi-Engine,
+Prüfer und SDL_ttf.c; fachlicher Kern, SDL/HarfBuzz/FreeType und weitere externe
+Objekte sind nicht instrumentiert. macOS-Leakprüfung bleibt abgeschaltet.
+Der UI-Build ohne Tests besteht und meldet 0.9.37. Protokolle: lokal
+build/wrap-full-ctest.log, build/wrap-no-tests-build.log und build/wrap-sanitizers/.
+
+Aktuelle RTL-Umbruchaufnahme sowie Notiz-/Projektkarten aus der bestandenen
+Interaktionsprüfung wurden betrachtet. Das ist eine Raster-/Geometrieabnahme,
+keine menschliche Geräte-/Screenreaderprüfung. Native Zeichenrechtecke,
+Unicode-Wortbefehle, große reale Daten und reale Eingabemethoden bleiben offen.
+
+Die vorausgehende 0.9.36-Plattform-CI zu e22d067 ist inzwischen vollständig
+erfolgreich: [37769203269](https://github.com/Lulus792/SecondBrain/actions/runs/37769203269),
+alle 20 Jobs inklusive vier entpackter Plattformpakete. Das belegt 0.9.36;
+0.9.37 braucht eine eigene neue Plattform-/Paketabnahme. Installiert bleibt bis
+zur sauberen neuen Paketprüfung 0.9.35 / 178128eb0923. 1.0 bleibt gesperrt.

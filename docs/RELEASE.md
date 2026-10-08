@@ -167,3 +167,13 @@ Prüfungen bestehen; [Umfang und Grenzen](PLAIN_TEXT.md). Der allgemeine
 Widgetumbruch benötigt weiterhin zusammenhängenden Absatzkontext und gleiche
 Höhen-/Rasterpläne. Native Textgeometrie und reale assistive/IME-Abnahme bleiben
 offen. Die neue Plattform-/Paketabnahme folgt getrennt in STATUS.
+
+## Allgemeiner Umbruch vom 8. Oktober
+
+Ab 0.9.37 behalten einfache umgebrochene Texte und Codeblöcke den ursprünglichen
+Absatzkontext. Messung und Rasterung teilen den Layoutplan; Widgetflächen clippen
+ihre eigene Zeichnung. Lokale Gesamt-, unabhängige Geometrie-/Pixel- und gezielte
+Sanitizerprüfungen bestehen; [Umfang](WRAPPED_TEXT.md). Native Zeichenrechtecke,
+Unicode-Wortbefehle, vollständige Unicode-Zeilenbruchregeln und echte assistive/
+IME-/Geräte-/Leistungsabnahmen bleiben offen. Neue Plattform-/Paketabnahme folgt
+in STATUS. Die vorherige 0.9.36-CI besteht inzwischen alle 20 Jobs/vier Pakete.

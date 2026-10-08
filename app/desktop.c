@@ -1563,10 +1563,8 @@ static void document_block(SBDesktop *d,const char *text,size_t length_total,SBM
             nk_style_set_font(ctx, font);
             const char *shown = plain ? plain : content;
             size_t shown_length = plain ? strlen(plain) : length;
-            float available = fmaxf(60, ctx->current->layout->bounds.w);
-            float measured = font->width(font->userdata, font->height, shown, (int)shown_length);
-            float lines = measured < available * 0.92f ? 1 : ceilf(measured / available) + 1;
-            float text_height=plain ? sb_ui_styled_height(&d->ui,font,&styled,ctx->current->layout->bounds.w) : lines*(font->height+4);
+            float text_height=plain ? sb_ui_styled_height(&d->ui,font,&styled,ctx->current->layout->bounds.w) :
+                sb_ui_wrap_height(ctx,font,shown,shown_length,ctx->current->layout->bounds.w);
             nk_layout_row_dynamic(ctx,text_height+(heading ? 10 : 0),1);
             size_t before=d->passive_count;
             document_span(d,shown,shown_length,block.offset,heading ? ACCESSKIT_ROLE_HEADING : code ? ACCESSKIT_ROLE_CODE : ACCESSKIT_ROLE_PARAGRAPH,heading,nk_widget_bounds(ctx),slot,false);

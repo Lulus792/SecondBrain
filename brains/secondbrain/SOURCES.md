@@ -132,3 +132,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Einfache UI-Textgeometrie](../../docs/PLAIN_TEXT.md): gemeinsamer Absatz-/
   Script-/Glyphenplan, graphemgebundene Kürzung, exakter Cache und verbleibender
   allgemeiner Widgetumbruch ab 0.9.36.
+
+- [Gemeinsamer allgemeiner Umbruch](../../docs/WRAPPED_TEXT.md): Absatzkontext,
+  tatsächliche Höhen, Widgetclips, Abschluss-/Cachepolitik und unabhängige
+  Referenzprüfung ab 0.9.37.
