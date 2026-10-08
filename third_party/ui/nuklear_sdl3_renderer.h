@@ -179,7 +179,7 @@ nk_sdl_update_TextInput(struct nk_context* ctx)
      * This will not work, if the widget is not updating context state properly. */
     if (!ctx->active)
         active = false;
-    else if (ctx->active->popup.win)
+    else if (ctx->active->popup.active && ctx->active->popup.win)
         active = ctx->active->popup.win->edit.active;
     else
         active = ctx->active->edit.active;
@@ -728,4 +728,3 @@ nk_sdl_style_set_debug_font(struct nk_context* ctx)
 
 #endif /* NK_SDL3_RENDERER_IMPLEMENTATION_ONCE */
 #endif /* NK_SDL3_RENDERER_IMPLEMENTATION */
-

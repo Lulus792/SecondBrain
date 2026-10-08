@@ -107,3 +107,28 @@ Ab 0.9.11 verwenden [Inline-Stile](INLINE_STILE.md) getrennte Schriftkopien
 und gemeinsame Grundlinien. Grapheme über Formatgrenzen bleiben beim Zeichnen
 eine Einheit. Native Stilattribute und die oben genannten Bidi-/Geometriearbeiten
 bleiben offen.
+
+
+## Native Eingabeanker ab 0.9.24
+
+Am 8. Oktober 2026 erneut geprüft: [SDL_SetTextInputArea](https://wiki.libsdl.org/SDL3/SDL_SetTextInputArea)
+verwendet Fensterkoordinaten und einen relativen horizontalen Cursoroffset;
+[SDL_GetTextInputArea](https://wiki.libsdl.org/SDL3/SDL_GetTextInputArea) liest diese
+Werte zurück. Vorschlagsfenster können daran ausgerichtet werden. Das tatsächliche
+Verhalten einer Eingabemethode benötigt zusätzlich eine native Bedienabnahme.
+
+Die eigene Anbindung übernimmt den Caret aus dem Zeichnungslayout jedes aktiven,
+editierbaren Nuklear-Felds. Das gilt für Editor, Suche und Formularfelder. Der
+Anker folgt Cursor, Auswahlende, Scrollposition und Schriftgröße; er bleibt im
+sichtbaren Cliprechteck. Fensterpunkte verhindern eine doppelte Retina-Skalierung.
+Inaktive, verdeckte und schreibgeschützte Felder liefern keinen neuen Anker;
+ohne aktives Feld wird der alte Bereich gelöscht. Unveränderte Koordinaten
+verursachen keinen wiederholten nativen API-Aufruf pro Frame.
+
+Die neue Regression fragt echte SDL-Fensterwerte nach Einfügen, Pfeiltasten,
+Auswahl, Zeilenwechsel, Scrollen, 150 Prozent Schrift, einzeiligem Formularfeld
+und Fokusverlust ab; eine echte Popup-Folge prüft den verdrängten Elternanker
+und zurückkehrenden Textfokus. Lokale Prüfungen bestehen: 49/49 und nach letzter
+Popup-Korrektur 3/3 (134 Editorassertions). Der native Plattformnachweis folgt
+im Umsetzungsstand. Dieser Schritt implementiert keine Preedit-Komposition,
+keine Bidi-Abbildung und keine neue native Zeichenrechteck-Schnittstelle.

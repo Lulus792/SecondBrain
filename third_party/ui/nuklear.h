@@ -4603,6 +4603,9 @@ struct nk_text_edit {
     struct nk_str string;
     nk_plugin_filter filter;
     struct nk_vec2 scrollbar;
+    /* SecondBrain: geometry from the same layout used to paint the caret. */
+    struct nk_rect caret_bounds;
+    struct nk_rect caret_clip;
 
     int cursor;
     int select_start;
@@ -29059,6 +29062,11 @@ nk_do_edit(nk_flags *state, struct nk_command_buffer *out,
             }
         }
 
+        edit->caret_bounds = nk_rect(area.x + cursor_pos.x - edit->scrollbar.x,
+            area.y + cursor_pos.y - edit->scrollbar.y + (row_height-font->height)/2.0f,
+            style->cursor_size, font->height);
+        edit->caret_clip = clip;
+
         /* draw text */
         {struct nk_color background_color;
         struct nk_color text_color;
@@ -29355,6 +29363,10 @@ nk_edit_buffer(struct nk_context *ctx, nk_flags flags,
     in = (flags & NK_EDIT_READ_ONLY) ? 0: in;
     ret_flags = nk_do_edit(&ctx->last_widget_state, &win->buffer, bounds, flags,
                     filter, edit, &style->edit, in, style->font);
+#ifdef NK_TEXTEDIT_CARET_CUSTOM
+    if (edit->active && !(flags & (NK_EDIT_READ_ONLY|NK_EDIT_NO_CURSOR)))
+        NK_TEXTEDIT_CARET_CUSTOM(ctx, edit->caret_bounds, edit->caret_clip);
+#endif
 
     if (ctx->last_widget_state & NK_WIDGET_STATE_HOVER)
         ctx->style.cursor_active = ctx->style.cursors[NK_CURSOR_TEXT];

@@ -9,6 +9,10 @@ static void sb_ui_grapheme_text(struct nk_text_edit *,const char *,int);
 struct nk_draw_list;
 struct nk_command_text;
 void sb_ui_text_draw(struct nk_draw_list *, const struct nk_command_text *);
+struct nk_context;
+struct nk_rect;
+static void sb_ui_input_caret(struct nk_context *,struct nk_rect,struct nk_rect);
+#define NK_TEXTEDIT_CARET_CUSTOM sb_ui_input_caret
 #define NK_DRAW_TEXT_CUSTOM sb_ui_text_draw
 #define NK_IMPLEMENTATION
 #define NK_SDL3_RENDERER_IMPLEMENTATION
@@ -20,6 +24,23 @@ void sb_ui_text_draw(struct nk_draw_list *, const struct nk_command_text *);
 #include "platform.h"
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
+
+static struct nk_window *sb_ui_input_owner(struct nk_context *ctx) {
+    struct nk_window *owner=ctx->active;
+    return owner && owner->popup.active && owner->popup.win ? owner->popup.win : owner;
+}
+static void sb_ui_input_caret(struct nk_context *ctx,struct nk_rect caret,struct nk_rect clip) {
+    SBUi *ui=nk_sdl_get_userdata(ctx).ptr;
+    if (!ui || ctx->current!=sb_ui_input_owner(ctx) ||
+        clip.w<1 || clip.h<1 || caret.h<=0) return;
+    float height=fminf(caret.h,clip.h);
+    ui->input_area=(SDL_Rect){(int)floorf(NK_CLAMP(clip.x,caret.x,clip.x+clip.w-1)),
+        (int)floorf(NK_CLAMP(clip.y,caret.y,clip.y+clip.h-height)),
+        1,(int)ceilf(height)};
+    ui->input_area_pending=true;
+    ui->input_window=ctx->current;
+}
 
 static int sb_ui_grapheme_index(struct nk_text_edit *edit,int index,int direction) {
     SBGraphemePosition p; index=NK_CLAMP(0,index,edit->string.len);
@@ -216,6 +237,7 @@ SBStatus sb_ui_init(SBUi *ui, const char *font_path, int width, int height, bool
     if (!ui->renderer) { sb_ui_shutdown(ui); return sb_error(SB_IO, "Darstellung: %s", SDL_GetError()); }
     ui->text_cursor=SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_TEXT);ui->caret_epoch=SDL_GetTicksNS();
     ui->ctx = nk_sdl_init(ui->window, ui->renderer, nk_sdl_allocator());
+    nk_sdl_set_userdata(ui->ctx,nk_handle_ptr(ui));
     ui->ctx->clip.paste = paste;
     result = sb_ui_fonts(ui, 1);
     if (result.code != SB_OK) { sb_ui_shutdown(ui); return result; }
@@ -283,6 +305,18 @@ void sb_ui_transition_tick(SBUi *ui,float seconds,bool reduced_motion) {
     if (ui->transition>=1) {SDL_DestroyTexture(ui->outgoing_texture);ui->outgoing_texture=NULL;ui->transitioning=false;}
 }
 void sb_ui_draw(SBUi *ui) {
+    /* Nuklear uses window coordinates, independent of backing-pixel density. */
+    struct nk_window *owner=sb_ui_input_owner(ui->ctx);
+    if (ui->input_area_pending && owner && owner==ui->input_window && owner->edit.active) {
+        SDL_Rect r=ui->input_area,last=ui->applied_input_area;
+        if (!ui->input_area_applied || r.x!=last.x || r.y!=last.y || r.w!=last.w || r.h!=last.h) {
+            if (SDL_SetTextInputArea(ui->window,&r,0)) {
+                ui->applied_input_area=r;ui->input_area_applied=true;
+            }
+        }
+    } else if (ui->input_area_applied && SDL_SetTextInputArea(ui->window,NULL,0))
+        ui->input_area_applied=false;
+    ui->input_area_pending=false;
     int width,height;SDL_GetWindowSize(ui->window,&width,&height);
     SDL_SetRenderLogicalPresentation(ui->renderer,width,height,SDL_LOGICAL_PRESENTATION_STRETCH);
     SDL_SetRenderDrawColor(ui->renderer,ui->dark ? 28 : 255,ui->dark ? 29 : 255,ui->dark ? 33 : 255,255);SDL_RenderClear(ui->renderer);

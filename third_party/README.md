@@ -29,6 +29,9 @@ Lokale Anpassungen des Nuklear-Headers:
 - Positionen und Einfügelängen jenseits des 16-Bit-Bereichs werden erhalten.
 - Einfügen zeigt einen dünnen Caret auch innerhalb einer Zeile; der Überschreibmodus
   behält seine Blockdarstellung. Die Cursorfarben folgen dem eigenen Blink-/Eingabezustand.
+- Aktive editierbare Felder melden Cursor- und Cliprechteck aus ihrem Zeichnungslayout
+  über `NK_TEXTEDIT_CARET_CUSTOM`; die eigene SDL-Anbindung positioniert daran native
+  Eingabevorschläge. Der Hook verändert weder Text noch Auswahl.
 - Bei rückwärts belegtem Zeichenpuffer entsteht vor einer nötigen Vergrößerung
   kein überlaufender Probezeiger. Die Interaktionsprüfung führt diesen Wachstumspfad
   mit ASan/UBSan aus.
@@ -38,7 +41,9 @@ Unicode-Zeichen. Große Änderungen können ältere beziehungsweise zu große
 Undo-Einträge verdrängen. Die UI-Regression prüft ausdrücklich große Cursorpositionen
 und verhindert eine Verwechslung von Zeichen- und Byte-Längen.
 
-Der SDL-Renderer-Header bleibt unverändert. Ab 0.9.0 erlaubt ein bedingter
+Der SDL-Renderer berücksichtigt ab 0.9.24 nur tatsächlich aktive Popups beim
+Textfokus; ein geschlossenes Popup verdrängt das Elternfeld nicht mehr.
+Ab 0.9.0 erlaubt ein bedingter
 Nuklear-Hook (`NK_DRAW_TEXT_CUSTOM`) die Darstellung geformter Textläufe
 als UI-Texturen; ohne Hook bleibt der Originalkonverter aktiv. app/ui.c ergänzt die Einfügefunktion,
 verarbeitet mehrteilige Texteingaben vollständig und übersetzt Command-Tasten

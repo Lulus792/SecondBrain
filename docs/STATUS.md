@@ -2174,3 +2174,27 @@ bytegenau; Installation und read-only Gedächtnis-Snapshot verändern keine
 Gedächtnisdateien. Logs: build/crt-package-*.log, build/crt-install.json.
 Rückfallkopie: build/previous-dist-0.9.22-20261008-020609. Die Vorschau wurde
 betrachtet. Mindest-OS-, Geräte- und menschliche Abnahmen bleiben gesondert offen.
+
+
+## 0.9.24: native Position der Texteingabe
+
+Der Cursor aus dem tatsächlich verwendeten Nuklear-Zeichnungslayout bestimmt
+jetzt den nativen SDL-Eingabeanker. Er folgt Einfügen, Bewegung, Auswahlende,
+Zeilenwechsel, Scrollposition und Schriftgröße, begrenzt auf sichtbare
+Fensterkoordinaten. Nur Änderungen lösen einen nativen API-Aufruf aus.
+Fokusverlust löscht den Bereich; ein Popup verdrängt den Elternanker bereits
+im Öffnungsbild. Nach Popup-Schließen erhält das Elternfeld wieder SDL-Textfokus.
+Alle editierbaren String-/Editorfelder nutzen denselben Hook. Grenzen und
+Originalquellen stehen in [Textdarstellung](TEXTDARSTELLUNG.md).
+
+Sauberer lokaler Release-Neubau besteht mit 49/49 Prüfungen (311,01 s),
+einschließlich 126 Desktop-, 157 Tastatur-, 75 Sicherungsassertions und 128
+Editorassertions. Nach abschließender Popup-Korrektur bestehen Navigation,
+Editor und Tastaturweg nochmals (3/3, 114,83 s; jetzt 134 Editorassertions). Ein erster Mischbuild scheiterte durch
+während des Builds geänderte gemeinsame Struktur; anschließend alle eigenen
+UI-/Desktop-/Testobjekte neu gebaut. Lokal hängende unsignierte Buildwerkzeuge
+wurden durch isolierte lokale Kopien und System-Git ersetzt; installierte
+Werkzeuge blieben unverändert. Logs: build/ime-clean-tests.log und
+build/ime-popup-{build,tests}.log. Neuer nativer CI-/Paketnachweis folgt;
+installierte App bleibt bis zur Paketabnahme 0.9.23. IME-Preedit, Bidi und reale
+Eingabemethodenabnahme sind durch diesen Anker nicht abgeschlossen.

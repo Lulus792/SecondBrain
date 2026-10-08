@@ -40,7 +40,11 @@ Windows/Linux-Cargo zeigen in der ausgeführten CI 1.98.1/48a229c. Vollständige
 Zuordnung tatsächlich gelinkter SDK-/Systemanteile und abweichender Toolchains
 bleibt offen; zusammengesetzte Lizenzbedingungen sind erhalten.
 
-Nächster Schritt: Texteingabe und native IME-Positionierung prüfen/verbessern.
+0.9.24 ergänzt den nativen Cursor-Anker und Popup-/Elternfokus. Lokaler
+Release-Neubau besteht mit 49/49; letzte Popup-Nachprüfung mit 3/3
+und 134 Editorassertions besteht. Native CI-/Paketabnahme folgen. Installierte App bleibt bis dahin 0.9.23.
+
+Nächster Schritt: 0.9.24 abnehmen und Paket installieren.
 Weitere Release-Arbeiten: Bidi/visuelle Textgeometrie/IME, native
 Tabellenmatrix, Screenreader-/Dialog-/Geräte-/Langzeitabnahmen, volle Windows-/
 Linux-Zielvolumes und physische Persistenz. Originalverträge stehen in SOURCES.

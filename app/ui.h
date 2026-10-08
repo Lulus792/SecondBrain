@@ -30,6 +30,11 @@ typedef struct {
     SDL_Renderer *renderer;
     SDL_Cursor *text_cursor;
     Uint64 caret_epoch;
+    SDL_Rect input_area;
+    bool input_area_pending;
+    SDL_Rect applied_input_area;
+    bool input_area_applied;
+    struct nk_window *input_window;
     bool pointer_text;
     struct nk_context *ctx;
     struct nk_font *normal, *body, *heading, *code;
