@@ -3162,3 +3162,29 @@ zuletzt queued; kein neuer Gesamt-Plattformnachweis für diesen Quellstand.
 Weitere Felder/Leseblöcke, kalter langer Wechsel, große Exporte, reale
 assistive/IME-/Geräteabnahme und übrige Release-Liste bleiben offen.
 Vollständiger Auftrag aktiv; 1.0 nur nach ausdrücklicher Nutzerfreigabe.
+
+## Kalter Readerwechsel erneut untersucht (0.9.43, keine Versionsänderung)
+
+Aktueller isolierter Softwarevergleich: drei alternierende Vorher/Nachher-Paare
+mit unveränderter Kopie des eigenen Projektgedächtnisses. Experimenteller
+Breitenmessweg bewahrt Kontext/Schreibrichtung/Stil und besteht5.396 exakte
+Form-/Breitenprüfungen sowie unabhängige Umbruch-/Rasterprüfer. Trotzdem kein
+belastbarer Layoutgewinn: Median75,32→85,14ms, einschließlich Ausreißer.
+Kein Geschwindigkeitsversprechen daraus abgeleitet. Alle sechs veränderten
+Produkt-/Prüfdateien bytegleich zu HEAD wiederhergestellt; Originalform-/
+Readerprüfer bestehen anschließend (2,46s). Experiment und feste Binärdateien
+im Diagnosebuild erhalten. Nachweise: `build/cold-layout/paired.json`,
+`experiment/sources.json`, `review-proof.json`, `restored-tests.log`.
+
+[UI-Nachprüfung](/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-08_19-28-45/UI_REVIEW.md) bestätigt SBUI-074: vollständiges kaltes Layout läuft
+vor Zeichnung/Present auf dem UI-Thread. Loading/Motion am Apple-Original neu
+gelesen; SDL_ttf3.2.2-Fontthreadvertrag lokal geprüft.
+[Vorbereitungs-/Abnahmevertrag](READER_VORBEREITUNG.md) legt frühe Rückmeldung,
+Abbruch, Quellen-/Fontidentität, atomare volle Übernahme und gleiche Scroll-
+geometrie fest. Kein bloßer Absatzzähler gilt als Zeitbudget für sehr große
+Absätze. UI-Reviewer-Wissen lokal gepflegt, nicht committet/gepusht.
+
+Produktcode/Installation unverändert0.9.43/fe2436a. Das ist neue Diagnose und
+Grundlage der nächsten Implementierung, keine umgesetzte Ladefunktion oder
+abgeschlossene Performance-/Plattformabnahme. Vollständiger Auftrag aktiv;
+1.0 weiterhin nur nach ausdrücklicher Freigabe.

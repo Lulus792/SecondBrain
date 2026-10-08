@@ -34,9 +34,20 @@ Vier abwechselnde lokale Profilpaare: nativer Export des vorbereiteten
 Sauberes Intel/macOS-Paket und Installation bestehen; neue Zielplattformprüfungen
 bleiben offen. Die oben genannten Paketprüfungen gehören zu0.9.43.
 
+## Neue Diagnose des langen Wechsels
+
+Ein reiner Breitenmessversuch erhielt Geometrie, zeigte im alternierenden
+Vergleich keinen Gewinn (75,32→85,14ms Layoutmedian) und wurde vollständig
+entfernt. Produktcode/Installation bleiben0.9.43. Der
+[Vorbereitungsvertrag](../../docs/READER_VORBEREITUNG.md) folgt neu gelesenen
+Apple Loading/Motion und dem festgelegten SDL_ttf-Fontthreadvertrag.
+Neue UI-Diagnose SBUI-074; die Vorbereitung ist noch nicht integriert.
+
 ## Nächste Arbeiten
 
-Native Zeichenrechtecke für weitere Felder und Leseblöcke integrieren.
+Abbrechbare Dokumentvorbereitung mit eigenem Quellen-/Fontbesitz prototypisieren
+und in den langen Wechsel integrieren. Native Zeichenrechtecke für weitere
+Felder und Leseblöcke integrieren.
 Das erste Layout langer Dokumente und große Exporte über der Cachegrenze
 weiter optimieren. Reale Eingabemethoden, VoiceOver/NVDA/Orca, Dialoge,
 Geräte/mehrere Monitore/lange Sitzungen und X11-/Wayland-HiDPI prüfen.

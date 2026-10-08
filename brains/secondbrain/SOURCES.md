@@ -152,3 +152,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 
 - [Native Editorrechtecke](../../docs/NATIVE_TEXTGEOMETRIE.md): tatsächlicher
   Glyphen-/Cursorplan, Scrollen, Bidi, native Retina-Koordinaten und Grenzen ab42.
+
+- [Reader-Vorbereitung](../../docs/READER_VORBEREITUNG.md): negativer
+  Breitenmessvergleich, erneute Apple-Grundlagen und noch nicht integrierter
+  Zustands-/Eigentums-/Abnahmevertrag für den langen Wechsel.
