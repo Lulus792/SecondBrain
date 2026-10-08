@@ -2,7 +2,7 @@
 
 Stand: 8. Oktober 2026. Originale: [STATUS](../../docs/STATUS.md),
 [Release-Aufgaben](../../docs/RELEASE.md), [Quellen](SOURCES.md).
-Chronologie und Rückfallkopien: [Journal vom 8. Oktober](journal/2026-10-08.md).
+Chronologie und frühere Nachweise: [Journal](journal/2026-10-08.md).
 
 ## Produkt und installierte App
 
@@ -12,129 +12,44 @@ Lumen-Sternkarte, Glaskarten/Icons, direkte Pfeilnavigation, Kamerafahrt,
 weiches Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert: **0.9.35, Build 178128eb0923**, Intel/macOS Release.
-Entpacktes Paket besteht mit 126/157/75 Assertions, zwei Prozessneustarts,
-Produktions-CLI und Runtime-Importprüfung. Lizenzbündel exakt, eigenes Gedächtnis
-beim Laden unverändert, installierte Ansicht betrachtet. Rückfallkopie:
-`/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.34-20261008-125613`.
+Installiert: **0.9.37 / 47a5a4392418**, sauberer Intel/macOS-Release-Build.
+94 Dateien entsprechen dem geprüften entpackten Paket. Vorherige Version 0.9.35:
+`/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.35-20261008-134625`.
+Installierte Ansicht betrachtet; Laden verändert keine Gedächtnisdatei.
 
-## Geprüfte Fortschritte
+## Geprüfter aktueller Fortschritt
 
-- Neue C-Bidi-Grundlage: 861.948 Unicode-18-Richtungsfälle,
-  438 Spiegelpaare und alle Unicode-Positionen bestehen; ASan/UBSan im
-  dokumentierten Teilscope und bytegenaue Neugenerierung ebenfalls.
-  32/32 Kernprüfungen ohne UI bestehen. Ab 0.9.34 in der formatierten Leseansicht angeschlossen; [Vertrag/Nachweise](../../docs/BIDI.md).
-- Geformter C-Zeilenplan erhält vollständigen Zeilenkontext, Glyphen-/Quell-
-  positionen und RTL-Schriftteile. 380 Assertions bei drei Größen, Raster-
-  vorschau, ASan/UBSan im Teilscope und neun Release-Nachprüfungen bestehen.
-  Reader-Einbindung lokal geprüft; Editor/native Anbindung offen; [Vertrag](../../docs/GLYPHENGEOMETRIE.md).
-- Korrigierte Bidi-CI zu 23837f1: alle acht nativen UI-Testschritte und vier
-  entpackten Pakete bestehen, einschließlich Windows Debug/Release.
-  19 Jobs erfolgreich; Intel-Debug scheitert erst am Artefakt-Upload mit
-  GitHub-DNS-Fehler nach bestandenen Tests. Der folgende Glyphenplan zu
-  1906c3d besteht alle 20 Jobs/vier Pakete; die folgende Reader-CI zu
-  4eda9db besteht inzwischen ebenfalls alle 20 Jobs/vier Pakete.
-- Erneute gezielte macOS-Release-Nachprüfung des Nutzerfeedbacks:
-  135 Bewegungs-/Layout- und 144 Navigations-Assertions, darunter alle vier
-  vorherigen Listen-/Leseansichten nach Leerung, erneutem Tippen und Escape.
-  Beide Anlegekarten als aktuelle Screenshots betrachtet. Keine Änderung am
-  installierten Produktbuild; [Details](../../docs/NAVIGATION_POLITUR.md).
-- 0.9.28: GPU-Übergänge, Desktop-Startfokus/Projektabschluss, freies Suchende
-  und erster stabiler Formularrahmen. 51 lokale Release-Prüfungen, gezielte
-  UI-/Desktop-/Renderer-Sanitizer und [20 Plattformjobs](https://github.com/Lulus792/SecondBrain/actions/runs/37730572189)
-  inklusive vier Pakete bestehen.
-- Native Tabellenmatrix: Mac ab 0.9.27; Windows Grid/Table ab 0.9.29
-  ([20 Jobs](https://github.com/Lulus792/SecondBrain/actions/runs/37732498154));
-  Linux Table/TableCell ab 0.9.32
-  ([20 Jobs](https://github.com/Lulus792/SecondBrain/actions/runs/37736031017)).
-  Zellen, Header, Spannen, Eltern/Indizes und 200%-Ansicht sind im
-  [Tabellenvertrag](../../docs/TABELLEN.md) getrennt nachgewiesen.
-- 0.9.33: direkter Cache-/Parent-Index für markierte rechteckige C-Tabellen.
-  16.384 Indizes, unabhängiger Child-Zugriff, falsche Metadaten und Defunct-
-  Kontexte geprüft. Synthetischer Cache-Teilschritt 43,560 s → 48,186 ms;
-  keine globale FPS-Aussage. Neue native Linux-Prüfung und
-  [alle 20 Jobs/vier Pakete](https://github.com/Lulus792/SecondBrain/actions/runs/37737157648)
-  bestehen.
-- Geordnete normale/IME-Eingabe, vorläufige Komposition, UTF-/Graphemgrenzen,
-  große Texte und Feldbindung sind implementiert. Verträge/Nachweise stehen
-  in [IME](../../docs/IME.md), [Grapheme](../../docs/GRAPHEME.md) und STATUS.
-- Importprüfung, originale Lizenzinventur/Rust-Laufzeitzuordnung, Support-/
-  Beitragsregeln und Wartungsablauf sind umgesetzt; ihre dokumentierten
-  Grenzen bleiben maßgeblich.
+Reader, Editor/Felder und einfache Texte verwenden gemeinsame Absatz-/Script-/
+Glyphenpläne. Cursor, Auswahl, Maus, Pfeile und IME-Markierungen folgen derselben
+Geometrie. Allgemeine Umbruchflächen behalten Absatzrichtung über Folgezeilen;
+Höhe und Zeichnung teilen den Plan. Code bleibt wörtlicher Text. Ganze Grapheme,
+CRLF und leere Absätze sind erhalten; Widgetclips und Cachepolitik sind geprüft.
+[Editorvertrag](../../docs/EDITORGEOMETRIE.md),
+[einfacher Text](../../docs/PLAIN_TEXT.md), [Umbruch](../../docs/WRAPPED_TEXT.md).
 
-## Neue Reader-Integration (0.9.34)
+62/62 lokale Release-Prüfungen (294,76 s), 623 unabhängige Umbruch-/Glyphen-/
+Pixel-Assertions unter haltendem ASan/UBSan und UI-Build ohne Tests bestehen.
+Sanitizer-Scope und Grenzen nennt STATUS. Das entpackte Mac-Paket besteht
+126 Desktop-, 157 Tastatur- und 75 Sicherungs-Assertions, zwei Neustarts,
+Produktions-CLI und Runtime-/Lizenz-/Versionsprüfung.
 
-Formatierte Leseansicht verwendet gemeinsamen Absatz-/Script-/Glyphenplan,
-ganze Grapheme, Stil-/Schriftwahl und denselben Umbruch für Höhe/Rasterung.
-Float-Bildpositionen erhalten Zwischenstände beim Scrollen. Lokal 56/56
-Release-Prüfungen, 105 gezielte ASan/UBSan-Reader-Assertions, frischer UI-Build
-mit BUILD_TESTING=OFF und 32/32 separat gebaute Kernprüfungen bestehen.
-SheenBidi-Lizenz ist in App und Paketen integriert. Neue Plattform-/Paketabnahme zu 4eda9db besteht mit allen 20 Jobs/vier
-Paketen; Intel-Mac-Installation 0.9.34 besteht. Native Metal-Messung zeigt
-Scroll-Median 1,87 ms und Wechsel-Median 14,03 ms; erster langer Wechsel
-bleibt mit 123,30 ms ein offener Ausreißer (zuvor 237,01 ms im neuen Plan). Details: STATUS/GLYPHENGEOMETRIE.
+0.9.36 besteht alle 20 Plattformjobs/vier Pakete (CI 37769203269).
+Neue 0.9.37-CI 37771435451 besteht inzwischen alle 20 Jobs/vier Pakete.
+Die tatsächlichen menschlichen/gerätebezogenen Abnahmen bleiben gesondert offen.
 
-## Geprüfte Cursorgrundlage
-
-Gemeinsamer C-Plan für Graphem-/Glyphenpunkte, echte GDEF-Ligaturpositionen,
-Bidi-Affinität, Maustreffer und Auswahlflächen. Indizierte Abfragen, leere
-LTR-/RTL-Absätze und als solche markierte proportionale Annäherungen.
-Lokal 402.874 Assertions, gezielte ASan/UBSan und 57/57 Release-Prüfungen
-bestehen; gerasterte Geometrievorschau betrachtet. [Vertrag und Grenzen](../../docs/CURSORGEOMETRIE.md).
-Noch keine neue produktive Editor-/IME-/native Anbindung. Installiert bleibt
-das paketgeprüfte 0.9.34 / 4eda9dbfce37; neue Cursor-CI folgt separat.
-
-## Produktive Editor-Anbindung (0.9.35)
-
-Gemeinsame Glyphen-/Cursorgeometrie arbeitet jetzt in Editor, Suche und Feldern:
-Zeichnung, Auswahl, Maus, Pfeile, vertikale Position, Schriftwechsel und IME-
-Markierungen. Original/Undo bleiben logisch erhalten. Pixelreferenz bei drei
-Schriftgrößen, Float-Cursor, Maus, RTL-/Ligaturschritte, CRLF und IME-Anker geprüft.
-Eine gefundene SDL_ttf-Nullzeigerarithmetik an leeren Bitmaps ist hashgeprüft
-korrigiert und mit haltendem UBSan vor/nach reproduziert.
-60/60 lokale Release-Prüfungen und UI-Build ohne Tests bestehen; frische Intel-Mac-Paketprüfung und Installation bestehen. Neue Plattform-
-CI 37766464641 zum importfreien Prüfstarter folgt gesondert.
-[Vertrag und Grenzen](../../docs/EDITORGEOMETRIE.md).
-Die vorige Cursorgrundlage zu 13e9e08 besteht inzwischen alle 20 Jobs/vier Pakete.
-Die produktive Editor-CI 37766464641 zu a1e6f5e ist inzwischen ebenfalls
-vollständig erfolgreich (20 Jobs/vier Pakete).
-
-## Einfache Textkommandos (0.9.36)
-
-Labels, Button-/Sterntexte und Hinweise verwenden gemeinsame Absatz-/Script-/
-Glyphengeometrie zum Messen und Zeichnen. Kürzung erhält ganze Grapheme.
-61/61 lokale Release-Prüfungen, unabhängige Pixelreferenz (67 Assertions),
-gezieltes haltendes ASan/UBSan und UI-Build ohne Tests bestehen. Aktuelle
-Projektansicht betrachtet, beim Laden alle Gedächtnisdateien bytegleich.
-Installiert bleibt 0.9.35 bis zur neuen Plattform-/Paketabnahme.
-[Vertrag/Restumfang](../../docs/PLAIN_TEXT.md), [Nachweise](../../docs/STATUS.md).
-
-## Allgemeiner Absatzumbruch (0.9.37)
-
-Einfache Hinweise/Labels und Codeblöcke behalten jetzt Richtungs-/Schriftkontext
-über Folgezeilen. Höhe und Zeichnung teilen den Plan; eigene Widgetclips und
-getrennte Cachepolitik für Reader/einfache Texte sind geprüft. 62/62 lokale
-Release-Prüfungen, 623 unabhängige Geometrie-/Pixel-Assertions unter haltendem
-ASan/UBSan und UI-Build ohne Tests bestehen. RTL-Aufnahme und aktuelle Anlegekarten
-betrachtet. Installiert bleibt vor neuer Paketabnahme 0.9.35.
-[Vertrag](../../docs/WRAPPED_TEXT.md), [Nachweise](../../docs/STATUS.md).
+Native Metal-Stichprobe auf diesem Intel-Mac: Scroll-Median 1,88 ms,
+Wechsel 14,00 ms/p95 22,91 ms; erster langer Wechsel 107,58 ms, davon
+95,40 ms Layout. Keine allgemeine Bildraten- oder Langzeitabnahme.
 
 ## Nächste Arbeiten
 
-0.9.34 ist auf allen Plattformen im dokumentierten automatisierten Umfang
-abgenommen. 0.9.35 besteht inzwischen alle 20 Plattformjobs/vier Pakete. 0.9.36 ist lokal
-mit 61/61 Prüfungen, Pixelreferenz, gezieltem Sanitizer und UI-Build ohne Tests
-geprüft und besteht inzwischen alle 20 Jobs/vier Pakete (CI 37769203269).
-0.9.37 ist lokal geprüft; seine neue Plattform-/Paketabnahme folgt.
-Weitere Release-Arbeiten: Bidi/visuelle/native Textgeometrie und reale Eingabemethoden;
-menschliche VoiceOver/NVDA/Orca-, Dialog-, Geräte-, Mehrmonitor-/Langzeitabnahme;
-volle Windows-/Linux-Zielvolumes und physische Persistenz; frische Rechner und
+Erstes Layout langer Dokumente weiter optimieren. Native Zeichenrechtecke
+an tatsächliche Glyphen-/Zeilenpläne anbinden; Unicode-Wortregeln und reale
+Eingabemethoden prüfen. Weitere offene Release-Arbeiten: menschliche
+VoiceOver/NVDA/Orca-, Dialog-, Geräte-, Mehrmonitor-/Langzeitabnahme; volle
+Windows-/Linux-Zielvolumes und physische Persistenz; frische Rechner und
 OS-Mindestversionen; vollständige SDK-/Systemruntime-Zuordnung.
-
-Nächster Textschritt: native Zeichenrechtecke an die tatsächlichen
-Glyphen-/Zeilenpläne anbinden; Unicode-Wortregeln, größere reale Dateien
-und echte Eingabe-/Screenreader-Abnahme weiterführen.
-Reader-CI 37751197759 und Intel-Mac-Paketabnahme bestehen.
+Die Details stehen in der Release-Liste und ihren Originalnachweisen.
 
 Eigener Code MIT. Signaturkonten fehlen; vertraulicher Sicherheitskanal ist
 angefragt. Vollständiger Auftrag bleibt aktiv. **1.0 erst nach ausdrücklicher

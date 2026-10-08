@@ -2728,3 +2728,39 @@ erfolgreich: [37769203269](https://github.com/Lulus792/SecondBrain/actions/runs/
 alle 20 Jobs inklusive vier entpackter Plattformpakete. Das belegt 0.9.36;
 0.9.37 braucht eine eigene neue Plattform-/Paketabnahme. Installiert bleibt bis
 zur sauberen neuen Paketprüfung 0.9.35 / 178128eb0923. 1.0 bleibt gesperrt.
+
+## Sauberes Umbruch-Paket auf dem Intel-Mac installiert
+
+0.9.37 / **47a5a4392418**, sauberer Release-Build: entpacktes Paket besteht
+Runtime-/Lizenz-/Versionsprüfung, 126 Desktop-, 157 Tastatur- und 75 Sicherungs-
+Assertions, zwei isolierte Neustarts und Produktions-CLI-Sicherung/Wiederherstellung.
+Archiv: build/wrap-release-package/SecondBrain-0.9.37-Darwin-x86_64.tar.gz,
+SHA-256 `24a98d8b51e3818d15a7cd39513e71f7782ba367ce5fa18b7d4940de004bf67f`.
+94 installierte Dateien unter dist/SecondBrain entsprechen exakt dem Paket.
+Vorherige 0.9.35-Dateien bleiben bytegleich in
+build/previous-dist-0.9.35-20261008-134625. Installierte Ansicht betrachtet;
+das Laden hat keine Projektgedächtnisdatei verändert. Protokolle/Manifeste:
+build/wrap-package-check.log und build/wrap-install-proof.json.
+
+Neue native Metal-Stichprobe, gleicher Intel-Mac, 1336×840, 16 Notizen, je 60
+warme Frames: Scroll-Median 1,88 ms, Kamera 12,19 ms, Wechsel 14,00 ms/p95
+22,91 ms. Der erste lange Wechsel braucht weiterhin 107,58 ms, davon 95,40 ms
+Layout. Ein Scroll-Maximum von 15,97 ms liegt überwiegend im Present-Schritt.
+Dies ist eine konkrete Stichprobe, kein allgemeiner Bildraten-/Langzeitnachweis.
+Projektgedächtnis bleibt beim Probeaufruf bytegleich; build/wrap-native-profile.log.
+Das erste Layout langer Dokumente bleibt eine gezielte weitere Leistungsaufgabe.
+
+Neue Plattform-CI [37771435451](https://github.com/Lulus792/SecondBrain/actions/runs/37771435451)
+zu 47a5a43: inzwischen alle 20 Jobs inklusive vier entpackter Plattformpakete
+erfolgreich. Dies belegt die neue Änderung im dokumentierten automatisierten Scope.
+Der volle Release-Auftrag und die Freigabesperre für 1.0 bleiben bestehen.
+
+Abgeschlossene Testaufnahmen sind verlustfrei gzip-archiviert: 68 weitere
+Interaktions-BMPs (962.192.710 Bytes Ersparnis) sowie 622 Desktop-/Tastatur-/
+Sicherungs-BMPs (6.981.052.908 Bytes). Vor Entfernen jedes unkomprimierten BMP
+stimmen entpackte Bytes per SHA-256 mit dem Original überein; anderslautende
+vorhandene Archive werden unter eigenem Hashnamen erhalten. Manifeste:
+build/wrap-bitmap-archive.json und build/wrap-workflow-bitmap-archive.json.
+Anwendungspakete, Rückfallkopien und Projektdateien bleiben erhalten.
+Die installierte Produktions-CLI liest den verdichteten aktuellen Projektkontext;
+relative Links in STATE und WRAPPED_TEXT sind geprüft.
