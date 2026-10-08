@@ -158,3 +158,12 @@ logische Speicherung und Undo bleiben erhalten. [Umfang/Nachweise](EDITORGEOMETR
 Native Zeichenrechtecke, einfache Label-/Schaltflächentexte, Unicode-Wortregeln,
 große reale Dateien sowie reale Eingabe-/Screenreader-Abnahme bleiben offen.
 Die neue Plattform-/Paketabnahme wird in STATUS gesondert dokumentiert.
+
+## Einfache Textdarstellung vom 8. Oktober
+
+Ab 0.9.36 sind einfache Textkommandos, Fontmessung und graphemgebundene Kürzung
+an den gemeinsamen Glyphenplan angeschlossen. Lokale Gesamt-/Pixel-/Sanitizer-
+Prüfungen bestehen; [Umfang und Grenzen](PLAIN_TEXT.md). Der allgemeine
+Widgetumbruch benötigt weiterhin zusammenhängenden Absatzkontext und gleiche
+Höhen-/Rasterpläne. Native Textgeometrie und reale assistive/IME-Abnahme bleiben
+offen. Die neue Plattform-/Paketabnahme folgt getrennt in STATUS.

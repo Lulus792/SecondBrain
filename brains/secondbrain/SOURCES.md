@@ -128,3 +128,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Produktive Editor-/Feldgeometrie](../../docs/EDITORGEOMETRIE.md): gemeinsamer
   Plan für Cursor/Auswahl/Maus/Pfeile/IME, Backing-Pixelclips, Cache und
   verbleibende native/Unicode-/Leistungsabnahme.
+
+- [Einfache UI-Textgeometrie](../../docs/PLAIN_TEXT.md): gemeinsamer Absatz-/
+  Script-/Glyphenplan, graphemgebundene Kürzung, exakter Cache und verbleibender
+  allgemeiner Widgetumbruch ab 0.9.36.

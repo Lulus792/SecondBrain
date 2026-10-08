@@ -96,18 +96,32 @@ korrigiert und mit haltendem UBSan vor/nach reproduziert.
 CI 37766464641 zum importfreien Prüfstarter folgt gesondert.
 [Vertrag und Grenzen](../../docs/EDITORGEOMETRIE.md).
 Die vorige Cursorgrundlage zu 13e9e08 besteht inzwischen alle 20 Jobs/vier Pakete.
+Die produktive Editor-CI 37766464641 zu a1e6f5e ist inzwischen ebenfalls
+vollständig erfolgreich (20 Jobs/vier Pakete).
+
+## Einfache Textkommandos (0.9.36)
+
+Labels, Button-/Sterntexte und Hinweise verwenden gemeinsame Absatz-/Script-/
+Glyphengeometrie zum Messen und Zeichnen. Kürzung erhält ganze Grapheme.
+61/61 lokale Release-Prüfungen, unabhängige Pixelreferenz (67 Assertions),
+gezieltes haltendes ASan/UBSan und UI-Build ohne Tests bestehen. Aktuelle
+Projektansicht betrachtet, beim Laden alle Gedächtnisdateien bytegleich.
+Installiert bleibt 0.9.35 bis zur neuen Plattform-/Paketabnahme.
+[Vertrag/Restumfang](../../docs/PLAIN_TEXT.md), [Nachweise](../../docs/STATUS.md).
 
 ## Nächste Arbeiten
 
 0.9.34 ist auf allen Plattformen im dokumentierten automatisierten Umfang
-abgenommen. 0.9.35 ist lokal und im Intel-Mac-Paket geprüft; neue CI läuft.
+abgenommen. 0.9.35 besteht inzwischen alle 20 Plattformjobs/vier Pakete. 0.9.36 ist lokal
+mit 61/61 Prüfungen, Pixelreferenz, gezieltem Sanitizer und UI-Build ohne Tests
+geprüft; seine neue Plattform-/Paketabnahme folgt.
 Weitere Release-Arbeiten: Bidi/visuelle/native Textgeometrie und reale Eingabemethoden;
 menschliche VoiceOver/NVDA/Orca-, Dialog-, Geräte-, Mehrmonitor-/Langzeitabnahme;
 volle Windows-/Linux-Zielvolumes und physische Persistenz; frische Rechner und
 OS-Mindestversionen; vollständige SDK-/Systemruntime-Zuordnung.
 
-Nächster Textschritt: gemeinsame Geometrie an einfache Labels/Schaltflächentexte
-und native Zeichenrechtecke anbinden; Unicode-Wortregeln, größere reale Dateien
+Nächster Textschritt: allgemeinen Widgetumbruch an zusammenhängenden
+Absatzkontext anbinden, danach native Zeichenrechtecke; Unicode-Wortregeln, größere reale Dateien
 und echte Eingabe-/Screenreader-Abnahme weiterführen.
 Reader-CI 37751197759 und Intel-Mac-Paketabnahme bestehen.
 

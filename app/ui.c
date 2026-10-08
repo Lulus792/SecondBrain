@@ -29,6 +29,8 @@ static int sb_ui_edit_render(struct nk_command_buffer *,struct nk_text_edit *,co
 #define NK_TEXTEDIT_LOCATE_CUSTOM sb_ui_edit_locate
 #define NK_TEXTEDIT_KEY_CUSTOM sb_ui_edit_key
 #define NK_TEXTEDIT_RENDER_CUSTOM sb_ui_edit_render
+static int sb_ui_plain_clamp(const struct nk_user_font *,const char *,int,float,int *,float *,unsigned int *,int);
+#define NK_TEXT_CLAMP_CUSTOM sb_ui_plain_clamp
 #define NK_DRAW_TEXT_CUSTOM sb_ui_text_draw
 #define NK_IMPLEMENTATION
 #define NK_SDL3_RENDERER_IMPLEMENTATION
@@ -136,6 +138,22 @@ bool sb_ui_edit_geometry(SBUi *ui,struct nk_text_edit *edit,const struct nk_user
 }
 
 
+/* Fit actual shaped advances and never split a displayed grapheme. The
+   separator policy remains the existing logical word-wrap policy. */
+static int sb_ui_plain_clamp(const struct nk_user_font *font,const char *value,int length,float space,int *glyphs,float *measured,unsigned int *separators,int count){
+    if(!sb_ui_font_owner(font))return -1;
+    if(length<=0 || space<=0){*glyphs=0;*measured=0;return 0;}
+    size_t fitting=sb_ui_text_fit(font,value,(size_t)length,space,measured);
+    if(count>0 && fitting<(size_t)length){
+        const char *at=value,*end=value+fitting;size_t last=0;
+        while(at<end){uint32_t cp=SDL_StepUTF8(&at,NULL);for(int i=0;i<count;++i)if(cp==separators[i])last=(size_t)(at-value);}
+        if(last){SBGrapheme reader;SBGraphemeBoundary b;size_t whole=0;if(sb_grapheme_init(&reader,value,(size_t)length))while(sb_grapheme_next(&reader,&b) && b.byte<=last)whole=b.byte;fitting=whole;}
+        /* Wrapping must consume at least one whole unit even in a tiny area. */
+        if(!fitting){SBGrapheme reader;SBGraphemeBoundary b;if(sb_grapheme_init(&reader,value,(size_t)length)){sb_grapheme_next(&reader,&b);if(sb_grapheme_next(&reader,&b))fitting=b.byte;}}
+        *measured=font->width(font->userdata,font->height,value,(int)fitting);
+    }
+    *glyphs=nk_utf_len(value,(int)fitting);return (int)fitting;
+}
 float sb_ui_wrap_height(struct nk_context *ctx,const struct nk_user_font *font,const char *text,size_t length,float width) {
     struct nk_vec2 padding=ctx->style.text.padding;
     float available=width-2*padding.x; if (available<1) available=1;

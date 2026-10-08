@@ -2659,3 +2659,42 @@ entfernt und 296 alte BMP-Testaufnahmen verlustfrei gzip-archiviert. Entpackte
 Bytes jeweils per SHA-256 geprüft; Ersparnis 4.269.762.905 Bytes. Originale
 Testbilder bleiben als .bmp.gz erhalten, Projektdateien/Pakete/Rückfallkopien
 sind nicht entfernt. Künftige lokale Builds erzeugen die entfernten Objekte neu.
+
+## Einfache Textkommandos vereinheitlicht (0.9.36)
+
+Fontmessung und produktiver Textkonverter verwenden jetzt dieselbe Absatz-/
+Script-/Glyphengeometrie wie Editor und Reader. Einfache Labels, Buttontexte,
+Sternbeschriftungen und Hinweise erhalten vollständige Zeilenformung; breite
+Zeilen werden nur als sichtbare Ausschnitte gerastert. Der eigene Nuklear-
+Kürzungshook benutzt tatsächliche Präfixbreiten und ganze Grapheme.
+[Vertrag und verbleibender Umbruch](PLAIN_TEXT.md).
+
+**61/61 lokale Release-Prüfungen bestehen (320,76 s)**, einschließlich neuer
+unabhängiger Font-/Script-/Pixelreferenz und bisheriger Editor-/Reader-/IME-/
+Navigations-/Desktop-/Tastatur-/Sicherungswege. Nach der Versionsanhebung und
+Verschiebung der Aufnahme auf den gemischten Referenztext bestehen die vier
+gezielten Text-/Versions-/Release-Vertragsprüfungen nochmals. Der Textprüfer hat
+67 Assertions bei 100/150/200 Prozent. Die tatsächliche gemischte Aufnahme und
+die eigene Projektansicht wurden betrachtet; beim Laden blieben alle Dateien
+des Projektgedächtnisses bytegleich.
+
+Gezielte ASan/UBSan-Prüfung: 67 Assertions, haltende Fehlerbehandlung, kein
+Befund. Instrumentiert sind eigener UI-/Text-/Renderer-/Glyphen-/Cursor-/Script-/
+Bidi-Code, Bidi-Engine, Textprüfer und SDL_ttf.c mit eigenen Hooks. Fachlicher
+Kern, SDL/HarfBuzz/FreeType und weitere externe Objekte sind nicht instrumentiert;
+macOS-Leakprüfung ist abgeschaltet. Die Testaufnahme wurde danach nur auf den
+gemischten Text verlegt. Protokolle/Quellhashes: build/plain-sanitizers/.
+Ein UI-Build ohne Tests besteht und meldet 0.9.36; text.c besteht außerdem
+-Wall/-Wextra/-Wpedantic ohne Warnung. Protokolle: build/plain-full-ctest.log,
+build/plain-version-check.log und build/plain-no-tests-build.log.
+
+Die vorausgehende Plattform-CI zu a1e6f5e / Anwendung 0.9.35 ist inzwischen
+vollständig erfolgreich: [37766464641](https://github.com/Lulus792/SecondBrain/actions/runs/37766464641),
+alle 20 Jobs einschließlich vier entpackter Plattformpakete. Das belegt 0.9.35,
+nicht die neue Änderung. Installiert bleibt das geprüfte 0.9.35 / 178128eb0923;
+0.9.36 benötigt seine eigene neue Plattform-/Paketabnahme.
+
+Offen bleiben zusammenhängender Absatzkontext beim allgemeinen Widgetumbruch,
+native Zeichenrechtecke, Unicode-Wortbefehle, echte Eingabe-/Screenreader-Abnahme
+und reale Leistungs-/Gerätefälle. Der vollständige Release-Auftrag bleibt offen;
+1.0 ist weiterhin bis zur ausdrücklichen Nutzerfreigabe gesperrt.

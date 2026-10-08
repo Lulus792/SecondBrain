@@ -268,3 +268,11 @@ prüft Original- und korrigierten Hash sowie den eigenen Hookmarker; unbekannte
 Dateien werden unverändert abgewiesen. [Befund/Nachweise](../docs/GLYPHENGEOMETRIE.md).
 Die Korrektur ist eigener MIT-lizenzierter UI-Code; die ursprüngliche Datei
 bleibt der festgelegten SDL_ttf-Lizenz zugeordnet.
+
+## Einfache UI-Texte ab 0.9.36
+
+Der eigene Textkonverter verwendet jetzt den gemeinsamen Absatz-/Script-/
+Glyphenplan auch für unformatierte Textkommandos. Der lokale optionale
+`NK_TEXT_CLAMP_CUSTOM`-Hook kürzt anhand tatsächlich geformter Breiten und ganzer
+Grapheme; ohne Hook bleibt Nuklears ursprüngliche Funktion erhalten.
+[Umfang und offene Umbrucharbeit](../docs/PLAIN_TEXT.md).

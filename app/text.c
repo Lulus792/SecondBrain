@@ -1,14 +1,13 @@
 #include "text.h"
 #include "platform.h"
 #include "grapheme.h"
+#include "scripts.h"
 #include <SDL3_ttf/SDL_ttf.h>
 #include <math.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define SB_TEXT_CACHE_ENTRIES 1024
-#define SB_TEXT_CACHE_BYTES (32u * 1024u * 1024u)
 #define SB_FALLBACK_COUNT 7
 #define SB_TEXT_FACES 32
 typedef struct SBGlyphTexture {SBShapeGlyph *signature;size_t count;uint64_t hash;int left,top,w,h;SDL_Texture *texture;size_t bytes;uint64_t stamp;struct SBGlyphTexture *next;} SBGlyphTexture;
@@ -20,14 +19,6 @@ typedef struct {
     TTF_Font *font, *fallback[SB_FALLBACK_COUNT];
     struct SBTextSystem *owner;
 } SBTextFace;
-typedef struct {
-    SDL_Texture *texture;
-    char *text;
-    size_t length, bytes;
-    unsigned face;
-    int width, height, maximum,offset;
-    uint64_t stamp;
-} SBTextCache;
 /* Bounded, exact-key measurement cache. Font systems own all entries and
    discard them on font/density changes; hash collisions compare full bytes. */
 typedef struct {
@@ -39,34 +30,26 @@ typedef struct {
 struct SBTextSystem {
     SBUi *ui;
     SDL_Renderer *renderer;
-    TTF_TextEngine *surface_engine;
     float density;
     SBTextFace faces[SB_TEXT_FACES];
-    SBTextCache cache[SB_TEXT_CACHE_ENTRIES];
     SBMeasureCache measures[SB_MEASURE_CACHE_ENTRIES];
     SBGlyphTexture *glyphs[SB_GLYPH_BUCKETS];size_t glyph_bytes;
-    size_t bytes;
+    void *plain;size_t plain_bytes;
     uint64_t frame;
 };
 
-static void cache_free(SBTextSystem *text, SBTextCache *entry) {
-    SDL_DestroyTexture(entry->texture); free(entry->text);
-    text->bytes-=entry->bytes; memset(entry,0,sizeof(*entry));
-}
+static void plain_system_free(SBTextSystem *text);
 static void system_free(SBTextSystem *text) {
     if (!text) return;
-    for (unsigned i=0;i<SB_TEXT_CACHE_ENTRIES;++i) cache_free(text,&text->cache[i]);
+    plain_system_free(text);
     for (unsigned i=0;i<SB_MEASURE_CACHE_ENTRIES;++i) free(text->measures[i].text);
     for(unsigned i=0;i<SB_GLYPH_BUCKETS;++i){SBGlyphTexture *entry=text->glyphs[i];while(entry){SBGlyphTexture *next=entry->next;SDL_DestroyTexture(entry->texture);free(entry->signature);free(entry);entry=next;}}
-    TTF_DestroySurfaceTextEngine(text->surface_engine);
     for (unsigned i=0;i<SB_TEXT_FACES;++i) {
         TTF_CloseFont(text->faces[i].font);
         for (unsigned j=0;j<SB_FALLBACK_COUNT;++j) TTF_CloseFont(text->faces[i].fallback[j]);
     }
     free(text);
 }
-typedef struct { size_t start,end; TTF_Font *font; } SBFontRun;
-typedef struct { SBTextFace *face; SBGrapheme reader; SBGraphemeBoundary boundary; TTF_Font *previous; bool available; } SBFontRuns;
 static bool ignored(Uint32 cp) {
     return cp==0x200d || cp==0x200c || (cp>=0xfe00 && cp<=0xfe0f) || (cp>=0xe0020 && cp<=0xe007f) || (cp>=0xe0100 && cp<=0xe01ef);
 }
@@ -89,6 +72,8 @@ static TTF_Font *cluster_font(SBTextFace *face,const char *text,size_t length,TT
     return face->font;
 }
 TTF_Font *sb_ui_cluster_font(const struct nk_user_font *font,const char *value,size_t length,TTF_Font *previous){SBTextFace *face=font ? font->userdata.ptr : NULL;return face ? cluster_font(face,value,length,previous) : NULL;}
+#include "plain_text.inc"
+static void plain_system_free(SBTextSystem *text){SBPlainPlan *plans=text->plain;if(plans){for(unsigned i=0;i<SB_PLAIN_ENTRIES;++i)plain_free(&plans[i]);free(plans);}}
 static uint64_t glyph_hash(const SBShapedLine *line) {
     uint64_t hash=1469598103934665603ULL;
     for(size_t i=0;i<line->count;++i){const SBShapeGlyph *g=&line->glyphs[i];uint32_t x,y;memcpy(&x,&g->x,4);memcpy(&y,&g->y,4);
@@ -145,26 +130,6 @@ bool sb_ui_shaped_draw(SBUi *ui,const SBShapedLine *line,float x,float baseline,
         y+=h;
     }return true;
 }
-static bool runs_init(SBFontRuns *runs,SBTextFace *face,const char *text,size_t length) {
-    *runs=(SBFontRuns){.face=face};
-    if (!sb_grapheme_init(&runs->reader,text,length)) return false;
-    runs->available=sb_grapheme_next(&runs->reader,&runs->boundary); return true;
-}
-static bool run_next(SBFontRuns *runs,SBFontRun *run) {
-    if (!runs->available) return false;
-    size_t start=runs->boundary.byte; SBGraphemeBoundary next;
-    if (!sb_grapheme_next(&runs->reader,&next)) { runs->available=false; return false; }
-    TTF_Font *font=cluster_font(runs->face,runs->reader.text+start,next.byte-start,runs->previous);
-    *run=(SBFontRun){start,next.byte,font}; runs->boundary=next; runs->previous=font;
-    for (;;) {
-        SBGrapheme saved=runs->reader;
-        if (!sb_grapheme_next(&runs->reader,&next)) break;
-        TTF_Font *candidate=cluster_font(runs->face,runs->reader.text+runs->boundary.byte,next.byte-runs->boundary.byte,font);
-        if (candidate!=font) { runs->reader=saved; return true; }
-        run->end=next.byte; runs->boundary=next;
-    }
-    runs->available=false; return true;
-}
 static SBMeasureCache *measure_entry(SBTextFace *face,const char *value,size_t length) {
     if(length>SB_MEASURE_CACHE_LENGTH)return NULL;
     unsigned index=(unsigned)(face-face->owner->faces);uint64_t hash=sb_hash(value,length)^((uint64_t)index*UINT64_C(0x9e3779b97f4a7c15));
@@ -177,10 +142,9 @@ static float width(nk_handle handle, float height, const char *value, int length
     SBTextFace *face=handle.ptr; (void)height;
     if (length<=0 || !value || !face) return 0;
     SBMeasureCache *memo=measure_entry(face,value,(size_t)length);if(memo && memo->width_ready)return memo->width;
-    SBFontRuns runs; SBFontRun run; int total=0;
-    if (!runs_init(&runs,face,value,(size_t)length)) return 0;
-    while (run_next(&runs,&run)) { int w=0,h=0; if (!TTF_GetStringSize(run.font,value+run.start,run.end-run.start,&w,&h)) return 0; total+=w; }
-    float measured=(float)total/face->owner->density;if(memo){memo->width=measured;memo->width_ready=true;}return measured;
+    SBPlainPlan scratch={0};SBPlainPlan *plan=plain_get(face,value,(size_t)length,&scratch);
+    float measured=plan ? plan->advance/face->owner->density : 0;plain_free(&scratch);
+    if(plan && memo){memo->width=measured;memo->width_ready=true;}return measured;
 }
 SBUi *sb_ui_font_owner(const struct nk_user_font *font){if(!font || font->width!=width)return NULL;SBTextFace *face=font->userdata.ptr;return face && face->owner ? face->owner->ui : NULL;}
 static TTF_Font *open_font(const char *path, float logical_height, float density) {
@@ -261,135 +225,62 @@ const struct nk_user_font *sb_ui_text_style(SBUi *ui,const struct nk_user_font *
     return &face->nk.handle;
 }
 size_t sb_ui_text_fit(const struct nk_user_font *font,const char *value,size_t length,float available,float *measured) {
-    SBTextFace *face=font->userdata.ptr; SBFontRuns runs; SBFontRun run;
-    if (measured) *measured=0;
-    if (!face || !measured || available<=0 || !runs_init(&runs,face,value,length)) return 0;
-    int maximum=(int)fminf(8192,floorf(available*face->owner->density)),total=0; size_t fitting=0;
-    while (total<maximum && run_next(&runs,&run)) {
-        size_t fit=0; int w=0;
-        if (!TTF_MeasureString(run.font,value+run.start,run.end-run.start,maximum-total,&w,&fit)) return 0;
-        fitting=run.start+fit; total+=w;
-        if (fit<run.end-run.start) break;
+    if(measured)*measured=0;
+    if(!font || !value || !measured || available<=0 || length>INT_MAX || !sb_ui_font_owner(font))return 0;
+    float full=font->width(font->userdata,font->height,value,(int)length);
+    if(full<=available){*measured=full;return length;}
+    SBGrapheme reader;SBGraphemeBoundary boundary;size_t *ends=NULL,count=0,capacity=0;
+    if(!sb_grapheme_init(&reader,value,length))return 0;
+    while(sb_grapheme_next(&reader,&boundary)){
+        if(count==capacity){size_t next=capacity ? capacity*2 : 32;size_t *grown=realloc(ends,next*sizeof(*grown));if(!grown){free(ends);return 0;}ends=grown;capacity=next;}
+        ends[count++]=boundary.byte;
     }
-    SBGrapheme reader; SBGraphemeBoundary boundary; size_t whole=0;
-    if (!sb_grapheme_init(&reader,value,length)) return 0;
-    while (sb_grapheme_next(&reader,&boundary) && boundary.byte<=fitting) whole=boundary.byte;
-    *measured=font->width(font->userdata,font->height,value,(int)whole); return whole;
+    size_t low=0,high=count;
+    while(low<high){size_t mid=low+(high-low)/2;float w=font->width(font->userdata,font->height,value,(int)ends[mid]);
+        if(w<=available)low=mid+1;else high=mid;
+    }
+    size_t fitting=low ? ends[low-1] : 0;free(ends);
+    *measured=font->width(font->userdata,font->height,value,(int)fitting);return fitting;
 }
 bool sb_ui_text_metrics(const struct nk_user_font *font,const char *value,size_t length,float *ascent,float *descent) {
-    SBTextFace *face=font->userdata.ptr; SBFontRuns runs; SBFontRun run;
-    if (!face || !ascent || !descent || !runs_init(&runs,face,value,length)) return false;
-    SBMeasureCache *memo=measure_entry(face,value,length);
+    if(!font || !value || !ascent || !descent || !sb_ui_font_owner(font))return false;
+    SBTextFace *face=font->userdata.ptr;SBMeasureCache *memo=measure_entry(face,value,length);
     if(memo && memo->metrics_ready){*ascent=memo->ascent;*descent=memo->descent;return true;}
-    int above=TTF_GetFontAscent(face->font),below=-TTF_GetFontDescent(face->font);
-    while (run_next(&runs,&run)) {
-        above=SDL_max(above,TTF_GetFontAscent(run.font)); below=SDL_max(below,-TTF_GetFontDescent(run.font));
-    }
-    *ascent=above/face->owner->density; *descent=below/face->owner->density;
+    SBPlainPlan scratch={0};SBPlainPlan *plan=plain_get(face,value,length,&scratch);if(!plan)return false;
+    *ascent=plan->ascent/face->owner->density;*descent=plan->descent/face->owner->density;plain_free(&scratch);
     if(memo){memo->ascent=*ascent;memo->descent=*descent;memo->metrics_ready=true;}return true;
 }
 
 void sb_ui_text_draw(struct nk_draw_list *list, const struct nk_command_text *command) {
-    if (!command->font || command->length<=0 || !command->foreground.a) return;
-    struct nk_rect rect=nk_rect(command->x,command->y,command->w,command->h);
-    if (rect.x>=list->clip_rect.x+list->clip_rect.w || rect.y>=list->clip_rect.y+list->clip_rect.h ||
-        rect.x+rect.w<=list->clip_rect.x || rect.y+rect.h<=list->clip_rect.y) return;
-    SBTextFace *face=command->font->userdata.ptr;
-    if (!face || !face->owner) return;
-    SBTextSystem *text=face->owner;
-    unsigned face_number=(unsigned)(face-text->faces);
-    size_t length=(size_t)command->length;
-    int offset=(int)fmaxf(0,floorf((list->clip_rect.x-rect.x)*text->density)-2);
-    int maximum=(int)fminf(8192,ceilf((fminf(rect.x+rect.w+2,list->clip_rect.x+list->clip_rect.w+2)-rect.x)*text->density)-offset);
-    if (maximum<1) return;
-    SBTextCache *entry=NULL;
-    for (unsigned i=0;i<SB_TEXT_CACHE_ENTRIES;++i) {
-        SBTextCache *candidate=&text->cache[i];
-        if (candidate->texture && candidate->face==face_number && candidate->length==length && candidate->maximum==maximum && candidate->offset==offset &&
-            !memcmp(candidate->text,command->string,length)) { entry=candidate; break; }
+    if(!command->font || command->length<=0 || !command->foreground.a)return;
+    SBTextFace *face=command->font->userdata.ptr;if(!face || !face->owner)return;
+    SBTextSystem *text=face->owner;float density=text->density;
+    struct nk_rect clip=list->clip_rect;
+    if(command->x>=clip.x+clip.w || command->y>=clip.y+clip.h || command->x+command->w<=clip.x || command->y+command->h<=clip.y)return;
+    SBPlainPlan scratch={0};SBPlainPlan *plan=plain_get(face,command->string,(size_t)command->length,&scratch);
+    if(!plan)return;
+    for(size_t row=0;row<plan->count;++row){const SBPlainLine *item=&plan->lines[row];const SBShapedLine *line=&item->shape;
+        float baseline=command->y+(item->y+line->ascent)/density;
+        float left=0,right=0,top=0,bottom=0;bool ink=false;
+        for(size_t i=0;i<line->count;++i){const SBShapeGlyph *g=&line->glyphs[i];if(!g->width || !g->height)continue;
+            float gx=floorf(g->x+g->left),gy=floorf(g->y-g->top);
+            if(!ink){left=gx;right=gx+g->width;top=gy;bottom=gy+g->height;ink=true;}
+            else{left=fminf(left,gx);right=fmaxf(right,gx+g->width);top=fminf(top,gy);bottom=fmaxf(bottom,gy+g->height);}
+        }
+        if(!ink || command->x+right/density<=clip.x || command->x+left/density>=clip.x+clip.w || baseline+bottom/density<=clip.y || baseline+top/density>=clip.y+clip.h)continue;
+        if(right-left>8192){left=fmaxf(left,floorf((clip.x-command->x)*density)-2);right=fminf(right,ceilf((clip.x+clip.w-command->x)*density)+2);}
+        if(bottom-top>8192){top=fmaxf(top,floorf((clip.y-baseline)*density)-2);bottom=fminf(bottom,ceilf((clip.y+clip.h-baseline)*density)+2);}
+        if((double)left<INT_MIN || (double)right>INT_MAX || (double)top<INT_MIN || (double)bottom>INT_MAX)continue;
+        for(int y=(int)top;y<(int)bottom;){int h=SDL_min(8192,(int)bottom-y);
+            for(int x=(int)left;x<(int)right;){int w=SDL_min(8192,(int)right-x);SBGlyphTexture *image=glyph_texture(text,line,x,y,w,h);if(!image)break;
+                nk_draw_list_add_image(list,nk_image_ptr(image->texture),nk_rect(command->x+x/density,baseline+y/density,w/density,h/density),command->foreground);x+=w;}
+            y+=h;
+        }
     }
-    if (!entry) {
-        /* All textures referenced by this frame stay alive until conversion draws them. */
-        for (unsigned i=0;i<SB_TEXT_CACHE_ENTRIES;++i)
-            if (!text->cache[i].texture) { entry=&text->cache[i]; break; }
-        if (!entry) return;
-        SBFontRuns runs; SBFontRun run; int measured=0,ascent=0,descent=0,total=0;
-        if (!runs_init(&runs,face,command->string,length)) return;
-        while (run_next(&runs,&run)) {
-            int w=0,h=0; if (!TTF_GetStringSize(run.font,command->string+run.start,run.end-run.start,&w,&h)) return;
-            if (measured<maximum) measured=SDL_min(maximum,measured+w);
-            total+=w;
-            ascent=SDL_max(ascent,TTF_GetFontAscent(run.font)); descent=SDL_max(descent,-TTF_GetFontDescent(run.font));
-        }
-        if (measured<=0 || ascent+descent<=0) return;
-        /* Match SDL_ttf's raster format; avoid an extra channel conversion. */
-        SDL_Surface *surface=SDL_CreateSurface(measured,ascent+descent,SDL_PIXELFORMAT_ARGB8888);
-        if (!surface) return;
-        if (!SDL_ClearSurface(surface,0,0,0,0)) { SDL_DestroySurface(surface); return; }
-        runs_init(&runs,face,command->string,length); int x=0;
-        bool tile=offset>0 || total>maximum;
-        if(tile && !text->surface_engine)text->surface_engine=TTF_CreateSurfaceTextEngine();
-        if(tile && !text->surface_engine){SDL_DestroySurface(surface);return;}
-        while ((tile ? x<offset+maximum : x<maximum) && run_next(&runs,&run)) {
-            int w=0,h=0; size_t fitting=0,run_length=run.end-run.start;
-            if(tile){
-                if(!TTF_GetStringSize(run.font,command->string+run.start,run_length,&w,&h)){SDL_DestroySurface(surface);return;}
-                if(x+w>offset){
-                    /* Shape the complete run, then paint just its visible tile. */
-                    TTF_Text *shaped=TTF_CreateText(text->surface_engine,run.font,command->string+run.start,run_length);
-                    bool drawn=shaped && TTF_SetTextColor(shaped,255,255,255,255) && TTF_DrawSurfaceText(shaped,x-offset,ascent-TTF_GetFontAscent(run.font),surface);
-                    TTF_DestroyText(shaped);
-                    if(!drawn){SDL_DestroySurface(surface);return;}
-                }
-                x+=w;continue;
-            }
-            if (!TTF_MeasureString(run.font,command->string+run.start,run_length,maximum-x,&w,&fitting)) { SDL_DestroySurface(surface); return; }
-            if (!fitting) break;
-            SDL_Surface *piece=TTF_RenderText_Blended(run.font,command->string+run.start,fitting,(SDL_Color){255,255,255,255});
-            if (!piece) { SDL_DestroySurface(surface); return; }
-            SDL_Rect destination={x,ascent-TTF_GetFontAscent(run.font),piece->w,piece->h};
-            /* Preserve straight alpha; the final texture draw blends exactly once. */
-            bool copied=SDL_SetSurfaceBlendMode(piece,SDL_BLENDMODE_NONE) && SDL_BlitSurface(piece,NULL,surface,&destination);
-            if (!copied) { SDL_DestroySurface(piece); SDL_DestroySurface(surface); return; }
-            SDL_DestroySurface(piece); x+=w;
-            if (fitting<run_length) break;
-        }
-        if(tile){
-            /* Surface compositing produces premultiplied RGB. Textures below
-               blend straight alpha, including any color glyphs. */
-            for(int y=0;y<surface->h;++y){Uint32 *pixels=(Uint32 *)((Uint8 *)surface->pixels+y*surface->pitch);
-                for(int i=0;i<surface->w;++i){Uint32 p=pixels[i],a=p>>24;if(a && a<255){
-                    Uint32 r=SDL_min(255,(((p>>16)&255)*255+a/2)/a),g=SDL_min(255,(((p>>8)&255)*255+a/2)/a),b=SDL_min(255,((p&255)*255+a/2)/a);
-                    pixels[i]=(a<<24)|(r<<16)|(g<<8)|b;
-                }}
-            }
-        }
-        entry->text=malloc((size_t)command->length);
-        if (entry->text) entry->texture=SDL_CreateTextureFromSurface(text->renderer,surface);
-        if (!entry->text || !entry->texture) {
-            SDL_DestroySurface(surface); free(entry->text); memset(entry,0,sizeof(*entry)); return;
-        }
-        memcpy(entry->text,command->string,(size_t)command->length);
-        entry->length=(size_t)command->length; entry->face=face_number; entry->maximum=maximum;entry->offset=offset;
-        entry->width=surface->w; entry->height=surface->h;
-        entry->bytes=(size_t)surface->w*(size_t)surface->h*4+entry->length;
-        text->bytes+=entry->bytes;
-        SDL_DestroySurface(surface);
-        SDL_SetTextureBlendMode(entry->texture,SDL_BLENDMODE_BLEND);
-        SDL_SetTextureScaleMode(entry->texture,SDL_SCALEMODE_LINEAR);
-    }
-    entry->stamp=text->frame;
-    rect.x+=entry->offset/text->density;
-    rect.w=entry->width/text->density; rect.h=entry->height/text->density;
-    nk_draw_list_add_image(list,nk_image_ptr(entry->texture),rect,command->foreground);
+    plain_free(&scratch);
 }
 void sb_ui_text_frame_end(SBUi *ui) {
     SBTextSystem *text=ui->text; if (!text) return;
-    /* Release unused entries promptly; no draw command still references them here. */
-    for (unsigned i=0;i<SB_TEXT_CACHE_ENTRIES;++i)
-        if (text->cache[i].texture && text->cache[i].stamp!=text->frame) cache_free(text,&text->cache[i]);
-    if (text->bytes>SB_TEXT_CACHE_BYTES)
-        for (unsigned i=0;i<SB_TEXT_CACHE_ENTRIES;++i) cache_free(text,&text->cache[i]);
     if(text->glyph_bytes>SB_GLYPH_BYTES)for(unsigned i=0;i<SB_GLYPH_BUCKETS;++i){SBGlyphTexture **at=&text->glyphs[i];while(*at){SBGlyphTexture *e=*at;if(e->stamp<text->frame || text->glyph_bytes>SB_GLYPH_BYTES){*at=e->next;text->glyph_bytes-=e->bytes;SDL_DestroyTexture(e->texture);free(e->signature);free(e);}else at=&e->next;}}
     ++text->frame;
 }

@@ -7900,6 +7900,10 @@ nk_text_clamp(const struct nk_user_font *font, const char *text,
     int text_len, float space, int *glyphs, float *text_width,
     nk_rune *sep_list, int sep_count)
 {
+#ifdef NK_TEXT_CLAMP_CUSTOM
+    int custom = NK_TEXT_CLAMP_CUSTOM(font,text,text_len,space,glyphs,text_width,sep_list,sep_count);
+    if (custom >= 0) return custom;
+#endif
     int i = 0;
     int glyph_len = 0;
     float last_width = 0;
