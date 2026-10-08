@@ -35,6 +35,19 @@ static int vertical(SBUi *ui){
     edit.cursor=edit.select_start=edit.select_end=6;edit.visual_valid=0;multi(ui,&edit,NK_KEY_RIGHT,true);multi(ui,&edit,NK_KEY_RIGHT,false);CHECK(edit.cursor==8);CHECK((size_t)nk_str_len_char(&edit.string)==strlen(source) && !memcmp(nk_str_get_const(&edit.string),source,strlen(source)));
     sb_caret_plan_free(&carets);sb_shape_line_free(&line);sb_shape_paragraph_free(p);sb_bidi_paragraph_free(bidi);nk_textedit_free(&edit);return 0;
 }
+static int native_scroll(SBUi *ui){
+    char source[1000]={0};for(unsigned i=0;i<30;++i)strcat(source,"AV ffi\r\nאבג\n\n");
+    struct nk_text_edit edit;nk_textedit_init_default(&edit);edit.mode=NK_TEXT_EDIT_MODE_INSERT;CHECK(nk_textedit_paste(&edit,source,(int)strlen(source)));edit.cursor=edit.select_start=edit.select_end=1;
+    multi(ui,&edit,NK_KEY_NONE,false);SBNativeText before={0},after={0};CHECK(sb_ui_edit_native(ui,&edit,&before));
+    size_t bytes=0;bool crlf=false,rtl=false;for(size_t i=0;i<before.count;++i){SBNativeTextRun *r=&before.runs[i];CHECK(r->geometry && r->span.offset==bytes);crlf|=r->span.length>=2 && !memcmp(source+r->span.offset+r->span.length-2,"\r\n",2);rtl|=(r->level&1)!=0;bytes+=r->span.length;}
+    CHECK(bytes==strlen(source) && crlf && rtl && !before.runs[before.count-1].characters);
+    float old_x=edit.scrollbar.x,old_y=edit.scrollbar.y;edit.scrollbar=nk_vec2(37.25f,73.5f);multi(ui,&edit,NK_KEY_NONE,false);CHECK(sb_ui_edit_native(ui,&edit,&after));CHECK(before.count==after.count && edit.scrollbar.x>0 && edit.scrollbar.y>0);
+    for(size_t i=0;i<before.count;++i){SBNativeTextRun a=before.runs[i],b=after.runs[i];CHECK(a.span.offset==b.span.offset && a.span.length==b.span.length && a.characters==b.characters);
+        CHECK(fabsf(b.x-a.x+edit.scrollbar.x-old_x)<0.01f && fabsf(b.y-a.y+edit.scrollbar.y-old_y)<0.01f);
+        CHECK(a.width==b.width && a.height==b.height && a.level==b.level && !memcmp(a.positions,b.positions,a.characters*sizeof(float)) && !memcmp(a.widths,b.widths,a.characters*sizeof(float)));}
+    CHECK(after.runs[0].y<field.y); /* Offscreen source remains available to native text navigation. */
+    sb_native_text_free(&before);sb_native_text_free(&after);nk_textedit_free(&edit);return 0;
+}
 typedef struct {SBCaret before,after;bool valid;} AffinityProbe;
 static bool inspect_affinity(void *user,const char *source,size_t length,size_t offset,const SBShapedLine *line,const SBCaretPlan *carets,float y){AffinityProbe *p=user;(void)source;(void)length;(void)offset;(void)y;p->valid=sb_caret_find(carets,3,SB_CARET_BEFORE,line->base_level,&p->before) && sb_caret_find(carets,3,SB_CARET_AFTER,line->base_level,&p->after);return p->valid;}
 static int font_affinity(SBUi *ui){const char *source="AB אב CD";struct nk_text_edit edit;nk_textedit_init_default(&edit);edit.mode=NK_TEXT_EDIT_MODE_INSERT;CHECK(nk_textedit_paste(&edit,source,(int)strlen(source)));edit.cursor=edit.select_start=edit.select_end=3;actual(ui,&edit);AffinityProbe old={0};CHECK(sb_ui_edit_geometry(ui,&edit,&ui->normal->handle,70,false,inspect_affinity,&old));CHECK(old.valid && old.before.x>old.after.x);edit.visual_valid=1;edit.visual_cursor=3;edit.visual_hash=sb_hash(source,strlen(source));edit.visual_affinity=old.before.affinity;edit.visual_level=old.before.level;edit.visual_x=old.before.x;actual(ui,&edit);CHECK(sb_ui_fonts(ui,1.5f).code==SB_OK);actual(ui,&edit);AffinityProbe resized={0};CHECK(sb_ui_edit_geometry(ui,&edit,&ui->normal->handle,70,false,inspect_affinity,&resized));CHECK(resized.valid && fabsf(edit.caret_bounds.x-field.x-resized.before.x/ui->density)<0.01f && resized.before.x>resized.after.x);CHECK(edit.cursor==3);nk_textedit_free(&edit);return 0;}
@@ -45,6 +58,13 @@ int main(int argc,char **argv){CHECK(argc==3);SBUi ui;CHECK(sb_ui_init(&ui,argv[
         for(unsigned i=0;i<8;++i){size_t n=strlen(parts[i]);TTF_Font *font=i==0 || i==2 ? latin : i<5 ? hebrew : i<7 ? arabic : emoji;uint32_t script=i==0 ? TAG('L','a','t','n') : i<5 ? TAG('H','e','b','r') : TAG('A','r','a','b');fonts[i]=(SBShapeFontSpan){length,n,font,script};memcpy(source+length,parts[i],n);length+=n;}source[length]=0;
         SBTextParagraph *bidi=NULL;SBShapeParagraph *paragraph=NULL;SBShapedLine line={0};SBCaretPlan carets={0};CHECK(sb_bidi_paragraph_create(source,length,SB_BIDI_AUTO_LTR,&bidi).code==SB_OK);CHECK(sb_shape_paragraph_create(bidi,fonts,8,&paragraph).code==SB_OK);CHECK(sb_shape_paragraph_line(paragraph,0,length,&line).code==SB_OK);CHECK(sb_caret_plan(paragraph,&line,&carets).code==SB_OK);
         struct nk_text_edit edit;nk_textedit_init_default(&edit);edit.mode=NK_TEXT_EDIT_MODE_INSERT;CHECK(nk_textedit_paste(&edit,source,(int)length));actual(&ui,&edit);
+        SBNativeText native={0};CHECK(sb_ui_edit_native(&ui,&edit,&native));size_t units=0;
+        for(size_t r=0;r<native.count;++r){SBNativeTextRun *run=&native.runs[r];CHECK(run->geometry);size_t byte=run->span.offset;
+            for(size_t j=0;j<run->characters;++j){const SBCaretCluster *expected=NULL;for(size_t k=0;k<carets.cluster_count;++k)if(carets.clusters[k].byte==byte)expected=&carets.clusters[k];CHECK(expected!=NULL);
+                float x=(run->level&1) ? run->x+run->width-run->positions[j]-run->widths[j] : run->x+run->positions[j];
+                CHECK(fabsf(x-field.x-expected->left/ui.density)<0.01f && fabsf(run->widths[j]-(expected->right-expected->left)/ui.density)<0.01f);
+                CHECK((run->level&1)==(expected->level&1));byte+=run->lengths[j];++units;}}
+        CHECK(units==carets.cluster_count);sb_native_text_free(&native);
         Probe probe={.reference=&line,.valid=true};CHECK(sb_ui_edit_geometry(&ui,&edit,base,70,false,inspect,&probe));CHECK(probe.valid && probe.lines==1);
         for(unsigned selected=0;selected<2;++selected){size_t a=selected ? strlen(parts[0]) : 0,b=selected ? a+5 : 0;edit.select_start=(int)nk_utf_len(source,(int)a);edit.select_end=edit.cursor=(int)nk_utf_len(source,(int)b);uint64_t expected=reference(&ui,&line,&carets,a,b),observed=actual(&ui,&edit);CHECK(expected && expected==observed);}
         edit.cursor=edit.select_start=edit.select_end=4;actual(&ui,&edit);SBCaret expected;CHECK(sb_caret_find(&carets,4,SB_CARET_BOTH,0,&expected));CHECK(fabsf(edit.caret_bounds.x-field.x-expected.x/ui.density)<0.01f);
@@ -58,5 +78,5 @@ int main(int argc,char **argv){CHECK(argc==3);SBUi ui;CHECK(sb_ui_init(&ui,argv[
         key(&ui,&edit,NK_KEY_LEFT,false);CHECK(edit.cursor==hebrew_start+1);CHECK((size_t)nk_str_len_char(&edit.string)==length && !memcmp(nk_str_get_const(&edit.string),source,length));
         actual(&ui,&edit);if(scale==2)CHECK(sb_ui_capture(&ui,argv[2]).code==SB_OK);
         nk_textedit_free(&edit);sb_caret_plan_free(&carets);sb_shape_line_free(&line);sb_shape_paragraph_free(paragraph);sb_bidi_paragraph_free(bidi);
-    }CHECK(!vertical(&ui));CHECK(!font_affinity(&ui));sb_ui_shutdown(&ui);printf("%u integrated field glyph/pixel/ligature/bidi assertions passed.\n",checks);return 0;
+    }CHECK(!vertical(&ui));CHECK(!native_scroll(&ui));CHECK(!font_affinity(&ui));sb_ui_shutdown(&ui);printf("%u integrated field glyph/pixel/ligature/bidi/native-scroll assertions passed.\n",checks);return 0;
 }

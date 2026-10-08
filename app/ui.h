@@ -20,6 +20,7 @@
 #include "inline.h"
 #include "shaped.h"
 #include "carets.h"
+#include "native_text.h"
 
 void sb_ui_grapheme_clamp(struct nk_text_edit *edit);
 typedef struct SBTextSystem SBTextSystem;
@@ -46,6 +47,7 @@ typedef struct {
     struct nk_vec2 input_scrollbar;
     SBComposition *composition;
     SBEditCache *edit_cache;
+    struct {struct nk_text_edit *edit;const struct nk_user_font *font;uint64_t hash;float row;struct nk_rect area,clip;struct nk_vec2 scroll;} edit_paint;
     SBStatus input_status;
     bool pointer_text;
     struct nk_context *ctx;
@@ -106,5 +108,7 @@ typedef bool (*SBEditGeometryVisitor)(void *user,const char *source,size_t lengt
     size_t offset,const SBShapedLine *line,const SBCaretPlan *carets,float y);
 bool sb_ui_edit_geometry(SBUi *ui,struct nk_text_edit *edit,const struct nk_user_font *font,
     float row,bool display,SBEditGeometryVisitor visitor,void *user);
+/* Original-source native units of the most recently painted matching edit. */
+bool sb_ui_edit_native(SBUi *ui,struct nk_text_edit *edit,SBNativeText *out);
 
 #endif

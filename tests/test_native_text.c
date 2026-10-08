@@ -3,12 +3,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 static unsigned checks;
 #define CHECK(x) do{++checks;if(!(x)){fprintf(stderr,"NATIVE TEXT %d: %s\n",__LINE__,#x);return 1;}}while(0)
 #define OK(x) CHECK((x).code==SB_OK)
 static char *tree(SBAccessibility *a){accesskit_tree_update *t=sb_accessibility_tree(a);char *s=accesskit_tree_update_debug(t);accesskit_tree_update_free(t);return s;}
 static size_t children(const char *s,accesskit_node_id *nodes,size_t capacity){const char *p=strstr(s,"role: MultilineTextInput");if(!p)return 0;p=strstr(p,"children: [");if(!p)return 0;p+=11;size_t n=0;while(*p!=']' && *p){if(*p=='#'){CHECK(n<capacity);nodes[n++]=strtoull(p+1,(char **)&p,10);}else ++p;}return n;}
+static int geometry(void){
+ const char *source="abאב\r\n";SBNativeCharBox boxes[]={{0,1,10,20,5,20,0},{1,1,15,20,5,20,0},{2,2,30,20,5,20,1},{4,2,25,20,5,20,1},{6,2,25,20,0,20,1},{8,0,10,40,0,20,0}};SBNativeText p={0};
+ OK(sb_native_text_geometry(source,8,NULL,0,boxes,6,&p));CHECK(p.count==3 && !p.scalar_fallback);
+ CHECK(p.runs[0].x==10 && p.runs[0].width==10 && p.runs[0].positions[0]==0 && p.runs[0].positions[1]==5);
+ CHECK(p.runs[1].level==1 && p.runs[1].x==25 && p.runs[1].width==10 && p.runs[1].positions[0]==0 && p.runs[1].positions[1]==5 && p.runs[1].lengths[2]==2);
+ CHECK(p.runs[2].geometry && !p.runs[2].characters && p.runs[2].y==40 && p.runs[2].height==20);sb_native_text_free(&p);
+ boxes[1].x=22;OK(sb_native_text_geometry(source,8,NULL,0,boxes,6,&p));CHECK(p.count==4 && p.runs[1].span.offset==1);sb_native_text_free(&p);boxes[1].x=15;
+ CHECK(sb_native_text_geometry(source,8,NULL,0,boxes,3,&p).code==SB_INVALID && !p.runs);
+ boxes[1].byte=2;CHECK(sb_native_text_geometry(source,8,NULL,0,boxes,6,&p).code==SB_INVALID && !p.runs);boxes[1].byte=1;
+ boxes[1].width=-1;CHECK(sb_native_text_geometry(source,8,NULL,0,boxes,6,&p).code==SB_INVALID && !p.runs);boxes[1].width=5;
+ boxes[1].x=NAN;CHECK(sb_native_text_geometry(source,8,NULL,0,boxes,6,&p).code==SB_INVALID && !p.runs);boxes[1].x=15;
+ boxes[5].height=0;CHECK(sb_native_text_geometry(source,8,NULL,0,boxes,6,&p).code==SB_INVALID && !p.runs);boxes[5].height=20;
+ CHECK(sb_native_text_geometry(source,8,NULL,0,NULL,0,&p).code==SB_INVALID && !p.runs);
+ CHECK(sb_native_text_geometry("",0,NULL,0,boxes+5,1,&p).code==SB_INVALID && !p.runs);
+ boxes[5].byte=0;OK(sb_native_text_geometry("",0,NULL,0,boxes+5,1,&p));CHECK(p.count==1 && p.runs[0].geometry && !p.runs[0].characters);
+ sb_native_text_free(&p);return 0;
+}
 int main(int argc,char **argv){CHECK(argc==2);char source[2500];memset(source,'a',300);strcpy(source+300," é 👩‍👩‍👧‍👦 can't 3,456.7 τέλος\r\nabc");
+ CHECK(!geometry());
  SBTextSpan styles[]={{0,300,SB_TEXT_BOLD},{300,strlen(source)-300,SB_TEXT_ITALIC}};
  SBNativeText text={0};OK(sb_native_text(source,strlen(source),styles,2,&text));CHECK(text.count>=4 && !text.scalar_fallback);
  size_t bytes=0,scalars=0;bool accent=false,emoji=false,crlf=false;

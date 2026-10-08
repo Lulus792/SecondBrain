@@ -91,10 +91,23 @@ Intel/macOS-Paket und Installation bestehen: 126 Desktop-, 158 Tastatur-,
 Neue CI 37804528961 auf e6739d7 zuletzt queued, weitere Zielsysteme offen. Glyphenrechtecke
 und Sonderfall sehr langer nativer Grapheme bleiben offen.
 
+## Native Editorrechtecke (0.9.42)
+
+Zeichenflächen und Richtung folgen dem tatsächlich gezeichneten Editorplan
+einschließlich Scrollposition. Ein bestätigter Retina-Faktor-zwei-Fehler
+in der nativen Abbildung ist durch die Fenstertransformation korrigiert.
+68/68 lokale Release-Prüfungen (535,28 s), 405 native Text-, 667 Editor- und
+590 Adapter-/Providerprüfungen bestehen, dieselben drei Prüfer auch unter
+haltendem ASan/UBSan. Build ohne Tests besteht.
+[Vertrag](../../docs/NATIVE_TEXTGEOMETRIE.md), Scope und Nachweise in STATUS.
+Paket/neue Zielplattformprüfung folgen; installiert bleibt vorerst 0.9.41.
+Andere Felder/Leseansicht und Metadaten-Wiederverwendung bleiben weitere
+Integrationen. Reale assistive/IME-/HiDPI-Abnahme bleibt offen.
+
 ## Nächste Arbeiten
 
 Erstes Layout langer Dokumente weiter optimieren. Native Zeichenrechtecke
-an tatsächliche Glyphen-/Zeilenpläne anbinden; native Wort-/Unicode-Bedienung
+für andere Felder und die Leseansicht anbinden; unveränderte Geometriemetadaten wiederverwenden; native Wort-/Unicode-Bedienung
 und reale Eingabemethoden prüfen. Weitere offene Release-Arbeiten: menschliche
 VoiceOver/NVDA/Orca-, Dialog-, Geräte-, Mehrmonitor-/Langzeitabnahme; volle
 Windows-/Linux-Zielvolumes und physische Persistenz; frische Rechner und

@@ -14,6 +14,7 @@ typedef struct {
     uint64_t order;
     size_t row,column,rows,columns;
     const SBTextSpan *styles; size_t style_count; float font_size;
+    const SBNativeText *native_text;
 } SBAccessibleItem;
 typedef struct {
     char id[100]; accesskit_action action;

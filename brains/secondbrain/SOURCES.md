@@ -149,3 +149,6 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 
 - [Native Textläufe](../../docs/NATIVE_TEXTLAEUFE.md): begrenzte Graphem-/
   Wortmetadaten, Quellenpositionen, Cache-/Abbruchvertrag und weitere Geometriearbeit.
+
+- [Native Editorrechtecke](../../docs/NATIVE_TEXTGEOMETRIE.md): tatsächlicher
+  Glyphen-/Cursorplan, Scrollen, Bidi, native Retina-Koordinaten und Grenzen ab42.

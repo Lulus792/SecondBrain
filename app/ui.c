@@ -142,6 +142,22 @@ bool sb_ui_edit_geometry(SBUi *ui,struct nk_text_edit *edit,const struct nk_user
     for(size_t i=0;i<plan->count;++i){SBEditLine *line=&plan->lines[i];if(!visitor(user,plan->text+line->byte,line->length,line->byte,&line->shape,&line->carets,i*plan->row))return false;}
     return true;
 }
+bool sb_ui_edit_native(SBUi *ui,struct nk_text_edit *edit,SBNativeText *out){
+    if(!ui || !edit || !out || ui->edit_paint.edit!=edit)return false;
+    SBEditPlan *p=edit_plan(edit,ui->edit_paint.font,ui->edit_paint.row);if(!p || p->hash!=ui->edit_paint.hash)return false;
+    SBNativeCharBox *boxes=NULL;size_t count=0,capacity=0;bool ok=true;
+    for(size_t i=0;i<p->count && ok;++i){SBEditLine *l=&p->lines[i];
+        float x=ui->edit_paint.area.x-ui->edit_paint.scroll.x,y=ui->edit_paint.area.y+i*p->row-ui->edit_paint.scroll.y;
+        size_t extra=l->carets.cluster_count+(l->next>l->last || !l->length ? 1 : 0);
+        if(count+extra>capacity){size_t next=capacity ? capacity*2 : 32;if(next<count+extra)next=count+extra;SBNativeCharBox *grown=realloc(boxes,next*sizeof(*grown));if(!grown){ok=false;break;}boxes=grown;capacity=next;}
+        for(size_t j=0;j<l->carets.cluster_count;++j){SBCaretCluster c=l->carets.clusters[j];boxes[count++]=(SBNativeCharBox){l->byte+c.byte,c.length,x+c.left/ui->density,y,(c.right-c.left)/ui->density,p->row,c.level};}
+        if(l->next>l->last || !l->length){SBCaret c;size_t n=p->bytes[l->next]-p->bytes[l->last];
+            if(!sb_caret_find(&l->carets,l->length,SB_CARET_AFTER,l->shape.base_level,&c)){ok=false;break;}
+            boxes[count++]=(SBNativeCharBox){l->byte+l->length,n,x+c.x/ui->density,y,0,p->row,l->shape.base_level};}
+    }
+    if(ok)ok=sb_native_text_geometry(p->text,p->length,NULL,0,boxes,count,out).code==SB_OK;
+    free(boxes);return ok;
+}
 
 
 /* Fit actual shaped advances and never split a displayed grapheme. The

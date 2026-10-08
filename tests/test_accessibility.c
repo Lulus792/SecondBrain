@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 static char opened_url[SB_PATH_CAP];
 static unsigned opened_urls;
 static bool capture_url(const char *url) {
@@ -14,6 +15,26 @@ static bool capture_url(const char *url) {
 #include <objc/runtime.h>
 #include <objc/message.h>
 #include <dlfcn.h>
+typedef struct {double x,y;} TextPoint;
+typedef struct {double width,height;} TextSize;
+typedef struct {TextPoint origin;TextSize size;} TextRect;
+typedef struct {size_t location,length;} TextRange;
+static TextRect native_text_rect(void *node,TextRange range){TextRect rect={0};
+#if defined(__x86_64__)
+    ((void(*)(TextRect *,void *,SEL,TextRange))objc_msgSend_stret)(&rect,node,sel_registerName("accessibilityFrameForRange:"),range);
+#else
+    rect=((TextRect(*)(void *,SEL,TextRange))objc_msgSend)(node,sel_registerName("accessibilityFrameForRange:"),range);
+#endif
+    return rect;
+}
+static TextRect native_frame(void *node){TextRect rect={0};
+#if defined(__x86_64__)
+    ((void(*)(TextRect *,void *,SEL))objc_msgSend_stret)(&rect,node,sel_registerName("accessibilityFrame"));
+#else
+    rect=((TextRect(*)(void *,SEL))objc_msgSend)(node,sel_registerName("accessibilityFrame"));
+#endif
+    return rect;
+}
 static void *send(void *object,const char *selector) {
     SEL method=sel_registerName(selector);
     if (!object || !((BOOL(*)(void *,SEL,SEL))objc_msgSend)(object,sel_registerName("respondsToSelector:"),method)) return NULL;
@@ -130,6 +151,13 @@ int main(int argc,char **argv) {
     ((void(*)(void *,SEL,NativeRange))objc_msgSend)(editor,sel_registerName("setAccessibilitySelectedTextRange:"),(NativeRange){250,65});frame(&d);frame(&d);
     CHECK(d.text_edit.select_start==250 && d.text_edit.select_end==311);
     selected=utf8(send(editor,"accessibilitySelectedText"));CHECK(selected && strlen(selected)==80 && !memcmp(selected,native_long+250,80));
+    TextRect native_box=native_text_rect(editor,(TextRange){316,1});float expected_width=0,expected_height=0,expected_x=0,expected_y=0;
+    for(size_t i=0;i<d.native_editor.count;++i){SBNativeTextRun *r=&d.native_editor.runs[i];for(size_t j=0;j<r->characters;++j)if(r->scalars[j]==312){expected_width=r->widths[j];expected_height=r->height;expected_x=(r->level&1) ? r->x+r->width-r->positions[j]-r->widths[j] : r->x+r->positions[j];expected_y=r->y;}}
+    CHECK(expected_width>0 && fabs(native_box.size.width-expected_width)<0.1 && fabs(native_box.size.height-expected_height)<0.1);
+    TextRect native_editor_frame=native_frame(editor);struct nk_rect editor_bounds={0};for(size_t i=0;i<d.target_count;++i)if(!strcmp(d.targets[i].id,"editor"))editor_bounds=d.targets[i].bounds;
+    CHECK(editor_bounds.w>0 && fabs(native_editor_frame.size.width-editor_bounds.w)<0.1 && fabs(native_editor_frame.size.height-editor_bounds.h)<0.1);
+    CHECK(fabs(native_box.origin.x-(native_editor_frame.origin.x+expected_x-editor_bounds.x))<0.1);
+    CHECK(fabs(native_box.origin.y-(native_editor_frame.origin.y+editor_bounds.h-(expected_y-editor_bounds.y)-expected_height))<0.1);
     ((void(*)(void *,SEL,void *))objc_msgSend)(editor,sel_registerName("setAccessibilityValue:"),string("# Native Notiz\n\nÜber den Provider bearbeitet.\n")); frame(&d); frame(&d);
     ((void(*)(void *,SEL))objc_msgSend)(save,sel_registerName("accessibilityPerformPress")); frame(&d); frame(&d); CHECK(!sb_app_dirty(&d.model));
     /* Native callback is queued; changing document before consumption must reject it. */

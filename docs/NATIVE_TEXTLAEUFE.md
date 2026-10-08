@@ -41,10 +41,10 @@ Leerzeichen einschließen. Die Metadaten vereinheitlichen die tatsächlichen
 Wortanfänge; sie behaupten keine sprachabhängig identischen Wortbefehle aller
 Screenreader. Wörterbuchanalyse bleibt außerhalb dieses Umfangs.
 
-Zeichenpositionen, Zeichenbreiten und genaue Glyphenrechtecke sind noch nicht
-angebunden. Die Laufrechtecke verwenden vorerst die vorhandene Elementfläche.
-Die hier geprüfte Auswahl- und Wortabbildung ist die Grundlage der weiteren
-Geometriearbeit, kein abgeschlossener Screenreader-/Vergrößerungstest.
+Ab 0.9.42 veröffentlicht der Notizeditor [Zeichenpositionen und Breiten](NATIVE_TEXTGEOMETRIE.md)
+aus seinem tatsächlichen Glyphen-/Cursorplan. Andere Felder und Leseblöcke
+verwenden weiterhin die vorhandene Elementfläche. Die Auswahl- und
+Wortabbildung ist kein abgeschlossener Screenreader-/Vergrößerungstest.
 
 Primärvertrag: AccessKit 0.25.1, `Node::character_lengths`, `word_starts` und
 `character_positions`, lokale festgelegte Bibliotheksquelle am 8. Oktober gelesen:

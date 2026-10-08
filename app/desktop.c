@@ -567,6 +567,7 @@ void sb_desktop_free(SBDesktop *d) {
     sb_backup_job_free(d->backup);
     sb_dialogs_free(d->dialogs);
     if (d->text_edit_ready) nk_textedit_free(&d->text_edit);
+    sb_native_text_free(&d->native_editor);
     free(d->targets); passive_clear(d); free(d->passive);
     sb_graph_free(&d->graph); sb_notes_free(&d->graph_notes); free(d->graph_ids);
     sb_notes_free(&d->hits); free(d->context); free(d->notice); sb_app_free(&d->model);
@@ -835,6 +836,7 @@ static void accessible_publish(SBDesktop *d) {
         if (t->kind==SB_FOCUS_TEXT) {
             size_t capacity=0; v->value=!strcmp(t->id,"editor") ? d->model.editor : accessible_field(d,t->id,&capacity); v->editable=true;
             if (!strcmp(t->id,"editor") && d->text_edit_ready) { v->anchor=(size_t)d->text_edit.select_start; v->caret=(size_t)d->text_edit.select_end; }
+            if(!strcmp(t->id,"editor") && d->native_editor.count)v->native_text=&d->native_editor;
         } else if (t->kind==SB_FOCUS_READER) v->value=d->form==SB_FORM_NOTICE_TEXT ? d->notice : d->form==SB_FORM_CONTEXT ? d->context : d->model.source ? d->model.source : d->model.editor;
         if (!strcmp(t->id,"galaxy")) v->label="Dokumente in der Sternkarte";
         v->order=((uint64_t)t->group<<32)|t->order;
@@ -1805,6 +1807,7 @@ static void detail(SBDesktop *d, float x, float y, float width, float height, nk
             if (d->focus_editor) { nk_edit_focus(ctx,NK_EDIT_ALWAYS_INSERT_MODE); d->focus_editor=false; }
             nk_uint scroll=(nk_uint)roundf(d->text_edit.scrollbar.y); smooth_scroll(d,1,&scroll); d->text_edit.scrollbar.y=d->scrolling[1].position;
             nk_edit_buffer(ctx,NK_EDIT_BOX,&d->text_edit,nk_filter_default);
+            sb_ui_edit_native(&d->ui,&d->text_edit,&d->native_editor);
             if (d->text_edit.scrollbar.y+0.5f < d->scrolling[1].applied) {
                 d->scrolling[1].maximum=d->text_edit.scrollbar.y; d->scrolling[1].measured=true;
             }
@@ -2343,6 +2346,7 @@ static void welcome(SBDesktop *d,int width,int height,nk_flags flags) {
     nk_end(ctx);
 }
 void sb_desktop_frame(SBDesktop *d) {
+    sb_native_text_free(&d->native_editor);
     if (d->reveal_document[0] && (d->reveal_document_context!=accessible_context(d) ||
         (!modal_reader(d) && (!d->card || (d->editing && !d->model.source))))) d->reveal_document[0]=0;
     int width, height; SDL_GetWindowSize(d->ui.window,&width,&height);

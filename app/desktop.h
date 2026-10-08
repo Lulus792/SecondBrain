@@ -90,6 +90,7 @@ typedef struct {
     bool graph_stale;
     SBStatus graph_status;
     struct nk_text_edit text_edit;
+    SBNativeText native_editor;
     bool text_edit_ready;
     char graph_project[SB_PATH_CAP];
     bool graph_dirty, card, browser, solid, reduced_motion, focus_changed, keyboard, dragging, moved;

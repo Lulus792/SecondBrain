@@ -3017,3 +3017,48 @@ Quellstand e6739d7 normal nach origin gepusht. Neue
 zuletzt queued; für diesen Schritt kein neuer Gesamt-Plattformnachweis.
 Weitere Textgeometrie/assistive Abnahme, kalter langer Wechsel und alle
 übrigen Release-Arbeiten bleiben offen. 1.0 nur nach Nutzerfreigabe.
+
+## Native Editorrechtecke und Retina-Koordinaten (0.9.42)
+
+Der Notizeditor übernimmt Zeichenflächen, Schreibrichtung und Zeilenhöhe
+aus seinem tatsächlich gezeichneten Glyphen-/Cursorplan; beide Scrollwerte
+werden berücksichtigt. Normale Grapheme, CRLF, Quellenabdeckung und der leere
+Schlussabsatz bleiben erhalten. Nicht benachbarte visuelle Bereiche werden
+in getrennte Läufe aufgeteilt. IME-Komposition und native skalare Teilstücke
+sehr langer Grapheme erhalten keine unzutreffende genaue Quellgeometrie.
+[Vertrag und Grenzen](NATIVE_TEXTGEOMETRIE.md).
+
+Die echte Mac-Abfrage fand zunächst halbe Zeichenbreite/-höhe auf Retina:
+AccessKit erwartet physische Pixel, die UI verwendet Fensterkoordinaten.
+Die Transformation am Fensterknoten berücksichtigt die SDL-Pixeldichte auf
+macOS/Windows und invalidiert die Momentaufnahme bei Dichteänderungen.
+Die echte Mac-Abfrage besteht anschließend für Breite, Höhe, Bildschirmposition
+und den Editorrahmen. Der Unix-Fensterweg bleibt unverändert; reale HiDPI-
+Abnahme unter X11/Wayland bleibt gesondert offen. Pinned AccessKit-Quellen
+für Transform, CharacterPositions und Mac-Umrechnung lokal gelesen.
+
+**68/68 lokale Release-Prüfungen bestehen (535,28 s, CTest -j4)**.
+405 native Lauf-/Wort-/Geometrie-/Fehlerprüfungen, 667 unabhängige
+Editor-Glyphen-/Pixel-/Bidi-/Scrollprüfungen und 590 native Adapter-/
+Providerprüfungen bestehen. **Dieselben drei Prüfer bestehen unter haltendem
+ASan/UBSan ohne Befund**. Instrumentiert: ui/text/space/icons, native_text,
+desktop/accessibility, Caret-/Shape-/Script-/Bidi-Code, Wort-/Graphemkern,
+Bidi-Engine, alle drei Prüfer und SDL_ttf.c samt UI-Hooks. Weitere externe
+Objekte, übriger Kern/Modell-/Dialog-/Sicherungscode und native Rust-Bibliothek
+sind nicht instrumentiert; Mac-Leakprüfung abgeschaltet. Quellhashes aller
+23 erfassten Quellen und UI-Includes stimmen. Build ohne Tests besteht.
+Protokolle: `build/native-geometry-full-ctest.log`,
+`native-geometry-{native,editor,provider}-sanitizer.log`,
+`native-geometry-sanitizers/sources.json`, `native-geometry-no-tests-build.log`.
+
+169 ältere abgeschlossene generierte BMPs verlustfrei komprimiert: entpackte
+SHA-256 und unveränderte Dateistatistik vor jeder Rohdateientfernung geprüft.
+2.416.131.718 Bytes freigegeben; Projektwissen, Pakete und laufende Prüfdaten
+unberührt. Manifeste: `build/native-geometry-completed-bitmap-archive{,-2}.json`.
+
+Genaue native Geometrie anderer Felder und der Leseansicht, Wiederverwendung
+unveränderter Geometriemetadaten, reale assistive/IME-/Geräteprüfungen und
+der kalte lange Dokumentwechsel bleiben offen. Paket und neue Plattform-
+prüfung folgen; installiert bleibt zunächst 0.9.41. Vorherige CI37804528961
+zu e6739d7 am 8. Oktober erneut über GitHub API als queued bestätigt.
+Vollständiger Release-Auftrag aktiv; 1.0 nur nach ausdrücklicher Freigabe.

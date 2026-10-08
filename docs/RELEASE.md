@@ -215,3 +215,12 @@ werden verworfen. [Vertrag und genaue Grenzen](NATIVE_TEXTLAEUFE.md).
 Eine lokale native Mac-Auswahl über Laufgrenzen ist nachgeprüft.
 Glyphenrechtecke, sehr lange native Grapheme und reale assistive/
 sprachabhängige Abnahmen bleiben weitere offene Textaufgaben.
+
+## Native Editorrechtecke vom 8. Oktober
+
+Ab 0.9.42 übernimmt der Notizeditor die tatsächliche Zeichen-/Zeilengeometrie
+einschließlich Bidi und Scrollposition. Die native Fenstertransformation
+korrigiert den auf dem Intel/Retina-Mac bestätigten Skalierungsfehler.
+[Vertrag und Prüfgrenzen](NATIVE_TEXTGEOMETRIE.md). Weitere Felder und die
+Leseansicht, Wiederverwendung unveränderter Geometriemetadaten, neue native
+Zielplattformprüfungen und reale assistive/IME-/HiDPI-Abnahmen bleiben offen.

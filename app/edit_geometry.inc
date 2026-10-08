@@ -7,7 +7,7 @@ typedef struct {char *text;uint32_t *bytes;size_t length,count,capacity,memory;i
 #define SB_EDIT_BUDGET (64u*1024u*1024u)
 struct SBEditCache {SBEditPlan entries[SB_EDIT_WAYS],scratch;size_t bytes;uint64_t stamp;};
 static void edit_plan_free(SBEditPlan *p){for(size_t i=0;i<p->count;++i){sb_shape_line_free(&p->lines[i].shape);sb_caret_plan_free(&p->lines[i].carets);}free(p->lines);free(p->text);free(p->bytes);free(p->words);memset(p,0,sizeof(*p));}
-void sb_ui_edit_cache_clear(SBUi *ui){if(!ui->edit_cache)return;for(unsigned i=0;i<SB_EDIT_WAYS;++i)edit_plan_free(&ui->edit_cache->entries[i]);edit_plan_free(&ui->edit_cache->scratch);free(ui->edit_cache);ui->edit_cache=NULL;}
+void sb_ui_edit_cache_clear(SBUi *ui){ui->edit_paint.edit=NULL;if(!ui->edit_cache)return;for(unsigned i=0;i<SB_EDIT_WAYS;++i)edit_plan_free(&ui->edit_cache->entries[i]);edit_plan_free(&ui->edit_cache->scratch);free(ui->edit_cache);ui->edit_cache=NULL;}
 static void edit_cache_frame_end(SBUi *ui){if(ui->edit_cache)edit_plan_free(&ui->edit_cache->scratch);}
 static int edit_character(const SBEditPlan *p,size_t byte){int lo=0,hi=p->characters;while(lo<hi){int m=lo+(hi-lo)/2;if(p->bytes[m]<byte)lo=m+1;else hi=m;}return lo;}
 static void edit_tabs(SBShapedLine *shape,const char *source){
@@ -174,6 +174,8 @@ static int sb_ui_edit_render(struct nk_command_buffer *out,struct nk_text_edit *
         nk_push_scissor(out,clip);sb_caret_selection_free(&selection);
     }
     edit->caret_bounds=nk_rect(area.x+cursor_x-edit->scrollbar.x,area.y+cursor_y-edit->scrollbar.y+(row-font->height)/2,style->cursor_size,font->height);edit->caret_clip=clip;
+    if(!display){ui->edit_paint.edit=edit;ui->edit_paint.font=font;ui->edit_paint.hash=p->hash;ui->edit_paint.row=p->requested_row;ui->edit_paint.area=area;ui->edit_paint.clip=clip;ui->edit_paint.scroll=edit->scrollbar;}
+    else ui->edit_paint.edit=NULL;
     if(edit->active && first==last && !(flags&NK_EDIT_NO_CURSOR)){
         struct nk_rect r=edit->caret_bounds;
         if(edit->mode==NK_TEXT_EDIT_MODE_REPLACE){SBEditLine *l=&p->lines[cursor_line];size_t byte=p->bytes[NK_CLAMP(0,edit->cursor,p->characters)]-l->byte;for(size_t j=0;j<l->carets.cluster_count;++j)if(l->carets.clusters[j].byte==byte){SBCaretCluster c=l->carets.clusters[j];r.x=area.x+c.left/ui->density-edit->scrollbar.x;r.w=fmaxf(style->cursor_size,(c.right-c.left)/ui->density);break;}}

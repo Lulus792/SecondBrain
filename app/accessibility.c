@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 #if defined(__APPLE__)
 #include <objc/runtime.h>
 #include <objc/message.h>
@@ -110,6 +111,7 @@ typedef struct {
     bool editable,selected; size_t anchor,caret;
     StyledRun *runs; size_t run_count; float font_size;
     SBTextSpan *source_styles;size_t style_count;
+    bool geometric;
 } Item;
 typedef struct Pending { SBAccessibleAction action; struct Pending *next; } Pending;
 struct SBAccessibility {
@@ -118,6 +120,7 @@ struct SBAccessibility {
     size_t *identity_slots,slot_capacity;
     Item *items; size_t count; char title[SB_NAME_CAP],focus[100],message[512];
     uint64_t generation,signature,context; accesskit_node_id next_node; bool modal,alive;
+    float coordinate_scale;
     Pending *head,*tail; size_t queued,queued_bytes;
 #if defined(__APPLE__)
     accesskit_macos_subclassing_adapter *adapter;
@@ -209,6 +212,12 @@ static void text_run(accesskit_tree_update *tree,accesskit_node *parent,accesski
     }
     accesskit_node_set_character_lengths(text,run->characters,run->lengths);
     accesskit_node_set_word_starts(text,run->word_count,run->words);
+    if(run->geometry){
+        accesskit_rect actual={run->x,run->y,run->x+run->width,run->y+run->height};accesskit_node_set_bounds(text,actual);
+        accesskit_node_set_text_direction(text,(run->level&1) ? ACCESSKIT_TEXT_DIRECTION_RIGHT_TO_LEFT : ACCESSKIT_TEXT_DIRECTION_LEFT_TO_RIGHT);
+        accesskit_node_set_character_positions(text,run->characters,run->positions);
+        accesskit_node_set_character_widths(text,run->characters,run->widths);
+    }
     accesskit_node_push_child(parent,id); accesskit_tree_update_push_node(tree,id,text);
 }
 static accesskit_text_position native_position(const Item *v,size_t scalar) {
@@ -223,6 +232,9 @@ static accesskit_tree_update *build_locked(SBAccessibility *a) {
     accesskit_tree_update *tree=accesskit_tree_update_with_capacity_and_focus(a->count*2+3,focus);
     accesskit_tree_info *info=accesskit_tree_info_new(1); accesskit_tree_update_set_tree_info(tree,info);
     accesskit_node *root=accesskit_node_new(ACCESSKIT_ROLE_WINDOW); accesskit_node_set_label(root,a->title);
+    /* UI bounds and text runs share SDL window coordinates. The native
+       macOS/Windows providers consume physical client pixels. */
+    if(a->coordinate_scale!=1)accesskit_node_set_transform(root,accesskit_affine_scale(a->coordinate_scale));
     accesskit_node *container=accesskit_node_new(a->modal ? ACCESSKIT_ROLE_DIALOG : ACCESSKIT_ROLE_GROUP);
     if (a->modal) accesskit_node_set_modal(container);
     const char *region=a->modal ? "Aktuelle Aufgabe" : "Projektarbeitsfläche";
@@ -363,7 +375,7 @@ static void deactivate(void *userdata) { (void)userdata; }
 #endif
 SBAccessibility *sb_accessibility_new(SDL_Window *window) {
     SBAccessibility *a=calloc(1,sizeof(*a)); if (!a) return NULL;
-    a->mutex=SDL_CreateMutex(); if (!a->mutex) { free(a); return NULL; } a->alive=true; a->window=window; strcpy(a->title,"SecondBrain");
+    a->mutex=SDL_CreateMutex(); if (!a->mutex) { free(a); return NULL; } a->alive=true; a->window=window; a->coordinate_scale=1; strcpy(a->title,"SecondBrain");
     SDL_PropertiesID properties=SDL_GetWindowProperties(window);
 #if defined(__APPLE__)
     void *native=SDL_GetPointerProperty(properties,SDL_PROP_WINDOW_COCOA_WINDOW_POINTER,NULL);
@@ -384,13 +396,25 @@ SBAccessibility *sb_accessibility_new(SDL_Window *window) {
 static void clear_items(SBAccessibility *a) { for (size_t i=0;i<a->count;++i) { free(a->items[i].label); free(a->items[i].value); free(a->items[i].runs);free(a->items[i].source_styles); } free(a->items); a->items=NULL; a->count=0; }
 void sb_accessibility_update(SBAccessibility *a,const char *title,const char *focus,const SBAccessibleItem *items,size_t count,const char *message,bool modal,uint64_t context) {
     if (!a) return;
+    float coordinate_scale=1;
+#if defined(__APPLE__) || defined(_WIN32)
+    coordinate_scale=SDL_GetWindowPixelDensity(a->window);
+    if(!isfinite(coordinate_scale) || coordinate_scale<=0)coordinate_scale=1;
+#endif
     uint64_t signature=sb_hash(title,strlen(title))^sb_hash(focus,strlen(focus))^sb_hash(message,strlen(message))^(uint64_t)modal;
+    signature^=sb_hash((const char *)&coordinate_scale,sizeof(coordinate_scale));
     for (size_t i=0;i<count;++i) { signature=signature*1099511628211ULL^sb_hash(items[i].id,strlen(items[i].id))^sb_hash(items[i].label,strlen(items[i].label))^sb_hash((const char *)&items[i].bounds,sizeof(items[i].bounds))^items[i].role^items[i].anchor^(items[i].caret<<1)^(uint64_t)items[i].selected^((uint64_t)items[i].editable<<8); if (items[i].value) signature^=sb_hash(items[i].value,strlen(items[i].value)); if (items[i].parent) signature^=sb_hash(items[i].parent,strlen(items[i].parent)); signature^=(uint64_t)items[i].level<<16;
         signature^=sb_hash((const char *)&items[i].font_size,sizeof(items[i].font_size));
         for (size_t j=0;items[i].styles && items[i].style_count<=SB_INLINE_LIMIT && j<items[i].style_count;++j) {
             SBTextSpan span=items[i].styles[j];
             signature=signature*1099511628211ULL^span.offset^span.length^span.style;
-        } signature^=items[i].row^((uint64_t)items[i].column<<16)^((uint64_t)items[i].rows<<32)^((uint64_t)items[i].columns<<48); }
+        }
+        if(items[i].native_text){signature^=items[i].native_text->count;
+            for(size_t j=0;j<items[i].native_text->count;++j){const SBNativeTextRun *r=&items[i].native_text->runs[j];
+                signature=signature*1099511628211ULL^r->span.offset^r->span.length^r->level^r->geometry;
+                signature^=sb_hash((const char *)&r->x,4*sizeof(float));
+                signature^=sb_hash((const char *)r->positions,r->characters*sizeof(float));signature^=sb_hash((const char *)r->widths,r->characters*sizeof(float));}}
+        signature^=items[i].row^((uint64_t)items[i].column<<16)^((uint64_t)items[i].rows<<32)^((uint64_t)items[i].columns<<48); }
     SDL_LockMutex(a->mutex);
     bool changed=signature!=a->signature || context!=a->context;
     if (changed) {
@@ -412,17 +436,18 @@ void sb_accessibility_update(SBAccessibility *a,const char *title,const char *fo
                 for(size_t j=0;j<count;++j)if(j!=i && items[j].parent && !strcmp(items[j].parent,items[i].id)){structured=true;break;}
             if(items[i].value && !structured){
                 Item *old=context==a->context && i<a->count && !strcmp(items[i].id,a->items[i].id) ? &a->items[i] : NULL;
-                bool reuse=old && old->value && old->run_count && !strcmp(old->value,items[i].value) && old->style_count==next[i].style_count;
+                bool reuse=old && !old->geometric && !items[i].native_text && old->value && old->run_count && !strcmp(old->value,items[i].value) && old->style_count==next[i].style_count;
                 for(size_t j=0;reuse && j<next[i].style_count;++j){SBTextSpan x=old->source_styles[j],y=items[i].styles[j];reuse=x.offset==y.offset && x.length==y.length && x.style==y.style;}
                 SBNativeText layout={0};
                 if(reuse){next[i].run_count=old->run_count;next[i].runs=malloc(old->run_count*sizeof(*next[i].runs));
                     if(!next[i].runs)complete=false;else memcpy(next[i].runs,old->runs,old->run_count*sizeof(*next[i].runs));}
-                else if(sb_native_text(items[i].value,strlen(items[i].value),styled ? items[i].styles : NULL,next[i].style_count,&layout).code==SB_OK){
-                    next[i].runs=calloc(layout.count,sizeof(*next[i].runs));
-                    if(!next[i].runs)complete=false;else{next[i].run_count=layout.count;
-                        for(size_t j=0;j<layout.count;++j){char id[100];snprintf(id,sizeof(id),"@text:%llu:%zu",(unsigned long long)next[i].node,layout.runs[j].span.offset);
+                else if(items[i].native_text || sb_native_text(items[i].value,strlen(items[i].value),styled ? items[i].styles : NULL,next[i].style_count,&layout).code==SB_OK){
+                    const SBNativeText *prepared=items[i].native_text ? items[i].native_text : &layout;next[i].geometric=items[i].native_text!=NULL;
+                    next[i].runs=calloc(prepared->count,sizeof(*next[i].runs));
+                    if(!next[i].runs)complete=false;else{next[i].run_count=prepared->count;
+                        for(size_t j=0;j<prepared->count;++j){char id[100];snprintf(id,sizeof(id),"@text:%llu:%zu",(unsigned long long)next[i].node,prepared->runs[j].span.offset);
                             accesskit_node_id node=j ? identify(a,id,context) : next[i].node;if(!node)complete=false;
-                            next[i].runs[j]=(StyledRun){layout.runs[j],run_id(node)};}}
+                            next[i].runs[j]=(StyledRun){prepared->runs[j],run_id(node)};}}
                     sb_native_text_free(&layout);
                 }else complete=false;
             }
@@ -434,7 +459,7 @@ void sb_accessibility_update(SBAccessibility *a,const char *title,const char *fo
         bool controls=context!=a->context || count!=a->count;
         if (!controls) for (size_t i=0;i<count;++i) if (strcmp(a->items[i].id,next[i].id) || strcmp(a->items[i].parent,next[i].parent) || a->items[i].role!=next[i].role) { controls=true; break; }
         if(!controls)for(size_t i=0;i<count;++i)if(next[i].editable && ((!next[i].value)!=(!a->items[i].value) || (next[i].value && strcmp(next[i].value,a->items[i].value)))){controls=true;break;}
-        clear_items(a); a->items=next; a->count=count; a->signature=signature; a->context=context;
+        clear_items(a); a->items=next; a->count=count; a->signature=signature; a->context=context; a->coordinate_scale=coordinate_scale;
         if (controls) ++a->generation;
         snprintf(a->title,sizeof(a->title),"%s",title); snprintf(a->focus,sizeof(a->focus),"%s",focus); snprintf(a->message,sizeof(a->message),"%s",message); a->modal=modal;
     }
