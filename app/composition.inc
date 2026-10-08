@@ -16,7 +16,21 @@ struct SBComposition {
 };
 bool sb_ui_composition_active(const SBUi *ui){return ui->composition && ui->composition->active;}
 bool sb_ui_composition_committing(const SBUi *ui){return ui->composition && ui->composition->commit;}
-bool sb_ui_composition_working(const SBUi *ui){return ui->composition && (ui->composition->commit || ui->composition->deferred_count);}
+bool sb_ui_composition_working(const SBUi *ui){return ui->composition && (ui->composition->commit || ui->composition->deferred_count || ui->composition->wait_for_frame);}
+void sb_ui_input_barrier(SBUi *ui) {
+    sb_ui_composition_cancel(ui);
+    if(!ui->composition)ui->composition=calloc(1,sizeof(*ui->composition));
+    if(ui->composition)ui->composition->wait_for_frame=true;
+    else ui->input_status=sb_error(SB_MEMORY,"Texteingabe: nicht genug Arbeitsspeicher.");
+}
+void sb_ui_input_layout_changed(SBUi *ui) {
+    sb_ui_input_barrier(ui);
+    if(ui->composition)ui->composition->ready=false;
+}
+static bool composition_edit_key(const SDL_KeyboardEvent *key) {
+    return (key->mod&(SDL_KMOD_CTRL|SDL_KMOD_GUI)) || key->key<SDLK_SPACE ||
+        key->key>=0x110000 || key->key==SDLK_DELETE;
+}
 static size_t composition_byte(const char *text,size_t length,int characters) {
     size_t at=0;nk_rune rune;
     while(at<length && characters-->0)at+=(size_t)nk_utf_decode(text+at,&rune,(int)(length-at));
@@ -57,7 +71,9 @@ bool sb_ui_composition_event(SBUi *ui,const SDL_Event *event) {
         if(!c->deferred_count && !c->wait_for_frame &&
            (event->type==SDL_EVENT_TEXT_INPUT || event->type==SDL_EVENT_TEXT_EDITING))goto text_event;
         SBCompositionEvent item={0};item.event=*event;
-        item.boundary=event->type!=SDL_EVENT_KEY_UP && event->type!=SDL_EVENT_MOUSE_BUTTON_UP && event->type!=SDL_EVENT_TEXT_EDITING;
+        item.boundary=(event->type==SDL_EVENT_KEY_DOWN && composition_edit_key(&event->key)) ||
+            event->type==SDL_EVENT_MOUSE_BUTTON_DOWN || event->type==SDL_EVENT_WINDOW_FOCUS_LOST ||
+            event->type==SDL_EVENT_QUIT || event->type==SDL_EVENT_WINDOW_CLOSE_REQUESTED;
         if(event->type==SDL_EVENT_TEXT_INPUT || event->type==SDL_EVENT_TEXT_EDITING){
             const char *text=event->type==SDL_EVENT_TEXT_INPUT ? event->text.text : event->edit.text;
             if(!text)text="";size_t bytes=strlen(text);
@@ -93,7 +109,6 @@ text_event:;
     }
     if(c && c->ignore_text)return true;
     if(!length) {if(editing && c){free(c->preedit);c->preedit=NULL;c->active=false;}return true;}
-    if(!editing && length<NK_INPUT_MAX && (!c || (!c->active && !c->commit && !c->had_preedit)))return false;
     c=composition_begin(ui);
     if(!c)return editing; /* Keep direct low-level input usable before a first widget. */
     if(editing) {
@@ -212,6 +227,8 @@ void sb_ui_composition_replay(SBUi *ui,void (*dispatch)(void *,const SDL_Event *
     c->ready=false;c->replaying=true;
     size_t used=0;
     while(used<c->deferred_count){
+        /* Apply accumulated characters before the next editing/focus action. */
+        if(c->commit && c->deferred[used].boundary)break;
         SBCompositionEvent item=c->deferred[used++];dispatch(user,&item.event);free(item.text);
         if(item.boundary){c->wait_for_frame=true;break;}
     }

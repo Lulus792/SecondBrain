@@ -279,6 +279,8 @@ SBStatus sb_ui_init(SBUi *ui, const char *font_path, int width, int height, bool
 
 void sb_ui_event(SBUi *ui, const SDL_Event *event) {
     if(sb_ui_composition_event(ui,event))return;
+    if(event->type==SDL_EVENT_KEY_DOWN && ui->input_area_applied && composition_edit_key(&event->key))
+        sb_ui_input_barrier(ui);
     if(event->type==SDL_EVENT_KEY_DOWN || event->type==SDL_EVENT_TEXT_INPUT || event->type==SDL_EVENT_MOUSE_BUTTON_DOWN)ui->caret_epoch=SDL_GetTicksNS();
     SDL_Event copy = *event;
     if (event->type == SDL_EVENT_TEXT_INPUT) {

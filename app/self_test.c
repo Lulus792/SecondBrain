@@ -79,7 +79,7 @@ int sb_desktop_self_test(SBDesktop *d, const char *directory) {
     char path[SB_PATH_CAP], *text = NULL;
     size_t length = 0;
 #define CHECK(x) do { ++checks; if (!(x)) { fprintf(stderr, "GUI FAIL line %d: %s (form=%d, path=%s, message=%s)\n", \
-    __LINE__, #x, d->form, d->model.path, d->message.message); capture(d,directory,"failure.bmp"); return 1; } } while (0)
+    __LINE__, #x, d->form, d->model.path, d->message.message); fprintf(stderr,"Form name=%s id=%s focus=%s input=%d %s\n",d->name,d->id,d->focus,d->ui.input_status.code,d->ui.input_status.message); capture(d,directory,"failure.bmp"); return 1; } } while (0)
     frame(d); frame(d);
     CHECK(click(d, "new-project"));
     CHECK(d->form == SB_FORM_PROJECT);

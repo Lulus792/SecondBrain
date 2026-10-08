@@ -32,6 +32,8 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   sind in 0.6.0 im dokumentierten Umfang angebunden. Der leere Einstieg ist in
   0.7.0 implementiert und auf allen drei CI-Plattformen sowie in Paketen geprüft.
   Interaktive native Dialog- und menschliche Bedienabnahmen bleiben offen.
+  0.9.26 ergänzt die [geordnete Texteingabe](IME.md) über Fokuswechsel und
+  den schnellen Neuaufbau nach Formularbefehlen; native Abnahme folgt gesondert.
 - [ ] **Barrierefreiheit abnehmen:** native Screenreader-Anbindung, Kontraste,
   Fokusreihenfolge, große Schrift, Schrift-Fallback und Systemeinstellung für
   reduzierte Bewegung. Die App bietet bereits Tastaturwege, größere Schrift und

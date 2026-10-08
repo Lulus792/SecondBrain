@@ -67,6 +67,8 @@ void sb_ui_composition_replay(SBUi *ui,void (*dispatch)(void *,const SDL_Event *
 bool sb_ui_composition_active(const SBUi *ui);
 bool sb_ui_composition_committing(const SBUi *ui);
 bool sb_ui_composition_working(const SBUi *ui);
+void sb_ui_input_barrier(SBUi *ui);
+void sb_ui_input_layout_changed(SBUi *ui);
 void sb_ui_focus_input(SBUi *ui);
 void sb_ui_draw(SBUi *ui);
 void sb_ui_transition_begin(SBUi *ui);

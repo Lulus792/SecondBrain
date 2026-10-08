@@ -393,7 +393,7 @@ static bool selectable(SBDesktop *d, const char *id, const char *label, nk_bool 
 static void text_target(SBDesktop *d, const char *id) {
     target(d, id);
     if (d->target_count && !strcmp(d->targets[d->target_count-1].id,id)) d->targets[d->target_count - 1].kind = SB_FOCUS_TEXT;
-    if (focused(d, id) && !(d->ui.ctx->current->layout->flags & NK_WINDOW_NO_INPUT)) {
+    if (!strcmp(d->focus,id) && !(d->ui.ctx->current->layout->flags & NK_WINDOW_NO_INPUT)) {
         nk_window_set_focus(d->ui.ctx, d->ui.ctx->current->name_string);
         /* Closing a higher window can leave Nuklear's lower window read-only. */
         d->ui.ctx->current->flags &= ~(nk_flags)NK_WINDOW_ROM;
@@ -402,7 +402,9 @@ static void text_target(SBDesktop *d, const char *id) {
         nk_edit_focus(d->ui.ctx, NK_EDIT_ALWAYS_INSERT_MODE); d->focus_changed = false;
     }
 }
-static void command(SBDesktop *d, SBCommand cmd) { if (d->command == SB_CMD_NONE) d->command = cmd; }
+static void command(SBDesktop *d, SBCommand cmd) {
+    if(d->command==SB_CMD_NONE){sb_ui_input_barrier(&d->ui);d->command=cmd;}
+}
 static void result(SBDesktop *d, SBStatus status, const char *success) {
     d->message = status;
     if (status.code != SB_OK) d->card = true;
@@ -617,6 +619,7 @@ static void synchronize(SBDesktop *d) {
     if (!d->text_edit_ready && d->model.editor) editor_reset(d);
 }
 void sb_desktop_apply(SBDesktop *d) {
+    bool action=d->command!=SB_CMD_NONE || d->navigation.kind!=SB_ACT_NONE;
     SBCommand cmd = d->command;
     SBStatus status = sb_ok();
     d->command = SB_CMD_NONE;
@@ -718,12 +721,14 @@ void sb_desktop_apply(SBDesktop *d) {
             d->form = SB_FORM_NONE;
     }
     synchronize(d);
+    if(action)sb_ui_input_layout_changed(&d->ui);
 }
 static SBTarget *focus_target(SBDesktop *d) {
     for (size_t i = 0; i < d->target_count; ++i) if (!strcmp(d->focus, d->targets[i].id)) return &d->targets[i];
     return NULL;
 }
 static void focus_set(SBDesktop *d, const char *id) {
+    sb_ui_input_barrier(&d->ui);
     if(!strcmp(id,"search"))search_begin(d);
     snprintf(d->focus, sizeof(d->focus), "%s", id);
     d->ui.caret_epoch=SDL_GetTicksNS();
@@ -954,6 +959,7 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
     if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
         d->keyboard = false;
         for (size_t i = d->target_count; i > 0; --i) if (inside(event->button.x, event->button.y, d->targets[i-1].bounds)) {
+            if(d->targets[i-1].kind==SB_FOCUS_TEXT || strcmp(d->focus,d->targets[i-1].id))sb_ui_input_barrier(&d->ui);
             if(!strcmp(d->targets[i-1].id,"search"))search_begin(d);
             snprintf(d->focus, sizeof(d->focus), "%s", d->targets[i-1].id); break;
         }
@@ -1800,6 +1806,8 @@ static float modal_estimate(SBDesktop *d,float width) {
     if (d->form==SB_FORM_ACTIONS) return (7+(d->model.editor && strchr(d->model.path,'/') && strncmp(d->model.path,"archive/",8) ? 1 : 0))*row;
     if (d->form==SB_FORM_NOTE) return 3*(24*s+36*s+2*gap);
     if (d->form==SB_FORM_PROJECT) return 3*(24*s+36*s+2*gap);
+    /* Two section labels and ten control rows, matching the settings content. */
+    if (d->form==SB_FORM_SETTINGS) return (24+32+10*36)*s+11*gap;
     if (d->form==SB_FORM_WORKSPACE) return 48*s+gap+24*s+36*s+2*gap+row;
     if (d->form==SB_FORM_PROJECTS) return (float)(fmin(8,d->model.projects.count)+4)*row+48*s;
     if (d->form==SB_FORM_ABOUT) return 48*s+gap+4*row+48*s+gap+3*row;
@@ -1857,6 +1865,9 @@ static void popup(SBDesktop *d, int width, int height) {
     float shell=2*ctx->style.window.padding.y+32*s+2*gap+(has_footer ? 36*s+gap : 0);
     float content_height=modal_estimate(d,w)+2*ctx->style.window.group_padding.y;
     if (d->measured_form==d->form && d->modal_content_width==w && d->modal_content_scale==s && d->modal_content_height>0 && !modal_reader(d)) content_height=d->modal_content_height;
+    else if(d->measured_form==d->form && d->modal_content_scale>0 && d->modal_content_height>0 &&
+            fabsf(d->modal_content_width/d->modal_content_scale-w/s)<0.5f && !modal_reader(d))
+        content_height=d->modal_content_height*s/d->modal_content_scale;
     h=fminf(height-40.0f,shell+content_height);
     if (modal_reader(d)) h=height-40.0f;
     d->modal_bounds=nk_rect((width-w)/2,(height-h)/2,w,h);

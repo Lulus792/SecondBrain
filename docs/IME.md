@@ -20,7 +20,7 @@ trennt eigene Kompositionsanzeige von nativen Kandidatenlisten.
 beendet die Komposition ohne Abschalten der Texteingabe. Quellen und festgelegte
 SDL-3.2.30-Header wurden am 8. Oktober geprüft.
 
-## Verbindliches Verhalten dieses Schritts
+## Verhalten des Kompositionsschritts
 
 Vorläufiger Text erscheint unterstrichen direkt an der Einfügestelle und ersetzt
 in der Anzeige eine bestehende Auswahl. Der eigentliche Feldinhalt, Suchtreffer,
@@ -50,7 +50,7 @@ Bestätigte IME-Eingabe wird vor nachfolgenden Fokusaktionen übernommen.
 Vorgemerkte Text-Ereignisse besitzen ihre UTF-8-Bytes selbst; Fokusaktionen und
 nachfolgende Texte werden in Reihenfolge über Framegrenzen abgearbeitet.
 Solche vorgemerkten Aktionen halten die App im kurzen Frame-Takt. Die gewöhnliche
-kurze Texteingabe behält ihren bisherigen Nuklear-Ereignisweg; große Text-Ereignisse
+kurze Texteingabe behielt in 0.9.25 ihren bisherigen Nuklear-Ereignisweg; große Text-Ereignisse
 verwenden den vollständigen Übernahmeweg. Native Provideraktionen warten auf eine
 bereits bestätigte, noch nicht im Feld übernommene Eingabe.
 
@@ -93,3 +93,55 @@ Desktop-Ereignisrouting und Tests besteht mit 36 Kompositions-, 7 Ausschnitt-
 und 109 Navigationsassertions einschließlich 48 Cache-Rastervergleichen.
 Kern und externe Bibliotheken sind in diesem Lauf nicht instrumentiert;
 macOS-Leakprüfung ist ausgeschaltet. Logs: build/composition-tile-sanitizer-*.log.
+
+
+## Geordnete gewöhnliche Eingabe ab 0.9.26
+
+Die gezielte Nachprüfung von 0.9.25 reproduziert auch ohne IME eine falsche
+Feldzuordnung: normale Eingabe, Tab und weitere Zeichen im selben SDK-
+Ereignispaket gelangen gemeinsam in das zweite Feld. Die neue Feldbindung
+verwendet deshalb den vollständigen Übernahmeweg für alle aktiven Textfelder.
+Fokus-/Caretaktionen werden vor nachfolgender Eingabe im Layout umgesetzt;
+bereits bestätigte Zeichen werden vor einer solchen Aktion übernommen.
+
+Druckbare Tastenevents und ihre Texte werden gemeinsam verarbeitet. Ein neuer
+Burst-Test prüft acht Zeichen nach einer ersten Eingabe in höchstens zwei
+Frames. Es wird kein zusätzlicher Frame pro Buchstabe verlangt. Weitere
+Desktop-Folgen prüfen Tab vor Eingabe und eine Pfeilbewegung vor neuer Eingabe.
+
+Eine zusätzliche negative Probe reproduziert fehlenden kurzen Frame-Takt beim
+Öffnen eines Formulars. Befehle merken folgende Texte vor; nach dem Anwenden des
+Befehls wird zuerst die geänderte Ansicht aufgebaut und dann das neue Feld
+verwendet. Die Folge Formular-Shortcut und sofortiger Text prüft dieses Verhalten.
+Die endgültige lokale Abnahme ist im Umsetzungsstand ergänzt.
+
+
+Die vollständige Mausprüfung ergänzte zwei Korrekturen: Textfelder behalten
+ihren aktiven Zustand unabhängig vom Eingabegerät; der visuelle Tastaturrahmen
+bleibt getrennt. Beim Schriftwechsel verwendet die Einstellungskarte ihre
+konkreten Zeilenhöhen und skaliert vorhandene Messungen bei proportionaler
+Breite. Die Mausprüfung mit zwei aufeinanderfolgenden Schriftvergrößerungen
+besteht wieder (126 Desktopassertions); die abschließende lokale Gesamtprüfung ist abgeschlossen.
+
+Negative Ausgangsnachweise: build/ordinary-input-baseline.log (falsches Feld),
+ordinary-input-burst-baseline.log (unnötige Einzel-Frames),
+ordinary-form-baseline.log (fehlender schneller Neuaufbau),
+ordinary-mouse-diagnostic.log (inaktives angeklicktes Feld) und
+ordinary-scale-debug.log (versetztes Ziel nach Schriftwechsel).
+
+Die finale Gesamtprüfung wurde nach erfolgreichen UI-Prüfungen durch die
+volle Host-Festplatte unterbrochen (Bild-/CTest-Logdateien konnten nicht
+geschrieben werden). Alte generierte Accessibility-/Interaktions-Testläufe
+wurden gezielt bereinigt; die drei neuesten je Fixture bleiben erhalten.
+Projektgedächtnisse und Rückfallpakete bleiben erhalten. Rund 19 GiB wieder
+frei. Die fehlgeschlagenen und noch nicht ausgeführten Prüfungen wurden mit
+unverändertem Quellstand erneut ausgeführt und bestehen (35/35, 55,95 s). Bereinigungsprotokoll:
+build/generated-test-cleanup.json.
+
+Nach Abschluss bestehen alle 51 Prüfungen des unveränderten Quellstands:
+die ersten 16 UI-Prüfungen vor dem Platzmangel und die restlichen 35 danach.
+Gezielte ASan/UBSan-Prüfung besteht mit 36 Kompositions-, 7 Ausschnitts- und
+119 Navigationsassertions einschließlich 48 Cache-Rastervergleichen. Externe
+Bibliotheken und Kern sind dabei nicht instrumentiert, macOS-Leaks ausgeschaltet.
+Logs: build/ordinary-input-{complete-tests,resumed-tests,sanitizer-*}.log.
+Native 0.9.26- und neue Paketabnahme folgen.

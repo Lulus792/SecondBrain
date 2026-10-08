@@ -2261,3 +2261,35 @@ und explizit alle vier entpackten Release-Pakete bestehen. 51 lokale Prüfungen
 und neue Kompositions-/Ausschnittsregression sind damit auch im
 automatisierten nativen Umfang bestätigt. Reale IMEs und die weiteren
 1.0-Abnahmen bleiben offen.
+
+
+## 0.9.26: normale Eingaben, schnelle Folgen und neue Formularfelder
+
+[Geordnete Eingabe](IME.md) verwendet die Feldbindung auch für gewöhnliche
+kurze Texte. Negative Ausgangsproben reproduzieren falsche Feldzuordnung bei
+Text/Tab/Text, unnötige Frames pro Buchstabe und verzögerten Aufbau eines neuen
+Formulars. Korrekturen erhalten Texte vor Fokus-/Caretaktionen, setzen solche
+Aktionen vor nachfolgenden Texten um und verarbeiten druckbare Folgen zusammen.
+Ein Formularbefehl zeichnet zunächst die neue Ansicht; sofortige Eingabe landet
+im neuen Feld. Der kurze Frame-Takt bleibt für diesen Aufbau aktiv.
+
+Gesamtprüfung deckt außerdem inaktiven Maus-Textfokus und einen versetzten
+Klick nach Schriftvergrößerung auf. Textfelder halten ihren aktiven Zustand
+für beide Eingabegeräte. Einstellungen verwenden konkrete Zeilenhöhen und bei
+proportionaler Skalierung die vorhandene gemessene Inhaltshöhe.
+
+Alle 51 lokalen Prüfungen bestehen am unveränderten finalen Quellstand. Nach
+16 erfolgreichen UI-Prüfungen unterbricht eine volle Host-Festplatte den Lauf;
+35 fehlgeschlagene/nicht ausgeführte Prüfungen bestehen nach gezielter Bereinigung
+alter generierter Testläufe (55,95 s). Drei neueste Accessibility-/Interaktions-
+Läufe je Fixture, Gedächtnisse und Rückfallpakete bleiben erhalten. Rund 19 GiB
+wieder frei; Protokoll build/generated-test-cleanup.json. Nicht als vollständigen
+unterbrechungsfreien Lauf ausgeben.
+
+Gezielte instrumentierte UI-/Desktop-/Renderer-/Testobjekte bestehen mit
+36 Kompositions-, 7 Ausschnitts- und 119 Navigationsassertions einschließlich
+48 Cache-Rasterfällen ohne ASan-/UBSan-Diagnose. Kern/externe Bibliotheken nicht
+instrumentiert, macOS-Leaks ausgeschaltet. Mausablauf 126, Tastatur 157 und
+Sicherung 75 Assertions bestehen. Logs: build/ordinary-input-complete-tests.log,
+ordinary-input-resumed-tests.log und ordinary-input-sanitizer-*.log.
+Neue native CI-/Paketprüfung folgt; installiert bleibt 0.9.25.

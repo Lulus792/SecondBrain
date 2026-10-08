@@ -78,5 +78,34 @@ int main(int argc,char **argv){
     SDL_PushEvent(&committed);SDL_PushEvent(&tab);SDL_PushEvent(&after);frame(&d);if(strcmp(d.name,"Alpha"))fprintf(stderr,"ORDER name=%s id=%s focus=%s status=%d input=%d %s\n",d.name,d.id,d.focus,d.message.code,d.ui.input_status.code,d.ui.input_status.message);CHECK(!strcmp(d.name,"Alpha"));
     frame(&d);frame(&d);frame(&d);CHECK(!strcmp(d.focus,"form-id") && !strcmp(d.name,"Alpha") && strchr(d.id,'b'));
     key(&d,SDLK_ESCAPE,0);
+    /* Ordinary typing has the same field-ownership guarantee as IME commits. */
+    key(&d,SDLK_N,MOD|SDL_KMOD_SHIFT);CHECK(d.form==SB_FORM_PROJECT);
+    committed.text.text="Gamma";after.text.text="d";
+    SDL_PushEvent(&committed);SDL_PushEvent(&tab);SDL_PushEvent(&after);frame(&d);
+    CHECK(!strcmp(d.name,"Gamma"));frame(&d);frame(&d);frame(&d);
+    CHECK(!strcmp(d.name,"Gamma") && !strcmp(d.focus,"form-id") && strchr(d.id,'d'));
+    key(&d,SDLK_ESCAPE,0);
+    /* Printable key bursts must not add a frame for every character. */
+    key(&d,SDLK_N,MOD|SDL_KMOD_SHIFT);CHECK(d.form==SB_FORM_PROJECT);
+    committed.text.text="A";SDL_PushEvent(&committed);
+    const char *burst[]={"a","b","c","d","e","f","g","h"};
+    for(size_t i=0;i<8;++i){SDL_Event press=tab;press.key.key=(SDL_Keycode)burst[i][0];SDL_PushEvent(&press);SDL_Event letter=committed;letter.text.text=burst[i];SDL_PushEvent(&letter);press.type=SDL_EVENT_KEY_UP;press.key.down=false;SDL_PushEvent(&press);}
+    frame(&d);frame(&d);CHECK(!strcmp(d.name,"Aabcdefgh"));
+    key(&d,SDLK_ESCAPE,0);
+    /* Focus and caret actions before input also establish a fresh binding. */
+    key(&d,SDLK_N,MOD|SDL_KMOD_SHIFT);CHECK(d.form==SB_FORM_PROJECT);
+    after.text.text="q";SDL_PushEvent(&tab);SDL_PushEvent(&after);frame(&d);frame(&d);frame(&d);
+    CHECK(!d.name[0] && !strcmp(d.focus,"form-id") && strchr(d.id,'q'));
+    char original_id[65],expected_id[65];snprintf(original_id,sizeof(original_id),"%s",d.id);snprintf(expected_id,sizeof(expected_id),"z%.63s",original_id);
+    SDL_Event left=tab;left.key.key=SDLK_LEFT;after.text.text="z";
+    SDL_PushEvent(&left);SDL_PushEvent(&after);left.type=SDL_EVENT_KEY_UP;left.key.down=false;SDL_PushEvent(&left);
+    frame(&d);frame(&d);frame(&d);frame(&d);CHECK(!strcmp(d.id,expected_id));
+    key(&d,SDLK_ESCAPE,0);
+    /* Opening a form and immediately typing must bind to the new form. */
+    SDL_Event create=tab;create.key.key=SDLK_N;create.key.mod=MOD|SDL_KMOD_SHIFT;
+    after.text.text="Sofort";SDL_PushEvent(&create);SDL_PushEvent(&after);frame(&d);
+    CHECK(d.form==SB_FORM_PROJECT && sb_desktop_animating(&d));
+    frame(&d);frame(&d);frame(&d);CHECK(!strcmp(d.name,"Sofort"));
+    key(&d,SDLK_ESCAPE,0);
     sb_desktop_free(&d);printf("%u navigation assertions passed; %s.\n",checks,argc==3 ? "48 cached/uncached raster cases" : "navigation-only run");return 0;
 }

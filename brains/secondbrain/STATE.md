@@ -56,7 +56,13 @@ Float-Geometrie und sichtbare Textausschnitte behoben. Details: [IME](../../docs
 zu 90bdb78 besteht in allen 20 Jobs inklusive vier entpackter Pakete.
 Lokales Paket ist vollständig abgenommen und installiert.
 
-Nächster Schritt: Feldzuordnung auch für normale kurze Texteingabe prüfen/verbessern.
+0.9.26 erweitert Feldbindung auf normale Texte, erhält Fokus-/Caret-/Formular-
+reihenfolge und verarbeitet druckbare Zeichenfolgen zusammen. 51 lokale
+Prüfungen bestehen am selben Quellstand (16 vor, 35 nach Platzbereinigung);
+gezielte ASan/UBSan bestehen mit 36/7/119 Assertions. Mausfokus und Layout
+bei Schriftwechsel sind nachgeprüft. Native CI-/Paketabnahme folgen.
+
+Nächster Schritt: 0.9.26 nativ und als Paket abnehmen; Mac-Paket aktualisieren.
 Weitere Release-Arbeiten: Bidi/visuelle Textgeometrie/IME, native
 Tabellenmatrix, Screenreader-/Dialog-/Geräte-/Langzeitabnahmen, volle Windows-/
 Linux-Zielvolumes und physische Persistenz. Originalverträge stehen in SOURCES.
