@@ -100,3 +100,21 @@ dem Intel-Mac. Mit alter beziehungsweise neuer Snapshottechnik liegt das
 14,53 → 14,79 ms und Maximum 84,19 → 87,83 ms verbessern sich nicht.
 Dies belegt die reduzierte Verzögerung eines konkreten Renderwegs; kein
 Versprechen einer festen Bildrate oder allgemeiner Geräteabnahme.
+
+## Gezielte Nachprüfung in 0.9.33
+
+Am 8. Oktober wurden die bestehenden Korrekturen zum Nutzerfeedback erneut
+lokal im macOS-Release-Build geprüft: 135 Bewegungs-/Layout-Assertions bestehen,
+einschließlich Start-/Zwischenbildern, schnell unterbrochenen Übergängen,
+Scrollspur sowie beiden Anlegekarten bei normaler und 200%-Schriftgröße.
+Die aktuellen Screenshots der beiden Anlegekarten wurden betrachtet.
+
+Die Navigationsprüfung umfasst jetzt zusätzlich alle vier Kombinationen aus
+vorher offener/geschlossener Liste und normaler/großer Leseansicht. Suche leeren,
+sofort erneut tippen und mit Escape beenden stellen jeweils den ursprünglichen
+Zustand wieder her. Insgesamt bestehen 144 Navigations-Assertions und die
+48 Vergleiche von gecachten und frisch berechneten Textbildern. Startfokus ohne
+Mausklick, Textzeiger, blinkender Einfügecursor und Such-X bleiben mitgeprüft.
+Das sind automatisierte SDL-Eingabe-/Renderprüfungen, keine menschliche
+Bewertung des Bewegungsgefühls auf allen Geräten. Die installierte Intel-Mac-App
+bleibt 0.9.33 / d48ee9bf7075; dieser Schritt erweitert nur Prüfungen und Nachweise.

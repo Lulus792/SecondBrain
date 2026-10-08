@@ -20,6 +20,11 @@ beim Laden unverändert, installierte Ansicht betrachtet. Rückfallkopie:
 
 ## Geprüfte Fortschritte
 
+- Erneute gezielte macOS-Release-Nachprüfung des Nutzerfeedbacks:
+  135 Bewegungs-/Layout- und 144 Navigations-Assertions, darunter alle vier
+  vorherigen Listen-/Leseansichten nach Leerung, erneutem Tippen und Escape.
+  Beide Anlegekarten als aktuelle Screenshots betrachtet. Keine Änderung am
+  installierten Produktbuild; [Details](../../docs/NAVIGATION_POLITUR.md).
 - 0.9.28: GPU-Übergänge, Desktop-Startfokus/Projektabschluss, freies Suchende
   und erster stabiler Formularrahmen. 51 lokale Release-Prüfungen, gezielte
   UI-/Desktop-/Renderer-Sanitizer und [20 Plattformjobs](https://github.com/Lulus792/SecondBrain/actions/runs/37730572189)

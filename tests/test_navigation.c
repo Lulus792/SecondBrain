@@ -48,6 +48,20 @@ int main(int argc,char **argv){
     CHECK(!strcmp(d.focus,"note:knowledge/a.md") && d.search_session && !strcmp(d.search,"Alpha"));
     key(&d,SDLK_ESCAPE,0);CHECK(!d.browser && !d.search_session && !d.search[0]);
     d.browser=true;key(&d,SDLK_F,MOD);type(&d,"Alpha");key(&d,SDLK_ESCAPE,0);CHECK(d.browser && !d.search_session && !d.search[0]);
+    /* Search restores both panes, including an initially expanded reader.
+       Clearing and starting again must remember the restored state anew. */
+    for(unsigned state=0;state<4;++state) {
+        bool browser=(state&1)!=0,expanded=(state&2)!=0;
+        d.browser=browser;d.expanded=expanded;frame(&d);
+        key(&d,SDLK_F,MOD);type(&d,"Alpha");
+        CHECK(d.search_session && d.browser && !d.expanded);
+        CHECK(click(&d,"clear-search"));
+        CHECK(!d.search_session && !d.search[0] && d.browser==browser && d.expanded==expanded);
+        type(&d,"Alpha");CHECK(d.search_session && d.browser && !d.expanded);
+        key(&d,SDLK_ESCAPE,0);
+        CHECK(!d.search_session && !d.search[0] && d.browser==browser && d.expanded==expanded);
+    }
+    d.expanded=false;
     d.browser=false;key(&d,SDLK_F,MOD);type(&d,"Alpha");CHECK(click(&d,"reader"));CHECK(!d.browser && !d.search_session && !d.search[0]);
     /* Leaving search through unused chrome must restore the prior list state. */
     key(&d,SDLK_F,MOD);type(&d,"Alpha");
