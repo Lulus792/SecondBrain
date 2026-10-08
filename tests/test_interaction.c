@@ -71,7 +71,13 @@ int main(int argc,char **argv) {
     for(unsigned scale=0;scale<2;++scale) {
         OK(sb_ui_fonts(&d.ui,scale ? 2 : 1));CHECK(SDL_SetWindowSize(d.ui.window,scale ? 780 : 1336,scale ? 640 : 840));CHECK(SDL_SyncWindow(d.ui.window));
         SBForm forms[]={SB_FORM_FILTER,SB_FORM_ACTIONS,SB_FORM_PROJECTS,SB_FORM_NOTE,SB_FORM_PROJECT,SB_FORM_WORKSPACE,SB_FORM_SETTINGS,SB_FORM_ABOUT,SB_FORM_HELP,SB_FORM_BACKUP,SB_FORM_RESTORE,SB_FORM_NOTICE_LIST};
-        for(size_t f=0;f<sizeof(forms)/sizeof(*forms);++f) {d.form=forms[f];frame(&d);frame(&d);frame(&d);CHECK(d.modal_bounds.w<= (scale ? 740 : 1296) && d.modal_bounds.h<=(scale ? 600 : 800));char artifact[64];snprintf(artifact,sizeof(artifact),"modal-%u-%u.bmp",scale,(unsigned)forms[f]);OK(capture(&d,root,artifact));}
+        for(size_t f=0;f<sizeof(forms)/sizeof(*forms);++f) {d.form=forms[f];frame(&d);struct nk_rect initial=d.modal_bounds;frame(&d);
+            if(forms[f]==SB_FORM_NOTE || forms[f]==SB_FORM_PROJECT) {
+                if(fabsf(initial.h-d.modal_bounds.h)>=1)fprintf(stderr,"INITIAL form=%d scale=%.1f h=%.2f->%.2f content=%.2f width=%.2f gap=%.2f message=%s\n",forms[f],d.ui.scale,initial.h,d.modal_bounds.h,d.modal_content_height,d.modal_bounds.w,d.ui.ctx->style.window.spacing.y,d.message.message);
+                CHECK(fabsf(initial.y-d.modal_bounds.y)<1 && fabsf(initial.h-d.modal_bounds.h)<1);
+                if(!scale){SBTarget *name_field=find(&d,"form-name"),*submit=find(&d,"submit");CHECK(name_field && submit && fabsf(name_field->bounds.x+name_field->bounds.w-submit->bounds.x-submit->bounds.w)<1);}
+            }
+            frame(&d);CHECK(d.modal_bounds.w<= (scale ? 740 : 1296) && d.modal_bounds.h<=(scale ? 600 : 800));char artifact[64];snprintf(artifact,sizeof(artifact),"modal-%u-%u.bmp",scale,(unsigned)forms[f]);OK(capture(&d,root,artifact));}
     }
     d.form=SB_FORM_NONE;OK(sb_ui_fonts(&d.ui,1));CHECK(SDL_SetWindowSize(d.ui.window,1336,840));CHECK(SDL_SyncWindow(d.ui.window));frame(&d);frame(&d);
     d.navigation.kind=SB_ACT_NOTE;strcpy(d.navigation.value,"knowledge/a.md");d.follow_star=true;d.ui.capture_pending=true;frame(&d);frame(&d);CHECK(d.ui.transitioning);
@@ -80,6 +86,8 @@ int main(int argc,char **argv) {
         d.navigation.kind=SB_ACT_NOTE;strcpy(d.navigation.value,path);d.follow_star=true;d.ui.capture_pending=true;frame(&d);
         CHECK(!strcmp(d.model.path,path) && !sb_app_dirty(&d.model) && d.ui.transitioning);frame(&d);
     }
+    /* Time spent in a busy frame counts toward the short motion. */
+    d.flight=0.4f;sb_desktop_tick(&d,0.2f);CHECK(d.flight>0.85f);
     e.type=SDL_EVENT_MOUSE_BUTTON_DOWN;e.button.windowID=SDL_GetWindowID(d.ui.window);e.button.button=SDL_BUTTON_LEFT;e.button.x=d.ui.card_bounds.x+30;e.button.y=d.ui.card_bounds.y+30;sb_desktop_event(&d,&e);CHECK(!d.ui.transitioning);
     sb_desktop_set_style(&d,(SBStyleChoice){.dark=true,.motion=true});frame(&d);CHECK(!d.ui.transitioning && d.flight==1 && !sb_app_dirty(&d.model));
     sb_desktop_free(&d);printf("%u interaction assertions passed. Artifacts: %s\n",checks,root);return 0;

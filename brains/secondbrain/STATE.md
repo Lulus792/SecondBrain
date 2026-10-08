@@ -13,11 +13,11 @@ kopieren. Lumen-Sternkarte, Glaskarten/Icons, direkte Pfeilnavigation, Kamerafah
 weiches Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Entwürfe, Originalbytes und erkannte Konflikte bleiben geschützt.
 
-Dist enthält **0.9.25, Build 90bdb78ef4d1**, Intel/macOS Release. Entpacktes Paket
+Dist enthält **0.9.26, Build 598af64e048c**, Intel/macOS Release. Entpacktes Paket
 besteht mit 126 Desktop-, 157 Tastatur-, 75 Sicherungsassertions, zwei Neustarts
 und CLI. Alle drei Lizenzsammlungen stimmen bytegenau mit ihren Manifesten
 überein. Eigenes Gedächtnis geladen/Raster betrachtet, Dateien unverändert.
-Rückfallkopie: build/previous-dist-0.9.24-20261008-054010.
+Rückfallkopie: build/previous-dist-0.9.25-20261008-063006.
 
 [CI 37704298271](https://github.com/Lulus792/SecondBrain/actions/runs/37704298271)
 zu 7f9acb8 besteht in allen 20 Jobs einschließlich acht Desktop-Varianten und
@@ -63,9 +63,16 @@ gezielte ASan/UBSan bestehen mit 36/7/119 Assertions. Mausfokus und Layout
 bei Schriftwechsel sind nachgeprüft. Native CI-/Paketabnahme folgen.
 
 Quellstand 598af64 gepusht; [CI 37727294396](https://github.com/Lulus792/SecondBrain/actions/runs/37727294396)
-ist gestartet. Lokale Paketprüfung läuft mit demselben Quellstand.
+besteht in allen 20 Jobs inklusive vier entpackter Pakete. Lokal installiert.
 
-Nächster Schritt: laufende 0.9.26-CI-/Paketprüfung auswerten; Mac-Paket aktualisieren.
+0.9.27 / 6496f7b: Mac-Tabellenmatrix lokal nativ geprüft und gepusht.
+0.9.28: Nutzerfeedback zu GPU-Übergang, Startfokus, Suchende und Formularlinien
+umgesetzt. Gesamtprüfung fand einen ersten instabilen Formularrahmen;
+Anfangsmaße und Meldungszustand sind korrigiert; alle 51 abschließenden
+Release-Prüfungen bestehen (293,35 Sekunden). Eigene UI-/Desktop-/Renderer-
+Sanitizer bestehen mit 135/124/36 Assertions. Paketabschluss folgt.
+
+Nächster Schritt: 0.9.28 abschließend prüfen, pushen und Mac-Paket aktualisieren.
 Weitere Release-Arbeiten: Bidi/visuelle Textgeometrie/IME, native
 Tabellenmatrix, Screenreader-/Dialog-/Geräte-/Langzeitabnahmen, volle Windows-/
 Linux-Zielvolumes und physische Persistenz. Originalverträge stehen in SOURCES.

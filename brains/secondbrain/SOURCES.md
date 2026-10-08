@@ -109,3 +109,8 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Rust-Laufzeitnachweis](../../docs/RUST_RUNTIME_NACHWEIS.md): originale Library-Lockdatei und buildbezogene Compileridentität; zusätzliche Original-Lizenzen bleiben offen.
 
 - [Paket-Laufzeitprüfung](../../docs/PAKET_LAUFZEIT.md): native Imports/Abhängigkeitsauflösung, Systemverträge, tatsächliche Fixture-/Paketnachweise und Grenzen.
+
+- [Weitere Navigationspolitur](../../docs/NAVIGATION_POLITUR.md): GPU-Snapshot,
+  freie Suchflächen, Anfangsgeometrie und erneute Apple-Originale am 8. Oktober.
+- [Tabellenmatrix](../../docs/TABELLEN.md): native Mac-Matrix, verbleibende
+  Windows-/Linux-Anbindung und getrennte Screenreader-Abnahme.

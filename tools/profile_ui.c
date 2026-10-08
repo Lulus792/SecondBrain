@@ -6,15 +6,21 @@
 typedef struct { double layout,draw,present,apply,total; } Sample;
 static double elapsed(Uint64 start) { return (double)(SDL_GetTicksNS()-start)/1e6; }
 static int compare(const void *a,const void *b) { double x=*(const double *)a,y=*(const double *)b;return x<y ? -1 : x>y; }
-static void phase(SBDesktop *d,const char *name,unsigned mode) {
+static void phase(SBDesktop *d,const char *name,unsigned mode,char **notes,size_t count) {
     Sample samples[60];
     for(unsigned i=0;i<68;++i) {
         nk_input_begin(d->ui.ctx);SDL_Event e;while(SDL_PollEvent(&e))sb_desktop_event(d,&e);
         if(mode==1)d->scrolling[0].pending+=i<34 ? 3 : -3;
         if(mode==2)d->yaw+=0.01f;
         if(mode==3 && i%10==0 && d->model.notes.count>1) {
-            SDL_Event key={0};key.type=SDL_EVENT_KEY_DOWN;key.key.key=SDLK_RIGHT;key.key.down=true;
-            strcpy(d->focus,"galaxy");d->keyboard=true;sb_desktop_event(d,&key);
+            if(count>1) {
+                const char *path=notes[(i/10)%count];
+                d->navigation.kind=SB_ACT_NOTE;snprintf(d->navigation.value,sizeof(d->navigation.value),"%s",path);
+                d->ui.capture_pending=strcmp(path,d->model.path)!=0;d->follow_star=true;
+            } else {
+                SDL_Event key={0};key.type=SDL_EVENT_KEY_DOWN;key.key.key=SDLK_RIGHT;key.key.down=true;
+                strcpy(d->focus,"galaxy");d->keyboard=true;sb_desktop_event(d,&key);
+            }
         }
         Uint64 start=SDL_GetTicksNS(),t=start;sb_desktop_tick(d,1.0f/60);nk_input_end(d->ui.ctx);sb_desktop_frame(d);
         Sample s={0};s.layout=elapsed(t);t=SDL_GetTicksNS();sb_ui_draw(&d->ui);s.draw=elapsed(t);
@@ -28,13 +34,13 @@ static void phase(SBDesktop *d,const char *name,unsigned mode) {
     printf("%s: layout %.2f ms; draw %.2f ms; present %.2f ms; apply %.2f ms; frame median %.2f p95 %.2f max %.2f ms\n",name,layout/60,draw/60,present/60,apply/60,times[30],times[56],times[59]);fflush(stdout);
 }
 int main(int argc,char **argv) {
-    if(argc!=5 && argc!=6){fprintf(stderr,"Usage: profile WORKSPACE PROJECT FONT software|native [NOTE]\n");return 2;}
+    if(argc<5){fprintf(stderr,"Usage: profile WORKSPACE PROJECT FONT software|native [NOTE ...]\n");return 2;}
     SBDesktop d;SBStatus s=sb_desktop_init(&d,argv[1],argv[3],!strcmp(argv[4],"software"));
     if(s.code!=SB_OK){fprintf(stderr,"%s\n",s.message);return 1;}
     s=sb_app_request(&d.model,SB_ACT_PROJECT,argv[2]);
     if(s.code!=SB_OK){fprintf(stderr,"%s\n",s.message);sb_desktop_free(&d);return 1;}
-    if(argc==6){s=sb_app_request(&d.model,SB_ACT_NOTE,argv[5]);if(s.code!=SB_OK){fprintf(stderr,"%s\n",s.message);sb_desktop_free(&d);return 1;}}
+    if(argc>=6){s=sb_app_request(&d.model,SB_ACT_NOTE,argv[5]);if(s.code!=SB_OK){fprintf(stderr,"%s\n",s.message);sb_desktop_free(&d);return 1;}}
     printf("Renderer: %s; notes: %zu; view: 1336x840\n",SDL_GetRendererName(d.ui.renderer),d.model.notes.count);
-    phase(&d,"idle",0);phase(&d,"scroll",1);phase(&d,"camera",2);phase(&d,"switch",3);
+    phase(&d,"idle",0,argv+5,(size_t)argc-5);phase(&d,"scroll",1,argv+5,(size_t)argc-5);phase(&d,"camera",2,argv+5,(size_t)argc-5);phase(&d,"switch",3,argv+5,(size_t)argc-5);
     sb_desktop_free(&d);return 0;
 }

@@ -2,7 +2,7 @@
 
 Stand: 8. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.25. Die neue Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.26. Die neue Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -2298,3 +2298,29 @@ Quellstand 598af64 ist nach origin gepusht.
 [CI 37727294396](https://github.com/Lulus792/SecondBrain/actions/runs/37727294396)
 ist gestartet; lokale entpackte Paketprüfung läuft separat. Nachweise erst
 nach tatsächlichem Abschluss übernehmen. Installiert bleibt 0.9.25.
+
+## Nachweise vom 8. Oktober 2026
+
+0.9.26 / 598af64 ist lokal als geprüftes Paket installiert. Versionsausgabe,
+Original-Lizenzbündel und unveränderte Projektdateien sind geprüft.
+[CI 37727294396](https://github.com/Lulus792/SecondBrain/actions/runs/37727294396)
+besteht in allen 20 Jobs einschließlich vier entpackter Pakete.
+
+0.9.27 / 6496f7b ergänzt die native macOS-Tabellenmatrix; die gezielte
+Release-Prüfung besteht. Windows-/Linux-Matrix und menschliche Screenreader-
+Abnahme bleiben offen. [Tabellenvertrag](TABELLEN.md).
+
+0.9.28 verfeinert GPU-Übergänge, den Fokus nach Einstieg/Projektanlage,
+Suchende bei freien Flächen und gemeinsame Formularlinien. Eine alte
+Suchsitzung blieb im provozierten Ausgangsfall bestehen; die neue
+Navigation besteht. Die Gesamtprüfung provozierte einen instabilen ersten
+Formularrahmen; Anfangsmaße und alte Meldungen sind korrigiert. Der vollständige
+Desktopablauf besteht erneut; eine zusätzliche Prüfung beider erster
+Formularrahmen bei 100/200 Prozent besteht (18,50 Sekunden). Die gezielten Release-Prüfungen für native
+Zugänglichkeit, Übergänge und Navigation bestehen (12,92 / 18,33 /
+18,07 Sekunden). Der abschließende lokale Release-Lauf besteht mit 51/51 Prüfungen
+(293,35 Sekunden). Gezielte ASan/UBSan-Prüfungen bestehen mit 135 Interaktions-,
+124 Navigations- und 36 IME-Assertions. Eigene UI-/Desktop-/Renderer-/
+Testobjekte sind instrumentiert; Kern/externe Bibliotheken nicht,
+macOS-Leakprüfung deaktiviert. Paket- und neue Plattformprüfung folgen.
+[Vertrag und Messgrenzen](NAVIGATION_POLITUR.md).

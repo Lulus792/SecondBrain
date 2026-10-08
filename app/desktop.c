@@ -17,6 +17,7 @@ static void accessible_actions(SBDesktop *d);
 static void accessible_publish(SBDesktop *d);
 static void search_begin(SBDesktop *d);
 static void search_end(SBDesktop *d);
+static void focus_set(SBDesktop *d,const char *id);
 static void composition_dispatch(void *user,const SDL_Event *event){sb_desktop_event(user,event);}
 static void style_update(SBDesktop *d,bool force) {
     d->system_style=sb_system_style_snapshot(d->style_monitor,force);
@@ -59,7 +60,8 @@ void sb_desktop_tick(SBDesktop *d, float seconds) {
     d->ui.ctx->style.edit.cursor_size=1.5f*d->ui.scale;
     accessible_actions(d);
     backup_poll(d);
-    d->seconds = fmaxf(0, fminf(seconds, 0.05f));
+    /* A slow frame must not stretch a short transition into slow motion. */
+    d->seconds = fmaxf(0, fminf(seconds, 0.25f));
     float factor = d->reduced_motion ? 1 : 1-expf(-d->seconds/0.085f);
     d->view_yaw = approach(d->view_yaw,d->yaw,factor,0.0001f);
     d->view_pitch = approach(d->view_pitch,d->pitch,factor,0.0001f);
@@ -497,6 +499,7 @@ SBStatus sb_desktop_init(SBDesktop *d, const char *workspace, const char *font, 
         d->message = status;
     }
     d->generation = d->model.generation;
+    sb_desktop_focus_start(d);
     return sb_ok();
 }
 SBStatus sb_desktop_preferences(SBDesktop *d, const char *path, bool explicit_workspace) {
@@ -653,6 +656,7 @@ void sb_desktop_apply(SBDesktop *d) {
         d->message=status; return;
     }
     if (cmd == SB_CMD_NEW_PROJECT || cmd == SB_CMD_NEW_NOTE) {
+        d->message=sb_ok();
         d->form = cmd == SB_CMD_NEW_PROJECT ? SB_FORM_PROJECT : SB_FORM_NOTE;
         d->name[0] = 0; d->id[0] = 0; d->repository[0] = 0; d->id_manual = false;
         d->note_section = 0; d->form_focus = 1; d->active_form_field = 1;
@@ -673,7 +677,11 @@ void sb_desktop_apply(SBDesktop *d) {
             if (status.code == SB_OK && d->settings_path[0]) d->settings_enabled=true;
             result(d, status, "Arbeitsordner geöffnet.");
         }
-        if (status.code == SB_OK) d->form = SB_FORM_NONE;
+        if (status.code == SB_OK) {
+            bool project_created=d->form==SB_FORM_PROJECT || d->form==SB_FORM_WORKSPACE;
+            d->form = SB_FORM_NONE;
+            if(project_created && d->model.has_project)snprintf(d->saved_focus,sizeof(d->saved_focus),"galaxy");
+        }
     } else if (cmd == SB_CMD_CANCEL) { ++d->dialog_serial; d->form = SB_FORM_NONE; }
     else if (cmd == SB_CMD_SAVE) {
         status = sb_app_save(&d->model); result(d, status, "Gespeichert.");
@@ -958,10 +966,19 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
     }
     if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
         d->keyboard = false;
+        bool hit=false;
         for (size_t i = d->target_count; i > 0; --i) if (inside(event->button.x, event->button.y, d->targets[i-1].bounds)) {
+            hit=true;
             if(d->targets[i-1].kind==SB_FOCUS_TEXT || strcmp(d->focus,d->targets[i-1].id))sb_ui_input_barrier(&d->ui);
             if(!strcmp(d->targets[i-1].id,"search"))search_begin(d);
             snprintf(d->focus, sizeof(d->focus), "%s", d->targets[i-1].id); break;
+        }
+        struct nk_window *results=nk_window_find(d->ui.ctx,"Documents");
+        bool in_results=d->browser && results && inside(event->button.x,event->button.y,results->bounds);
+        if(!hit && inside(event->button.x,event->button.y,d->search_bounds) && d->form==SB_FORM_NONE && !d->model.guard) {
+            focus_set(d,"search");d->keyboard=false;
+        } else if(!hit && d->search_session && !in_results) {
+            search_end(d);focus_set(d,"galaxy");d->keyboard=false;
         }
         if (map_input(d, event->button.x, event->button.y)) {
             d->dragging = true; d->moved = false; d->drag_x = event->button.x; d->drag_y = event->button.y;
@@ -1180,7 +1197,7 @@ static void search_box(SBDesktop *d) {
     struct nk_style_item background=ctx->style.edit.normal,hover=ctx->style.edit.hover,active=ctx->style.edit.active;float border=ctx->style.edit.border;
     nk_fill_rect(nk_window_get_canvas(ctx),box,10*s,d->ui.dark ? nk_rgba(6,16,30,170) : nk_rgba(255,255,255,180));
     nk_stroke_rect(nk_window_get_canvas(ctx),box,10*s,1,d->ui.dark ? nk_rgba(160,190,225,70) : nk_rgba(75,100,130,100));
-    ctx->style.window.group_padding=nk_vec2(12*s,0);ctx->style.window.spacing=nk_vec2(8*s,0);
+    ctx->style.window.group_padding=nk_vec2(8*s,0);ctx->style.window.spacing=nk_vec2(8*s,0);
     ctx->style.edit.normal=ctx->style.edit.hover=ctx->style.edit.active=nk_style_item_color(nk_rgba(0,0,0,0));ctx->style.edit.border=0;
     ctx->style.edit.padding=nk_vec2(0,fmaxf(0,(box.h-d->ui.normal->handle.height)/2));
     if (nk_group_begin(ctx,"Search field",NK_WINDOW_NO_SCROLLBAR)) {
@@ -1804,8 +1821,12 @@ static float modal_estimate(SBDesktop *d,float width) {
     float s=d->ui.scale,gap=d->ui.ctx->style.window.spacing.y,row=36*s+gap;
     if (d->form==SB_FORM_FILTER) return 6*row;
     if (d->form==SB_FORM_ACTIONS) return (7+(d->model.editor && strchr(d->model.path,'/') && strncmp(d->model.path,"archive/",8) ? 1 : 0))*row;
-    if (d->form==SB_FORM_NOTE) return 3*(24*s+36*s+2*gap);
-    if (d->form==SB_FORM_PROJECT) return 3*(24*s+36*s+2*gap);
+    if (d->form==SB_FORM_NOTE || d->form==SB_FORM_PROJECT) {
+        const char *hint=d->form==SB_FORM_PROJECT ? "Aus dem Projektnamen abgeleitet. Kleinbuchstaben, Zahlen und Bindestriche sind möglich." : "Aus dem Titel abgeleitet. Kleinbuchstaben, Zahlen und Bindestriche sind möglich.";
+        float inner=fmaxf(1,width-2*d->ui.ctx->style.window.padding.x-(10+6*s));
+        float help=sb_ui_wrap_height(d->ui.ctx,&d->ui.normal->handle,hint,strlen(hint),inner);
+        return (d->form==SB_FORM_NOTE ? 192 : 190)*s+9*gap+help+(d->message.message[0] ? 52*s+gap : 0);
+    }
     /* Two section labels and ten control rows, matching the settings content. */
     if (d->form==SB_FORM_SETTINGS) return (24+32+10*36)*s+11*gap;
     if (d->form==SB_FORM_WORKSPACE) return 48*s+gap+24*s+36*s+2*gap+row;
@@ -1863,7 +1884,9 @@ static void popup(SBDesktop *d, int width, int height) {
     float gap=ctx->style.window.spacing.y;
     bool has_footer=d->backup || d->form==SB_FORM_PROJECT || d->form==SB_FORM_NOTE || d->form==SB_FORM_WORKSPACE || d->form==SB_FORM_BACKUP || d->form==SB_FORM_RESTORE;
     float shell=2*ctx->style.window.padding.y+32*s+2*gap+(has_footer ? 36*s+gap : 0);
-    float content_height=modal_estimate(d,w)+2*ctx->style.window.group_padding.y;
+    bool creation=d->form==SB_FORM_NOTE || d->form==SB_FORM_PROJECT;
+    /* Nuklear starts the first row with the panel's vertical padding too. */
+    float content_height=modal_estimate(d,w)+(creation ? 24*s : 2*ctx->style.window.group_padding.y);
     if (d->measured_form==d->form && d->modal_content_width==w && d->modal_content_scale==s && d->modal_content_height>0 && !modal_reader(d)) content_height=d->modal_content_height;
     else if(d->measured_form==d->form && d->modal_content_scale>0 && d->modal_content_height>0 &&
             fabsf(d->modal_content_width/d->modal_content_scale-w/s)<0.5f && !modal_reader(d))
@@ -1881,6 +1904,8 @@ static void popup(SBDesktop *d, int width, int height) {
         bool form=!d->backup && (d->form==SB_FORM_PROJECT || d->form==SB_FORM_NOTE || d->form==SB_FORM_WORKSPACE || d->form==SB_FORM_BACKUP || d->form==SB_FORM_RESTORE);
         float contents=fmaxf(40,h-shell);
         nk_layout_row_dynamic(ctx,contents,1);
+        struct nk_vec2 body_padding=ctx->style.window.group_padding;
+        if(form)ctx->style.window.group_padding=nk_vec2(0,8*s);
         bool group=nk_group_begin(ctx,"Modal contents",NK_WINDOW_NO_SCROLLBAR);
         if (group) {
         scroll_gutter(d);
@@ -2088,6 +2113,7 @@ static void popup(SBDesktop *d, int width, int height) {
         }
         scroll_measure(d,3); nk_group_end(ctx);
         }
+        ctx->style.window.group_padding=body_padding;
         if (d->backup) {
             nk_layout_row_dynamic(ctx,36*s,2); nk_spacer(ctx);
             if (button(d,"backup-cancel","Abbrechen")) command(d,SB_CMD_CANCEL);
@@ -2097,7 +2123,7 @@ static void popup(SBDesktop *d, int width, int height) {
             float cancel_width=fmaxf(88*s,font->width(font->userdata,font->height,"Abbrechen",9)+32*s);
             float submit_width=fmaxf(88*s,font->width(font->userdata,font->height,submit,(int)strlen(submit))+32*s);
             nk_layout_row_begin(ctx,NK_STATIC,36*s,3);
-            nk_layout_row_push(ctx,fmaxf(0,available-cancel_width-submit_width-2*ctx->style.window.spacing.x));nk_spacer(ctx);
+            nk_layout_row_push(ctx,fmaxf(0,available-(10+6*s)-cancel_width-submit_width-2*ctx->style.window.spacing.x));nk_spacer(ctx);
             nk_layout_row_push(ctx,cancel_width);if(button(d,"cancel-footer","Abbrechen"))command(d,SB_CMD_CANCEL);
             nk_layout_row_push(ctx,submit_width);if(button(d,"submit",submit))command(d,SB_CMD_SUBMIT);
             nk_layout_row_end(ctx);

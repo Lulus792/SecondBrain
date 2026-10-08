@@ -57,3 +57,46 @@ Vor Umsetzung erneut gelesen: Apple [Text fields](https://developer.apple.com/de
 [Focus and selection](https://developer.apple.com/design/human-interface-guidelines/focus-and-selection).
 Fokusstart, Cachetechnik, Cursorzeiten und konkrete Abstände sind eigene Übertragung.
 Prüfungen und Grenzen: [STATUS](STATUS.md), verbleibende Arbeiten: [RELEASE](RELEASE.md).
+
+## Weitere Politur am 8. Oktober 2026 (0.9.28)
+
+Die ausgehende Ansicht bleibt für den Kartenwechsel in einer GPU-Textur.
+Der zuvor synchrone `SDL_RenderReadPixels`-Schritt entfällt dabei; gewöhnliche
+Frames rendern weiterhin direkt. Der bestehende Pixelvergleich prüft das alte
+Bild und zwölf schnell unterbrochene Wechsel. Fehlende Snapshot-Ressourcen
+führen zum direkten Wechsel, niemals zu einer veralteten Karte.
+Bewegung berücksichtigt auch langsamere Frames bis 250 ms; die vorherige
+50-ms-Grenze konnte die Dauer unter Last verlängern.
+
+Das Desktop-Modell setzt den Startfokus selbst. Auch nach erfolgreichem
+Anlegen eines Projekts beziehungsweise Öffnen eines Arbeitsordners liegt er
+auf der Sternkarte. Der dünne blinkende Einfügecursor und der native
+Textzeiger sind in der aktuellen Navigation nochmals geprüft.
+
+Ein Klick auf freie Fensterfläche außerhalb von Suchfeld und Ergebnisliste
+beendet jetzt die Suche. Freie Fläche innerhalb der Ergebnisliste erhält sie.
+Das Suchsymbol selbst fokussiert das Feld. Escape, Löschung, Trefferwahl und
+Dokumentfokus behalten ihre Wege. Vorher geöffnete Listen bleiben bestehen;
+allein durch Suche geöffnete Listen schließen wieder. Das X liegt mit
+20 statt 24 skalierten Einheiten am rechten Rand, zentriert in seinem Platz.
+
+In den Anlegekarten teilen Überschrift, Beschriftungen und Felder dieselbe
+linke Linie; die Hauptaktion schließt rechts mit den Feldern ab. Die
+Scrollspur bleibt frei. Körper und fest erreichbare Fußzeile sind getrennt. Schon die erste
+Formgröße enthält gemessenen Hilfetext und sämtliche Feldabstände; dadurch
+verschiebt ein nachfolgender Frame das erste Klickziel nicht. Eine alte
+Erfolgsmeldung wird beim Beginn einer neuen Anlage entfernt.
+
+Apple [Search fields](https://developer.apple.com/design/human-interface-guidelines/search-fields),
+[Text fields](https://developer.apple.com/design/human-interface-guidelines/text-fields) und
+[Motion](https://developer.apple.com/design/human-interface-guidelines/motion)
+wurden vor diesen Änderungen erneut über die offiziellen DocC-Daten gelesen.
+Die genannten Zeiten, Maße, Fokus- und Suchzustände sind eigene Umsetzung.
+
+Die isolierte Metal-Messung wechselt Eingang → START.md → Übergabe vom
+7. Oktober, jeweils sechs Wechsel in 60 warmen Stichproben bei 1336×840 auf
+dem Intel-Mac. Mit alter beziehungsweise neuer Snapshottechnik liegt das
+95. Perzentil der Frames bei 40,85 beziehungsweise 26,66 ms. Median
+14,53 → 14,79 ms und Maximum 84,19 → 87,83 ms verbessern sich nicht.
+Dies belegt die reduzierte Verzögerung eines konkreten Renderwegs; kein
+Versprechen einer festen Bildrate oder allgemeiner Geräteabnahme.

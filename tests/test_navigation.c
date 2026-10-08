@@ -43,12 +43,19 @@ int main(int argc,char **argv){
     key(&d,SDLK_LEFT,0);if(!strcmp(previous,d.model.path))key(&d,SDLK_RIGHT,0);CHECK(strcmp(previous,d.model.path) && d.graph.stars==graph);
     OK(sb_app_request(&d.model,SB_ACT_NOTE,"knowledge/a.md"));frame(&d);frame(&d);
     d.browser=false;key(&d,SDLK_F,MOD);type(&d,"Alpha");CHECK(d.search_session && d.browser && !strcmp(d.search,"Alpha"));
-    SBTarget *clear=target(&d,"clear-search");CHECK(clear);CHECK(fabsf(d.search_bounds.x+d.search_bounds.w-clear->bounds.x-clear->bounds.w/2-24*d.ui.scale)<1);
+    SBTarget *clear=target(&d,"clear-search");CHECK(clear);CHECK(fabsf(d.search_bounds.x+d.search_bounds.w-clear->bounds.x-clear->bounds.w/2-20*d.ui.scale)<1);
     for(unsigned i=0;i<25 && strcmp(d.focus,"note:knowledge/a.md");++i)key(&d,SDLK_TAB,0);
     CHECK(!strcmp(d.focus,"note:knowledge/a.md") && d.search_session && !strcmp(d.search,"Alpha"));
     key(&d,SDLK_ESCAPE,0);CHECK(!d.browser && !d.search_session && !d.search[0]);
     d.browser=true;key(&d,SDLK_F,MOD);type(&d,"Alpha");key(&d,SDLK_ESCAPE,0);CHECK(d.browser && !d.search_session && !d.search[0]);
     d.browser=false;key(&d,SDLK_F,MOD);type(&d,"Alpha");CHECK(click(&d,"reader"));CHECK(!d.browser && !d.search_session && !d.search[0]);
+    /* Leaving search through unused chrome must restore the prior list state. */
+    key(&d,SDLK_F,MOD);type(&d,"Alpha");
+    SDL_Event outside={0};outside.type=SDL_EVENT_MOUSE_BUTTON_DOWN;
+    outside.button.windowID=SDL_GetWindowID(d.ui.window);outside.button.button=SDL_BUTTON_LEFT;
+    outside.button.down=true;outside.button.x=4;outside.button.y=4;SDL_PushEvent(&outside);frame(&d);
+    outside.type=SDL_EVENT_MOUSE_BUTTON_UP;outside.button.down=false;SDL_PushEvent(&outside);frame(&d);
+    CHECK(!d.search_session && !d.browser && !d.search[0]);
     key(&d,SDLK_F,MOD);type(&d,"Alpha");CHECK(click(&d,"clear-search"));if(d.browser || d.search_session || d.search[0])fprintf(stderr,"CLEAR state browser=%d session=%d query=%s focus=%s\n",d.browser,d.search_session,d.search,d.focus);CHECK(!d.browser && !d.search_session && !d.search[0]);
     key(&d,SDLK_E,MOD);CHECK(d.editing);SBTarget *edit=target(&d,"editor");CHECK(edit);SDL_Event motion={0};motion.type=SDL_EVENT_MOUSE_MOTION;motion.motion.windowID=SDL_GetWindowID(d.ui.window);motion.motion.x=edit->bounds.x+20;motion.motion.y=edit->bounds.y+20;SDL_PushEvent(&motion);frame(&d);
     CHECK(d.ui.pointer_text && d.ui.text_cursor && SDL_GetCursor()==d.ui.text_cursor && d.ui.ctx->style.edit.cursor_size<3);
@@ -107,5 +114,12 @@ int main(int argc,char **argv){
     CHECK(d.form==SB_FORM_PROJECT && sb_desktop_animating(&d));
     frame(&d);frame(&d);frame(&d);CHECK(!strcmp(d.name,"Sofort"));
     key(&d,SDLK_ESCAPE,0);
+    /* A fresh desktop with a remembered project has keyboard focus itself. */
+    sb_desktop_free(&d);OK(sb_desktop_init(&d,root,argv[1],true));
+    CHECK(d.model.has_project && d.keyboard && !strcmp(d.focus,"galaxy"));frame(&d);frame(&d);
+    strcpy(previous,d.model.path);key(&d,SDLK_LEFT,0);if(!strcmp(previous,d.model.path))key(&d,SDLK_RIGHT,0);
+    CHECK(strcmp(previous,d.model.path));
+    key(&d,SDLK_N,MOD|SDL_KMOD_SHIFT);type(&d,"Drittes Projekt");key(&d,SDLK_RETURN,0);frame(&d);
+    CHECK(d.form==SB_FORM_NONE && !strcmp(d.model.project.id,"drittes-projekt") && !strcmp(d.focus,"galaxy"));
     sb_desktop_free(&d);printf("%u navigation assertions passed; %s.\n",checks,argc==3 ? "48 cached/uncached raster cases" : "navigation-only run");return 0;
 }

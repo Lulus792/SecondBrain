@@ -354,6 +354,14 @@ void sb_ui_draw(SBUi *ui) {
     ui->input_area_pending=false;
     sb_ui_composition_frame_end(ui);
     int width,height;SDL_GetWindowSize(ui->window,&width,&height);
+    /* Keep the outgoing frame on the GPU. Reading the window back to the CPU
+       forces a synchronous GPU wait on every note change. */
+    SDL_Texture *snapshot=NULL;
+    int pixels_w=0,pixels_h=0;
+    if(ui->capture_pending && SDL_GetRenderOutputSize(ui->renderer,&pixels_w,&pixels_h)) {
+        snapshot=SDL_CreateTexture(ui->renderer,SDL_PIXELFORMAT_RGBA32,SDL_TEXTUREACCESS_TARGET,pixels_w,pixels_h);
+        if(snapshot && !SDL_SetRenderTarget(ui->renderer,snapshot)) {SDL_DestroyTexture(snapshot);snapshot=NULL;}
+    }
     SDL_SetRenderLogicalPresentation(ui->renderer,width,height,SDL_LOGICAL_PRESENTATION_STRETCH);
     SDL_SetRenderDrawColor(ui->renderer,ui->dark ? 28 : 255,ui->dark ? 29 : 255,ui->dark ? 33 : 255,255);SDL_RenderClear(ui->renderer);
     if (!sb_space_draw(&ui->space,ui->renderer,width,height)) {SDL_SetRenderDrawColor(ui->renderer,7,14,26,255);SDL_RenderClear(ui->renderer);}
@@ -364,12 +372,19 @@ void sb_ui_draw(SBUi *ui) {
         SDL_RenderTexture(ui->renderer,ui->outgoing_texture,&source,&dest);
     }
     if (ui->capture_pending) {
-        /* Capture only the outgoing change, before Present invalidates the
-           backbuffer. Normal frames keep their direct rendering path. */
-        ui->capture_pending=false;SDL_Surface *surface=SDL_RenderReadPixels(ui->renderer,NULL);
-        SDL_Texture *snapshot=surface ? SDL_CreateTextureFromSurface(ui->renderer,surface) : NULL;
-        if (snapshot) {SDL_DestroyTexture(ui->outgoing_texture);ui->outgoing_texture=snapshot;ui->snapshot_width=surface->w;ui->snapshot_height=surface->h;ui->outgoing_bounds=ui->card_bounds;SDL_SetTextureBlendMode(snapshot,SDL_BLENDMODE_BLEND);}
-        SDL_DestroySurface(surface);
+        ui->capture_pending=false;
+        if (snapshot) {
+            SDL_SetRenderTarget(ui->renderer,NULL);
+            SDL_SetRenderLogicalPresentation(ui->renderer,width,height,SDL_LOGICAL_PRESENTATION_STRETCH);
+            SDL_SetTextureBlendMode(snapshot,SDL_BLENDMODE_NONE);
+            SDL_RenderTexture(ui->renderer,snapshot,NULL,NULL);
+            SDL_DestroyTexture(ui->outgoing_texture);ui->outgoing_texture=snapshot;
+            ui->snapshot_width=pixels_w;ui->snapshot_height=pixels_h;ui->outgoing_bounds=ui->card_bounds;
+            SDL_SetTextureBlendMode(snapshot,SDL_BLENDMODE_BLEND);
+        } else {
+            /* Never blend a stale note if allocation or target setup failed. */
+            SDL_DestroyTexture(ui->outgoing_texture);ui->outgoing_texture=NULL;ui->transitioning=false;
+        }
     }
 }
 
