@@ -22,6 +22,7 @@
 void sb_ui_grapheme_clamp(struct nk_text_edit *edit);
 typedef struct SBTextSystem SBTextSystem;
 typedef struct SBStyledCache SBStyledCache;
+typedef struct SBComposition SBComposition;
 typedef struct {
     SBTextSystem *text;
     SBStyledCache *styled_cache;
@@ -35,6 +36,13 @@ typedef struct {
     SDL_Rect applied_input_area;
     bool input_area_applied;
     struct nk_window *input_window;
+    nk_hash input_id;
+    uint64_t input_hash;
+    int input_cursor,input_start,input_end;
+    unsigned char input_mode;
+    struct nk_vec2 input_scrollbar;
+    SBComposition *composition;
+    SBStatus input_status;
     bool pointer_text;
     struct nk_context *ctx;
     struct nk_font *normal, *body, *heading, *code;
@@ -53,6 +61,13 @@ SBStatus sb_ui_init(SBUi *ui, const char *font_path, int width, int height, bool
 SBStatus sb_ui_fonts(SBUi *ui, float scale);
 void sb_ui_theme(SBUi *ui, bool dark);
 void sb_ui_event(SBUi *ui, const SDL_Event *event);
+bool sb_ui_composition_event(SBUi *ui,const SDL_Event *event);
+void sb_ui_composition_cancel(SBUi *ui);
+void sb_ui_composition_replay(SBUi *ui,void (*dispatch)(void *,const SDL_Event *),void *user);
+bool sb_ui_composition_active(const SBUi *ui);
+bool sb_ui_composition_committing(const SBUi *ui);
+bool sb_ui_composition_working(const SBUi *ui);
+void sb_ui_focus_input(SBUi *ui);
 void sb_ui_draw(SBUi *ui);
 void sb_ui_transition_begin(SBUi *ui);
 void sb_ui_transition_tick(SBUi *ui,float seconds,bool reduced_motion);

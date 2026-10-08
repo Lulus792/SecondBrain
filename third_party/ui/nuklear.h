@@ -4606,6 +4606,7 @@ struct nk_text_edit {
     /* SecondBrain: geometry from the same layout used to paint the caret. */
     struct nk_rect caret_bounds;
     struct nk_rect caret_clip;
+    nk_handle display_userdata;
 
     int cursor;
     int select_start;
@@ -4876,8 +4877,8 @@ struct nk_command_text {
     const struct nk_user_font *font;
     struct nk_color background;
     struct nk_color foreground;
-    short x, y;
-    unsigned short w, h;
+    /* Long editor lines keep logical geometry until the renderer clips it. */
+    float x, y, w, h;
     float height;
     int length;
     char string[2];
@@ -9463,6 +9464,13 @@ nk_fill_rect(struct nk_command_buffer *b, struct nk_rect rect,
         const struct nk_rect *clip = &b->clip;
         if (!NK_INTERSECT(rect.x, rect.y, rect.w, rect.h,
             clip->x, clip->y, clip->w, clip->h)) return;
+        /* Huge, square text selections are clipped before 16-bit packing. */
+        if (rounding==0 && (rect.x<-32768 || rect.y<-32768 || rect.x>32767 || rect.y>32767 || rect.w>65535 || rect.h>65535)) {
+            float right=NK_MIN(rect.x+rect.w,clip->x+clip->w),bottom=NK_MIN(rect.y+rect.h,clip->y+clip->h);
+            rect.x=NK_MAX(rect.x,clip->x);rect.y=NK_MAX(rect.y,clip->y);
+            rect.w=right-rect.x;rect.h=bottom-rect.y;
+            if(rect.w<=0 || rect.h<=0)return;
+        }
     }
 
     cmd = (struct nk_command_rect_filled*)
@@ -9847,10 +9855,10 @@ nk_draw_text(struct nk_command_buffer *b, struct nk_rect r,
     cmd = (struct nk_command_text*)
         nk_command_buffer_push(b, NK_COMMAND_TEXT, sizeof(*cmd) + (nk_size)(length + 1));
     if (!cmd) return;
-    cmd->x = (short)r.x;
-    cmd->y = (short)r.y;
-    cmd->w = (unsigned short)r.w;
-    cmd->h = (unsigned short)r.h;
+    cmd->x = r.x;
+    cmd->y = r.y;
+    cmd->w = r.w;
+    cmd->h = r.h;
     cmd->background = bg;
     cmd->foreground = fg;
     cmd->font = font;
@@ -28856,6 +28864,12 @@ nk_do_edit(nk_flags *state, struct nk_command_buffer *out,
     if (is_hovered)
         *state |= NK_WIDGET_STATE_HOVERED;
 
+    /* A display-only edit leaves the original buffer and undo history intact. */
+    struct nk_text_edit *original_edit=edit;
+#ifdef NK_TEXTEDIT_DISPLAY_CUSTOM
+    edit=NK_TEXTEDIT_DISPLAY_CUSTOM(edit);
+    if(edit!=original_edit)cursor_follow=nk_true;
+#endif
     /* DRAW EDIT */
     {const char *text = nk_str_get_const(&edit->string);
     int len = nk_str_len_char(&edit->string);
@@ -29030,7 +29044,7 @@ nk_do_edit(nk_flags *state, struct nk_command_buffer *out,
                     if (cursor_pos.y < edit->scrollbar.y)
                         edit->scrollbar.y = NK_MAX(0.0f, cursor_pos.y);
                     if (cursor_pos.y > edit->scrollbar.y + area.h - row_height)
-                        edit->scrollbar.y = edit->scrollbar.y + row_height;
+                        edit->scrollbar.y = NK_MAX(0.0f,cursor_pos.y - area.h + row_height);
                 } else edit->scrollbar.y = 0;
             }
 
@@ -29224,7 +29238,15 @@ nk_do_edit(nk_flags *state, struct nk_command_buffer *out,
             area.y - edit->scrollbar.y, 0, begin, l, row_height, font,
             background_color, text_color, nk_false);
     }
+#ifdef NK_TEXTEDIT_MARKED_CUSTOM
+    NK_TEXTEDIT_MARKED_CUSTOM(out,edit,style,font,area,row_height);
+#endif
     nk_push_scissor(out, old_clip);}
+    if(edit!=original_edit){
+        original_edit->scrollbar=edit->scrollbar;
+        original_edit->caret_bounds=edit->caret_bounds;
+        original_edit->caret_clip=edit->caret_clip;
+    }
     return ret;
 }
 NK_API void
@@ -29361,12 +29383,11 @@ nk_edit_buffer(struct nk_context *ctx, nk_flags flags,
     filter = (!filter) ? nk_filter_default: filter;
     prev_state = (unsigned char)edit->active;
     in = (flags & NK_EDIT_READ_ONLY) ? 0: in;
+#ifdef NK_TEXTEDIT_PREPARE_CUSTOM
+    NK_TEXTEDIT_PREPARE_CUSTOM(ctx,edit,hash,flags);
+#endif
     ret_flags = nk_do_edit(&ctx->last_widget_state, &win->buffer, bounds, flags,
                     filter, edit, &style->edit, in, style->font);
-#ifdef NK_TEXTEDIT_CARET_CUSTOM
-    if (edit->active && !(flags & (NK_EDIT_READ_ONLY|NK_EDIT_NO_CURSOR)))
-        NK_TEXTEDIT_CARET_CUSTOM(ctx, edit->caret_bounds, edit->caret_clip);
-#endif
 
     if (ctx->last_widget_state & NK_WIDGET_STATE_HOVER)
         ctx->style.cursor_active = ctx->style.cursors[NK_CURSOR_TEXT];
@@ -29377,7 +29398,12 @@ nk_edit_buffer(struct nk_context *ctx, nk_flags flags,
     } else if (prev_state && !edit->active) {
         /* current edit is now cold */
         win->edit.active = nk_false;
-    } return ret_flags;
+    }
+#ifdef NK_TEXTEDIT_CARET_CUSTOM
+    if (edit->active && !(flags & (NK_EDIT_READ_ONLY|NK_EDIT_NO_CURSOR)))
+        NK_TEXTEDIT_CARET_CUSTOM(ctx,edit);
+#endif
+    return ret_flags;
 }
 NK_API nk_flags
 nk_edit_string_zero_terminated(struct nk_context *ctx, nk_flags flags,

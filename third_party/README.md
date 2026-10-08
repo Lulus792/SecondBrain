@@ -32,6 +32,14 @@ Lokale Anpassungen des Nuklear-Headers:
 - Aktive editierbare Felder melden Cursor- und Cliprechteck aus ihrem Zeichnungslayout
   über `NK_TEXTEDIT_CARET_CUSTOM`; die eigene SDL-Anbindung positioniert daran native
   Eingabevorschläge. Der Hook verändert weder Text noch Auswahl.
+- Ab 0.9.25 trennen Prepare-/Display-/Marked-Hooks die bestätigte Eingabe von
+  einer vorläufigen, unterstrichenen Kompositionsdarstellung. Die Anzeige verwendet
+  einen eigenen Textpuffer; Original und Undo bleiben bis zur Bestätigung erhalten.
+- Ab 0.9.25 behalten Textkommandos Float-Geometrie für lange Zeilen. Sehr große
+  ungerundete Textauswahlen werden vor dem Packen geclippt; vertikale
+  Cursor-Sprünge stellen direkt die sichtbare Zeile her. Die eigene
+  SDL_ttf-Anbindung rastert abgeschnittene vollständige Schriftläufe als
+  sichtbare Ausschnitte. [Nachweise](../docs/IME.md).
 - Bei rückwärts belegtem Zeichenpuffer entsteht vor einer nötigen Vergrößerung
   kein überlaufender Probezeiger. Die Interaktionsprüfung führt diesen Wachstumspfad
   mit ASan/UBSan aus.

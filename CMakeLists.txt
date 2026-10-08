@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-project(SecondBrain VERSION 0.9.24 LANGUAGES C)
+project(SecondBrain VERSION 0.9.25 LANGUAGES C)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
@@ -294,6 +294,20 @@ if(SB_BUILD_UI)
             "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/NotoSans-Regular.ttf"
             "${CMAKE_CURRENT_BINARY_DIR}/unicode-text.bmp")
         set_tests_properties(unicode-text-rendering PROPERTIES TIMEOUT 120 RESOURCE_LOCK secondbrain_clipboard)
+        add_executable(secondbrain-text-extent-tests tests/test_text_extent.c)
+        target_link_libraries(secondbrain-text-extent-tests PRIVATE sb_ui)
+        add_test(NAME long-text-viewport COMMAND secondbrain-text-extent-tests
+            "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/NotoSans-Regular.ttf")
+        set_tests_properties(long-text-viewport PROPERTIES TIMEOUT 120 RESOURCE_LOCK secondbrain_clipboard)
+        add_executable(secondbrain-composition-tests tests/test_composition.c)
+        target_link_libraries(secondbrain-composition-tests PRIVATE sb_ui)
+        if(MSVC)
+            target_compile_options(secondbrain-composition-tests PRIVATE /utf-8)
+        endif()
+        add_test(NAME ime-composition COMMAND secondbrain-composition-tests
+            "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/NotoSans-Regular.ttf"
+            "${CMAKE_CURRENT_BINARY_DIR}/composition.bmp")
+        set_tests_properties(ime-composition PROPERTIES TIMEOUT 120 RESOURCE_LOCK secondbrain_clipboard)
         add_executable(secondbrain-ui-tests tests/test_ui.c)
         target_link_libraries(secondbrain-ui-tests PRIVATE sb_ui)
         if(MSVC)

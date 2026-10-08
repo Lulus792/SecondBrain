@@ -44,7 +44,9 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   In 0.9.0 ergänzt eine eigene SDL_ttf-Anbindung HarfBuzz, FreeType und
   Ersatzschriften; lokale Raster-/Text-/Paketprüfungen bestehen. Gemischte
   Schreibrichtungen und präzise visuelle Eingabegeometrie bleiben in
-  [TEXTDARSTELLUNG.md](TEXTDARSTELLUNG.md) offen. 0.9.8 implementiert und prüft
+  [TEXTDARSTELLUNG.md](TEXTDARSTELLUNG.md) offen. 0.9.25 ergänzt
+  die [vorläufige IME-Komposition](IME.md); reale native Eingabemethoden,
+  Bidi und visuelle/native Zeichenrechtecke bleiben gesonderte Abnahmen. 0.9.8 implementiert und prüft
   [vollständige Graphem-Eingaben](GRAPHEME.md); 0.9.9 ergänzt die
   [Emoji-Schrift und Schriftläufe](EMOJI.md), deren Abschlussprüfung läuft. Ab 0.9.1 veröffentlicht
   die Leseansicht strukturierte Blöcke und bietet Abschnittssprünge;

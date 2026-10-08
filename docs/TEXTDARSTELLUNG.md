@@ -132,3 +132,10 @@ und zurückkehrenden Textfokus. Lokale Prüfungen bestehen: 49/49 und nach letzt
 Popup-Korrektur 3/3 (134 Editorassertions). Der native Plattformnachweis folgt
 im Umsetzungsstand. Dieser Schritt implementiert keine Preedit-Komposition,
 keine Bidi-Abbildung und keine neue native Zeichenrechteck-Schnittstelle.
+
+## Vorläufige Komposition ab 0.9.25
+
+[IME-Anbindung](IME.md) ergänzt unterstrichenen, vorläufigen Text direkt im
+Editor-/Feldlayout und schützt Original, Undo und Feldzuordnung. Lokaler
+Release-Neubau besteht mit 50/50. Das schließt Bidi-/präzise visuelle Geometrie,
+native Provider-Zeichenrechtecke und echte Eingabemethodenabnahme nicht ab.

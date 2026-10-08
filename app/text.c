@@ -21,7 +21,7 @@ typedef struct {
     char *text;
     size_t length, bytes;
     unsigned face;
-    int width, height, maximum;
+    int width, height, maximum,offset;
     uint64_t stamp;
 } SBTextCache;
 /* Bounded, exact-key measurement cache. Font systems own all entries and
@@ -34,6 +34,7 @@ typedef struct {
 #define SB_MEASURE_CACHE_LENGTH 2048
 struct SBTextSystem {
     SDL_Renderer *renderer;
+    TTF_TextEngine *surface_engine;
     float density;
     SBTextFace faces[SB_TEXT_FACES];
     SBTextCache cache[SB_TEXT_CACHE_ENTRIES];
@@ -50,6 +51,7 @@ static void system_free(SBTextSystem *text) {
     if (!text) return;
     for (unsigned i=0;i<SB_TEXT_CACHE_ENTRIES;++i) cache_free(text,&text->cache[i]);
     for (unsigned i=0;i<SB_MEASURE_CACHE_ENTRIES;++i) free(text->measures[i].text);
+    TTF_DestroySurfaceTextEngine(text->surface_engine);
     for (unsigned i=0;i<SB_TEXT_FACES;++i) {
         TTF_CloseFont(text->faces[i].font);
         for (unsigned j=0;j<SB_FALLBACK_COUNT;++j) TTF_CloseFont(text->faces[i].fallback[j]);
@@ -232,12 +234,13 @@ void sb_ui_text_draw(struct nk_draw_list *list, const struct nk_command_text *co
     SBTextSystem *text=face->owner;
     unsigned face_number=(unsigned)(face-text->faces);
     size_t length=(size_t)command->length;
-    int maximum=(int)fminf(8192,ceilf((rect.w+2)*text->density));
+    int offset=(int)fmaxf(0,floorf((list->clip_rect.x-rect.x)*text->density)-2);
+    int maximum=(int)fminf(8192,ceilf((fminf(rect.x+rect.w+2,list->clip_rect.x+list->clip_rect.w+2)-rect.x)*text->density)-offset);
     if (maximum<1) return;
     SBTextCache *entry=NULL;
     for (unsigned i=0;i<SB_TEXT_CACHE_ENTRIES;++i) {
         SBTextCache *candidate=&text->cache[i];
-        if (candidate->texture && candidate->face==face_number && candidate->length==length && candidate->maximum==maximum &&
+        if (candidate->texture && candidate->face==face_number && candidate->length==length && candidate->maximum==maximum && candidate->offset==offset &&
             !memcmp(candidate->text,command->string,length)) { entry=candidate; break; }
     }
     if (!entry) {
@@ -245,11 +248,12 @@ void sb_ui_text_draw(struct nk_draw_list *list, const struct nk_command_text *co
         for (unsigned i=0;i<SB_TEXT_CACHE_ENTRIES;++i)
             if (!text->cache[i].texture) { entry=&text->cache[i]; break; }
         if (!entry) return;
-        SBFontRuns runs; SBFontRun run; int measured=0,ascent=0,descent=0;
+        SBFontRuns runs; SBFontRun run; int measured=0,ascent=0,descent=0,total=0;
         if (!runs_init(&runs,face,command->string,length)) return;
         while (run_next(&runs,&run)) {
             int w=0,h=0; if (!TTF_GetStringSize(run.font,command->string+run.start,run.end-run.start,&w,&h)) return;
             if (measured<maximum) measured=SDL_min(maximum,measured+w);
+            total+=w;
             ascent=SDL_max(ascent,TTF_GetFontAscent(run.font)); descent=SDL_max(descent,-TTF_GetFontDescent(run.font));
         }
         if (measured<=0 || ascent+descent<=0) return;
@@ -258,8 +262,22 @@ void sb_ui_text_draw(struct nk_draw_list *list, const struct nk_command_text *co
         if (!surface) return;
         if (!SDL_ClearSurface(surface,0,0,0,0)) { SDL_DestroySurface(surface); return; }
         runs_init(&runs,face,command->string,length); int x=0;
-        while (x<maximum && run_next(&runs,&run)) {
+        bool tile=offset>0 || total>maximum;
+        if(tile && !text->surface_engine)text->surface_engine=TTF_CreateSurfaceTextEngine();
+        if(tile && !text->surface_engine){SDL_DestroySurface(surface);return;}
+        while ((tile ? x<offset+maximum : x<maximum) && run_next(&runs,&run)) {
             int w=0,h=0; size_t fitting=0,run_length=run.end-run.start;
+            if(tile){
+                if(!TTF_GetStringSize(run.font,command->string+run.start,run_length,&w,&h)){SDL_DestroySurface(surface);return;}
+                if(x+w>offset){
+                    /* Shape the complete run, then paint just its visible tile. */
+                    TTF_Text *shaped=TTF_CreateText(text->surface_engine,run.font,command->string+run.start,run_length);
+                    bool drawn=shaped && TTF_SetTextColor(shaped,255,255,255,255) && TTF_DrawSurfaceText(shaped,x-offset,ascent-TTF_GetFontAscent(run.font),surface);
+                    TTF_DestroyText(shaped);
+                    if(!drawn){SDL_DestroySurface(surface);return;}
+                }
+                x+=w;continue;
+            }
             if (!TTF_MeasureString(run.font,command->string+run.start,run_length,maximum-x,&w,&fitting)) { SDL_DestroySurface(surface); return; }
             if (!fitting) break;
             SDL_Surface *piece=TTF_RenderText_Blended(run.font,command->string+run.start,fitting,(SDL_Color){255,255,255,255});
@@ -271,13 +289,23 @@ void sb_ui_text_draw(struct nk_draw_list *list, const struct nk_command_text *co
             SDL_DestroySurface(piece); x+=w;
             if (fitting<run_length) break;
         }
+        if(tile){
+            /* Surface compositing produces premultiplied RGB. Textures below
+               blend straight alpha, including any color glyphs. */
+            for(int y=0;y<surface->h;++y){Uint32 *pixels=(Uint32 *)((Uint8 *)surface->pixels+y*surface->pitch);
+                for(int i=0;i<surface->w;++i){Uint32 p=pixels[i],a=p>>24;if(a && a<255){
+                    Uint32 r=SDL_min(255,(((p>>16)&255)*255+a/2)/a),g=SDL_min(255,(((p>>8)&255)*255+a/2)/a),b=SDL_min(255,((p&255)*255+a/2)/a);
+                    pixels[i]=(a<<24)|(r<<16)|(g<<8)|b;
+                }}
+            }
+        }
         entry->text=malloc((size_t)command->length);
         if (entry->text) entry->texture=SDL_CreateTextureFromSurface(text->renderer,surface);
         if (!entry->text || !entry->texture) {
             SDL_DestroySurface(surface); free(entry->text); memset(entry,0,sizeof(*entry)); return;
         }
         memcpy(entry->text,command->string,(size_t)command->length);
-        entry->length=(size_t)command->length; entry->face=face_number; entry->maximum=maximum;
+        entry->length=(size_t)command->length; entry->face=face_number; entry->maximum=maximum;entry->offset=offset;
         entry->width=surface->w; entry->height=surface->h;
         entry->bytes=(size_t)surface->w*(size_t)surface->h*4+entry->length;
         text->bytes+=entry->bytes;
@@ -286,6 +314,7 @@ void sb_ui_text_draw(struct nk_draw_list *list, const struct nk_command_text *co
         SDL_SetTextureScaleMode(entry->texture,SDL_SCALEMODE_LINEAR);
     }
     entry->stamp=text->frame;
+    rect.x+=entry->offset/text->density;
     rect.w=entry->width/text->density; rect.h=entry->height/text->density;
     nk_draw_list_add_image(list,nk_image_ptr(entry->texture),rect,command->foreground);
 }

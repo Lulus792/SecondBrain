@@ -2,7 +2,7 @@
 struct nk_text_edit;
 static int sb_ui_grapheme_index(struct nk_text_edit *,int,int);
 void sb_ui_grapheme_clamp(struct nk_text_edit *);
-static void sb_ui_grapheme_text(struct nk_text_edit *,const char *,int);
+static int sb_ui_grapheme_text(struct nk_text_edit *,const char *,int);
 #define NK_TEXTEDIT_GRAPHEME_INDEX sb_ui_grapheme_index
 #define NK_TEXTEDIT_GRAPHEME_CLAMP sb_ui_grapheme_clamp
 #define NK_TEXTEDIT_TEXT_CUSTOM sb_ui_grapheme_text
@@ -11,7 +11,16 @@ struct nk_command_text;
 void sb_ui_text_draw(struct nk_draw_list *, const struct nk_command_text *);
 struct nk_context;
 struct nk_rect;
-static void sb_ui_input_caret(struct nk_context *,struct nk_rect,struct nk_rect);
+struct nk_command_buffer;
+struct nk_style_edit;
+struct nk_user_font;
+static void sb_ui_input_caret(struct nk_context *,struct nk_text_edit *);
+static void sb_ui_composition_prepare(struct nk_context *,struct nk_text_edit *,unsigned int,unsigned int);
+static struct nk_text_edit *sb_ui_composition_display(struct nk_text_edit *);
+static void sb_ui_composition_mark(struct nk_command_buffer *,struct nk_text_edit *,const struct nk_style_edit *,const struct nk_user_font *,struct nk_rect,float);
+#define NK_TEXTEDIT_PREPARE_CUSTOM sb_ui_composition_prepare
+#define NK_TEXTEDIT_DISPLAY_CUSTOM sb_ui_composition_display
+#define NK_TEXTEDIT_MARKED_CUSTOM sb_ui_composition_mark
 #define NK_TEXTEDIT_CARET_CUSTOM sb_ui_input_caret
 #define NK_DRAW_TEXT_CUSTOM sb_ui_text_draw
 #define NK_IMPLEMENTATION
@@ -30,7 +39,8 @@ static struct nk_window *sb_ui_input_owner(struct nk_context *ctx) {
     struct nk_window *owner=ctx->active;
     return owner && owner->popup.active && owner->popup.win ? owner->popup.win : owner;
 }
-static void sb_ui_input_caret(struct nk_context *ctx,struct nk_rect caret,struct nk_rect clip) {
+static void sb_ui_input_caret(struct nk_context *ctx,struct nk_text_edit *edit) {
+    struct nk_rect caret=edit->caret_bounds,clip=edit->caret_clip;
     SBUi *ui=nk_sdl_get_userdata(ctx).ptr;
     if (!ui || ctx->current!=sb_ui_input_owner(ctx) ||
         clip.w<1 || clip.h<1 || caret.h<=0) return;
@@ -40,6 +50,24 @@ static void sb_ui_input_caret(struct nk_context *ctx,struct nk_rect caret,struct
         1,(int)ceilf(height)};
     ui->input_area_pending=true;
     ui->input_window=ctx->current;
+    ui->input_id=ctx->current->edit.name;
+    ui->input_hash=sb_hash(nk_str_get_const(&edit->string),(size_t)nk_str_len_char(&edit->string));
+    ui->input_cursor=edit->cursor;ui->input_start=edit->select_start;ui->input_end=edit->select_end;
+    ui->input_mode=edit->mode;ui->input_scrollbar=edit->scrollbar;
+}
+void sb_ui_focus_input(SBUi *ui) {
+    struct nk_window *window=ui->input_window;
+    if(!ui->input_area_pending || !window || (window->popup.active && window->popup.win))return;
+    struct nk_window *root=window->parent ? window->parent : window;
+    nk_window_set_focus(ui->ctx,root->name_string);
+    /* Nuklear's collector forgets edits when the visible widget count changes.
+       The app has already resolved this exact field's stable focus target. */
+    if(!window->edit.active || window->edit.name!=ui->input_id) {
+        window->edit.active=nk_true;window->edit.name=ui->input_id;
+        window->edit.cursor=ui->input_cursor;window->edit.sel_start=ui->input_start;window->edit.sel_end=ui->input_end;
+        window->edit.mode=ui->input_mode;
+        window->edit.scrollbar.x=(nk_uint)ui->input_scrollbar.x;window->edit.scrollbar.y=(nk_uint)ui->input_scrollbar.y;
+    }
 }
 
 static int sb_ui_grapheme_index(struct nk_text_edit *edit,int index,int direction) {
@@ -61,9 +89,9 @@ void sb_ui_grapheme_clamp(struct nk_text_edit *edit) {
     }
 }
 
-static void sb_ui_grapheme_text(struct nk_text_edit *edit,const char *text,int length) {
-    if (!edit || !text || length<=0 || (size_t)length>SB_TEXT_LIMIT || edit->mode==NK_TEXT_EDIT_MODE_VIEW || !sb_utf8_valid(text,(size_t)length)) return;
-    char *filtered=malloc((size_t)length); if (!filtered) return;
+static int sb_ui_grapheme_text(struct nk_text_edit *edit,const char *text,int length) {
+    if (!edit || !text || length<=0 || (size_t)length>SB_TEXT_LIMIT || edit->mode==NK_TEXT_EDIT_MODE_VIEW || !sb_utf8_valid(text,(size_t)length)) return 0;
+    char *filtered=malloc((size_t)length); if (!filtered) return 0;
     int used=0;
     for (int at=0;at<length;) {
         nk_rune rune; int bytes=nk_utf_decode(text+at,&rune,length-at);
@@ -72,7 +100,7 @@ static void sb_ui_grapheme_text(struct nk_text_edit *edit,const char *text,int l
         }
         at+=bytes;
     }
-    if (!used) { free(filtered); return; }
+    if (!used) { free(filtered); return 0; }
     int cursor=edit->cursor,start=edit->select_start,end=edit->select_end;
     sb_ui_grapheme_clamp(edit);
     if (edit->mode==NK_TEXT_EDIT_MODE_REPLACE && edit->select_start==edit->select_end) {
@@ -83,9 +111,12 @@ static void sb_ui_grapheme_text(struct nk_text_edit *edit,const char *text,int l
         sb_grapheme_init(&existing,nk_str_get_const(&edit->string),(size_t)nk_str_len_char(&edit->string));
         while (clusters && sb_grapheme_next(&existing,&b)) if (b.characters>(size_t)edit->cursor) { edit->select_end=(int)b.characters; --clusters; }
     }
-    if (!nk_textedit_paste(edit,filtered,used)) { edit->cursor=cursor; edit->select_start=start; edit->select_end=end; }
-    free(filtered);
+    int inserted=nk_textedit_paste(edit,filtered,used);
+    if (!inserted) { edit->cursor=cursor; edit->select_start=start; edit->select_end=end; }
+    free(filtered);return inserted;
 }
+
+#include "composition.inc"
 
 float sb_ui_wrap_height(struct nk_context *ctx,const struct nk_user_font *font,const char *text,size_t length,float width) {
     struct nk_vec2 padding=ctx->style.text.padding;
@@ -228,6 +259,7 @@ SBStatus sb_ui_init(SBUi *ui, const char *font_path, int width, int height, bool
     strcpy(ui->font_path, font_path);
     ui->testing = testing;
     SDL_SetMainReady();
+    SDL_SetHint(SDL_HINT_IME_IMPLEMENTED_UI,"composition");
     if (!SDL_Init(SDL_INIT_VIDEO)) return sb_error(SB_IO, "Fenstersystem: %s", SDL_GetError());
     ui->window = SDL_CreateWindow("SecondBrain", width, height,
         SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | (testing ? SDL_WINDOW_HIDDEN : 0));
@@ -246,6 +278,7 @@ SBStatus sb_ui_init(SBUi *ui, const char *font_path, int width, int height, bool
 }
 
 void sb_ui_event(SBUi *ui, const SDL_Event *event) {
+    if(sb_ui_composition_event(ui,event))return;
     if(event->type==SDL_EVENT_KEY_DOWN || event->type==SDL_EVENT_TEXT_INPUT || event->type==SDL_EVENT_MOUSE_BUTTON_DOWN)ui->caret_epoch=SDL_GetTicksNS();
     SDL_Event copy = *event;
     if (event->type == SDL_EVENT_TEXT_INPUT) {
@@ -317,6 +350,7 @@ void sb_ui_draw(SBUi *ui) {
     } else if (ui->input_area_applied && SDL_SetTextInputArea(ui->window,NULL,0))
         ui->input_area_applied=false;
     ui->input_area_pending=false;
+    sb_ui_composition_frame_end(ui);
     int width,height;SDL_GetWindowSize(ui->window,&width,&height);
     SDL_SetRenderLogicalPresentation(ui->renderer,width,height,SDL_LOGICAL_PRESENTATION_STRETCH);
     SDL_SetRenderDrawColor(ui->renderer,ui->dark ? 28 : 255,ui->dark ? 29 : 255,ui->dark ? 33 : 255,255);SDL_RenderClear(ui->renderer);
@@ -338,6 +372,7 @@ void sb_ui_draw(SBUi *ui) {
 }
 
 void sb_ui_reset_editor(SBUi *ui) {
+    sb_ui_composition_cancel(ui);
     nk_textedit_clear_state(&ui->ctx->text_edit, NK_TEXT_EDIT_MULTI_LINE, nk_filter_default);
     ui->ctx->text_edit.active = 0;
     if (ui->ctx->active) ui->ctx->active->edit.active = 0;
@@ -351,6 +386,7 @@ SBStatus sb_ui_capture(SBUi *ui, const char *path) {
     return ok ? sb_ok() : sb_error(SB_IO, "Bild konnte nicht gespeichert werden.");
 }
 void sb_ui_shutdown(SBUi *ui) {
+    sb_ui_composition_free(ui);
     SDL_DestroyTexture(ui->outgoing_texture);
     if(ui->text_cursor){SDL_SetCursor(SDL_GetDefaultCursor());SDL_DestroyCursor(ui->text_cursor);}
     sb_space_free(&ui->space);

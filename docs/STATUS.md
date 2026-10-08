@@ -2208,3 +2208,37 @@ read-only geladen und Vorschau betrachtet, Dateien unverändert. Logs:
 build/ime-package-*.log, build/ime-install.json. Rückfallkopie:
 build/previous-dist-0.9.23-20261008-042422. IME-Preedit, Bidi und reale
 Eingabemethodenabnahme sind durch diesen Anker nicht abgeschlossen.
+
+
+## 0.9.25: vorläufige IME-Komposition und lange Textzeilen
+
+[Kompositionsvertrag und Quellen](IME.md): vorläufiger, unterstrichener Text
+erscheint direkt im Feld. Original, Suche, Speicherstatus und Undo bleiben
+bis zur Bestätigung unverändert. Bestätigte Eingabe wird vollständig als
+Undo-Vorgang übernommen; nachfolgende Fokusaktionen und Texte behalten ihre
+Reihenfolge. Text-Ereignisse besitzen vorgemerkte Bytes selbst. Popup-/Feld-/
+Projektwechsel und geänderter Originaltext dürfen keine alte Komposition
+weiterverwenden. Kandidatenlisten bleiben nativ.
+
+Desktop-Nachprüfung findet und behebt entwendeten Textfokus durch spätere
+passive Panels und durch Nuklears Garbage-Collector bei geänderter sichtbarer
+Feldanzahl. Der eigene stabile Fokus stellt den gerade gezeichneten Texteditor
+wieder her. Erster Formularfokus aktiviert zugleich das zugehörige Fenster.
+
+ASan/UBSan provoziert anfangs einen 16-Bit-Breitenüberlauf bei einer 12.000-
+Zeichen-Zeile. Float-Textgeometrie, begrenzte rechteckige Auswahlen und ein
+sichtbarer Textausschnitt mit vollständiger Schriftformung beheben ihn.
+Unabhängiger Rastervergleich sieht das Zeilenende (>65K Punkte), einschließlich
+Auswahl und geprüftem Schriftpixelanteil. Große vertikale Sprünge zeigen die
+Cursorzeile direkt. Keine neue fachliche Bibliothek.
+
+Endgültiger lokaler Release-Neubau: 51/51 in 292,04 s. 36 IME-, 7 Ausschnitt-,
+109 Navigationsassertions mit 48 gleichen Cache-Rasterfällen; außerdem
+134 Editor-, 126 Desktop-, 157 Tastatur- und 75 Sicherungsassertions.
+Gezielte instrumentierte UI-/Desktop-/Renderer-/Testobjekte bestehen mit
+36/7/109 Assertions ohne ASan-/UBSan-Diagnose. Externe Bibliotheken und Kern
+in diesem Lauf nicht instrumentiert; macOS-Leakprüfung ausgeschaltet.
+Logs: build/composition-tile-final-{build,tests}.log und
+build/composition-tile-sanitizer-*.log. Die tatsächliche Kompositionsvorschau
+wurde betrachtet; echte Native-IME-, Bidi-/Zeichenrechteck- und Geräteabnahmen
+bleiben offen. Neue Plattform-/Paketprüfung folgt; installiert bleibt 0.9.24.

@@ -56,5 +56,27 @@ int main(int argc,char **argv){
     key(&d,SDLK_S,MOD);CHECK(!sb_app_dirty(&d.model));
     d.expanded=true;d.browser=false;key(&d,SDLK_F,MOD);type(&d,"Alpha");
     OK(sb_app_new_project(&d.model,"two","Second project",NULL));frame(&d);CHECK(!d.search_session && !d.browser && !d.expanded);
+    /* Real desktop routing: preedit does not search or submit a form. */
+    key(&d,SDLK_F,MOD);CHECK(!d.search[0]);
+    SDL_Event composing={0};composing.type=SDL_EVENT_TEXT_EDITING;
+    composing.edit.windowID=SDL_GetWindowID(d.ui.window);composing.edit.text="Second";composing.edit.start=6;
+    SDL_PushEvent(&composing);frame(&d);CHECK(!d.search[0] && d.search_session);
+    key(&d,SDLK_ESCAPE,0);CHECK(d.search_session && !d.search[0]);
+    key(&d,SDLK_ESCAPE,0);CHECK(!d.search_session);
+    key(&d,SDLK_N,MOD);CHECK(d.form==SB_FORM_NOTE);size_t notes_before=d.model.notes.count;
+    composing.edit.text="新しいノート";composing.edit.start=6;SDL_PushEvent(&composing);frame(&d);
+    CHECK(!d.name[0]);key(&d,SDLK_RETURN,0);CHECK(d.form==SB_FORM_NOTE && d.model.notes.count==notes_before);
+    type(&d,"新しいノート");CHECK(!strcmp(d.name,"新しいノート") && d.form==SB_FORM_NOTE);
+    key(&d,SDLK_ESCAPE,0);CHECK(d.form==SB_FORM_NONE);
+    /* Commit, Tab and more text in one batch keep the two fields separate. */
+    key(&d,SDLK_N,MOD|SDL_KMOD_SHIFT);CHECK(d.form==SB_FORM_PROJECT);CHECK(!strcmp(d.focus,"form-name") && d.ui.input_area_applied && SDL_TextInputActive(d.ui.window));
+    composing.edit.text="Alpha";composing.edit.start=5;SDL_PushEvent(&composing);frame(&d);CHECK(sb_ui_composition_active(&d.ui) && d.ui.input_area_applied && d.ui.input_status.code==SB_OK);
+    SDL_Event committed={0};committed.type=SDL_EVENT_TEXT_INPUT;
+    committed.text.windowID=SDL_GetWindowID(d.ui.window);committed.text.text="Alpha";
+    SDL_Event tab={0};tab.type=SDL_EVENT_KEY_DOWN;tab.key.windowID=SDL_GetWindowID(d.ui.window);tab.key.key=SDLK_TAB;tab.key.down=true;
+    SDL_Event after=committed;after.text.text="b";
+    SDL_PushEvent(&committed);SDL_PushEvent(&tab);SDL_PushEvent(&after);frame(&d);if(strcmp(d.name,"Alpha"))fprintf(stderr,"ORDER name=%s id=%s focus=%s status=%d input=%d %s\n",d.name,d.id,d.focus,d.message.code,d.ui.input_status.code,d.ui.input_status.message);CHECK(!strcmp(d.name,"Alpha"));
+    frame(&d);frame(&d);frame(&d);CHECK(!strcmp(d.focus,"form-id") && !strcmp(d.name,"Alpha") && strchr(d.id,'b'));
+    key(&d,SDLK_ESCAPE,0);
     sb_desktop_free(&d);printf("%u navigation assertions passed; %s.\n",checks,argc==3 ? "48 cached/uncached raster cases" : "navigation-only run");return 0;
 }

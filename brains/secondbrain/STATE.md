@@ -47,7 +47,12 @@ und 134 Editorassertions besteht. Lokales Paket ist abgenommen/installiert;
 zu 1c2f323 besteht in allen 20 Jobs inklusive acht Desktop-Varianten
 und vier entpackter Release-Pakete.
 
-Nächster Schritt: vollständige vorläufige IME-Komposition implementieren/prüfen.
+0.9.25 implementiert vorläufige IME-Komposition, geordneten Feldwechsel und
+Fokusbestand bei Layoutänderungen. 51/51 lokale Release-Prüfungen und gezielte
+ASan/UBSan bestehen. Ein provozierter 16-Bit-Textbreitenüberlauf ist durch
+Float-Geometrie und sichtbare Textausschnitte behoben. Details: [IME](../../docs/IME.md).
+
+Nächster Schritt: neue native 0.9.25- und Paketprüfung; Mac-Paket aktualisieren.
 Weitere Release-Arbeiten: Bidi/visuelle Textgeometrie/IME, native
 Tabellenmatrix, Screenreader-/Dialog-/Geräte-/Langzeitabnahmen, volle Windows-/
 Linux-Zielvolumes und physische Persistenz. Originalverträge stehen in SOURCES.

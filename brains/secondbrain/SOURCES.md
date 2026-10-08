@@ -33,6 +33,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Dokumentstruktur](../../docs/DOKUMENTSTRUKTUR.md): native Blockstruktur, Überschriften und Abschnittssprünge.
 - [Emoji und Schriftwahl](../../docs/EMOJI.md): Quelle, Lizenz und Mess-/Rasterabnahme.
 - [Grapheme](../../docs/GRAPHEME.md): eigener C-Algorithmus, Zeicheneinheiten, Unicode-Daten und Prüfgrenzen.
+- [IME-Komposition](../../docs/IME.md): Originalquellen, vorläufige Anzeige, Eingabeordnung und Prüfgrenzen.
 - [Textdarstellung](../../docs/TEXTDARSTELLUNG.md): UI-Schriftrollen, geformte Textläufe, Fallback und verbleibende Textarbeit.
 - [Lizenzansicht](../../docs/LIZENZEN.md): Originaltexte in der App, Bedienwege und Prüfgrenzen.
 - [MIT-Lizenz](../../LICENSE): gewählte Lizenz des eigenen Codes.

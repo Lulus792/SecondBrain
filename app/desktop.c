@@ -17,6 +17,7 @@ static void accessible_actions(SBDesktop *d);
 static void accessible_publish(SBDesktop *d);
 static void search_begin(SBDesktop *d);
 static void search_end(SBDesktop *d);
+static void composition_dispatch(void *user,const SDL_Event *event){sb_desktop_event(user,event);}
 static void style_update(SBDesktop *d,bool force) {
     d->system_style=sb_system_style_snapshot(d->style_monitor,force);
     SBStyleChoice effective=sb_style_resolve(d->requested_style,d->system_style);
@@ -49,6 +50,8 @@ static float approach(float current, float destination, float factor, float thre
     return fabsf(destination-value) < threshold ? destination : value;
 }
 void sb_desktop_tick(SBDesktop *d, float seconds) {
+    sb_ui_composition_replay(&d->ui,composition_dispatch,d);
+    if(d->ui.input_status.code!=SB_OK){d->message=d->ui.input_status;d->ui.input_status=sb_ok();}
     style_update(d,false);
     struct nk_color caret=d->ui.ctx->style.text.color;
     if((SDL_GetTicksNS()-d->ui.caret_epoch)%UINT64_C(1000000000)>=UINT64_C(500000000))caret.a=0;
@@ -72,6 +75,7 @@ void sb_desktop_tick(SBDesktop *d, float seconds) {
 
 }
 bool sb_desktop_animating(const SBDesktop *d) {
+    if(sb_ui_composition_working(&d->ui))return true;
     if (d->ui.transitioning || d->modal_sizing) return true;
     if (d->hover_label[0] && SDL_GetTicksNS()-d->hover_started<350000000u) return true;
     if (d->backup || d->follow_star || d->navigation.kind!=SB_ACT_NONE || d->generation!=d->model.generation) return true;
@@ -451,7 +455,10 @@ static void field(SBDesktop *d, const char *tag, const char *label, char *text, 
     nk_label(ctx, label, NK_TEXT_LEFT);
     nk_layout_row_dynamic(ctx, 36 * d->ui.scale, 1);
     text_target(d, tag); target_label(d,label);
-    if (d->form_focus == focus) { nk_edit_focus(ctx, NK_EDIT_ALWAYS_INSERT_MODE); d->form_focus = 0; }
+    if (d->form_focus == focus) {
+        nk_window_set_focus(ctx,ctx->current->name_string);
+        nk_edit_focus(ctx, NK_EDIT_ALWAYS_INSERT_MODE); d->form_focus = 0;
+    }
     nk_flags state = nk_edit_string(ctx, NK_EDIT_FIELD, text, &length, capacity, nk_filter_default);
     if (state & NK_EDIT_ACTIVE) d->active_form_field = focus;
     text[length] = 0;
@@ -735,6 +742,7 @@ static char *accessible_field(SBDesktop *d,const char *id,size_t *capacity) {
     *capacity=0; return NULL;
 }
 static void accessible_actions(SBDesktop *d) {
+    if(sb_ui_composition_committing(&d->ui))return;
     SBAccessibleAction action;
     while (sb_accessibility_next_action(d->accessibility,&action)) {
         if (!sb_accessibility_current(d->accessibility,&action,accessible_context(d))) { sb_accessibility_action_free(&action); continue; }
@@ -879,6 +887,8 @@ static void star_step(SBDesktop *d, SDL_Keycode key) {
     d->star = found;
 }
 void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
+    sb_ui_composition_replay(&d->ui,composition_dispatch,d);
+    if(sb_ui_composition_event(&d->ui,event))return;
     if (d->ui.transitioning) {
         bool arrow=event->type==SDL_EVENT_KEY_DOWN && !strcmp(d->focus,"galaxy") &&
             (event->key.key==SDLK_LEFT || event->key.key==SDLK_RIGHT || event->key.key==SDLK_UP || event->key.key==SDLK_DOWN);
@@ -2357,6 +2367,9 @@ void sb_desktop_frame(SBDesktop *d) {
     }
     if (d->focus_scroll_frames) --d->focus_scroll_frames;
     nk_style_set_font(d->ui.ctx,&d->ui.normal->handle);
+    /* Later passive panels must not steal the app's explicit text focus. */
+    SBTarget *input_focus=focus_target(d);
+    if(input_focus && input_focus->kind==SB_FOCUS_TEXT)sb_ui_focus_input(&d->ui);
     nk_sdl_update_TextInput(d->ui.ctx);
     if (!d->hover_claimed) d->hover_label[0]=0;
     if (d->hint_visible && ((d->form==SB_FORM_NONE && !d->model.guard) || d->hint_group==3)) draw_hint(d);
