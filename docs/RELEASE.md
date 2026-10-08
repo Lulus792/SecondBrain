@@ -66,8 +66,9 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   die dokumentierten weiteren Textregeln bleiben offen. 0.9.6 ergänzt
   [Tabellen](TABELLEN.md). Mac-Matrix ist ab 0.9.27 lokal geprüft; Windows
   Grid/Table besteht ab 0.9.29 nativ in Debug/Release und im entpackten Paket.
-  AT-SPI Table/TableCell ist in 0.9.30 implementiert, seine neue native
-  Abnahme läuft. Menschliche Tabellenbedienung bleibt gesondert offen.
+  AT-SPI Table/TableCell besteht ab 0.9.32 nativ in Debug/Release und im
+  entpackten Linux-Paket. 0.9.33 begrenzt die Cache-Indizes großer Tabellen;
+  die neue native Cache- und Paketabnahme besteht. Menschliche Tabellenbedienung bleibt gesondert offen.
   Die Cache-Signalstruktur ist in 0.5.2 korrigiert und mit echtem Linux-Clientcache
   geprüft; weitere Eventtypen bleiben gesonderte Abnahmen. Systemvorgaben bestehen
   in 0.6.0 auf allen drei CI-Systemen; reale Einstellungswechsel, Windows-Custom-

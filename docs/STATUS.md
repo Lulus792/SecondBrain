@@ -2,7 +2,7 @@
 
 Stand: 8. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.28. Die neue Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.33. Die neue Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -2408,3 +2408,19 @@ Defunct-Prüfung besteht auf dem Host (0,17 s); Linux-Zielcheck und vier
 Quellvorbereitungszustände sind geprüft. Zwei Mac-Nachprüfungen bestehen
 (14,15 s). Die zusätzliche Linux-Cargo-Prüfung ist an CTest angebunden;
 Ausführung mit dem Anwendungs-Lockfile folgt in nativer CI.
+
+0.9.33 / d48ee9bf7075 ist als sauberes Mac-Release-Paket geprüft und
+installiert: 126 Desktop-, 157 Tastatur- und 75 Sicherungsassertions, zwei
+Prozessneustarts, Produktions-CLI und Runtime-Importprüfung bestehen.
+Lizenzbündel stimmen exakt; Laden verändert keine Gedächtnisbytes.
+Installiertes Raster betrachtet. Rückfallkopie: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.28-20261008-082929`.
+Archiv-SHA256: `e9b52f584964c39a0575c472cc42f83fa75502263a8de8e3a16f9afa564ff9ba`.
+Linux-Debug/-Release einschließlich neuer Cache-Prüfung und entpacktem
+Linux-Paket bestehen in [CI 37737157648](https://github.com/Lulus792/SecondBrain/actions/runs/37737157648).
+Der gesamte Lauf ist zum Zeitpunkt dieser Notiz noch nicht abgeschlossen.
+
+[CI 37737157648](https://github.com/Lulus792/SecondBrain/actions/runs/37737157648)
+zu d48ee9b ist vollständig abgeschlossen: alle 20 Jobs und vier entpackte
+Pakete bestehen. Die neue Linux-Cargo-Cacheprüfung und die native Matrix
+sind in Debug/Release bestätigt. Die ursprünglichen 0.9.30/31-Fehler
+bleiben dokumentiert; dieser spätere Quellstand ist die erfolgreiche Abnahme.
