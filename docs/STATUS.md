@@ -2351,3 +2351,9 @@ Vier lokale Mac-Release-Nachprüfungen bestehen (63,78 Sekunden); diese
 belegen keine Windows-Ausführung. Native Windows-Matrixabnahme folgt.
 Installiert bleibt das vollständig abgenommene 0.9.28-Paket.
 [Vertrag und Originalquellen](TABELLEN.md).
+
+[CI 37732498154](https://github.com/Lulus792/SecondBrain/actions/runs/37732498154)
+zu 23b0b76 besteht in allen 20 Jobs und vier entpackten Paketen. Die neue
+Windows-Matrixprüfung besteht damit nativ in Debug und Release einschließlich
+zwölf Zellen, Headerbeziehungen, ungültiger Indizes und 200%-Ansicht.
+AT-SPI-Matrix und menschliche Tabellenbedienung bleiben offen.
