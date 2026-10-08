@@ -12,11 +12,11 @@ Lumen-Sternkarte, Glaskarten/Icons, direkte Pfeilnavigation, Kamerafahrt,
 weiches Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert: **0.9.34, Build 4eda9dbfce37**, Intel/macOS Release.
+Installiert: **0.9.35, Build 178128eb0923**, Intel/macOS Release.
 Entpacktes Paket besteht mit 126/157/75 Assertions, zwei Prozessneustarts,
 Produktions-CLI und Runtime-Importprüfung. Lizenzbündel exakt, eigenes Gedächtnis
 beim Laden unverändert, installierte Ansicht betrachtet. Rückfallkopie:
-`/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.33-20261008-104353`.
+`/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.34-20261008-125613`.
 
 ## Geprüfte Fortschritte
 
@@ -92,14 +92,15 @@ Markierungen. Original/Undo bleiben logisch erhalten. Pixelreferenz bei drei
 Schriftgrößen, Float-Cursor, Maus, RTL-/Ligaturschritte, CRLF und IME-Anker geprüft.
 Eine gefundene SDL_ttf-Nullzeigerarithmetik an leeren Bitmaps ist hashgeprüft
 korrigiert und mit haltendem UBSan vor/nach reproduziert.
-60/60 lokale Release-Prüfungen und UI-Build ohne Tests bestehen; eigene neue
-Plattform-/Paketabnahme folgt. Installiert bleibt bis dahin 0.9.34.
+60/60 lokale Release-Prüfungen und UI-Build ohne Tests bestehen; frische Intel-Mac-Paketprüfung und Installation bestehen. Neue Plattform-
+CI 37766464641 zum importfreien Prüfstarter folgt gesondert.
 [Vertrag und Grenzen](../../docs/EDITORGEOMETRIE.md).
 Die vorige Cursorgrundlage zu 13e9e08 besteht inzwischen alle 20 Jobs/vier Pakete.
 
 ## Nächste Arbeiten
 
-0.9.34 ist vollständig im dokumentierten automatisierten Umfang abgenommen.
+0.9.34 ist auf allen Plattformen im dokumentierten automatisierten Umfang
+abgenommen. 0.9.35 ist lokal und im Intel-Mac-Paket geprüft; neue CI läuft.
 Weitere Release-Arbeiten: Bidi/visuelle/native Textgeometrie und reale Eingabemethoden;
 menschliche VoiceOver/NVDA/Orca-, Dialog-, Geräte-, Mehrmonitor-/Langzeitabnahme;
 volle Windows-/Linux-Zielvolumes und physische Persistenz; frische Rechner und

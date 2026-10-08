@@ -5,7 +5,7 @@ Stand: 8. Oktober 2026. Der neue C-Plan verbindet die geprüfte
 gemeinsamer Grundlinie. Ab dem Entwicklungsschritt 0.9.34 benutzt die formatierte
 Leseansicht diesen Plan für Umbruch, Höhe und Rasterung. Ab 0.9.35 benutzen ihn auch [Editor und Eingabefelder](EDITORGEOMETRIE.md).
 Einfache Bedienelementtexte und native Textrechtecke benötigen die Anbindung.
-Die installierte Intel-Mac-App 0.9.34 besteht die gesonderte Paketabnahme;
+Die installierte Intel-Mac-App 0.9.35 besteht die gesonderte Paketabnahme;
 neue native Plattformnachweise folgen in STATUS.
 
 ## Grundlage

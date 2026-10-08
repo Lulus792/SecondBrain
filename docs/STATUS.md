@@ -2,7 +2,7 @@
 
 Stand: 8. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.34. Die neue Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.35. Die neue Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -2637,3 +2637,25 @@ Quellfixtures. Anwendungscode und das geprüfte Anwendungsarchiv sind unverände
 Der erste Paketlauf scheitert beim Sicherungsablauf während voller Platte; eine
 frische vollständige Paketprüfung folgt nach verlustfreier Kompression alter
 Testaufnahmen. Projektdateien und Rückfallkopien bleiben erhalten. Neue CI folgt.
+
+## Sauberes Editor-Paket installiert
+
+0.9.35 / **178128eb0923**, sauberer Intel/macOS-Release-Build: die frische
+wiederholte Paketprüfung besteht Runtime-Prüfung, 126 Desktop-, 157 Tastatur-
+und 75 Sicherungs-Assertions, zwei isolierte Prozessneustarts und Produktions-
+CLI-Sicherung/Wiederherstellung. Archiv-SHA-256:
+`4b30fa5f32f7785b272ee4a0903d86bc4765291696c1bcc1573cd10c635578fd`.
+
+Installiert unter dist/SecondBrain; alle Dateien entsprechen dem geprüften
+Paket. Installierte Ansicht betrachtet, eigenes Gedächtnis beim Laden bytegleich.
+Rückfallkopie: build/previous-dist-0.9.34-20261008-125613. Der Importfix zu
+a1e6f5e ändert nur den Prüfstarter und Dokumentation, nicht den Anwendungscode.
+Korrigierte Plattform-CI: [37766464641](https://github.com/Lulus792/SecondBrain/actions/runs/37766464641),
+noch nicht vollständig abgenommen; bereits geprüfte Python-Jobs bestätigen
+die Importkorrektur. Die übrigen Release-Arbeiten bleiben offen.
+
+Bei der vollen Platte wurden ausschließlich neu erzeugbare UI-/SDL-Objektdateien
+entfernt und 296 alte BMP-Testaufnahmen verlustfrei gzip-archiviert. Entpackte
+Bytes jeweils per SHA-256 geprüft; Ersparnis 4.269.762.905 Bytes. Originale
+Testbilder bleiben als .bmp.gz erhalten, Projektdateien/Pakete/Rückfallkopien
+sind nicht entfernt. Künftige lokale Builds erzeugen die entfernten Objekte neu.

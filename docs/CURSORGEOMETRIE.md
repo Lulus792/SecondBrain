@@ -5,7 +5,7 @@ Stand: 8. Oktober 2026. Die neue C-Geometrie ergänzt den
 Auswahlflächen. Ab 0.9.35 verwenden Editor und Eingabefelder diese gemeinsame Grundlage;
 [EDITORGEOMETRIE.md](EDITORGEOMETRIE.md) nennt die Anbindung. Native Zeichenrechtecke
 verwenden sie noch nicht;
-die installierte App bleibt 0.9.34 / 4eda9dbfce37.
+die installierte Intel-Mac-App ist 0.9.35 / 178128eb0923.
 
 ## Warum der bisherige Einzelzeichenweg nicht genügt
 
