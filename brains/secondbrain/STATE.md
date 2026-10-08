@@ -12,9 +12,9 @@ Lumen-Sternkarte, Glaskarten/Icons, direkte Pfeilnavigation, Kamerafahrt,
 weiches Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert: **0.9.39 / a24beb51119a**, sauberer Intel/macOS-Release-Build.
-94 Dateien entsprechen dem geprüften entpackten Paket. Vorherige Version 0.9.37:
-`/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.37-20261008-160515`.
+Installiert: **0.9.40 / 5b56e3542b38**, sauberer Intel/macOS-Release-Build.
+94 Dateien entsprechen dem geprüften entpackten Paket. Vorherige Version 0.9.39:
+`/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.39-20261008-171309`.
 Installierte Ansicht betrachtet; Laden verändert keine Gedächtnisdatei.
 
 ## Geprüfter aktueller Fortschritt
@@ -72,7 +72,9 @@ Mac-Command-Pfeile bedienen Zeilengrenzen; Key-up und aktuelle Klickposition
 sind geprüft. 67/67 lokale Release-Prüfungen, 125.569 Kern- und 126 UI-Assertions
 unter haltendem ASan/UBSan bestehen; Build ohne Tests ebenso.
 [Vertrag](../../docs/WORTNAVIGATION.md); Scope und Grenzen in STATUS.
-Neue native Plattform-/Paketabnahme folgt, installiert zunächst weiterhin39.
+Intel/macOS-Paket und Installation bestehen: 126 Desktop-, 158 Tastatur-,
+75 Sicherungs-Assertions, zwei Neustarts und CLI-/Runtime-/Lizenzprüfungen.
+Neue CI37798054080 zu5b56e35 zuletzt queued; weitere Zielsysteme offen.
 Die Wiederverwendung geformter Zeilen brachte im alternierenden Vergleich
 keinen Layoutgewinn und wurde entfernt. Kalter langer Wechsel bleibt offen.
 

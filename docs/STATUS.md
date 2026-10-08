@@ -2,7 +2,7 @@
 
 Stand: 8. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.39. Die neue Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.40. Die neue Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -2926,7 +2926,28 @@ Protokolle: `build/paragraph-fastpath/paired.json`, `geometry-{before,after}.log
 `count-{before,after}.log`, `fixture-hashes.json`. Voller Release-Auftrag bleibt
 aktiv; 1.0 weiterhin ausschließlich nach ausdrücklicher Freigabe.
 
-Zusätzlich bestehen 39 Python-Unittest-Fälle (8,53 s), einer nach vorhandener
-Plattformbedingung übersprungen. Die Wortdatentabellen entsprechen nach erneuter
+Zusätzlich besteht der Python-Unittest-Lauf mit 39 Fällen (8,53 s); einer
+ist nach vorhandener Plattformbedingung übersprungen. Die Wortdatentabellen entsprechen nach erneuter
 Hash-/Erzeugungsprüfung den festgelegten Originalen. Protokoll:
 `build/word-python-unittest.log`.
+
+## Geprüftes Wortbedienungs-Paket 0.9.40 installiert
+
+Sauberer Intel/macOS-Release-Build **0.9.40 / 5b56e3542b38**. Das entpackte
+Paket besteht 126 Desktop-, 158 Tastatur- und 75 Sicherungs-Assertions, zwei
+isolierte Neustarts und produktive CLI-Sicherung/Wiederherstellung.
+Runtime-/Lizenz-/Versionsprüfungen bestehen. Protokoll: `build/word-package-check.log`.
+Archiv: `build/word-release-package/SecondBrain-0.9.40-Darwin-x86_64.tar.gz`,
+SHA-256 `76d30c7f8146a554fd080c4661ac78ff6312a07eb3a5ef6aebbf4cf3be742b17`.
+
+Alle 94 installierten Dateien entsprechen bytegleich dem geprüften Paket.
+Vorige0.9.39 erhalten unter `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.39-20261008-171309`.
+Eigene Projektinstanz mit installierter App geladen, Ansicht betrachtet,
+Gedächtnisdateien unverändert. Nachweis: `build/word-install-proof.json`,
+`build/word-installed-brain.png`.
+
+5b56e35 normal nach origin gepusht. Neue
+[CI 37798054080](https://github.com/Lulus792/SecondBrain/actions/runs/37798054080)
+zuletzt queued; kein neuer Gesamt-Plattformnachweis für diesen Quellstand.
+Native Textgeometrie, reale Bedienabnahmen, langer kalter Wechsel und alle
+übrigen Release-Arbeiten bleiben offen. 1.0 weiterhin nur nach Nutzerfreigabe.
