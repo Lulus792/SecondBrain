@@ -30,6 +30,7 @@ typedef struct SBEditCache SBEditCache;
 typedef struct SBEditNativeCache SBEditNativeCache;
 typedef struct {
     SBTextSystem *text;
+    uint64_t font_epoch;
     SBStyledCache *styled_cache;
     bool styled_cache_disabled;
     SDL_Window *window;

@@ -3188,3 +3188,51 @@ Produktcode/Installation unverändert0.9.43/fe2436a. Das ist neue Diagnose und
 Grundlage der nächsten Implementierung, keine umgesetzte Ladefunktion oder
 abgeschlossene Performance-/Plattformabnahme. Vollständiger Auftrag aktiv;
 1.0 weiterhin nur nach ausdrücklicher Freigabe.
+
+## Private Font-/Vorbereitungsressourcen (0.9.44)
+
+Die UI öffnet ihre Fonts aus unveränderlichen, referenzgezählten Daten der
+neun mitgelieferten Schriftdateien (zusammen höchstens64MiB). Alle Rollen/
+Stilvarianten behalten eigene IO-/Fontzustände. Erzeugerthread und Schrift-
+Epoche binden Snapshots an den gültigen UI-Zustand. Snapshot/Instanz halten
+Daten unabhängig vom aktuellen UI-Fontsatz; Hinting, Outline, Kerning, SDF,
+Sprache, Größe/Stil und Generation werden übernommen.
+[Vertrag und Grenzen](FONT_SNAPSHOTS.md).
+
+Der neue `app/prepare.c`-Prototyp besitzt eine Textkopie und private, auf dem
+Worker erzeugte/gepflegte/geschlossene Fonts. UTF-8-, Script-/Bidi-Auswertung
+und Formung laufen dort. Ein atomarer Abschluss publiziert den Plan; Source/
+Kontext und aktuelle Fontbindung werden vor einmaliger Übernahme geprüft.
+Worker-Fontzeiger verlassen ihre Lebensdauer nicht; Zahlen/Schriftkennungen
+werden erst am UI-Thread an lebende Fonts gebunden. Abbrechen wartet nicht;
+Freigeben kann auf den Thread warten und benötigt später eine Retireverwaltung.
+
+**69/69 lokale Release-Prüfungen bestehen (596,74s, CTest -j4)**.
+393 neue Font-/Worker-/Quell-/Glyphen-/Abbruch-/Epochprüfungen bestehen:
+Latein/Akzente/Ligaturen, Hebräisch, Arabisch/Emoji, alle Stilvarianten und
+100/150/200Prozent; vollständige Werte gegen normalen UI-Plan geprüft.
+Getrennte Eingabekopie, Kontextwechsel, doppelte Übernahme, ungültigesUTF-8,
+Abbruch, Snapshotfreigabe, Schriftneuladen und fremder Erzeugerthread erfasst.
+**393 neue,405 native Text-,13.708 Editor-/Cache- und590 Providerprüfungen
+bestehen zusätzlich unter haltendem ASan/UBSan ohne Befund.** Instrumentiert:
+Prepare/Font-Snapshot, UI/Text/Space/Icons, NativeText/Desktop/Accessibility,
+Caret-/Shape-/Script-/Bidi-Code, Wort-/Graphemkern, Bidi-Engine, vier Prüfer
+und SDL_ttf.c inklusive Hook. Weitere externe Objekte, übriger Kern/Modell-/
+Dialog-/Sicherungscode und native Rust-Bibliothek nicht instrumentiert;
+Mac-Leakprüfung abgeschaltet.29 erfasste Quell-/Include-Hashes stimmen.
+Kein ThreadSanitizer- oder allgemeiner Parallelitätsnachweis behauptet.
+Build ohne Tests besteht. Logs: `build/prepare-full-ctest.log`,
+`prepare-{job,native,editor,provider}-sanitizer.log`,
+`prepare-sanitizers/sources.json`, `prepare-no-tests-build.log`.
+
+334 ältere abgeschlossene generierte BMPs nach entpacktemSHA-256
+und unveränderter Dateistatistik verlustfrei komprimiert; 4803087695Bytes
+freigegeben. Projektwissen/Pakete und aktuelle Prüfdaten erhalten. Manifest:
+`build/prepare-completed-bitmap-archive.json`.
+
+**Der produktive Dokumentwechsel ruft diesen Prototyp noch nicht auf.**
+Ergebnis bislang eine ungebrochene Zeile; vollständiger Umbruch/Styles/Blöcke,
+Job-/Output-/Spitzen-Speichergrenzen und nichtblockierende Retire-/Shutdown-
+Integration bleiben offen. SBUI-074 ist damit nicht geschlossen. Neue Paket-/
+Zielplattformabnahme folgt; installiert bleibt zunächst0.9.43. Vollständiger
+Auftrag aktiv;1.0 weiterhin nur nach ausdrücklicher Nutzerfreigabe.

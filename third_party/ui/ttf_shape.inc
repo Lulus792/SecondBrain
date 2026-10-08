@@ -12,6 +12,14 @@ static hb_codepoint_t sb_ttf_mirror(hb_unicode_funcs_t *funcs,hb_codepoint_t cp,
 void sb_ttf_shape_free(SBTTFShape *shape) {
     if(shape){SDL_free(shape->glyphs);SDL_memset(shape,0,sizeof(*shape));}
 }
+const char *sb_ttf_font_language(TTF_Font *font){
+    TTF_CHECK_FONT(font,NULL);
+#if TTF_USE_HARFBUZZ
+    return hb_language_to_string(font->hb_language);
+#else
+    return NULL;
+#endif
+}
 bool sb_ttf_shape_range(TTF_Font *font,const char *context,size_t length,
     size_t byte,size_t range,bool rtl,Uint32 script,SBTTFMirror mirror,SBTTFShape *out) {
     TTF_CHECK_FONT(font,false);

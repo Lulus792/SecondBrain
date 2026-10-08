@@ -156,3 +156,6 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Reader-Vorbereitung](../../docs/READER_VORBEREITUNG.md): negativer
   Breitenmessvergleich, erneute Apple-Grundlagen und noch nicht integrierter
   Zustands-/Eigentums-/Abnahmevertrag für den langen Wechsel.
+
+- [Font-Snapshots](../../docs/FONT_SNAPSHOTS.md): unveränderliche Ressourcen,
+  private Worker-Fonts, geprüfte Quell-/Fontbindung und Grenzen des Prototyps.

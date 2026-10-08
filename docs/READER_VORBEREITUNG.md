@@ -92,3 +92,11 @@ Nächster Umsetzungsschritt: isolierter Vorbereitungsprototyp mit Quellen-/
 Fontbesitz und Abbruch/Übernahme, danach Integration in den Dokumentwechsel.
 Das Ziel ist ein durchgehend bedienbarer Wechsel einschließlich großer Absätze;
 die vollständige Release-Liste und die Sperre für1.0 bleiben bestehen.
+
+## Erster Unterbau
+
+Ab 0.9.44 ist der [Font-/Jobprototyp](FONT_SNAPSHOTS.md) umgesetzt: unveränderliche
+Ressourcen, private Worker-Fonts, eigene Textkopie, Abbruch und geprüftes
+Übernehmen einer ungebrochenen Zeile. Der produktive Dokumentwechsel benutzt
+ihn noch nicht. Vollständiger Umbruch/Styles/Blöcke, begrenzte Jobverwaltung und
+sichtbare Integration bleiben der nächste Teil desselben Umsetzungsauftrags.

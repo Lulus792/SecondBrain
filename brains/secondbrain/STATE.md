@@ -43,10 +43,22 @@ entfernt. Produktcode/Installation bleiben0.9.43. Der
 Apple Loading/Motion und dem festgelegten SDL_ttf-Fontthreadvertrag.
 Neue UI-Diagnose SBUI-074; die Vorbereitung ist noch nicht integriert.
 
+## Geprüfter Vorbereitungsunterbau (0.9.44)
+
+Unveränderliche Fontdaten, private Worker-Fonts und eigener Quelltext sind
+umgesetzt. Vor einmaliger Übernahme werden Source/Kontext/Fontbindung geprüft.
+69/69 lokale Release-Prüfungen (596,74s),393 neue Job-/Fontprüfungen bestehen.
+Dieselben393 plus405 native Text-,13.708 Editor- und590 Providerprüfungen auch
+unter haltendemASan/UBSan; Scope/Hashes in STATUS. Build ohne Tests besteht.
+[Vertrag](../../docs/FONT_SNAPSHOTS.md). Paket/Zielplattformen folgen.
+Der produktive Wechsel ist noch nicht angebunden; das Ergebnis ist bislang
+eine ungebrochene Zeile. SBUI-074 bleibt offen.
+
 ## Nächste Arbeiten
 
-Abbrechbare Dokumentvorbereitung mit eigenem Quellen-/Fontbesitz prototypisieren
-und in den langen Wechsel integrieren. Native Zeichenrechtecke für weitere
+Vorbereitung auf vollständigen Umbruch/Styles/Blöcke erweitern, Job-/Output-/
+Speichergrenzen und nichtblockierende Retireverwaltung prüfen und in den langen
+Wechsel integrieren. Native Zeichenrechtecke für weitere
 Felder und Leseblöcke integrieren.
 Das erste Layout langer Dokumente und große Exporte über der Cachegrenze
 weiter optimieren. Reale Eingabemethoden, VoiceOver/NVDA/Orca, Dialoge,
