@@ -13,11 +13,11 @@ kopieren. Lumen-Sternkarte, Glaskarten/Icons, direkte Pfeilnavigation, Kamerafah
 weiches Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Entwürfe, Originalbytes und erkannte Konflikte bleiben geschützt.
 
-Dist enthält **0.9.26, Build 598af64e048c**, Intel/macOS Release. Entpacktes Paket
+Dist enthält **0.9.28, Build 7f5b63432062**, Intel/macOS Release. Entpacktes Paket
 besteht mit 126 Desktop-, 157 Tastatur-, 75 Sicherungsassertions, zwei Neustarts
 und CLI. Alle drei Lizenzsammlungen stimmen bytegenau mit ihren Manifesten
 überein. Eigenes Gedächtnis geladen/Raster betrachtet, Dateien unverändert.
-Rückfallkopie: build/previous-dist-0.9.25-20261008-063006.
+Rückfallkopie: build/previous-dist-0.9.26-20261008-071024.
 
 [CI 37704298271](https://github.com/Lulus792/SecondBrain/actions/runs/37704298271)
 zu 7f9acb8 besteht in allen 20 Jobs einschließlich acht Desktop-Varianten und
@@ -70,9 +70,11 @@ besteht in allen 20 Jobs inklusive vier entpackter Pakete. Lokal installiert.
 umgesetzt. Gesamtprüfung fand einen ersten instabilen Formularrahmen;
 Anfangsmaße und Meldungszustand sind korrigiert; alle 51 abschließenden
 Release-Prüfungen bestehen (293,35 Sekunden). Eigene UI-/Desktop-/Renderer-
-Sanitizer bestehen mit 135/124/36 Assertions. Paketabschluss folgt.
+Sanitizer bestehen mit 135/124/36 Assertions. Paket vollständig geprüft und
+installiert; [CI 37730572189](https://github.com/Lulus792/SecondBrain/actions/runs/37730572189)
+läuft. Neue Plattformnachweise erst nach Abschluss.
 
-Nächster Schritt: 0.9.28 abschließend prüfen, pushen und Mac-Paket aktualisieren.
+Nächster Schritt: 0.9.28-CI auswerten; weitere Release-Arbeiten fortsetzen.
 Weitere Release-Arbeiten: Bidi/visuelle Textgeometrie/IME, native
 Tabellenmatrix, Screenreader-/Dialog-/Geräte-/Langzeitabnahmen, volle Windows-/
 Linux-Zielvolumes und physische Persistenz. Originalverträge stehen in SOURCES.

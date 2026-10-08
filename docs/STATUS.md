@@ -2,7 +2,7 @@
 
 Stand: 8. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.26. Die neue Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.28. Die neue Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -2324,3 +2324,14 @@ Zugänglichkeit, Übergänge und Navigation bestehen (12,92 / 18,33 /
 Testobjekte sind instrumentiert; Kern/externe Bibliotheken nicht,
 macOS-Leakprüfung deaktiviert. Paket- und neue Plattformprüfung folgen.
 [Vertrag und Messgrenzen](NAVIGATION_POLITUR.md).
+
+0.9.28 / 7f5b63432062 ist als sauberes Intel/macOS-Release-Paket vollständig
+geprüft und installiert: 126 Desktop-, 157 Tastatur- und 75 Sicherungsassertions,
+zwei echte Prozessneustarts, Produktions-CLI und Laufzeitimporte bestehen.
+Original-Lizenzbündel sind bytegenau geprüft; die Projektdateien bleiben beim
+Laden unverändert. Das installierte Raster wurde betrachtet.
+Rückfallkopie: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.26-20261008-071024`.
+Archiv-SHA256: `503e088233a6428739b72c2e54237342e42f2ecea09d483be7dde46b33e7fc5b`.
+[CI 37730572189](https://github.com/Lulus792/SecondBrain/actions/runs/37730572189)
+zu diesem Quellstand läuft; neue Windows-/Linux-/ARM64-Nachweise folgen erst
+nach tatsächlichem Abschluss.
