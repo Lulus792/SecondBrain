@@ -18,7 +18,8 @@ if(node_hash STREQUAL "8fafcc4f13a061cc46ea070a7b4e240027487f8f5507d75c449253c95
         "        let mut attributes = HashMap::new();\n        if let Some(level) = self.0.level().and_then(|level| level.checked_add(1)) {\n            attributes.insert(\"level\", level.to_string());\n        }\n        if let Some(placeholder) = self.placeholder() {" node_text "${node_text}")
     file(WRITE "${node_source}" "${node_text}")
 elseif(NOT node_hash STREQUAL "32f8e038ed152668c190a3acd672485b60e0e9c9abd017fc746bf3d502c47dd1" AND
-       NOT node_hash STREQUAL "cdb02d7b49d51b74f2933f7a8905eee6e46b9b77300d1e8dc8963366469f46e5")
+       NOT node_hash STREQUAL "cdb02d7b49d51b74f2933f7a8905eee6e46b9b77300d1e8dc8963366469f46e5" AND
+       NOT node_hash STREQUAL "26910a9165dd73a29023679bb10c5d561388e8deaff672cda155251a6ec26bab")
     message(FATAL_ERROR "Unrecognized AccessKit AT-SPI level source; refusing an unverified patch")
 endif()
 file(READ "${SB_C_SOURCE}/Cargo.toml" manifest)

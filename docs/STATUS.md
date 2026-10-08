@@ -2397,3 +2397,14 @@ Linux-Matrix einschließlich Headern, Eltern, Indizes, Leerzellen und Spannen
 besteht damit in Debug/Release bei 100/200 Prozent. Die zuvor gefundenen
 Signatur-/Baumerwartungsfehler sind in diesem Umfang nachgeprüft. Menschliche
 Screenreader-Bedienung und tatsächliche Textgeometrie bleiben offen.
+
+## Begrenzte Linux-Cache-Indizes in 0.9.33
+
+Rechteckige C-Tabellen erhalten einen geprüften direkten Cache-/Parent-Index.
+Andere Strukturen behalten den bisherigen Baumweg. Die isolierte 16.384-
+Zellen-Messung verbessert den Cache-Teilschritt von 43,560 s auf 48,186 ms;
+keine Aussage über globale Bildrate. Zusätzliche Identitäts-/Rückfall-/
+Defunct-Prüfung besteht auf dem Host (0,17 s); Linux-Zielcheck und vier
+Quellvorbereitungszustände sind geprüft. Zwei Mac-Nachprüfungen bestehen
+(14,15 s). Die zusätzliche Linux-Cargo-Prüfung ist an CTest angebunden;
+Ausführung mit dem Anwendungs-Lockfile folgt in nativer CI.

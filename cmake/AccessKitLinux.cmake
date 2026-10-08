@@ -39,3 +39,11 @@ find_package(Threads REQUIRED)
 target_link_libraries(sb_accesskit_linux INTERFACE Threads::Threads ${CMAKE_DL_LIBS} m rt util)
 add_dependencies(sb_accesskit_linux sb_accesskit_linux_build)
 set(SB_ACCESSKIT_TARGET sb_accesskit_linux)
+
+if(BUILD_TESTING)
+    add_test(NAME native-table-cache-indices
+        COMMAND "${SB_CARGO}" test --locked --release --lib -p accesskit_atspi_common
+            secondbrain_table_cache --manifest-path "${SB_C_SOURCE}/Cargo.toml"
+            --target-dir "${SB_ACCESSKIT_CARGO_TARGET}")
+    set_tests_properties(native-table-cache-indices PROPERTIES TIMEOUT 180)
+endif()

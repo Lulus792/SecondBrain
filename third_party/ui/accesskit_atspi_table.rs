@@ -71,3 +71,15 @@ impl PlatformNode {
                 sb_cell_shape(header).is_ok_and(|(hr,hc,hrs,hcs)|if columns { c>=hc && c-hc<hcs } else { r>=hr && r-hr<hrs })).map(|header|header.id()).collect()) })
     }
 }
+
+// Only SecondBrain's rectangular, unhidden C table contract permits this path.
+fn sb_rectangular_index(node:&NodeRef)->Option<usize> {
+    let (r,c,rs,cs)=sb_cell_shape(node).ok()?;
+    if rs!=1 || cs!=1 || filter(node)!=FilterResult::Include { return None; }
+    let row=node.parent()?;let table=row.parent()?;
+    if row.role()!=Role::Row || !table.author_id().is_some_and(|id|id.starts_with("reader:table:")) { return None; }
+    let (rows,columns)=sb_table_shape(&table).ok()?;
+    if table.children().len()!=rows || row.children().len()!=columns || row.data().row_index()!=Some(r) ||
+        table.children().nth(r)?.id()!=row.id() || row.children().nth(c)?.id()!=node.id() { return None; }
+    r.checked_mul(columns)?.checked_add(c)
+}

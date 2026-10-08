@@ -196,3 +196,22 @@ Prüfung wird nicht reduziert; alle vier Werte bleiben verbindlich.
 Die anderslautende XML und Rust-atspi-Proxys sind keine Bestätigung des
 realen C-Clientvertrags; deren Interoperabilität bleibt separat zu beachten.
 [Konkrete CI-Diagnose](https://github.com/Lulus792/SecondBrain/actions/runs/37734521512/job/113170937263).
+
+## Cache-Indizes ohne globale Geschwistersuche (0.9.33)
+
+Eine isolierte synthetische Tabelle mit 512×32 Zellen deckt eine Regression
+durch den direkten Linux-Zellbaum auf: 16.384 Cache-Abfragen benötigen
+43,560 Sekunden, weil jede ihren Index durch alle vorhergehenden gefilterten
+Geschwister ermittelt. Für die mit `reader:table:` gekennzeichnete, rechteckige
+und nicht programmgesteuert versteckte C-Struktur wird der Index jetzt aus
+Zeile/Spalte berechnet. Eltern, tatsächliche Child-IDs, Dimensionen und
+Einzelspannen werden dabei geprüft. Andere Strukturen und falsche Metadaten
+behalten den bisherigen gefilterten Baumweg.
+
+Derselbe Cache-Teilschritt benötigt nachher 48,186 ms. Das ist eine lokale
+Messung der UI-Adapterdaten auf Intel/macOS, keine Linux-/App-/FPS-Abnahme.
+Eine zusätzliche Prüfung bestätigt alle 16.384 Indizes, unabhängigen
+GetChildAtIndex-Zugriff, falsche Zeilenmetadaten als Rückfall und entfernte
+Kontexte; sie besteht in 0,17 Sekunden. Sie wird außerdem als verbindliche
+Linux-Cargo-Bibliotheksprüfung an CTest angebunden. Festes Anwendungs-Lockfile
+und Original-Lizenzen bleiben erhalten; neuer nativer Abschluss folgt.

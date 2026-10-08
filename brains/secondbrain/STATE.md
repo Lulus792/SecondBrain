@@ -122,3 +122,8 @@ Linux-Matrix einschließlich Headern, Eltern, Indizes, Leerzellen und Spannen
 besteht damit in Debug/Release bei 100/200 Prozent. Die zuvor gefundenen
 Signatur-/Baumerwartungsfehler sind in diesem Umfang nachgeprüft. Menschliche
 Screenreader-Bedienung und tatsächliche Textgeometrie bleiben offen.
+
+0.9.33 begrenzt Cache-/Parent-Indexarbeit für markierte rechteckige
+C-Tabellen. Alle 16.384 Indizes, unabhängiger Child-Zugriff, falsche
+Metadaten und entfernte Kontexte sind geprüft; zusätzliche native Linux-
+Bibliotheksprüfung ist eingebunden. Neuer CI-Abschluss folgt.
