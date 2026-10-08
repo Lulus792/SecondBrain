@@ -2951,3 +2951,47 @@ Gedächtnisdateien unverändert. Nachweis: `build/word-install-proof.json`,
 zuletzt queued; kein neuer Gesamt-Plattformnachweis für diesen Quellstand.
 Native Textgeometrie, reale Bedienabnahmen, langer kalter Wechsel und alle
 übrigen Release-Arbeiten bleiben offen. 1.0 weiterhin nur nach Nutzerfreigabe.
+
+## Begrenzte native Graphem-/Wortläufe (0.9.41)
+
+AccessKit erhält höchstens255 auswählbare Einheiten je Textlauf. Normale
+Grapheme/Emoji und CRLF sind je eine Einheit. Stil-/Zeilenwechsel und lange
+Läufe erhalten neue stabile Quellenoffset-Identitäten; ein abschließendes
+Zeilenende erhält einen leeren Schlusslauf. Wortanfänge verwenden ganzen
+Quellenkontext, auch über Stil- und Laufgrenzen. Native lauflokale Auswahlen
+werden unter derselben Sperre in globale Editor-Skalarpositionen übersetzt.
+Ungültige/fremde Positionen und veraltete Eingabezuordnungen werden abgewiesen.
+Unveränderte Metadaten werden bei Bounds-Änderungen wiederverwendet;
+strukturierte Leser erhalten keinen unnötigen Plan des rohen Root-Markdowns.
+[Vertrag und Grenzen](NATIVE_TEXTLAEUFE.md).
+
+**68/68 lokale Release-Prüfungen bestehen (667,31 s)**.
+Neue Lauf-/Wort-/Graphem-/Auswahl-/Cacheprüfung:388 Assertions.
+Der echte macOS-Provider wählt zusätzlich über mehrere Läufe aus: UTF-16-
+Bereich250..315 entspricht Editor-Skalar250..311 und erhält Akzent/Familien-
+Emoji. Vorhandene native Provider-/Text-/Stil-/Strukturprüfungen bestehen.
+**Dieselben388 Assertions bestehen unter haltendem ASan/UBSan ohne Befund**.
+Instrumentiert sind native_text.c, accessibility.c, UI/Text/Renderer,
+Caret-/Shape-/Script-/Bidi-Code, Bidi-Engine, Wort-/Graphemkern, Prüfer und
+SDL_ttf.c samt Hooks. Weitere externe Objekte und übriger Kern/Modell-/
+Desktopcode sind nicht instrumentiert; Mac-Leakprüfung abgeschaltet.
+Quellhashes der Instrumentierung abgeglichen. Build ohne Tests besteht.
+Protokolle: `build/native-text-full-ctest.log`, `native-text-full-lasttest.log`,
+`native-text-provider.log`, `native-text-sanitizers/`, `native-text-no-tests-build.log`.
+
+Originaler AccessKit-Vertrag0.25.1 (Commitce8164ba92995cfa86005b6259115e08c8244253)
+erneut aus Primärquelle gelesen; Download entspricht lokaler Cratequelle bytegleich,
+SHA-256 f77ed125614c6e735141bdc5fe8551cfc8dbc2d16ffccf4d52880c2c2bdfeffd.
+Sehr lange Grapheme über255 UTF-8-Bytes benötigen native skalare Teilstücke;
+Quellenbytes bleiben erhalten und die UI klemmt ihre Auswahl weiterhin.
+Native Zeichenpositionen/-breiten/Glyphenrechtecke sind noch nicht angebunden.
+Die Laufrechtecke bleiben die vorhandenen Elementflächen. Reale assistive/
+sprachabhängige/IME-/Geräteabnahmen und neue Plattform-/Paketabnahme folgen.
+Installiert bleibt zunächst0.9.40. Der volle Release-Auftrag bleibt aktiv;
+1.0 nur nach ausdrücklicher Nutzerfreigabe.
+
+104 ältere abgeschlossene generierte BMPs verlustfrei komprimiert, SHA-256,
+entpackte Bytes und unveränderte Dateistatistik vor jeder Rohdateientfernung
+geprüft. 1476949328 Bytes freigegeben; laufende Prüfungen,
+Projektdateien und Pakete unberührt. Manifest:
+`build/native-text-completed-bitmap-archive.json`.

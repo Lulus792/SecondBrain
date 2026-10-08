@@ -32,4 +32,6 @@ bool sb_accessibility_current(SBAccessibility *accessibility,const SBAccessibleA
 accesskit_tree_update *sb_accessibility_tree(SBAccessibility *accessibility);
 void sb_accessibility_request(SBAccessibility *accessibility,accesskit_action_request *request);
 bool sb_accessibility_submit(SBAccessibility *accessibility,accesskit_node_id node,accesskit_action action,const char *value,size_t anchor,size_t caret);
+/* Native run-local selectable units are mapped to the editor's scalar ABI. */
+bool sb_accessibility_select(SBAccessibility *accessibility,accesskit_node_id node,accesskit_text_selection selection);
 #endif

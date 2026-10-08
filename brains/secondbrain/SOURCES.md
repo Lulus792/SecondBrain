@@ -146,3 +146,6 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 
 - [Wortnavigation](../../docs/WORTNAVIGATION.md): eigene Unicode-Defaultgrenzen,
   UI-Wortauswahl, Plattformtasten, Originaldaten und gesonderte native Grenzen ab40.
+
+- [Native Textläufe](../../docs/NATIVE_TEXTLAEUFE.md): begrenzte Graphem-/
+  Wortmetadaten, Quellenpositionen, Cache-/Abbruchvertrag und weitere Geometriearbeit.

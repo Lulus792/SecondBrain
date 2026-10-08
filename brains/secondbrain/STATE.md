@@ -78,6 +78,17 @@ Neue CI37798054080 zu5b56e35 zuletzt queued; weitere Zielsysteme offen.
 Die Wiederverwendung geformter Zeilen brachte im alternierenden Vergleich
 keinen Layoutgewinn und wurde entfernt. Kalter langer Wechsel bleibt offen.
 
+## Native Läufe (0.9.41)
+
+Begrenzte Graphem-/Wortläufe und native lauflokale Auswahl werden auf
+Editor-Skalarpositionen abgebildet. Metadaten behalten Kontext über Stil-/
+Laufgrenzen und werden bei reiner Geometrieänderung wiederverwendet.
+68/68 Release-Prüfungen,388 Assertions unter haltendem ASan/UBSan und
+Build ohne Tests bestehen. Echte Mac-Providerauswahl über Laufgrenzen geprüft.
+[Vertrag](../../docs/NATIVE_TEXTLAEUFE.md), Scope/Nachweise in STATUS.
+Neue Plattform-/Paketabnahme folgt, installiert zunächst40. Glyphenrechtecke
+und Sonderfall sehr langer nativer Grapheme bleiben offen.
+
 ## Nächste Arbeiten
 
 Erstes Layout langer Dokumente weiter optimieren. Native Zeichenrechtecke

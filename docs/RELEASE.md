@@ -204,3 +204,14 @@ Wort-/Zeichenrechtecke, sprachabhängige gemischte Schreibrichtungen, Wörterbuc
 Segmentierung und tatsächliche assistive/IME-/Geräteabnahme bleiben getrennt.
 Die untersuchte Zeilenwiederverwendung beschleunigte den kalten langen Wechsel
 nicht und wurde entfernt; dieser Leistungsschritt bleibt offen.
+
+## Native Textläufe vom 8. Oktober
+
+Ab0.9.41 sind native Textläufe auf255 Auswahleinheiten begrenzt und erhalten
+Unicode-Wortanfänge mit ganzem Quellenkontext. Normale Grapheme und CRLF
+werden als Einheiten publiziert. Auswahlen über mehrere Läufe werden unter
+Sperre auf globale Editorpositionen abgebildet; veraltete Eingabezuordnungen
+werden verworfen. [Vertrag und genaue Grenzen](NATIVE_TEXTLAEUFE.md).
+Eine lokale native Mac-Auswahl über Laufgrenzen ist nachgeprüft.
+Glyphenrechtecke, sehr lange native Grapheme und reale assistive/
+sprachabhängige Abnahmen bleiben weitere offene Textaufgaben.

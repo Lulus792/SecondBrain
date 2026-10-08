@@ -125,6 +125,11 @@ int main(int argc,char **argv) {
     ((void(*)(void *,SEL,NativeRange))objc_msgSend)(editor,sel_registerName("setAccessibilitySelectedTextRange:"),(NativeRange){1,1}); frame(&d); frame(&d);
     CHECK(d.text_edit.select_start==0 && d.text_edit.select_end==2);
     selected=utf8(send(editor,"accessibilitySelectedText")); CHECK(selected && !strcmp(selected,"e\xcc\x81"));
+    char native_long[600];memset(native_long,'a',300);strcpy(native_long+300," e\xcc\x81 👩‍👩‍👧‍👦 end");
+    ((void(*)(void *,SEL,void *))objc_msgSend)(editor,sel_registerName("setAccessibilityValue:"),string(native_long));frame(&d);frame(&d);
+    ((void(*)(void *,SEL,NativeRange))objc_msgSend)(editor,sel_registerName("setAccessibilitySelectedTextRange:"),(NativeRange){250,65});frame(&d);frame(&d);
+    CHECK(d.text_edit.select_start==250 && d.text_edit.select_end==311);
+    selected=utf8(send(editor,"accessibilitySelectedText"));CHECK(selected && strlen(selected)==80 && !memcmp(selected,native_long+250,80));
     ((void(*)(void *,SEL,void *))objc_msgSend)(editor,sel_registerName("setAccessibilityValue:"),string("# Native Notiz\n\nÜber den Provider bearbeitet.\n")); frame(&d); frame(&d);
     ((void(*)(void *,SEL))objc_msgSend)(save,sel_registerName("accessibilityPerformPress")); frame(&d); frame(&d); CHECK(!sb_app_dirty(&d.model));
     /* Native callback is queued; changing document before consumption must reject it. */

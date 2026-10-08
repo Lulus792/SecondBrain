@@ -1,4 +1,5 @@
 #include "accessibility.h"
+#include "native_text.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -101,13 +102,14 @@ static void mac_native_roles(void *window) {
 }
 #endif
 typedef struct { char id[100]; accesskit_node_id node; uint64_t context; } Identity;
-typedef struct { SBTextSpan span; accesskit_node_id node; } StyledRun;
+typedef struct { SBNativeTextRun text; accesskit_node_id node; } StyledRun;
 typedef struct {
     char id[100],parent[100]; char *label,*value;
     unsigned level; size_t row,column,rows,columns;
     accesskit_node_id node; struct nk_rect bounds; accesskit_role role;
     bool editable,selected; size_t anchor,caret;
     StyledRun *runs; size_t run_count; float font_size;
+    SBTextSpan *source_styles;size_t style_count;
 } Item;
 typedef struct Pending { SBAccessibleAction action; struct Pending *next; } Pending;
 struct SBAccessibility {
@@ -195,7 +197,8 @@ static bool parent_allowed(const Item *parent,const Item *child) {
     return (parent->role==ACCESSKIT_ROLE_CELL || parent->role==ACCESSKIT_ROLE_COLUMN_HEADER) && child->role==ACCESSKIT_ROLE_LINK;
 }
 static void text_run(accesskit_tree_update *tree,accesskit_node *parent,accesskit_node_id id,
-    const char *value,size_t length,accesskit_rect bounds,unsigned style,float font_size) {
+    const char *value,const SBNativeTextRun *run,accesskit_rect bounds,float font_size) {
+    size_t length=run->span.length;unsigned style=run->span.style;
     accesskit_node *text=accesskit_node_new(ACCESSKIT_ROLE_TEXT_RUN);
     accesskit_node_set_value_with_length(text,value,length); accesskit_node_set_bounds(text,bounds);
     if (font_size>0) {
@@ -204,16 +207,15 @@ static void text_run(accesskit_tree_update *tree,accesskit_node *parent,accesski
         accesskit_node_set_font_weight(text,style&SB_TEXT_BOLD ? 700 : 400);
         if (style&SB_TEXT_ITALIC) accesskit_node_set_italic(text);
     }
-    size_t n=0; for (size_t i=0;i<length;++i) if (((unsigned char)value[i]&0xc0)!=0x80) ++n;
-    uint8_t *lengths=n ? malloc(n) : NULL;
-    if (lengths) {
-        size_t at=0; for (size_t i=0;i<length;) {
-            unsigned char c=(unsigned char)value[i]; unsigned size=c<0x80 ? 1 : c<0xe0 ? 2 : c<0xf0 ? 3 : 4;
-            lengths[at++]=(uint8_t)size; i+=size;
-        }
-        accesskit_node_set_character_lengths(text,n,lengths); free(lengths);
-    }
+    accesskit_node_set_character_lengths(text,run->characters,run->lengths);
+    accesskit_node_set_word_starts(text,run->word_count,run->words);
     accesskit_node_push_child(parent,id); accesskit_tree_update_push_node(tree,id,text);
+}
+static accesskit_text_position native_position(const Item *v,size_t scalar) {
+    size_t run=0;while(run+1<v->run_count && v->runs[run+1].text.scalars[0]<=scalar)++run;
+    const StyledRun *r=&v->runs[run];size_t lo=0,hi=r->text.characters;
+    while(lo<hi){size_t mid=lo+(hi-lo)/2;if(r->text.scalars[mid]<scalar)lo=mid+1;else hi=mid;}
+    return (accesskit_text_position){r->node,lo};
 }
 static accesskit_tree_update *build_locked(SBAccessibility *a) {
     accesskit_node_id focus=1;
@@ -271,14 +273,14 @@ static accesskit_tree_update *build_locked(SBAccessibility *a) {
             if (v->role==ACCESSKIT_ROLE_DOCUMENT && !v->parent[0])
                 for (size_t j=0;j<a->count;++j) if (j!=i && !strcmp(a->items[j].parent,v->id)) { structured=true; break; }
             if (!structured) {
-            if (v->run_count && !v->editable) {
+            if (v->run_count) {
                 for (size_t j=0;j<v->run_count;++j) {
                     StyledRun run=v->runs[j];
-                    text_run(tree,node,run.node,v->value+run.span.offset,run.span.length,rect,run.span.style,v->font_size);
+                    text_run(tree,node,run.node,v->value+run.text.span.offset,&run.text,rect,v->font_size);
                 }
-            } else text_run(tree,node,run_id(v->node),v->value,strlen(v->value),rect,0,0);
-            if (v->editable && v->role==ACCESSKIT_ROLE_MULTILINE_TEXT_INPUT) {
-                accesskit_text_selection selection={{run_id(v->node),v->anchor},{run_id(v->node),v->caret}};
+            }
+            if (v->run_count && v->editable && v->role==ACCESSKIT_ROLE_MULTILINE_TEXT_INPUT) {
+                accesskit_text_selection selection={native_position(v,v->anchor),native_position(v,v->caret)};
                 accesskit_node_set_text_selection(node,selection);
             }
         }
@@ -307,12 +309,9 @@ static accesskit_tree_update *build_locked(SBAccessibility *a) {
 }
 accesskit_tree_update *sb_accessibility_tree(SBAccessibility *a) { SDL_LockMutex(a->mutex); accesskit_tree_update *t=build_locked(a); SDL_UnlockMutex(a->mutex); return t; }
 static accesskit_tree_update *factory(void *userdata) { return sb_accessibility_tree(userdata); }
-bool sb_accessibility_submit(SBAccessibility *a,accesskit_node_id node,accesskit_action kind,const char *value,size_t anchor,size_t caret) {
+static bool submit_locked(SBAccessibility *a,Item *item,accesskit_action kind,const char *value,size_t anchor,size_t caret) {
     size_t bytes=value ? strlen(value)+1 : 0;
     if (value && (bytes>SB_TEXT_LIMIT || !sb_utf8_valid(value,bytes-1))) return false;
-    SDL_LockMutex(a->mutex);
-    Item *item=NULL;
-    for (size_t i=0;i<a->count;++i) if (a->items[i].node==node || run_id(a->items[i].node)==node) { item=&a->items[i]; break; }
     bool accepted=false;
     bool data_valid=(kind!=ACCESSKIT_ACTION_SET_VALUE && kind!=ACCESSKIT_ACTION_REPLACE_SELECTED_TEXT) || value;
     if (kind==ACCESSKIT_ACTION_SET_TEXT_SELECTION && item && (anchor>characters(item->value) || caret>characters(item->value))) data_valid=false;
@@ -325,19 +324,37 @@ bool sb_accessibility_submit(SBAccessibility *a,accesskit_node_id node,accesskit
             else { if (a->tail) a->tail->next=p; else a->head=p; a->tail=p; ++a->queued; a->queued_bytes+=bytes; accepted=true; }
         }
     }
-    SDL_UnlockMutex(a->mutex); return accepted;
+    return accepted;
+}
+bool sb_accessibility_submit(SBAccessibility *a,accesskit_node_id node,accesskit_action kind,const char *value,size_t anchor,size_t caret) {
+    SDL_LockMutex(a->mutex);Item *item=NULL;
+    for(size_t i=0;i<a->count;++i)if(a->items[i].node==node || run_id(a->items[i].node)==node){item=&a->items[i];break;}
+    bool accepted=submit_locked(a,item,kind,value,anchor,caret);SDL_UnlockMutex(a->mutex);return accepted;
+}
+static bool source_position(const Item *item,accesskit_text_position position,size_t *scalar) {
+    for(size_t i=0;i<item->run_count;++i)if(item->runs[i].node==position.node){
+        if(position.character_index>item->runs[i].text.characters)return false;
+        *scalar=item->runs[i].text.scalars[position.character_index];return true;
+    }return false;
+}
+bool sb_accessibility_select(SBAccessibility *a,accesskit_node_id node,accesskit_text_selection selection) {
+    SDL_LockMutex(a->mutex);Item *item=NULL;size_t anchor=0,caret=0;
+    for(size_t i=0;i<a->count;++i)if(a->items[i].node==node){item=&a->items[i];break;}
+    bool accepted=item && source_position(item,selection.anchor,&anchor) && source_position(item,selection.focus,&caret) && submit_locked(a,item,ACCESSKIT_ACTION_SET_TEXT_SELECTION,NULL,anchor,caret);
+    SDL_UnlockMutex(a->mutex);return accepted;
 }
 void sb_accessibility_request(SBAccessibility *a,accesskit_action_request *request) {
     const char *value=NULL; size_t anchor=0,caret=0;
+    SDL_LockMutex(a->mutex);Item *item=NULL;bool valid=true;
+    for(size_t i=0;i<a->count;++i)if(a->items[i].node==request->target_node || run_id(a->items[i].node)==request->target_node){item=&a->items[i];break;}
+    if(request->action==ACCESSKIT_ACTION_SET_TEXT_SELECTION)valid=request->data.has_value && request->data.value.tag==ACCESSKIT_ACTION_DATA_SET_TEXT_SELECTION;
     if (request->data.has_value && request->data.value.tag==ACCESSKIT_ACTION_DATA_VALUE) value=request->data.value.value;
     if (request->data.has_value && request->data.value.tag==ACCESSKIT_ACTION_DATA_SET_TEXT_SELECTION) {
         accesskit_text_selection selection=request->data.value.set_text_selection;
-        if (selection.anchor.node!=run_id(request->target_node) || selection.focus.node!=run_id(request->target_node)) {
-            accesskit_action_request_free(request); return;
-        }
-        anchor=request->data.value.set_text_selection.anchor.character_index; caret=request->data.value.set_text_selection.focus.character_index;
+        valid=item && source_position(item,selection.anchor,&anchor) && source_position(item,selection.focus,&caret);
     }
-    sb_accessibility_submit(a,request->target_node,request->action,value,anchor,caret);
+    if(valid)submit_locked(a,item,request->action,value,anchor,caret);
+    SDL_UnlockMutex(a->mutex);
     accesskit_action_request_free(request);
 }
 static void action(accesskit_action_request *request,void *userdata) { sb_accessibility_request(userdata,request); }
@@ -364,7 +381,7 @@ SBAccessibility *sb_accessibility_new(SDL_Window *window) {
 #endif
     return a;
 }
-static void clear_items(SBAccessibility *a) { for (size_t i=0;i<a->count;++i) { free(a->items[i].label); free(a->items[i].value); free(a->items[i].runs); } free(a->items); a->items=NULL; a->count=0; }
+static void clear_items(SBAccessibility *a) { for (size_t i=0;i<a->count;++i) { free(a->items[i].label); free(a->items[i].value); free(a->items[i].runs);free(a->items[i].source_styles); } free(a->items); a->items=NULL; a->count=0; }
 void sb_accessibility_update(SBAccessibility *a,const char *title,const char *focus,const SBAccessibleItem *items,size_t count,const char *message,bool modal,uint64_t context) {
     if (!a) return;
     uint64_t signature=sb_hash(title,strlen(title))^sb_hash(focus,strlen(focus))^sb_hash(message,strlen(message))^(uint64_t)modal;
@@ -385,37 +402,38 @@ void sb_accessibility_update(SBAccessibility *a,const char *title,const char *fo
             snprintf(next[i].id,sizeof(next[i].id),"%s",items[i].id); next[i].label=copy(items[i].label); if (!next[i].label) complete=false;
             next[i].value=copy(items[i].value); if (items[i].value && !next[i].value) complete=false;
             next[i].node=identify(a,items[i].id,context); if (!next[i].node) complete=false;
-            if (items[i].value && items[i].style_count && !items[i].editable) {
-                size_t length=strlen(items[i].value),covered=0;
-                bool valid=items[i].styles && items[i].style_count<=SB_INLINE_LIMIT;
-                for (size_t j=0;valid && j<items[i].style_count;++j) {
-                    SBTextSpan span=items[i].styles[j];
-                    valid=span.offset==covered && span.length && span.length<=length-covered;
-                    if (valid) valid=sb_utf8_valid(items[i].value+span.offset,span.length);
-                    if (valid) covered+=span.length;
-                }
-                valid=valid && covered==length;
-                if (valid) {
-                    next[i].runs=calloc(items[i].style_count,sizeof(*next[i].runs));
-                    if (!next[i].runs) complete=false;
-                    else {
-                        next[i].run_count=items[i].style_count; next[i].font_size=items[i].font_size;
-                        for (size_t j=0;j<items[i].style_count;++j) {
-                            char id[100]; snprintf(id,sizeof(id),"@text:%llu:%zu",(unsigned long long)next[i].node,items[i].styles[j].offset);
-                            accesskit_node_id node=j ? identify(a,id,context) : next[i].node;
-                            if (!node) complete=false;
-                            next[i].runs[j]=(StyledRun){items[i].styles[j],run_id(node)};
-                        }
-                    }
-                }
+            next[i].font_size=items[i].font_size;
+            bool styled=items[i].styles && items[i].style_count<=SB_INLINE_LIMIT && !items[i].editable;
+            next[i].style_count=styled ? items[i].style_count : 0;
+            if(next[i].style_count){next[i].source_styles=malloc(next[i].style_count*sizeof(*next[i].source_styles));
+                if(!next[i].source_styles)complete=false;else memcpy(next[i].source_styles,items[i].styles,next[i].style_count*sizeof(*next[i].source_styles));}
+            bool structured=false;
+            if(items[i].role==ACCESSKIT_ROLE_DOCUMENT && (!items[i].parent || !items[i].parent[0]))
+                for(size_t j=0;j<count;++j)if(j!=i && items[j].parent && !strcmp(items[j].parent,items[i].id)){structured=true;break;}
+            if(items[i].value && !structured){
+                Item *old=context==a->context && i<a->count && !strcmp(items[i].id,a->items[i].id) ? &a->items[i] : NULL;
+                bool reuse=old && old->value && old->run_count && !strcmp(old->value,items[i].value) && old->style_count==next[i].style_count;
+                for(size_t j=0;reuse && j<next[i].style_count;++j){SBTextSpan x=old->source_styles[j],y=items[i].styles[j];reuse=x.offset==y.offset && x.length==y.length && x.style==y.style;}
+                SBNativeText layout={0};
+                if(reuse){next[i].run_count=old->run_count;next[i].runs=malloc(old->run_count*sizeof(*next[i].runs));
+                    if(!next[i].runs)complete=false;else memcpy(next[i].runs,old->runs,old->run_count*sizeof(*next[i].runs));}
+                else if(sb_native_text(items[i].value,strlen(items[i].value),styled ? items[i].styles : NULL,next[i].style_count,&layout).code==SB_OK){
+                    next[i].runs=calloc(layout.count,sizeof(*next[i].runs));
+                    if(!next[i].runs)complete=false;else{next[i].run_count=layout.count;
+                        for(size_t j=0;j<layout.count;++j){char id[100];snprintf(id,sizeof(id),"@text:%llu:%zu",(unsigned long long)next[i].node,layout.runs[j].span.offset);
+                            accesskit_node_id node=j ? identify(a,id,context) : next[i].node;if(!node)complete=false;
+                            next[i].runs[j]=(StyledRun){layout.runs[j],run_id(node)};}}
+                    sb_native_text_free(&layout);
+                }else complete=false;
             }
             snprintf(next[i].parent,sizeof(next[i].parent),"%s",items[i].parent ? items[i].parent : ""); next[i].level=items[i].level;
             next[i].row=items[i].row; next[i].column=items[i].column; next[i].rows=items[i].rows; next[i].columns=items[i].columns;
             next[i].bounds=items[i].bounds; next[i].role=items[i].role; next[i].editable=items[i].editable; next[i].selected=items[i].selected; next[i].anchor=items[i].anchor; next[i].caret=items[i].caret;
         }
-        if (!complete) { for (size_t i=0;i<count;++i) { free(next[i].label); free(next[i].value); free(next[i].runs); } free(next); SDL_UnlockMutex(a->mutex); return; }
+        if (!complete) { for (size_t i=0;i<count;++i) { free(next[i].label); free(next[i].value); free(next[i].runs); free(next[i].source_styles); } free(next); SDL_UnlockMutex(a->mutex); return; }
         bool controls=context!=a->context || count!=a->count;
         if (!controls) for (size_t i=0;i<count;++i) if (strcmp(a->items[i].id,next[i].id) || strcmp(a->items[i].parent,next[i].parent) || a->items[i].role!=next[i].role) { controls=true; break; }
+        if(!controls)for(size_t i=0;i<count;++i)if(next[i].editable && ((!next[i].value)!=(!a->items[i].value) || (next[i].value && strcmp(next[i].value,a->items[i].value)))){controls=true;break;}
         clear_items(a); a->items=next; a->count=count; a->signature=signature; a->context=context;
         if (controls) ++a->generation;
         snprintf(a->title,sizeof(a->title),"%s",title); snprintf(a->focus,sizeof(a->focus),"%s",focus); snprintf(a->message,sizeof(a->message),"%s",message); a->modal=modal;
