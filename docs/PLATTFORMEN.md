@@ -875,3 +875,12 @@ Intel bestehen jeweils Desktop-Debug/Release; alle vier entpackten Release-
 Pakete bestehen mit der neuen Importprüfung. Die statische MSVC-CRT-Konfiguration
 besteht auch unter Windows-Release. C17- und Python-Matrix bestehen. Frische
 Nutzerrechner, Mindestversionen und menschliche Abnahmen bleiben offen.
+
+## 0.9.24: Cursor-Anker und Popup-Fokus nativ geprüft
+
+[CI 37717307982](https://github.com/Lulus792/SecondBrain/actions/runs/37717307982)
+zu 1c2f323 besteht am 8. Oktober in allen 20 Jobs: Windows/Linux/macOS ARM64/
+Intel jeweils Desktop-Debug/Release sowie C17 und Python. Alle vier entpackten
+Release-Pakete bestehen. 134 Editorassertions prüfen echte SDL-Ankerwerte und
+Popup-/Eltern-Textfokus. Native Eingabemethoden mit echten Kompositionsfolgen,
+Bidi-/visuelle Textgeometrie und menschliche assistive Abnahmen bleiben offen.

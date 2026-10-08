@@ -44,10 +44,10 @@ bleibt offen; zusammengesetzte Lizenzbedingungen sind erhalten.
 Release-Neubau besteht mit 49/49; letzte Popup-Nachprüfung mit 3/3
 und 134 Editorassertions besteht. Lokales Paket ist abgenommen/installiert;
 [CI 37717307982](https://github.com/Lulus792/SecondBrain/actions/runs/37717307982)
-zu 1c2f323 läuft. C17/Python und Linux-Release samt Paket bestehen;
-übrige native Desktop-Abnahmen bleiben ausstehend.
+zu 1c2f323 besteht in allen 20 Jobs inklusive acht Desktop-Varianten
+und vier entpackter Release-Pakete.
 
-Nächster Schritt: neue native Desktop-/Paketnachweise übernehmen.
+Nächster Schritt: vollständige vorläufige IME-Komposition implementieren/prüfen.
 Weitere Release-Arbeiten: Bidi/visuelle Textgeometrie/IME, native
 Tabellenmatrix, Screenreader-/Dialog-/Geräte-/Langzeitabnahmen, volle Windows-/
 Linux-Zielvolumes und physische Persistenz. Originalverträge stehen in SOURCES.

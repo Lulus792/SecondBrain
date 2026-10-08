@@ -2197,8 +2197,10 @@ UI-/Desktop-/Testobjekte neu gebaut. Lokal hängende unsignierte Buildwerkzeuge
 wurden durch isolierte lokale Kopien und System-Git ersetzt; installierte
 Werkzeuge blieben unverändert. Logs: build/ime-clean-tests.log und
 build/ime-popup-{build,tests}.log. [CI 37717307982](https://github.com/Lulus792/SecondBrain/actions/runs/37717307982)
-zu 1c2f323 läuft; C17-/Python-Jobs und Linux-Release samt Paket bestehen.
-Die übrigen nativen Desktop-Nachweise folgen.
+zu 1c2f323 besteht in allen 20 Jobs: acht Desktop-Varianten auf Windows,
+Linux und macOS ARM64/Intel sowie C17 und Python. Alle vier entpackten
+Release-Pakete bestehen. Die Cursor-/Popup-Anbindung ist damit im
+automatisierten Umfang nativ nachgeprüft.
 Das lokale entpackte Paket besteht mit 126 Desktop-, 157 Tastatur- und 75
 Sicherungsassertions, zwei Neustarts, CLI und Importprüfung. Installiert ist
 0.9.24/1c2f323b0fa5; drei Lizenzsammlungen stimmen bytegenau. Eigenes Gedächtnis
