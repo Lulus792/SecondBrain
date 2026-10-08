@@ -105,3 +105,13 @@ bestehen 270 native Assertions (26,67 s). Die Prüfung scheitert mit dem vorheri
 0.9.6-Renderer an der weiterhin sichtbaren Kopfzeile. Rasterbilder zeigen die
 ersten Werte und den erhaltenen Kopfzeilenlink bei 780×560 und 200 %.
 Die neue Windows-/Linux-/ARM64-Abnahme folgt nach dem Commit.
+
+## macOS-Matrix, 8. Oktober 2026
+
+Ab 0.9.27 liefert die native AXTable Zeilen-/Spaltenzahlen und direkte
+Zellenabfragen. Die lokale Release-Prüfung `native-accessibility` besteht
+(16,75 Sekunden); sie vergleicht alle zwölf Zellen einer 4×3-Tabelle mit
+dem nativen Baum und prüft ungültige Indizes. Die Vorprüfung am alten
+Getter scheiterte an der Zeilenzahl. Windows UIA Grid/Table und Linux
+AT-SPI Table/TableCell bleiben offen; dies ist kein VoiceOver-Nutzertest.
+Primärvertrag: [Apple NSAccessibilityProtocol](https://developer.apple.com/documentation/appkit/nsaccessibilityprotocol/accessibilitycell(forcolumn:row:)).

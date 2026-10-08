@@ -563,6 +563,11 @@ int main(int argc,char **argv) {
     void *native_rows=send(native_table,"accessibilityRows");
     CHECK(native_rows && ((size_t(*)(void *,SEL))objc_msgSend)(native_rows,sel_registerName("count"))==4);
     CHECK(((BOOL(*)(void *,SEL,SEL))objc_msgSend)(native_table,sel_registerName("isAccessibilitySelectorAllowed:"),sel_registerName("accessibilityRows")));
+    CHECK(((BOOL(*)(void *,SEL,SEL))objc_msgSend)(native_table,sel_registerName("respondsToSelector:"),sel_registerName("accessibilityRowCount")));
+    CHECK(((BOOL(*)(void *,SEL,SEL))objc_msgSend)(native_table,sel_registerName("respondsToSelector:"),sel_registerName("accessibilityColumnCount")));
+    CHECK(((long(*)(void *,SEL))objc_msgSend)(native_table,sel_registerName("accessibilityRowCount"))==4);
+    CHECK(((long(*)(void *,SEL))objc_msgSend)(native_table,sel_registerName("accessibilityColumnCount"))==3);
+    CHECK(((BOOL(*)(void *,SEL,SEL))objc_msgSend)(native_table,sel_registerName("respondsToSelector:"),sel_registerName("accessibilityCellForColumn:row:")));
     for (size_t r=0;r<4;++r) {
         void *native_row=((void *(*)(void *,SEL,size_t))objc_msgSend)(native_rows,sel_registerName("objectAtIndex:"),r);
         CHECK(!strcmp(utf8(send(native_row,"accessibilityRole")),"AXRow"));
@@ -571,12 +576,23 @@ int main(int argc,char **argv) {
         for (size_t c=0;c<3;++c) {
             void *native_cell=((void *(*)(void *,SEL,size_t))objc_msgSend)(native_cells,sel_registerName("objectAtIndex:"),c);
             CHECK(!strcmp(utf8(send(native_cell,"accessibilityRole")),"AXCell"));
+            void *matrix_cell=((void *(*)(void *,SEL,long,long))objc_msgSend)(native_table,sel_registerName("accessibilityCellForColumn:row:"),(long)c,(long)r);
+            CHECK(matrix_cell && !strcmp(utf8(send(matrix_cell,"accessibilityRole")),"AXCell"));
+            const char *matrix_id=utf8(send(matrix_cell,"accessibilityIdentifier"));
+            const char *tree_id=utf8(send(native_cell,"accessibilityIdentifier"));
+            CHECK(matrix_id && tree_id && !strcmp(matrix_id,tree_id));
             const char *cell_value=utf8(send(native_cell,"accessibilityValue"));
             if (r==0) { const char *expected[]={"Aktion","Kürzel","Wert"}; CHECK(cell_value && !strcmp(cell_value,expected[c])); }
             if (r==1 && c==1) CHECK(cell_value && !strcmp(cell_value,"Ctrl+S"));
             if (r==3 && c>0) CHECK(!cell_value || !*cell_value);
         }
     }
+    const char *matrix_queries[]={"accessibilityRowCount","accessibilityColumnCount","accessibilityCellForColumn:row:"};
+    for(unsigned q=0;q<3;++q)CHECK(((BOOL(*)(void *,SEL,SEL))objc_msgSend)(native_table,sel_registerName("isAccessibilitySelectorAllowed:"),sel_registerName(matrix_queries[q])));
+    CHECK(!((void *(*)(void *,SEL,long,long))objc_msgSend)(native_table,sel_registerName("accessibilityCellForColumn:row:"),-1,0));
+    CHECK(!((void *(*)(void *,SEL,long,long))objc_msgSend)(native_table,sel_registerName("accessibilityCellForColumn:row:"),0,-1));
+    CHECK(!((void *(*)(void *,SEL,long,long))objc_msgSend)(native_table,sel_registerName("accessibilityCellForColumn:row:"),3,0));
+    CHECK(!((void *(*)(void *,SEL,long,long))objc_msgSend)(native_table,sel_registerName("accessibilityCellForColumn:row:"),0,4));
 #elif defined(_WIN32) || defined(SB_ATSPI_TEST)
     CHECK(sb_native_probe(d.ui.window,"Tabelle",NULL,SB_NATIVE_READ_TABLE_TREE,native_value,sizeof(native_value),pump,&d));
     CHECK(!strcmp(native_value,"4:3"));

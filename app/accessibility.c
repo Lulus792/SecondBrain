@@ -10,6 +10,7 @@
    heading role; preserve that native contract without changing the C tree role. */
 static SDL_SpinLock mac_role_lock;
 static IMP mac_children_original,mac_role_original,mac_rows_original,mac_allowed_original;
+static IMP mac_row_count_original,mac_column_count_original,mac_cell_original;
 static void *mac_heading_role;
 static void *mac_role(void *self,SEL selector) {
     SDL_LockSpinlock(&mac_role_lock); IMP original=mac_role_original; SDL_UnlockSpinlock(&mac_role_lock);
@@ -28,8 +29,42 @@ static void *mac_rows(void *self,SEL selector) {
     if (mac_table(self)) return ((void *(*)(void *,SEL))objc_msgSend)(self,sel_registerName("accessibilityChildren"));
     return ((void *(*)(void *,SEL))mac_rows_original)(self,selector);
 }
+static unsigned long mac_count(void *array) {
+    return array ? ((unsigned long(*)(void *,SEL))objc_msgSend)(array,sel_registerName("count")) : 0;
+}
+static void *mac_at(void *array,unsigned long index) {
+    return index<mac_count(array) ? ((void *(*)(void *,SEL,unsigned long))objc_msgSend)(array,sel_registerName("objectAtIndex:"),index) : NULL;
+}
+static long mac_row_count(void *self,SEL selector) {
+    if(mac_table(self))return (long)mac_count(mac_rows(self,sel_registerName("accessibilityRows")));
+    return mac_row_count_original ? ((long(*)(void *,SEL))mac_row_count_original)(self,selector) : 0;
+}
+static long mac_column_count(void *self,SEL selector) {
+    if(!mac_table(self))return mac_column_count_original ? ((long(*)(void *,SEL))mac_column_count_original)(self,selector) : 0;
+    void *rows=mac_rows(self,sel_registerName("accessibilityRows"));unsigned long count=0;
+    for(unsigned long i=0;i<mac_count(rows);++i){
+        void *row=mac_at(rows,i),*cells=((void *(*)(void *,SEL))objc_msgSend)(row,sel_registerName("accessibilityChildren"));
+        unsigned long columns=mac_count(cells);if(columns>count)count=columns;
+    }
+    return (long)count;
+}
+static void *mac_cell(void *self,SEL selector,long column,long row) {
+    if(!mac_table(self))return mac_cell_original ? ((void *(*)(void *,SEL,long,long))mac_cell_original)(self,selector,column,row) : NULL;
+    if(column<0 || row<0)return NULL;
+    void *rows=mac_rows(self,sel_registerName("accessibilityRows"));void *selected=mac_at(rows,(unsigned long)row);
+    if(!selected)return NULL;
+    void *cells=((void *(*)(void *,SEL))objc_msgSend)(selected,sel_registerName("accessibilityChildren"));
+    return mac_at(cells,(unsigned long)column);
+}
+static void mac_replace(Class node,const char *name,IMP replacement,const char *encoding,IMP *original) {
+    SEL selector=sel_registerName(name);Method method=class_getInstanceMethod(node,selector);
+    if(method){*original=method_getImplementation(method);method_setImplementation(method,replacement);}
+    else class_addMethod(node,selector,replacement,encoding);
+}
 static BOOL mac_allowed(void *self,SEL selector,SEL requested) {
-    if (requested==sel_registerName("accessibilityRows") && mac_table(self)) return YES;
+    if (mac_table(self) && (requested==sel_registerName("accessibilityRows") ||
+        requested==sel_registerName("accessibilityRowCount") || requested==sel_registerName("accessibilityColumnCount") ||
+        requested==sel_registerName("accessibilityCellForColumn:row:"))) return YES;
     return ((BOOL(*)(void *,SEL,SEL))mac_allowed_original)(self,selector,requested);
 }
 static void *mac_children(void *self,SEL selector) {
@@ -45,6 +80,9 @@ static void *mac_children(void *self,SEL selector) {
         if (rows && allowed) {
             mac_rows_original=method_getImplementation(rows); mac_allowed_original=method_getImplementation(allowed);
             method_setImplementation(rows,(IMP)mac_rows); method_setImplementation(allowed,(IMP)mac_allowed);
+            mac_replace(node,"accessibilityRowCount",(IMP)mac_row_count,"q@:",&mac_row_count_original);
+            mac_replace(node,"accessibilityColumnCount",(IMP)mac_column_count,"q@:",&mac_column_count_original);
+            mac_replace(node,"accessibilityCellForColumn:row:",(IMP)mac_cell,"@@:qq",&mac_cell_original);
         }
     }
     SDL_UnlockSpinlock(&mac_role_lock); return children;
