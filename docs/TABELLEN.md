@@ -182,3 +182,17 @@ Zellen inklusive Leerzellen, direkte Baum-/Elternidentität, drei echte Header,
 Koordinaten, Spannen und Indizes bei 100/200 Prozent. Die tatsächliche
 Linux-CI-Ausführung folgt. Menschliche Screenreader- und Geräteabnahme
 bleibt auch nach erfolgreicher Clientprüfung offen.
+
+## Korrektur der tatsächlichen TableCell-Signatur (0.9.31)
+
+Die native Linux-Abnahme zu ad67737 scheitert gezielt bei der ersten
+Spannenabfrage: Antwort `biiii`, der echte Client erwartet `iiii`.
+Die am 8. Oktober gelesene aktuelle XML beschreibt einen zusätzlichen
+Boolean; GNOMEs [C-Client](https://raw.githubusercontent.com/GNOME/at-spi2-core/main/atspi/atspi-table-cell.c)
+und [ATK-Brücke](https://raw.githubusercontent.com/GNOME/at-spi2-core/main/atk-adaptor/adaptors/table-cell-adaptor.c)
+verwenden beide vier Ganzzahlen. Deshalb entspricht GetRowColumnSpan ab
+0.9.31 der tatsächlich eingesetzten GNOME-Schnittstelle (`iiii`). Die
+Prüfung wird nicht reduziert; alle vier Werte bleiben verbindlich.
+Die anderslautende XML und Rust-atspi-Proxys sind keine Bestätigung des
+realen C-Clientvertrags; deren Interoperabilität bleibt separat zu beachten.
+[Konkrete CI-Diagnose](https://github.com/Lulus792/SecondBrain/actions/runs/37734521512/job/113170937263).

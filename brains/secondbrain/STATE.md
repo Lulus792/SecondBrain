@@ -106,3 +106,8 @@ AT-SPI-Matrix und menschliche Tabellenbedienung bleiben offen.
 transparenten Row-Containern sowie übereinstimmende Eltern/Cache-/
 Änderungswege. Linux-Zielcheck, Quellvorbereitung und vier Mac-Nachprüfungen
 bestehen. Tatsächlicher Linux-Build und native Matrixprüfung folgen.
+
+0.9.30-Linuxprüfung findet denselben GetRowColumnSpan-Signaturkonflikt in
+Debug/Release. 0.9.31 folgt dem echten GNOME-C-Client/ATK-Server statt der
+widersprüchlichen XML. Linux-Zielcheck (2,64 s) und zwei Mac-Nachprüfungen
+(14,12 s) bestehen; neuer nativer Lauf folgt. Installiert bleibt 0.9.28.

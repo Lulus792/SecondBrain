@@ -2369,3 +2369,15 @@ Die nativen libatspi-Aufrufe sind an den Original-Headern und ihrer
 Speicherownership geprüft. Dies ist noch keine Linux-Ausführung; die neue
 strikte native Matrixprüfung folgt in CI. Installiert bleibt 0.9.28.
 [Vertrag und Quellen](TABELLEN.md).
+
+0.9.30 / ad67737 ist im lokalen entpackten Mac-Paket mit 126/157/75
+Assertions, zwei Prozessneustarts, CLI und Runtime-Importprüfung geprüft.
+Die native Linux-Release-Abnahme scheitert an der widersprüchlichen
+TableCell-XML-/Client-Signatur; sie wird nicht als bestanden gewertet.
+0.9.31 korrigiert diese Signatur anhand GNOMEs tatsächlichem C-Client und
+ATK-Server, ohne Koordinaten-/Spannenprüfung zu entfernen. Neuer nativer
+Lauf folgt. Installiert bleibt das vollständig geprüfte 0.9.28-Paket.
+
+Die identische Linux-Debug-Diagnose ist geprüft. Abschließender Linux-
+Zielcheck besteht (2,64 Sekunden), zwei Mac-Release-Nachprüfungen bestehen
+(14,12 Sekunden). Die neue native Abnahme bleibt bis zum Abschluss offen.

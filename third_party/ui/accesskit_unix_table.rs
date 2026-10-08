@@ -57,7 +57,8 @@ impl TableCellInterface {
     #[zbus(property)] fn row_span(&self)->fdo::Result<i32> { self.node.sb_cell_extents().map(|(_,_,r,_)|r).map_err(self.map_error()) }
     #[zbus(property)] fn column_span(&self)->fdo::Result<i32> { self.node.sb_cell_extents().map(|(_,_,_,c)|c).map_err(self.map_error()) }
     #[zbus(property)] fn table(&self)->fdo::Result<OwnedObjectAddress> { Ok(self.object(self.node.sb_cell_table().map_err(self.map_error())?)) }
-    fn get_row_column_span(&self)->fdo::Result<(bool,i32,i32,i32,i32)> { self.node.sb_cell_extents().map(|(r,c,rs,cs)|(true,r,c,rs,cs)).map_err(self.map_error()) }
+    // GNOME's client and ATK bridge both use four integers; its XML wrongly adds a boolean.
+    fn get_row_column_span(&self)->fdo::Result<(i32,i32,i32,i32)> { self.node.sb_cell_extents().map_err(self.map_error()) }
     fn get_column_header_cells(&self)->fdo::Result<Vec<OwnedObjectAddress>> { self.headers(true) }
     fn get_row_header_cells(&self)->fdo::Result<Vec<OwnedObjectAddress>> { self.headers(false) }
 }

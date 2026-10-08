@@ -64,8 +64,10 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   bleibt offen. 0.9.12 bindet
   [native Textstile](NATIVE_TEXTSTILE.md) an. Die neuen Plattformnachweise und
   die dokumentierten weiteren Textregeln bleiben offen. 0.9.6 ergänzt
-  [Tabellen](TABELLEN.md); native UIA-/AT-SPI-Matrixschnittstellen und die
-  menschliche Tabellenbedienung bleiben offen.
+  [Tabellen](TABELLEN.md). Mac-Matrix ist ab 0.9.27 lokal geprüft; Windows
+  Grid/Table besteht ab 0.9.29 nativ in Debug/Release und im entpackten Paket.
+  AT-SPI Table/TableCell ist in 0.9.30 implementiert, seine neue native
+  Abnahme läuft. Menschliche Tabellenbedienung bleibt gesondert offen.
   Die Cache-Signalstruktur ist in 0.5.2 korrigiert und mit echtem Linux-Clientcache
   geprüft; weitere Eventtypen bleiben gesonderte Abnahmen. Systemvorgaben bestehen
   in 0.6.0 auf allen drei CI-Systemen; reale Einstellungswechsel, Windows-Custom-
