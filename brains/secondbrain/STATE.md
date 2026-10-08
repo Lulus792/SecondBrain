@@ -52,7 +52,10 @@ Fokusbestand bei Layoutänderungen. 51/51 lokale Release-Prüfungen und gezielte
 ASan/UBSan bestehen. Ein provozierter 16-Bit-Textbreitenüberlauf ist durch
 Float-Geometrie und sichtbare Textausschnitte behoben. Details: [IME](../../docs/IME.md).
 
-Nächster Schritt: neue native 0.9.25- und Paketprüfung; Mac-Paket aktualisieren.
+Quellstand 90bdb78 ist gepusht; [CI 37723366327](https://github.com/Lulus792/SecondBrain/actions/runs/37723366327)
+ist gestartet. Lokale Paketprüfung läuft mit Quellstand 90bdb78.
+
+Nächster Schritt: laufende native 0.9.25-/Paketprüfung auswerten; Mac-Paket aktualisieren.
 Weitere Release-Arbeiten: Bidi/visuelle Textgeometrie/IME, native
 Tabellenmatrix, Screenreader-/Dialog-/Geräte-/Langzeitabnahmen, volle Windows-/
 Linux-Zielvolumes und physische Persistenz. Originalverträge stehen in SOURCES.

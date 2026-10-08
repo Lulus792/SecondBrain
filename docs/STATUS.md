@@ -2242,3 +2242,8 @@ Logs: build/composition-tile-final-{build,tests}.log und
 build/composition-tile-sanitizer-*.log. Die tatsächliche Kompositionsvorschau
 wurde betrachtet; echte Native-IME-, Bidi-/Zeichenrechteck- und Geräteabnahmen
 bleiben offen. Neue Plattform-/Paketprüfung folgt; installiert bleibt 0.9.24.
+
+Quellstand 90bdb78 ist nach origin gepusht.
+[CI 37723366327](https://github.com/Lulus792/SecondBrain/actions/runs/37723366327)
+ist gestartet; lokale entpackte Paketprüfung läuft separat. Diese laufenden
+Prüfungen werden erst nach tatsächlichem Abschluss als Nachweis übernommen.
