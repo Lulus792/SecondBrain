@@ -1,12 +1,28 @@
 #include "ui.h"
 #include "text.h"
 #include <math.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 static unsigned checks;
 #define CHECK(x) do { ++checks; if (!(x)) { fprintf(stderr,"TEXT FAIL %d: %s\n",__LINE__,#x); sb_ui_shutdown(&ui); return 1; } } while (0)
 static float measure(struct nk_font *font,const char *text) {
     return font->handle.width(font->handle.userdata,font->handle.height,text,(int)strlen(text));
+}
+typedef struct {const char *text;bool bold,italic,both,code,arabic;float latin_baseline,arabic_baseline;} StyleProbe;
+static bool inspect_style(void *user,const SBShapedLine *line,size_t offset,float y) {
+    StyleProbe *p=user;
+    for(size_t i=0;i<line->count;++i){const SBShapeGlyph *g=&line->glyphs[i];size_t byte=offset+g->byte;TTF_FontStyleFlags style=TTF_GetFontStyle(g->font);
+        const char *words[]={"fett","kursiv","beides","Code","سلام"};
+        for(unsigned word=0;word<5;++word){const char *at=strstr(p->text,words[word]);if(!at || byte!=(size_t)(at-p->text))continue;
+            if(word==0){p->bold=(style&TTF_STYLE_BOLD)!=0;p->latin_baseline=y+line->ascent;}
+            if(word==1)p->italic=(style&TTF_STYLE_ITALIC)!=0;
+            if(word==2)p->both=(style&(TTF_STYLE_ITALIC|TTF_STYLE_BOLD))==(TTF_STYLE_ITALIC|TTF_STYLE_BOLD);
+            if(word==3){const char *family=TTF_GetFontFamilyName(g->font);p->code=family && strstr(family,"Mono");}
+            if(word==4){p->arabic=(style&TTF_STYLE_BOLD)!=0;p->arabic_baseline=y+line->ascent;}
+        }
+    }return true;
 }
 int main(int argc,char **argv) {
     SBUi ui; if (argc!=3) return 2;
@@ -68,28 +84,22 @@ int main(int argc,char **argv) {
             sb_ui_styled_draw(&ui,&ui.body->handle,&cluster_text);
         }
         nk_end(ui.ctx);
-        bool found_bold=false,found_italic=false,found_both=false,found_code=false,found_arabic=false;
-        float latin_baseline=0,arabic_baseline=0; bool complete_accent=false,complete_emoji=false;
-        const struct nk_command *command;
-        nk_foreach(command,ui.ctx) if (command->type==NK_COMMAND_TEXT) {
-            const struct nk_command_text *t=(const struct nk_command_text *)command;
-            if (t->length==4 && !memcmp(t->string,"fett",4)) {
-                found_bold=t->font==bold; float above,below;
-                CHECK(sb_ui_text_metrics(t->font,t->string,t->length,&above,&below)); latin_baseline=t->y+above;
-            }
-            if (t->length==6 && !memcmp(t->string,"kursiv",6)) found_italic=t->font==italic;
-            if (t->length==6 && !memcmp(t->string,"beides",6)) found_both=t->font==both;
-            if (t->length==4 && !memcmp(t->string,"Code",4)) found_code=t->font==sb_ui_text_style(&ui,&ui.body->handle,SB_TEXT_CODE);
-            if (t->length==8 && !memcmp(t->string,"سلام",8) && t->font==bold) {
-                found_arabic=true; float above,below;
-                CHECK(sb_ui_text_metrics(t->font,t->string,t->length,&above,&below)); arabic_baseline=t->y+above;
-            }
-            if (t->length==3 && !memcmp(t->string,"é",3)) complete_accent=t->font==italic;
-            if (t->length==11 && !memcmp(t->string,"👩‍💻",11)) complete_emoji=t->font==&ui.body->handle;
+        /* Styled drawing now emits cached glyph images. Inspect the shared
+           source/font geometry rather than assuming one text command per style. */
+        StyleProbe probe={.text=rich.text};
+        CHECK(sb_ui_styled_geometry(&ui,&ui.body->handle,&rich,950,inspect_style,&probe));
+        CHECK(probe.bold && probe.italic && probe.both && probe.code);
+        CHECK(probe.arabic && fabsf(probe.latin_baseline-probe.arabic_baseline)<=1);
+        SBTextSpan *normalized=NULL;size_t normalized_count=0;
+        CHECK(sb_ui_styled_spans(&cluster_text,&normalized,&normalized_count));
+        const char *emoji_at=strstr(cluster_text.text,"👩‍💻");CHECK(emoji_at!=NULL);
+        size_t emoji_byte=(size_t)(emoji_at-cluster_text.text);
+        bool complete_accent=false,complete_emoji=false;
+        for(size_t i=0;i<normalized_count;++i){SBTextSpan span=normalized[i];
+            if(span.offset==0 && span.length>=3)complete_accent=(span.style&SB_TEXT_ITALIC)!=0;
+            if(span.offset<=emoji_byte && span.offset+span.length>=emoji_byte+11)complete_emoji=(span.style==0);
         }
-        CHECK(found_bold && found_italic && found_both && found_code);
-        CHECK(found_arabic && fabsf(latin_baseline-arabic_baseline)<=1);
-        CHECK(complete_accent && complete_emoji);
+        free(normalized);CHECK(complete_accent && complete_emoji);
         CHECK(sb_ui_text_style(&ui,&ui.heading->handle,SB_TEXT_CODE)->height==ui.heading->handle.height);
         const char *compound[]={"≫⃒","≪⃒"},*base_symbols[]={"≫","≪"};
         for (unsigned m=0;m<2;++m) {

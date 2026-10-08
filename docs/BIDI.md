@@ -1,7 +1,7 @@
 # Gemeinsame Schreibrichtungsgrundlage
 
-Stand: 8. Oktober 2026. Der neue C-Absatz-/Zeilenplan ist lokal geprüft, aber
-noch nicht mit dem produktiven Renderer oder Editor verbunden. Die installierte
+Stand: 8. Oktober 2026. Der C-Absatz-/Zeilenplan ist ab 0.9.34 mit der formatierten Leseansicht
+verbunden. Editor und native Zeichenrechtecke benötigen weiterhin die Integration. Die installierte
 App bleibt 0.9.33 / d48ee9bf7075. Dies ist ein Umsetzungsschritt für die offenen
 Textaufgaben, kein Nachweis fertiger gemischter Schreibrichtungen in der App.
 
@@ -22,10 +22,9 @@ Die übrigen Bibliotheksfunktionen für Script/Kategorie bleiben auf dem
 Originalstand, sind keine Unicode-18-Schnittstelle und werden nicht exponiert.
 
 Die Bibliothek dient ausschließlich Textlayout. Eigener Kern und eigene
-Fachfunktionen bleiben C ohne externe Bibliotheken. Aktuell wird die Grundlage
-nur bei UI-Prüfbuilds kompiliert; Anwendung und Runtime-Pakete verlinken sie
-noch nicht. Vor der sichtbaren Anbindung werden auch Original-Lizenz und
-Herkunftshinweise in Paket und eingebauter Lizenzansicht ergänzt.
+Fachfunktionen bleiben C ohne externe Bibliotheken. Ab 0.9.34 wird die Grundlage auch ohne UI-Prüfprogramme mit der Anwendung
+verlinkt. Original-Lizenz und Herkunftshinweise sind in Paket und eingebauter
+Lizenzansicht ergänzt; [Reader-Vertrag](GLYPHENGEOMETRIE.md).
 
 ## C-Vertrag
 
@@ -114,10 +113,11 @@ grüner 20-Job-Lauf. Der nachfolgende Glyphenplan benötigt eine eigene neue Abn
 
 ## Verbleibende Integration
 
-Die gemeinsame Absatzanalyse muss vor Schrift-, Script- und Stilaufteilung
-stehen und über umgebrochene Zeilen erhalten bleiben. Dieselben endgültigen
+Die formatierte Leseansicht erhält die gemeinsame Absatzanalyse vor Schrift-,
+Script- und Stilaufteilung über umgebrochene Zeilen. Dieselben endgültigen
 Glyphenpositionen müssen Zeichnung, Messung, Klickziele, Caret, visuelle
 Pfeilnavigation, Auswahl, IME und native Zeichenrechtecke versorgen. Dafür
-bleiben Renderer, Absatzcache, Nuklear-Eingabe und native Provider anzubinden
-und mit echten Mischtexten in allen Eingabefeldern und der Leseansicht zu prüfen.
+bleiben einfache Feldtexte, Nuklear-Eingabe und native Provider anzubinden
+und mit echten Mischtexten in allen Eingabefeldern zu prüfen. Neue Reader-
+Plattformabnahme sowie reale Eingabe-/Screenreader-Abnahme folgen separat.
 Ein bestandener Absatzalgorithmus ersetzt diese Arbeit nicht.

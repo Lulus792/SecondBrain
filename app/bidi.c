@@ -92,3 +92,4 @@ SBStatus sb_bidi_line(const SBTextParagraph *p,size_t byte,size_t length,SBVisua
     return sb_ok();
 }
 uint32_t sb_bidi_mirror(uint32_t cp){return cp<=0x10ffff && !(cp>=0xd800 && cp<=0xdfff) ? SBCodepointGetMirror(cp) : 0;}
+bool sb_bidi_separator(uint32_t cp){return cp<=0x10ffff && SBCodepointGetBidiType(cp)==SBBidiTypeB;}

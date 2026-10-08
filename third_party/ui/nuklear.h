@@ -4856,8 +4856,8 @@ struct nk_command_polyline {
 
 struct nk_command_image {
     struct nk_command header;
-    short x, y;
-    unsigned short w, h;
+    /* Preserve fractional image positions during smooth scrolling. */
+    float x, y, w, h;
     struct nk_image img;
     struct nk_color col;
 };
@@ -9719,10 +9719,10 @@ nk_draw_image(struct nk_command_buffer *b, struct nk_rect r,
     cmd = (struct nk_command_image*)
         nk_command_buffer_push(b, NK_COMMAND_IMAGE, sizeof(*cmd));
     if (!cmd) return;
-    cmd->x = (short)r.x;
-    cmd->y = (short)r.y;
-    cmd->w = (unsigned short)NK_MAX(0, r.w);
-    cmd->h = (unsigned short)NK_MAX(0, r.h);
+    cmd->x = r.x;
+    cmd->y = r.y;
+    cmd->w = NK_MAX(0, r.w);
+    cmd->h = NK_MAX(0, r.h);
     cmd->img = *img;
     cmd->col = col;
 }

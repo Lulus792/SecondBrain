@@ -5,6 +5,7 @@ typedef struct TTF_Font TTF_Font;
 /* Covers the paragraph in logical order; font/style/script boundaries are
    complete grapheme boundaries. Fonts must outlive the resulting line. */
 typedef struct {size_t byte,length;TTF_Font *font;uint32_t script;} SBShapeFontSpan;
+typedef struct SBShapeParagraph SBShapeParagraph;
 typedef struct {
     size_t byte;
     uint32_t index;
@@ -32,5 +33,11 @@ typedef struct {
    Output must be empty. Pixel geometry is at the supplied fonts' density. */
 SBStatus sb_shape_line(const SBTextParagraph *paragraph,size_t byte,size_t length,
     const SBShapeFontSpan *spans,size_t count,SBShapedLine *out);
+/* Validates/copies spans and grapheme boundaries once for many wrapped lines.
+   The immutable bidi paragraph and fonts must outlive this object. */
+SBStatus sb_shape_paragraph_create(const SBTextParagraph *paragraph,
+    const SBShapeFontSpan *spans,size_t count,SBShapeParagraph **out);
+SBStatus sb_shape_paragraph_line(const SBShapeParagraph *paragraph,size_t byte,size_t length,SBShapedLine *out);
+void sb_shape_paragraph_free(SBShapeParagraph *paragraph);
 void sb_shape_line_free(SBShapedLine *line);
 #endif

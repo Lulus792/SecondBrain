@@ -40,7 +40,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   gemeinsame Renderer-/Editor-/native Anbindung.
 - [Geformte Glyphenpositionen](../../docs/GLYPHENGEOMETRIE.md): gemeinsamer
   C-Zeilenplan, kontextuelle Stil-/Schriftteile, Unicode-18-Spiegelanbindung,
-  Raster-/Sanitizer-Nachweise und ausstehende produktive Einbindung.
+  Raster-/Sanitizer-Nachweise, Reader-Einbindung und offene Editor-/native Anbindung.
 - [Lizenzansicht](../../docs/LIZENZEN.md): Originaltexte in der App, Bedienwege und Prüfgrenzen.
 - [MIT-Lizenz](../../LICENSE): gewählte Lizenz des eigenen Codes.
 - [UI-Abhängigkeiten](../../third_party/README.md): Herkunft, Versionen, Lizenzen, Anpassungen.

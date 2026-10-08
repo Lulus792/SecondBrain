@@ -163,7 +163,7 @@ im Einsatz. [Konzept und Arbeitsweise](docs/KONZEPT.md).
 
 ## Entwicklung
 
-Der fachliche Kern verwendet C und Betriebssystem-APIs. SDL3, Nuklear, SDL_ttf und AccessKit
+Der fachliche Kern verwendet C und Betriebssystem-APIs. SDL3, Nuklear, SDL_ttf, SheenBidi und AccessKit
 werden für die UI eingesetzt. Die Herkunft und Lizenzen der Abhängigkeiten stehen unter
 [third_party](third_party/README.md); die Architektur in [docs/ARCHITEKTUR.md](docs/ARCHITEKTUR.md).
 Dateiformate und Updateverhalten stehen im [Datenvertrag](docs/DATENVERTRAG.md).

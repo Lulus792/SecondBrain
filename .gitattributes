@@ -11,3 +11,5 @@ third_party/ui/nuklear_sdl3_renderer.h whitespace=-blank-at-eof
 third_party/unicode/** -text
 third_party/ui/bidi18/*.c text eol=lf
 third_party/ui/bidi18/SheenBidi-LICENSE -text
+third_party/licenses/SheenBidi.txt -text
+app/script_data.inc text eol=lf

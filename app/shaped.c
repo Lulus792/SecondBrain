@@ -4,19 +4,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+struct SBShapeParagraph {const SBTextParagraph *bidi;SBShapeFontSpan *spans;size_t count;uint32_t *boundaries;size_t boundary_count;};
+void sb_shape_paragraph_free(SBShapeParagraph *p){if(p){free(p->spans);free(p->boundaries);free(p);}}
 
 void sb_shape_line_free(SBShapedLine *line){if(line){free(line->glyphs);free(line->runs);memset(line,0,sizeof(*line));}}
-static bool span_boundaries(const char *text,size_t length,const SBShapeFontSpan *spans,size_t count,size_t byte,size_t end) {
+static SBStatus span_boundaries(SBShapeParagraph *p,const char *text,size_t length) {
     SBGrapheme reader;SBGraphemeBoundary b;
-    if(!sb_grapheme_init(&reader,text,length))return false;
-    size_t i=0;bool start=false,finish=false;
+    if(!sb_grapheme_init(&reader,text,length))return sb_error(SB_INVALID,"Ungültiger Absatztext.");
+    size_t i=0,capacity=0;
     while(sb_grapheme_next(&reader,&b)) {
-        start|=b.byte==byte;finish|=b.byte==end;
-        while(i<count && spans[i].byte+spans[i].length==b.byte)++i;
-        if(i<count && spans[i].byte+spans[i].length<b.byte)return false;
+        if(p->boundary_count==capacity){size_t next=capacity ? capacity*2 : 16;uint32_t *grown=realloc(p->boundaries,next*sizeof(*grown));if(!grown)return sb_error(SB_MEMORY,"Absatzgrenzen benötigen mehr Speicher.");p->boundaries=grown;capacity=next;}
+        p->boundaries[p->boundary_count++]=(uint32_t)b.byte;
+        while(i<p->count && p->spans[i].byte+p->spans[i].length==b.byte)++i;
+        if(i<p->count && p->spans[i].byte+p->spans[i].length<b.byte)return sb_error(SB_INVALID,"Schriftbereiche trennen ein Graphem.");
     }
-    return i==count && start && finish;
+    return i==p->count ? sb_ok() : sb_error(SB_INVALID,"Unvollständige Absatzgrenzen.");
 }
+static bool cluster_boundary(const SBShapeParagraph *p,size_t byte){size_t lo=0,hi=p->boundary_count;while(lo<hi){size_t mid=lo+(hi-lo)/2;if(p->boundaries[mid]<byte)lo=mid+1;else hi=mid;}return lo<p->boundary_count && p->boundaries[lo]==byte;}
 static size_t span_at(const SBShapeFontSpan *spans,size_t count,size_t byte) {
     size_t lo=0,hi=count;
     while(lo<hi){size_t mid=lo+(hi-lo)/2;if(spans[mid].byte+spans[mid].length<=byte)lo=mid+1;else hi=mid;}
@@ -61,17 +65,33 @@ static SBStatus append_range(SBShapedLine *line,const SBTextParagraph *p,size_t 
     if(shaped.descent>line->descent)line->descent=shaped.descent;
     sb_ttf_shape_free(&shaped);return sb_ok();
 }
-SBStatus sb_shape_line(const SBTextParagraph *p,size_t byte,size_t length,const SBShapeFontSpan *spans,size_t count,SBShapedLine *out) {
+SBStatus sb_shape_paragraph_create(const SBTextParagraph *p,const SBShapeFontSpan *spans,size_t count,SBShapeParagraph **out) {
     size_t total=sb_bidi_paragraph_length(p),covered=0;
-    if(!p || !out || out->glyphs || out->runs || out->count || out->run_count || out->capacity || out->run_capacity || !spans || !count ||
-       count>total || !length || byte>total || length>total-byte)return sb_error(SB_INVALID,"Ungültiger geformter Zeilenbereich.");
+    if(!out)return sb_error(SB_INVALID,"Absatzausgabe fehlt.");
+    *out=NULL;
+    if(!p || !spans || !count || count>total || count>SIZE_MAX/sizeof(*spans))return sb_error(SB_INVALID,"Ungültige Schriftbereiche.");
     for(size_t i=0;i<count;++i) {
         if(spans[i].byte!=covered || !spans[i].font || !spans[i].length || spans[i].length>total-covered)
             return sb_error(SB_INVALID,"Schriftbereiche decken den Absatz nicht vollständig ab.");
         covered+=spans[i].length;
     }
-    if(covered!=total || !span_boundaries(sb_bidi_paragraph_text(p),total,spans,count,byte,byte+length))
-        return sb_error(SB_INVALID,"Schrift- oder Zeilenbereiche trennen ein Graphem.");
+    if(covered!=total)return sb_error(SB_INVALID,"Unvollständige Schriftbereiche.");
+    SBShapeParagraph *prepared=calloc(1,sizeof(*prepared));
+    if(!prepared)return sb_error(SB_MEMORY,"Absatzlayout benötigt mehr Speicher.");
+    prepared->bidi=p;prepared->count=count;prepared->spans=malloc(count*sizeof(*spans));
+    if(!prepared->spans){sb_shape_paragraph_free(prepared);return sb_error(SB_MEMORY,"Absatzlayout benötigt mehr Speicher.");}
+    memcpy(prepared->spans,spans,count*sizeof(*spans));
+    SBStatus status=span_boundaries(prepared,sb_bidi_paragraph_text(p),total);
+    if(status.code!=SB_OK){sb_shape_paragraph_free(prepared);return status;}
+    *out=prepared;return sb_ok();
+}
+SBStatus sb_shape_paragraph_line(const SBShapeParagraph *prepared,size_t byte,size_t length,SBShapedLine *out) {
+    if(!prepared || !out || out->glyphs || out->runs || out->count || out->run_count || out->capacity || out->run_capacity)
+        return sb_error(SB_INVALID,"Ungültige Zeilenausgabe.");
+    const SBTextParagraph *p=prepared->bidi;size_t total=sb_bidi_paragraph_length(p);
+    if(!length || byte>total || length>total-byte || !cluster_boundary(prepared,byte) || !cluster_boundary(prepared,byte+length))
+        return sb_error(SB_INVALID,"Ungültiger geformter Zeilenbereich.");
+    const SBShapeFontSpan *spans=prepared->spans;size_t count=prepared->count;
     SBVisualLine visual={0};SBStatus status=sb_bidi_line(p,byte,length,&visual);
     if(status.code!=SB_OK)return status;
     SBShapedLine line={.byte=byte,.length=length,.base_level=visual.base_level};
@@ -96,4 +116,9 @@ SBStatus sb_shape_line(const SBTextParagraph *p,size_t byte,size_t length,const 
     sb_bidi_line_free(&visual);
     if(status.code!=SB_OK){sb_shape_line_free(&line);return status;}
     *out=line;return sb_ok();
+}
+SBStatus sb_shape_line(const SBTextParagraph *p,size_t byte,size_t length,const SBShapeFontSpan *spans,size_t count,SBShapedLine *out) {
+    SBShapeParagraph *prepared=NULL;SBStatus status=sb_shape_paragraph_create(p,spans,count,&prepared);
+    if(status.code==SB_OK)status=sb_shape_paragraph_line(prepared,byte,length,out);
+    sb_shape_paragraph_free(prepared);return status;
 }

@@ -1,6 +1,6 @@
 # Auf dem Weg zu 1.0
 
-Stand: 7. Oktober 2026. Diese Liste bewertet den vorhandenen Code und die
+Stand: 8. Oktober 2026. Diese Liste bewertet den vorhandenen Code und die
 [Distribution](DISTRIBUTION.md). Der Nutzer hat die offenen Arbeiten als Umsetzungsauftrag bestätigt. Die
 Versionsnummer 1.0 darf erst nach seiner ausdrücklichen Freigabe gesetzt werden.
 Die unterstützten Umgebungen und konkreten Abnahmen werden dabei festgelegt.
@@ -140,3 +140,12 @@ werden. Entwicklungspakete werden bis dahin eindeutig als solche gekennzeichnet.
   Plattform- und menschliche Abnahmen bleiben gesondert offen.
 - [ ] Die neue [Interaktionspolitur](INTERAKTION.md) auf den tatsächlichen
   Zielsystemen und mit menschlicher Bedienung/verschiedenen Geräten abnehmen.
+
+## Textfortschritt vom 8. Oktober
+
+Ab 0.9.34 benutzt die formatierte Leseansicht den gemeinsamen Bidi-/Script-/
+Glyphenplan für Umbruch und Rasterung. Lokale Gesamtprüfung, gezielter
+Sanitizer und UI-Build ohne Tests bestehen; [Nachweise](STATUS.md).
+Die offene Textaufgabe betrifft weiterhin Editor, Suche/Formulare/einfache Labels,
+visuelle Carets/Auswahl/IME, native Zeichenrechtecke und reale assistive Abnahme.
+Die neue Reader-Integration benötigt außerdem ihre eigene Plattform-/Paketabnahme.

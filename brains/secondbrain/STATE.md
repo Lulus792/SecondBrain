@@ -20,19 +20,19 @@ beim Laden unverändert, installierte Ansicht betrachtet. Rückfallkopie:
 
 ## Geprüfte Fortschritte
 
-- Neue C-Bidi-Grundlage im UI-Prüfbuild: 861.948 Unicode-18-Richtungsfälle,
+- Neue C-Bidi-Grundlage: 861.948 Unicode-18-Richtungsfälle,
   438 Spiegelpaare und alle Unicode-Positionen bestehen; ASan/UBSan im
   dokumentierten Teilscope und bytegenaue Neugenerierung ebenfalls.
-  32/32 Kernprüfungen ohne UI bestehen. Noch nicht an die sichtbare App
-  angeschlossen; [Vertrag/Nachweise](../../docs/BIDI.md).
+  32/32 Kernprüfungen ohne UI bestehen. Ab 0.9.34 in der formatierten Leseansicht angeschlossen; [Vertrag/Nachweise](../../docs/BIDI.md).
 - Geformter C-Zeilenplan erhält vollständigen Zeilenkontext, Glyphen-/Quell-
   positionen und RTL-Schriftteile. 380 Assertions bei drei Größen, Raster-
   vorschau, ASan/UBSan im Teilscope und neun Release-Nachprüfungen bestehen.
-  Produktive Einbindung bleibt offen; [Vertrag](../../docs/GLYPHENGEOMETRIE.md).
+  Reader-Einbindung lokal geprüft; Editor/native Anbindung offen; [Vertrag](../../docs/GLYPHENGEOMETRIE.md).
 - Korrigierte Bidi-CI zu 23837f1: alle acht nativen UI-Testschritte und vier
   entpackten Pakete bestehen, einschließlich Windows Debug/Release.
   19 Jobs erfolgreich; Intel-Debug scheitert erst am Artefakt-Upload mit
-  GitHub-DNS-Fehler nach bestandenen Tests. Neue Glyphenplan-Abnahme folgt.
+  GitHub-DNS-Fehler nach bestandenen Tests. Der folgende Glyphenplan zu
+  1906c3d besteht alle 20 Jobs/vier Pakete; neue Reader-CI folgt separat.
 - Erneute gezielte macOS-Release-Nachprüfung des Nutzerfeedbacks:
   135 Bewegungs-/Layout- und 144 Navigations-Assertions, darunter alle vier
   vorherigen Listen-/Leseansichten nach Leerung, erneutem Tippen und Escape.
@@ -61,6 +61,18 @@ beim Laden unverändert, installierte Ansicht betrachtet. Rückfallkopie:
   Beitragsregeln und Wartungsablauf sind umgesetzt; ihre dokumentierten
   Grenzen bleiben maßgeblich.
 
+## Neue Reader-Integration (0.9.34)
+
+Formatierte Leseansicht verwendet gemeinsamen Absatz-/Script-/Glyphenplan,
+ganze Grapheme, Stil-/Schriftwahl und denselben Umbruch für Höhe/Rasterung.
+Float-Bildpositionen erhalten Zwischenstände beim Scrollen. Lokal 56/56
+Release-Prüfungen, 105 gezielte ASan/UBSan-Reader-Assertions, frischer UI-Build
+mit BUILD_TESTING=OFF und 32/32 separat gebaute Kernprüfungen bestehen.
+SheenBidi-Lizenz ist in App und Paketen integriert. Neue Plattform-/Paketabnahme
+steht aus; installierter Build bleibt 0.9.33. Native Metal-Messung zeigt
+Scroll-Median 1,87 ms und Wechsel-Median 14,03 ms; erster langer Wechsel
+bleibt mit 123,30 ms ein offener Ausreißer (zuvor 237,01 ms im neuen Plan). Details: STATUS/GLYPHENGEOMETRIE.
+
 ## Nächste Arbeiten
 
 0.9.33 ist vollständig im dokumentierten automatisierten Umfang abgenommen.
@@ -69,9 +81,9 @@ menschliche VoiceOver/NVDA/Orca-, Dialog-, Geräte-, Mehrmonitor-/Langzeitabnahm
 volle Windows-/Linux-Zielvolumes und physische Persistenz; frische Rechner und
 OS-Mindestversionen; vollständige SDK-/Systemruntime-Zuordnung.
 
-Nächster Textschritt: geprüften Absatzplan vor Schrift-/Stilaufteilung und
-Umbruch anbinden, anschließend endgültige Glyphengeometrie für Cursor,
-Auswahl, IME und native Provider gemeinsam verwenden. Neue CI-Abnahme prüfen.
+Nächster Textschritt: gemeinsame Glyphengeometrie auch für Editor, Suche,
+Formulare/einfache Labels, Cursor, Auswahl, IME und native Provider verwenden.
+Neue Reader-Plattform-/Paketabnahme prüfen.
 
 Eigener Code MIT. Signaturkonten fehlen; vertraulicher Sicherheitskanal ist
 angefragt. Vollständiger Auftrag bleibt aktiv. **1.0 erst nach ausdrücklicher

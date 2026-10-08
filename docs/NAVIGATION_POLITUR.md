@@ -11,7 +11,9 @@ Höhe, Positionen, Schriftläufe und Ausrichtung frisch berechnet wurde. Inhalt,
 Stilbereiche, Breite, Padding und Schrift gehören zum Schlüssel. Schrift- und
 Pixeldichtewechsel verwerfen alle Pläne vor dem Freigeben der Schriften.
 Der Layoutcache ist auf 32 MiB begrenzt. Bei fehlenden Ressourcen und sehr langen
-Einzelabsätzen benutzt die App den vorhandenen Reflow; Originaltext bleibt erhalten.
+Einzelabsätzen berechnet die App den Umbruch frisch; Originaltext bleibt erhalten.
+Ab 0.9.34 benutzt die formatierte Leseansicht dabei denselben
+[Bidi-/Glyphenplan](GLYPHENGEOMETRIE.md) wie ihre gecachte Darstellung.
 Unsichtbare Zeichnung entfällt, die vollständigen nativen Dokumentblöcke bleiben.
 
 Unveränderte Notizinventur und geladene Dateirevision ersetzen beim Wechsel nicht

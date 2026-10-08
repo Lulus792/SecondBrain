@@ -2,8 +2,10 @@
 
 Stand: 8. Oktober 2026. Der neue C-Plan verbindet die geprüfte
 [Bidi-Absatzanalyse](BIDI.md) mit echten Glyphenpositionen, Schriftbereichen und
-gemeinsamer Grundlinie. Er ist aktuell im UI-Prüfbuild angebunden. Der produktive
-Renderer, der Editor und die nativen Textrechtecke benutzen ihn noch nicht.
+gemeinsamer Grundlinie. Ab dem Entwicklungsschritt 0.9.34 benutzt die formatierte
+Leseansicht diesen Plan für Umbruch, Höhe und Rasterung. Editor, einfache
+Bedienelementtexte und native Textrechtecke benutzen ihn noch nicht.
+Die installierte App bleibt bis zur gesonderten Paketabnahme bei 0.9.33.
 
 ## Grundlage
 
@@ -43,8 +45,8 @@ der Standardbuffer und sein Unicode-Zustand bleiben erhalten.
 
 Das Ergebnis hält Glyphenindex, Quellcluster, Schrift, Level, Advance,
 Grundlinienposition und Rastermetriken sowie die geformten Teilbereiche.
-Alle Maße verwenden die Backing-Pixeldichte der geladenen Fonts; die spätere
-UI-Anbindung muss sie genau einmal in Fensterpunkte umrechnen.
+Alle Glyphenmaße verwenden die Backing-Pixeldichte der geladenen Fonts;
+die Leseansicht rechnet sie genau einmal in Fensterpunkte um.
 Fontobjekte sind geliehen und müssen den Plan überleben. Ergebnisarrays werden
 explizit freigegeben. Fehler lassen die leere Ausgabe erhalten. Geometrisch
 wachsende Arrays und binäre Suche nach den betroffenen Schriftbereichen
@@ -83,12 +85,54 @@ Originaldatei und eine schon vorbereitete Datei; geänderte und abgeschnittene
 Quellen werden ohne weitere Veränderung abgewiesen. Neue native Plattform-
 nachweise folgen über CI; lokale Mac-Ausführung ersetzt sie nicht.
 
+## Einbindung in die formatierte Leseansicht ab 0.9.34
+
+Die eigene Scriptzuordnung verwendet Unicode-18-Scripts, Script_Extensions und
+BidiBrackets. Originaldaten und Hashes stehen in `tools/make_script_data.py`;
+der Generator erhält bei `--check` die vorhandene Datei und vergleicht alle Bytes.
+Die Zuordnung folgt einer eigenen UI-Regel nach
+[UAX #24, Revision 41](https://www.unicode.org/reports/tr24/tr24-41.html):
+Grapheme bleiben ganz, Common/Inherited berücksichtigen den Kontext und mögliche
+Scriptwerte; schließende Klammern behalten das Script ihrer passenden öffnenden
+Klammer. Absatzseparatoren setzen diesen Kontext zurück. Diese Anwendungspolitik
+ist kein zusätzlicher normativer Unicode-Algorithmus.
+
+Je Absatz werden Richtung, Schrift-/Stil-/Scriptbereiche und Graphemgrenzen einmal
+vorbereitet. Bei Absätzen bis 65.536 Bytes liefert eine vollständige Formung kumulierte
+Breiten als Umbruchschätzung. Jede gewählte Grenze wird danach mit eigenem
+Zeilenkontext exakt geprüft und bei Bedarf korrigiert; Ligaturen und Joining
+sind deshalb nicht an die Schätzung gebunden. Größere Absätze verwenden
+schrittweise Wrap-Proben und binäre Grenzsuche. Normale Leerzeichen bieten
+Wortgrenzen.
+Umbruch und Zeichnung benutzen die endgültigen Glyphenpositionen derselben Zeile.
+Auch nur lateinische Fortsetzungszeilen behalten die ursprüngliche Absatzrichtung.
+`sb_ui_styled_geometry` liefert geliehene Zeilen samt Absatz-Quelloffset und
+vertikaler Position in Fensterpunkten, ohne den Quelltext zu verändern.
+
+Layoutpläne vergleichen Text, Stilbereiche, Font, Breite und Padding exakt;
+ihre Arrays zählen zum 32-MiB-Budget. Absätze über 65.536 Bytes oder ohne Platz
+werden frisch mit denselben Regeln berechnet. Das ist noch kein abschließender
+Leistungsnachweis für große Einzelabsätze. Font-/Dichtewechsel verwerfen Pläne
+vor dem Freigeben ihrer Schriften.
+
+Der Rastercache speichert sichtbare Zeilenbilder anhand der tatsächlichen
+Fonts, Glyphenindizes und Positionen. Große Bilder werden auf sichtbare Ausschnitte
+begrenzt und gekachelt. Das Budget beträgt 32 MiB; die Freigabe erfolgt nach der
+Ausgabe der Nuklear-Kommandos, damit deren Texturen gültig bleiben. Image-Kommandos
+behalten Float-Geometrie statt Ganzzahlkürzung bei Scrollbewegungen. Farbige
+Emoji-Schriften sind damit nicht gesondert abgenommen; die gebündelte Emoji-Schrift
+ist monochrom.
+
+Die neue Reader-Prüfung vergleicht tatsächliche Pixel mit einer separat festgelegten
+Schriftaufteilung für Arabisch mit fettem Mittelteil neben Latein: drei Schriftgrößen,
+links/mittig/rechts, Cache und frischer Plan. Die vorhandene Textprüfung prüft Stile
+an den tatsächlich verwendeten Glyphenfonts statt an alten Textkommandogrenzen.
+Prüfergebnisse und Plattformgrenzen stehen im [Umsetzungsstand](STATUS.md).
+
 ## Weiterhin umzusetzen
 
-Scriptzuordnung, Font-Fallback, Stilbereiche und endgültiger Umbruch müssen
-diesen Plan gemeinsam benutzen; die sichtbare Darstellung muss seine Glyphen
-zeichnen. Aus derselben Geometrie folgen visuelle Carets, Klickzuordnung,
-Auswahl, IME und native Zeichenrechtecke. Dazu gehören Ligatur-/Graphempositionen
-und Cursor-Affinität an Richtungsgrenzen. Absatz-/Zeilencaches benötigen
-geprüfte Schlüssel, Font-/Dichte-Invaliderung und begrenztes Speicherbudget.
-Reale Eingabe- und Screenreader-Abnahme bleibt ein eigener Release-Schritt.
+Editor, Suche, Formulare und einfache Labels benötigen die gemeinsame Geometrie.
+Daraus folgen visuelle Carets, Klickzuordnung, Auswahl, IME und native
+Zeichenrechtecke. Dazu gehören Ligatur-/Graphempositionen und Cursor-Affinität an
+Richtungsgrenzen. Reale Eingabe-, Geräte-, Leistungs- und Screenreader-Abnahme
+bleibt ein eigener Release-Schritt; die Reader-Integration schließt ihn nicht ab.

@@ -153,3 +153,14 @@ sichtbare Renderer-/Editor-/native Anbindung ist weiterhin erforderlich.
 Editor-/Feldlayout und schützt Original, Undo und Feldzuordnung. Lokaler
 Release-Neubau besteht mit 50/50. Das schließt Bidi-/präzise visuelle Geometrie,
 native Provider-Zeichenrechtecke und echte Eingabemethodenabnahme nicht ab.
+
+## Formatierte Leseansicht ab 0.9.34
+
+Die sichtbare formatierte Leseansicht verbindet jetzt Scriptzuordnung,
+Schrift-Fallback, Stilbereiche und logischen Umbruch mit dem Bidi-/Glyphenplan.
+Höhe und Rasterung folgen derselben endgültigen Geometrie; Details und Grenzen
+stehen in [GLYPHENGEOMETRIE.md](GLYPHENGEOMETRIE.md). Die vorherigen Abschnitte
+beschreiben ihren jeweiligen historischen Stand. Editor, Suche, Formulare,
+einfache Labels und native Zeichenrechtecke bleiben anschließend umzusetzen.
+Neue native Plattformabnahme und installierte Version werden getrennt in STATUS
+dokumentiert.

@@ -38,10 +38,10 @@ foreach(SB_RESOURCE IN ITEMS "${SB_EXECUTABLE}" "${SB_ASSETS}/fonts/NotoSans-Reg
     "${SB_ASSETS}/fonts/NotoSansArabic-Regular.ttf" "${SB_ASSETS}/fonts/NotoSansHebrew-Regular.ttf"
     "${SB_ASSETS}/fonts/NotoSansDevanagari-Regular.ttf" "${SB_ASSETS}/fonts/NotoSansSymbols2-Regular.ttf"
     "${SB_ASSETS}/fonts/NotoSansCJKjp-Regular.otf" "${SB_ROOT}/licenses/Noto-CJK.txt"
-    "${SB_ROOT}/licenses/SDL_ttf.txt" "${SB_ROOT}/licenses/FreeType-LICENSE.txt"
+    "${SB_ROOT}/licenses/SDL_ttf.txt" "${SB_ROOT}/licenses/SheenBidi.txt" "${SB_ROOT}/licenses/FreeType-LICENSE.txt"
     "${SB_ROOT}/licenses/FreeType-FTL.txt" "${SB_ROOT}/licenses/HarfBuzz.txt"
     "${SB_ASSETS}/licenses/OFL-Emoji.txt" "${SB_ASSETS}/licenses/Unicode.txt" "${SB_ASSETS}/licenses/LICENSE" "${SB_ASSETS}/licenses/Nuklear-LICENSE"
-    "${SB_ASSETS}/licenses/SDL_ttf.txt" "${SB_ASSETS}/licenses/FreeType-FTL.txt"
+    "${SB_ASSETS}/licenses/SDL_ttf.txt" "${SB_ASSETS}/licenses/SheenBidi.txt" "${SB_ASSETS}/licenses/FreeType-FTL.txt"
     "${SB_ASSETS}/licenses/HarfBuzz-MS-USE.txt" "${SB_ASSETS}/licenses/OFL-CJK.txt" "${SB_ROOT}/licenses/SDL3.txt"
     "${SB_ROOT}/licenses/AccessKit-transitive.txt" "${SB_ROOT}/licenses/UI-source-notices.txt"
     "${SB_ROOT}/licenses/Rust-runtime.txt" "${SB_ASSETS}/licenses/Rust-runtime.txt"
@@ -49,6 +49,15 @@ foreach(SB_RESOURCE IN ITEMS "${SB_EXECUTABLE}" "${SB_ASSETS}/fonts/NotoSans-Reg
     "${SB_ROOT}/licenses/Nuklear.txt" "${SB_ROOT}/licenses/Noto.txt" "${SB_ROOT}/QUICKSTART.txt" "${SB_ROOT}/LICENSE")
     if(NOT EXISTS "${SB_RESOURCE}")
         message(FATAL_ERROR "Missing package resource: ${SB_RESOURCE}")
+    endif()
+endforeach()
+# Runtime UI dependency: both license copies must match the pinned original.
+file(READ "${CMAKE_CURRENT_LIST_DIR}/../third_party/ui/bidi18/manifest.json" SB_BIDI_LICENSE_MANIFEST)
+string(JSON SB_BIDI_LICENSE_EXPECTED GET "${SB_BIDI_LICENSE_MANIFEST}" runtime_license sha256)
+foreach(SB_BIDI_LICENSE IN ITEMS "${SB_ROOT}/licenses/SheenBidi.txt" "${SB_ASSETS}/licenses/SheenBidi.txt")
+    file(SHA256 "${SB_BIDI_LICENSE}" SB_BIDI_LICENSE_ACTUAL)
+    if(NOT SB_BIDI_LICENSE_ACTUAL STREQUAL SB_BIDI_LICENSE_EXPECTED)
+        message(FATAL_ERROR "Incorrect runtime UI license: ${SB_BIDI_LICENSE}")
     endif()
 endforeach()
 # Identify both shipped programs before any GUI or workspace is created.

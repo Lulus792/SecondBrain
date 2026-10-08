@@ -27,7 +27,8 @@ static const struct { const char *name,*file; } notices[]={
     {"Noto Math · SIL Open Font License","OFL-Math.txt"},
     {"AccessKit · Unterabhängigkeiten","AccessKit-transitive.txt"},
     {"SDL3 und HarfBuzz · Quellenhinweise","UI-source-notices.txt"},
-    {"Rust · Laufzeit und Quellenhinweise","Rust-runtime.txt"}
+    {"Rust · Laufzeit und Quellenhinweise","Rust-runtime.txt"},
+    {"SheenBidi · Apache 2.0","SheenBidi.txt"}
 };
 size_t sb_notice_count(void) { return sizeof(notices)/sizeof(*notices); }
 const char *sb_notice_name(size_t index) { return index<sb_notice_count() ? notices[index].name : "Lizenzen"; }

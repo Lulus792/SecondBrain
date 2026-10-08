@@ -3,9 +3,11 @@
 Diese Abhängigkeiten werden ausschließlich in das UI-Ziel eingebunden. Der
 C-Kern enthält keine externen Bibliotheken.
 
-In Vorbereitung: [Bidi-Absatzlayout](ui/bidi18/README.md) mit SheenBidi 3.0.0
-und aktualisierten Unicode-18-Bidi-Daten. Der neue C-Plan ist aktuell nur im
-UI-Prüfbuild eingebunden, noch keine zusätzliche Abhängigkeit des App-Pakets.
+Ab 0.9.34 verwendet die formatierte Leseansicht das
+[Bidi-Absatzlayout](ui/bidi18/README.md) mit SheenBidi 3.0.0 und aktualisierten
+Unicode-18-Bidi-Daten. SheenBidi wird ausschließlich mit der UI verbunden.
+Die originale Apache-2.0-Lizenz liegt unter `licenses/SheenBidi.txt` und wird
+mitgeliefert; Quelle und Hash stehen im Bidi-Manifest.
 Ein eigener [Glyphenplan](../docs/GLYPHENGEOMETRIE.md) nutzt den neuen,
 hashgeprüften C-Hook `ui/ttf_shape.h` / `ui/ttf_shape.inc` in SDL_ttf 3.2.2.
 Er ergänzt kontextgebundene Glyphenpositionen; die übrigen Textfunktionen bleiben
@@ -52,6 +54,8 @@ Lokale Anpassungen des Nuklear-Headers:
   Cursor-Sprünge stellen direkt die sichtbare Zeile her. Die eigene
   SDL_ttf-Anbindung rastert abgeschnittene vollständige Schriftläufe als
   sichtbare Ausschnitte. [Nachweise](../docs/IME.md).
+- Ab 0.9.34 behalten auch Bildkommandos Float-Geometrie, damit geformte
+  Textzeilen beim Scrollen keine Ganzzahlsprünge erhalten.
 - Bei rückwärts belegtem Zeichenpuffer entsteht vor einer nötigen Vergrößerung
   kein überlaufender Probezeiger. Die Interaktionsprüfung führt diesen Wachstumspfad
   mit ASan/UBSan aus.

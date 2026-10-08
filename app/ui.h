@@ -18,6 +18,7 @@
 #include "sb.h"
 #include "space.h"
 #include "inline.h"
+#include "shaped.h"
 
 void sb_ui_grapheme_clamp(struct nk_text_edit *edit);
 typedef struct SBTextSystem SBTextSystem;
@@ -83,6 +84,13 @@ void sb_ui_styled_cache_clear(SBUi *ui);
 float sb_ui_styled_height(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,float width);
 void sb_ui_styled_draw(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text);
 void sb_ui_styled_aligned(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,nk_flags alignment);
+/* Geometry is borrowed only for the callback; offsets map paragraph bytes
+   back to the complete displayed text. Positions are local window points. */
+/* Borrowed line glyphs/runs are valid only during the callback. Glyph geometry
+   is in backing pixels; y is local window points. source_offset + glyph.byte
+   addresses the styled display text, not the original Markdown source. */
+typedef bool (*SBStyledGeometryVisitor)(void *user,const SBShapedLine *line,size_t source_offset,float y);
+bool sb_ui_styled_geometry(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,float width,SBStyledGeometryVisitor visitor,void *user);
 SBStatus sb_ui_capture(SBUi *ui, const char *path);
 void sb_ui_shutdown(SBUi *ui);
 void sb_ui_reset_editor(SBUi *ui);

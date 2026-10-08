@@ -28,10 +28,11 @@ static void phase(SBDesktop *d,const char *name,unsigned mode,char **notes,size_
         if(i>=8)samples[i-8]=s;
         Uint64 work=SDL_GetTicksNS()-start;if(work<16666667u)SDL_DelayNS(16666667u-work);
     }
-    double times[60],layout=0,draw=0,present=0,apply=0;
-    for(unsigned i=0;i<60;++i){times[i]=samples[i].total;layout+=samples[i].layout;draw+=samples[i].draw;present+=samples[i].present;apply+=samples[i].apply;}
+    double times[60],layout=0,draw=0,present=0,apply=0;unsigned worst=0;
+    for(unsigned i=0;i<60;++i){times[i]=samples[i].total;if(samples[i].total>samples[worst].total)worst=i;layout+=samples[i].layout;draw+=samples[i].draw;present+=samples[i].present;apply+=samples[i].apply;}
     qsort(times,60,sizeof(double),compare);
-    printf("%s: layout %.2f ms; draw %.2f ms; present %.2f ms; apply %.2f ms; frame median %.2f p95 %.2f max %.2f ms\n",name,layout/60,draw/60,present/60,apply/60,times[30],times[56],times[59]);fflush(stdout);
+    printf("%s: layout %.2f ms; draw %.2f ms; present %.2f ms; apply %.2f ms; frame median %.2f p95 %.2f max %.2f ms\n",name,layout/60,draw/60,present/60,apply/60,times[30],times[56],times[59]);
+    Sample peak=samples[worst];printf("  slowest frame: layout %.2f; draw %.2f; present %.2f; apply %.2f ms\n",peak.layout,peak.draw,peak.present,peak.apply);fflush(stdout);
 }
 int main(int argc,char **argv) {
     if(argc<5){fprintf(stderr,"Usage: profile WORKSPACE PROJECT FONT software|native [NOTE ...]\n");return 2;}

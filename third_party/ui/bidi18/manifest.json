@@ -18,5 +18,10 @@
   "outputs": {
     "BidiTypeLookup.c": "f9adf88bdf38c128e7fcbed4676a65319a74d48f006eb0c30ea2f7b22f410e53",
     "PairingLookup.c": "62beb17d7e0ce594a1ea65b7e0a3fe800934b5d6574234c4e8c52c8f23fce31f"
+  },
+  "runtime_license": {
+    "path": "third_party/licenses/SheenBidi.txt",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "source": "https://github.com/Tehreer/SheenBidi/blob/v3.0.0/LICENSE"
   }
 }

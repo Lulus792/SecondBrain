@@ -3,6 +3,7 @@
 #include "grapheme.h"
 #include <SDL3_ttf/SDL_ttf.h>
 #include <math.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -10,6 +11,9 @@
 #define SB_TEXT_CACHE_BYTES (32u * 1024u * 1024u)
 #define SB_FALLBACK_COUNT 7
 #define SB_TEXT_FACES 32
+typedef struct SBGlyphTexture {SBShapeGlyph *signature;size_t count;uint64_t hash;int left,top,w,h;SDL_Texture *texture;size_t bytes;uint64_t stamp;struct SBGlyphTexture *next;} SBGlyphTexture;
+#define SB_GLYPH_BUCKETS 1024
+#define SB_GLYPH_BYTES (32u*1024u*1024u)
 
 typedef struct {
     struct nk_font nk;
@@ -39,6 +43,7 @@ struct SBTextSystem {
     SBTextFace faces[SB_TEXT_FACES];
     SBTextCache cache[SB_TEXT_CACHE_ENTRIES];
     SBMeasureCache measures[SB_MEASURE_CACHE_ENTRIES];
+    SBGlyphTexture *glyphs[SB_GLYPH_BUCKETS];size_t glyph_bytes;
     size_t bytes;
     uint64_t frame;
 };
@@ -51,6 +56,7 @@ static void system_free(SBTextSystem *text) {
     if (!text) return;
     for (unsigned i=0;i<SB_TEXT_CACHE_ENTRIES;++i) cache_free(text,&text->cache[i]);
     for (unsigned i=0;i<SB_MEASURE_CACHE_ENTRIES;++i) free(text->measures[i].text);
+    for(unsigned i=0;i<SB_GLYPH_BUCKETS;++i){SBGlyphTexture *entry=text->glyphs[i];while(entry){SBGlyphTexture *next=entry->next;SDL_DestroyTexture(entry->texture);free(entry->signature);free(entry);entry=next;}}
     TTF_DestroySurfaceTextEngine(text->surface_engine);
     for (unsigned i=0;i<SB_TEXT_FACES;++i) {
         TTF_CloseFont(text->faces[i].font);
@@ -80,6 +86,63 @@ static TTF_Font *cluster_font(SBTextFace *face,const char *text,size_t length,TT
     if (covers(face->font,text,length)) return face->font;
     for (unsigned i=0;i<SB_FALLBACK_COUNT;++i) if (covers(face->fallback[i],text,length)) return face->fallback[i];
     return face->font;
+}
+TTF_Font *sb_ui_cluster_font(const struct nk_user_font *font,const char *value,size_t length,TTF_Font *previous){SBTextFace *face=font ? font->userdata.ptr : NULL;return face ? cluster_font(face,value,length,previous) : NULL;}
+static uint64_t glyph_hash(const SBShapedLine *line) {
+    uint64_t hash=1469598103934665603ULL;
+    for(size_t i=0;i<line->count;++i){const SBShapeGlyph *g=&line->glyphs[i];uint32_t x,y;memcpy(&x,&g->x,4);memcpy(&y,&g->y,4);
+        hash=(hash^(uintptr_t)g->font)*1099511628211ULL;hash=(hash^g->index)*1099511628211ULL;hash=(hash^x)*1099511628211ULL;hash=(hash^y)*1099511628211ULL;}
+    return hash;
+}
+static bool glyph_equal(const SBGlyphTexture *entry,const SBShapedLine *line) {
+    if(entry->count!=line->count)return false;
+    for(size_t i=0;i<line->count;++i){const SBShapeGlyph *a=&entry->signature[i],*b=&line->glyphs[i];
+        if(a->font!=b->font || a->index!=b->index || a->x!=b->x || a->y!=b->y || a->left!=b->left || a->top!=b->top || a->width!=b->width || a->height!=b->height)return false;}
+    return true;
+}
+static SBGlyphTexture *glyph_texture(SBTextSystem *text,const SBShapedLine *line,int left,int top,int w,int h) {
+    uint64_t hash=glyph_hash(line);size_t bucket=hash%SB_GLYPH_BUCKETS;
+    for(SBGlyphTexture *e=text->glyphs[bucket];e;e=e->next)if(e->hash==hash && e->left==left && e->top==top && e->w==w && e->h==h && glyph_equal(e,line)){e->stamp=text->frame;return e;}
+    SDL_Surface *surface=SDL_CreateSurface(w,h,SDL_PIXELFORMAT_ARGB8888);if(!surface)return NULL;
+    SDL_ClearSurface(surface,0,0,0,0);
+    for(size_t i=0;i<line->count;++i){const SBShapeGlyph *g=&line->glyphs[i];if(!g->width || !g->height)continue;
+        float x=floorf(g->x+g->left)-left,y=floorf(g->y-g->top)-top;
+        if(x>=w || y>=h || x+g->width<=0 || y+g->height<=0)continue;
+        TTF_ImageType type;SDL_Surface *image=TTF_GetGlyphImageForIndex(g->font,g->index,&type);if(!image){SDL_DestroySurface(surface);return NULL;}
+        SDL_Rect dest={(int)x,(int)y,image->w,image->h};
+        bool copied=SDL_SetSurfaceBlendMode(image,SDL_BLENDMODE_BLEND) && SDL_BlitSurface(image,NULL,surface,&dest);
+        SDL_DestroySurface(image);if(!copied){SDL_DestroySurface(surface);return NULL;}
+    }
+    /* Compositing into a transparent tile produces premultiplied RGB. */
+    for(int y=0;y<h;++y){Uint32 *row=(Uint32 *)((Uint8 *)surface->pixels+y*surface->pitch);for(int x=0;x<w;++x){Uint32 p=row[x],a=p>>24;if(a && a<255){Uint32 r=SDL_min(255,(((p>>16)&255)*255+a/2)/a),g=SDL_min(255,(((p>>8)&255)*255+a/2)/a),b=SDL_min(255,((p&255)*255+a/2)/a);row[x]=(a<<24)|(r<<16)|(g<<8)|b;}}}
+    SBGlyphTexture *e=calloc(1,sizeof(*e));
+    if(e)e->signature=malloc(line->count*sizeof(*e->signature));
+    if(e && e->signature)e->texture=SDL_CreateTextureFromSurface(text->renderer,surface);
+    SDL_DestroySurface(surface);
+    if(!e || !e->texture){if(e)free(e->signature);free(e);return NULL;}
+    memcpy(e->signature,line->glyphs,line->count*sizeof(*e->signature));e->count=line->count;e->hash=hash;e->left=left;e->top=top;e->w=w;e->h=h;
+    e->bytes=(size_t)w*h*4+line->count*sizeof(*e->signature);e->stamp=text->frame;
+    SDL_SetTextureBlendMode(e->texture,SDL_BLENDMODE_BLEND);SDL_SetTextureScaleMode(e->texture,SDL_SCALEMODE_LINEAR);
+    e->next=text->glyphs[bucket];text->glyphs[bucket]=e;text->glyph_bytes+=e->bytes;return e;
+}
+bool sb_ui_shaped_draw(SBUi *ui,const SBShapedLine *line,float x,float baseline,struct nk_color color) {
+    if(!ui || !ui->text || !line)return false;
+    struct nk_command_buffer *canvas=nk_window_get_canvas(ui->ctx);struct nk_rect clip=canvas->clip;float density=ui->text->density;
+    float left=0,right=0,top=0,bottom=0;bool ink=false;
+    for(size_t i=0;i<line->count;++i){const SBShapeGlyph *g=&line->glyphs[i];if(!g->width || !g->height)continue;
+        float gx=floorf(g->x+g->left),gy=floorf(g->y-g->top);
+        if(!ink){left=gx;right=gx+g->width;top=gy;bottom=gy+g->height;ink=true;}
+        else{left=fminf(left,gx);right=fmaxf(right,gx+g->width);top=fminf(top,gy);bottom=fmaxf(bottom,gy+g->height);}
+    }
+    if(!ink || x+right/density<=clip.x || x+left/density>=clip.x+clip.w || baseline+bottom/density<=clip.y || baseline+top/density>=clip.y+clip.h)return true;
+    if(right-left>8192){left=fmaxf(left,floorf((clip.x-x)*density)-2);right=fminf(right,ceilf((clip.x+clip.w-x)*density)+2);}
+    if(bottom-top>8192){top=fmaxf(top,floorf((clip.y-baseline)*density)-2);bottom=fminf(bottom,ceilf((clip.y+clip.h-baseline)*density)+2);}
+    if((double)left<INT_MIN || (double)right>INT_MAX || (double)top<INT_MIN || (double)bottom>INT_MAX)return false;
+    for(int y=(int)top;y<(int)bottom;){int h=SDL_min(8192,(int)bottom-y);
+        for(int at=(int)left;at<(int)right;){int w=SDL_min(8192,(int)right-at);SBGlyphTexture *image=glyph_texture(ui->text,line,at,y,w,h);if(!image)return false;
+            struct nk_image handle=nk_image_ptr(image->texture);nk_draw_image(canvas,nk_rect(x+at/density,baseline+y/density,w/density,h/density),&handle,color);at+=w;}
+        y+=h;
+    }return true;
 }
 static bool runs_init(SBFontRuns *runs,SBTextFace *face,const char *text,size_t length) {
     *runs=(SBFontRuns){.face=face};
@@ -325,6 +388,7 @@ void sb_ui_text_frame_end(SBUi *ui) {
         if (text->cache[i].texture && text->cache[i].stamp!=text->frame) cache_free(text,&text->cache[i]);
     if (text->bytes>SB_TEXT_CACHE_BYTES)
         for (unsigned i=0;i<SB_TEXT_CACHE_ENTRIES;++i) cache_free(text,&text->cache[i]);
+    if(text->glyph_bytes>SB_GLYPH_BYTES)for(unsigned i=0;i<SB_GLYPH_BUCKETS;++i){SBGlyphTexture **at=&text->glyphs[i];while(*at){SBGlyphTexture *e=*at;if(e->stamp<text->frame || text->glyph_bytes>SB_GLYPH_BYTES){*at=e->next;text->glyph_bytes-=e->bytes;SDL_DestroyTexture(e->texture);free(e->signature);free(e);}else at=&e->next;}}
     ++text->frame;
 }
 void sb_ui_text_free(SBUi *ui) {

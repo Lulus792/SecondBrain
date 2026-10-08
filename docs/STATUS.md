@@ -2464,3 +2464,58 @@ betrachtet. Der dokumentierte ASan-/UBSan-Teilscope besteht ebenfalls.
 Neun gezielte Release-Prüfungen bestehen (27,49 s); vier Quellvorbereitungs-
 zustände mit Erhalt beziehungsweise Zurückweisung sind geprüft. Neue native
 Plattformabnahme folgt. [Vertrag, Originale und Grenzen](GLYPHENGEOMETRIE.md).
+
+## Formatierte Leseansicht mit Absatz-/Glyphengeometrie (0.9.34)
+
+Am 8. Oktober 2026 ist der geprüfte C-Bidi-/Glyphenplan in die formatierte
+Leseansicht eingebunden: eigene Unicode-18-Scriptzuordnung, ganze Grapheme,
+Schrift-/Stil-Fallback, Absatzrichtung vor Wrap-Proben und gemeinsame Grundlinie.
+Höhe und Zeichnung verwenden denselben geformten Zeilenplan. Begrenzte Layout-/
+Rastercaches erhalten die Fontlebensdauer; Bildkommandos behalten Float-Positionen
+für Zwischenstände beim Scrollen. [Vertrag](GLYPHENGEOMETRIE.md).
+
+Lokaler Intel/macOS-Release-Build: **56/56 Prüfungen bestehen nach der Umbruchoptimierung (279,20 s)**.
+Darin: 1.125.220 Script-Assertions einschließlich aller Unicode-Positionen,
+210 Script_Extensions-Bereiche und 130 Klammern; bytegenaue Neugenerierung;
+105 Reader-Assertions mit separat festgelegter Schriftaufteilung und tatsächlichem
+Pixelvergleich bei 100/150/200 Prozent, drei Ausrichtungen sowie frischem/gecachtem
+Layout; 94 Text-Assertions mit tatsächlichen Glyphenfont-Stilen.
+Die Textaufnahme bei 200 Prozent wurde betrachtet. Desktop-, Tastatur-, Sicherungs-,
+IME-, native Mac-Provider- und Unicode-Bidi-Prüfungen gehören zum Gesamtlauf.
+
+Gezielte ASan/UBSan-Prüfung: 105 Reader-Assertions bestehen. Instrumentiert sind
+UI/Nuklear-/SDL-Rendereranbindung, eigener Rastercache, Script-/Bidi-/Glyphenplan,
+Bidi-Engine und Reader-Prüfer. Kern und weitere externe Bibliotheken einschließlich
+SDL_ttf/HarfBuzz/FreeType sind in dieser Prüfung nicht instrumentiert;
+Leakprüfung ist auf macOS abgeschaltet. Quellenhashes: lokal
+`build/reader-sanitizers/sources.json`, Protokoll `test.log`.
+
+Ein frischer Release-Build mit `BUILD_TESTING=OFF` besteht und meldet 0.9.34;
+die neue UI-Textanbindung wird auch ohne Prüfprogramme gebaut. Ein separat ohne
+UI gebauter C-Kern besteht **32/32 Prüfungen (23,18 s)** und verlinkt keine
+UI-Bibliothek. SheenBidi ist ausschließlich UI-Abhängigkeit, seine originale
+Apache-2.0-Lizenz ist als 25. App-Lizenzeintrag und in beiden Paket-Lizenzordnern
+aufgenommen. Paketprüfung kontrolliert deren festgelegten Originalhash.
+
+Der vorherige veröffentlichte Glyphenplan zu 1906c3d ist inzwischen auf allen
+**20 Jobs einschließlich vier entpackter Pakete** abgenommen:
+[CI 37744221230](https://github.com/Lulus792/SecondBrain/actions/runs/37744221230).
+Das belegt die vorige Grundlage, nicht die neue Reader-Integration; deren neue
+Windows-/Linux-/Apple-Silicon-Abnahme folgt separat. Installiert bleibt 0.9.33
+bis zur gesonderten Paketabnahme. Editor/einfache Feldtexte und native
+Zeichenrechtecke benötigen weiterhin die gemeinsame visuelle Geometrie.
+
+Native Metal-Messung auf diesem Intel-Mac, 1336×840, 16 Notizen,
+je 60 warme Samples pro Phase und die Folge Eingang → START → Übergabe
+vom 7. Oktober: finaler Scroll-Median 1,87 ms; Kamerafahrt 12,18 ms;
+Dokumentwechsel 14,03 ms, p95 22,50 ms. Erstmaliger langer Dokumentwechsel
+bleibt als Ausreißer relevant: vor der zusätzlichen Umbruchschätzung 237,01 ms
+(222,14 ms Layout), danach 123,30 ms (110,88 ms Layout). Messungen desselben
+UI-Plans mit gleicher Quelle und unterschiedlichem Wrap-Weg, keine allgemeine
+Bildratenzusage. Der historische Vergleichsbuild liegt für den Ausreißer bei
+81,65 ms, verwendet aber noch die bisherige Textdarstellung; vollständige
+Unicode-Geometrie ist damit nicht belegt. Weitere Kaltstart-/Großdatenoptimierung
+bleibt offen. Profile `build/reader-native-{baseline,detailed,final}.log`;
+der Prüfer zeigt nun auch die Kostenbestandteile seines langsamsten Frames.
+Eine reale Projektaufnahme mit der neuen Leseansicht wurde betrachtet;
+alle Dateien des eigenen Projektgedächtnisses blieben dabei bytegleich.

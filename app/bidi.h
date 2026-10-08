@@ -26,4 +26,5 @@ const unsigned char *sb_bidi_paragraph_levels(const SBTextParagraph *paragraph);
 SBStatus sb_bidi_line(const SBTextParagraph *paragraph,size_t byte,size_t length,SBVisualLine *out);
 void sb_bidi_line_free(SBVisualLine *line);
 uint32_t sb_bidi_mirror(uint32_t codepoint);
+bool sb_bidi_separator(uint32_t codepoint);
 #endif
