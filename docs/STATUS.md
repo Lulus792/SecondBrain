@@ -4132,3 +4132,24 @@ Original-/Kopiedateien unverändert. Dies ist kein paarweiser Verbesserungsnachw
 und keine menschliche Trackpadmessung. Erste Layout-/Rasterarbeit bleibt
 Leistungsaufgabe; SBUI-074 offen. Originale: `performance/` im Prüfverzeichnis.
 1.0 nur nach ausdrücklicher Nutzerfreigabe.
+
+## Native Ausgabe während der Reader-Vorbereitung
+
+0.9.63 bindet den sichtbaren Ladehinweis an den Reader und veröffentlicht dessen
+Quelltext erst nach Bereitschaft. Während des Ladens bleiben Dokumentname und
+Scrollaktionen erhalten. Die bisherige Ausgabe erzeugte synchron native Textläufe
+aus dem noch unsichtbaren Markdown. Negative Regression bestätigt; vier gezielte
+Tests bestehen (24,21s), einschließlich vollständiger Ausgabe nach Bereitschaft,
+Literalquelle, frühem Scrollen, Geometrie und nativer Anbindung.
+
+Drei serielle Metal-Paare: erstes Bild78,28→62,62ms,77,29→61,68ms und
+78,77→64,67ms; mediane Verbesserung20,00Prozent auf diesem Intel-Mac. Die
+Wechsel-p95 ist nicht in jedem Paar besser. Kein menschlicher Eingabe-/Trackpad-
+oder allgemeiner Flüssigkeitsnachweis. Inline-Auftragscache-Versuch ohne
+verlässlichen ersten Bildgewinn entfernt. [Vertrag](LADEZUSTAND_NATIVE.md).
+Originale `build/reader-preflight-verification/`. Speicher-/Gesamt-/Paketprüfung
+folgen; installierte App bleibt vorerst0.9.62. SBUI-074 und1.0 bleiben offen.
+
+ASan/UBSan bestehen für120 Reader-,45 Frühscroll- und622 Mac-Providerbedingungen;
+39 eigene C-Dateien/56 aktuelle Hashes geprüft. Externe UI nicht instrumentiert,
+Leaks aus, kein ThreadSanitizer. Originale `build/reader-preflight-sanitizers/`.

@@ -232,3 +232,5 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   Snapshot-, Plattform-, Geräte- und assistive Abnahmen.
 
 - [Modaler Fokus](../../docs/MODALER_FOKUS.md): geteilte Readerkennungen, aktive Gruppe, Pixelregression und Rückkehr.
+
+- [Nativer Ladezustand](../../docs/LADEZUSTAND_NATIVE.md): sichtbarer Status statt vorzeitigem Markdown-Textlauf, negative Regression und Metal-Paare.

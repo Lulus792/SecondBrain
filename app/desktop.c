@@ -888,6 +888,8 @@ static void accessible_publish(SBDesktop *d) {
     size_t stars=modal ? 0 : d->graph_notes.count;
     size_t controls=d->target_count+d->passive_count;
     size_t count=controls+stars;
+    bool reader_loading=false;
+    for(size_t i=0;i<d->passive_count;++i)if(!strcmp(d->passive[i].id,"reader:preparing")){reader_loading=true;break;}
     SBAccessibleItem *items=calloc(count,sizeof(*items)); char (*ids)[100]=stars ? calloc(stars,sizeof(*ids)) : NULL;
     if ((count && !items) || (stars && !ids) ) { free(items); free(ids); return; }
     for (size_t i=0;i<d->target_count;++i) {
@@ -910,7 +912,10 @@ static void accessible_publish(SBDesktop *d) {
             }
             SBFieldSelection *selection=field_selection(d,t->id);
             if(v->value && field_selection_matches(d,selection,v->value)){v->anchor=selection->anchor;v->caret=selection->caret;}
-        } else if (t->kind==SB_FOCUS_READER) v->value=d->form==SB_FORM_NOTICE_TEXT ? d->notice : d->form==SB_FORM_CONTEXT ? d->context : d->model.source ? d->model.source : d->model.editor;
+        } else if (t->kind==SB_FOCUS_READER) {
+            /* Publish the painted loading child, not unlaid-out Markdown runs. */
+            v->value=reader_loading ? "" : d->form==SB_FORM_NOTICE_TEXT ? d->notice : d->form==SB_FORM_CONTEXT ? d->context : d->model.source ? d->model.source : d->model.editor;
+        }
         if (!strcmp(t->id,"galaxy")) v->label="Dokumente in der Sternkarte";
         v->order=((uint64_t)t->group<<32)|t->order;
         if (t->parent[0]) v->parent=t->parent;
@@ -1847,7 +1852,9 @@ static void document(SBDesktop *d, const char *text, float height) {
            until its real layout can consume and clamp it. */
         d->scrolling[slot].used=true;d->scrolling[slot].measured=false;
         nk_layout_row_dynamic(ctx,32*d->ui.scale,1);
+        size_t before=d->passive_count;
         passive_add(d,"reader:preparing","Dokument wird vorbereitet …",ACCESSKIT_ROLE_STATUS,nk_widget_bounds(ctx));
+        if(d->passive_count==before+1)strcpy(d->passive[before].parent,"reader");
         nk_label(ctx,"Dokument wird vorbereitet …",NK_TEXT_LEFT);
     }
     if (ready && !whole_code && !document_tree(d,&parsed,&references,slot,&link_number,&first_heading)) whole_code=true;
