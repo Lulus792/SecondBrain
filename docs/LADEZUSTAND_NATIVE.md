@@ -49,9 +49,15 @@ wurde entfernt und ist kein Bestandteil0.9.63. Originale bleiben für Diagnose
 unter `build/reader-preflight-verification/`, insbesondere `profiles/`,
 `native-profiles/`, `stages/` und die Baseline-/Regressionsprotokolle.
 
-Neue Gesamt-, Speicher-, Paket- und Zielplattformabnahme folgen. Kein Nachweis
+Vier gezielte Tests bestehen (24,21s); die aktuelle Literalansicht mit großer
+Schrift wurde angesehen. Gesamt-, Paket- und neue Zielplattformabnahme folgen. Kein Nachweis
 menschlicher VoiceOver-/NVDA-/Orca-Bedienung und keine allgemeine Flüssigkeitszusage.
 
 ASan/UBSan bestehen für120 Reader-,45 Frühscroll- und622 Mac-Providerbedingungen;
 39 eigene C-Dateien/56 aktuelle Hashes geprüft. Externe UI nicht instrumentiert,
 Leaks aus, kein ThreadSanitizer. Originale `build/reader-preflight-sanitizers/`.
+
+0.9.63:82/82 lokale Release-Prüfungen bestehen (447,15s). Quellstand
+22a8504ddb84e8c6a0428005697339dd78adda05 ist veröffentlicht. CI38169362014:
+Linux-Release einschließlich Paket erfolgreich; andere Windows-/Linux-Desktopjobs
+zuletzt in Arbeit, native Mac-Jobs queued. Sauberer Paketbuild folgt.

@@ -4153,3 +4153,8 @@ folgen; installierte App bleibt vorerst0.9.62. SBUI-074 und1.0 bleiben offen.
 ASan/UBSan bestehen für120 Reader-,45 Frühscroll- und622 Mac-Providerbedingungen;
 39 eigene C-Dateien/56 aktuelle Hashes geprüft. Externe UI nicht instrumentiert,
 Leaks aus, kein ThreadSanitizer. Originale `build/reader-preflight-sanitizers/`.
+
+0.9.63:82/82 lokale Release-Prüfungen bestehen (447,15s). Quellstand
+22a8504ddb84e8c6a0428005697339dd78adda05 ist veröffentlicht. CI38169362014:
+Linux-Release einschließlich Paket erfolgreich; andere Windows-/Linux-Desktopjobs
+zuletzt in Arbeit, native Mac-Jobs queued. Sauberer Paketbuild folgt.

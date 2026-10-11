@@ -57,8 +57,9 @@ und Windows-/Linux-Debug/Release geprüft. Menschliche Bedienung und neue ARM64-
 Abnahme bleiben offen. [Vertrag](../../docs/MODALER_FOKUS.md).
 
 0.9.63 korrigiert die vorzeitige native Markdown-Ausgabe während des Ladens.
-Vier gezielte Tests bestehen; erste Bilddauer in drei Metal-Paaren etwa20Prozent
-kleiner. Speicher-/Gesamt-/Paketprüfung folgen, installiert bleibt0.9.62.
+Vier gezielte Tests und82/82 Release-Prüfungen bestehen (447,15s); erste Bilddauer
+in drei Metal-Paaren etwa20Prozent kleiner. ASan/UBSan bestehen für120 Reader-,
+45 Frühscroll- und622 Mac-Bedingungen. Paket folgt; installiert bleibt0.9.62.
 [Vertrag](../../docs/LADEZUSTAND_NATIVE.md).
 
 Erste Quell-/Parser-/Worker-Aufbereitung, native Veröffentlichung, Tabellen,

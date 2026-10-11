@@ -83,7 +83,9 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   während der Lizenzreader-Vorbereitung kann vor der fertigen Ansicht verpuffen.
   Der Tastaturtest wartet für seine Prüfung der fertigen Leseansicht begrenzt
   auf deren Bereitschaft. Ab 0.9.61 bleiben diese Eingaben bis zur gemessenen
-  fertigen Ansicht erhalten; [lokale Korrektur und Prüfgrenzen](SCROLLEN_BEIM_LADEN.md).
+  fertigen Ansicht erhalten; [lokale Korrektur und Prüfgrenzen](SCROLLEN_BEIM_LADEN.md). Ab0.9.63
+  entspricht die native Ausgabe dem sichtbaren Ladezustand; vorzeitige vollständige
+  Markdown-Textläufe entfallen. [Messung und Grenzen](LADEZUSTAND_NATIVE.md).
 - [ ] **Dauerhafte Release-Pakete veröffentlichen:** versionierte GitHub Releases,
   Prüfsummen, Änderungsübersicht und reproduzierbare Paketabnahme. Actions-Artefakte
   verfallen nach 30 Tagen. Signierung, macOS-Notarisierung und einfache Installation
