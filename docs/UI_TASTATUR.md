@@ -29,6 +29,10 @@ keine native Full-Keyboard-Access-Brücke bietet, setzt sie die Wege selbst um.
   Einstellungen, Konfliktkopie, Archiv und Schutzdialog sind per Tastatur erreichbar.
 - Lesebereiche lassen sich per Tastatur scrollen. Hilfe erklärt die tatsächlich
   implementierten Wege. Reduzierte Transparenz hält Inhalt bei Bedarf ruhig.
+- Ab 0.9.59 führt F1-Hilfe mit Escape oder Zurück zur vorherigen Modalaufgabe
+  zurück, einschließlich Eingaben, Auswahl und Scrollposition. Umschalt+F10
+  öffnet Aktionen im Arbeitsbereich und verdrängt keine begonnenen Formulare.
+  [Vertrag und Prüfgrenzen](HILFE_RUECKKEHR.md).
 
 ## Daten und Material
 

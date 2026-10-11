@@ -219,5 +219,9 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   eigene Ausgabekopien, zusätzliches Budgetlimit und serielle Metal-Messung.
 - [Reader-Rückkehr](../../docs/READER_RUECKKEHR.md): stabile Inhaltsidentität unter
   gewöhnlichen Modalaufgaben, Scrollkörper-/Titelregeln und offener Formularbefund.
+- [Hilfe-Rückkehr](../../docs/HILFE_RUECKKEHR.md): Ursprungsaufgabe, Feldauswahl,
+  Scrollposition und modale Befehlsgrenzen ab 0.9.59; lokale Prüfgrenzen.
+- [Produktiver Hilfeprüfer](../../tests/test_help_return.c): SDL-Ereignisse,
+  native Auswahl/Ersetzung, gescrollte Einstellungen, Kontextreader und Hilfe-Schaltfläche.
 - [SBUI-077-Nachprüfung](/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-11_16-38-09/UI_REVIEW.md): Software-/Metalbilder und offene native
   Snapshot-, Plattform-, Geräte- und assistive Abnahmen.

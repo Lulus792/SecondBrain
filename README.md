@@ -112,13 +112,15 @@ build/app/secondbrain --workspace brains --project secondbrain
 | Lesebereich scrollen | Bild auf / Bild ab |
 | Vorherige / nächste Überschrift in der Leseansicht | Alt+Bild auf / Bild ab |
 | Wortweise bewegen / Auswahl erweitern | Option (Mac) bzw. Strg + Links/Rechts; zusätzlich Umschalt |
-| Aktionen öffnen / darin wechseln | Umschalt+F10 / Pfeile auf und ab |
+| Aktionen im Arbeitsbereich öffnen / darin wechseln | Umschalt+F10 / Pfeile auf und ab |
 | Speichern / Suche / Bearbeiten | Command/Control+S / F / E |
 | Neue Notiz / neues Projekt | Command/Control+N / Umschalt+N |
 | Zurück oder abbrechen / Hilfe | Escape / F1 |
 
 Command gilt auf macOS, Control auf Windows und Linux. Tab verlässt auch den
 Editor; Ctrl+I fügt dort einen Tabulator ein.
+Die Hilfe führt ab 0.9.59 zu einem zuvor geöffneten Formular oder Menü zurück;
+Eingaben und Textauswahl bleiben dabei erhalten. [Rückkehr aus der Hilfe](docs/HILFE_RUECKKEHR.md).
 Zusammengesetzte Zeichen werden beim Bewegen, Auswählen und Löschen als Einheit
 behandelt. [Eingabevertrag und Grenzen](docs/GRAPHEME.md). [Wortbewegung und Doppelklick](docs/WORTNAVIGATION.md)
 folgen ab 0.9.40 gemeinsamen Unicode-Segmenten. Mit der Maus: Ziehen dreht die

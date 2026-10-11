@@ -412,6 +412,7 @@ static bool button(SBDesktop *d, const char *id, const char *label) {
     bool clear=!strcmp(id,"clear-search");
     if (!clear && bounds.y >= clip.y && bounds.y+bounds.h <= clip.y+clip.h) glass(d,bounds,9);
     SBIcon icon=sb_icon_for(id);
+    if(d->help_return && !strcmp(id,"cancel"))icon=SB_ICON_LEFT;
     if (icon==SB_ICON_EXPAND && d->expanded) icon=SB_ICON_COLLAPSE;
     bool only= !strcmp(id,"close-card") || !strcmp(id,"cancel") || !strcmp(id,"clear-search") ||
         !strcmp(id,"zoom-in") || !strcmp(id,"zoom-out") || !strncmp(id,"rotate-",7) || !strcmp(id,"camera-home") || !strcmp(id,"settings");
@@ -509,6 +510,7 @@ static void backup_poll(SBDesktop *d) {
     }
 }
 #include "native_fields.inc"
+#include "help_return.inc"
 static void field(SBDesktop *d, const char *tag, const char *label, char *text, int capacity, int focus) {
     struct nk_context *ctx = d->ui.ctx;
     int length = (int)strlen(text);
@@ -611,6 +613,7 @@ SBStatus sb_desktop_store_preferences(SBDesktop *d) {
     return status;
 }
 void sb_desktop_free(SBDesktop *d) {
+    help_return_free(d);
     reader_preparation_free(d);
     reader_source_free(d);
     sb_system_style_free(d->style_monitor);
@@ -746,7 +749,7 @@ void sb_desktop_apply(SBDesktop *d) {
             d->form = SB_FORM_NONE;
             if(project_created && d->model.has_project)snprintf(d->saved_focus,sizeof(d->saved_focus),"galaxy");
         }
-    } else if (cmd == SB_CMD_CANCEL) { ++d->dialog_serial; d->form = SB_FORM_NONE; }
+    } else if (cmd == SB_CMD_CANCEL) { ++d->dialog_serial; if(!help_close(d))d->form = SB_FORM_NONE; }
     else if (cmd == SB_CMD_SAVE) {
         status = sb_app_save(&d->model); result(d, status, "Gespeichert.");
         if (status.code == SB_OK) d->graph_dirty = true;
@@ -1139,8 +1142,11 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
             if (key == SDLK_C && shift) { command(d, SB_CMD_CONTEXT); return; }
             if (key == SDLK_COMMA) { d->form = SB_FORM_SETTINGS; return; }
         }
-        if (key==SDLK_F10 && shift && !d->model.guard) { d->form=SB_FORM_ACTIONS; return; }
-        if (key == SDLK_F1) { d->form = SB_FORM_HELP; return; }
+        if (key==SDLK_F10 && shift && !d->model.guard) {
+            if(d->form==SB_FORM_NONE || d->form==SB_FORM_ACTIONS)d->form=SB_FORM_ACTIONS;
+            return;
+        }
+        if (key == SDLK_F1) { help_open(d); return; }
         SBTarget *item = focus_target(d);
         bool text = item && item->kind == SB_FOCUS_TEXT;
         if (text && !strcmp(d->focus, "editor") && key == SDLK_I && (event->key.mod & SDL_KMOD_CTRL)) {
@@ -1349,7 +1355,7 @@ static void tools(SBDesktop *d, int width, float height, nk_flags flags) {
         nk_layout_row_push(ctx,compact ? 42*s : 112*s);
         if (button(d,"new-project","Projekt")) command(d,SB_CMD_NEW_PROJECT);
         nk_layout_row_push(ctx,42*s);
-        if (compact) { if (button(d,"help","Hilfe")) d->form=SB_FORM_HELP; }
+        if (compact) { if (button(d,"help","Hilfe")) help_open(d); }
         else if (button(d,"settings","Darstellung")) d->form=SB_FORM_SETTINGS;
         nk_layout_row_end(ctx);
     }
@@ -2025,7 +2031,7 @@ static void popup(SBDesktop *d, int width, int height) {
         float available=ctx->current->layout->bounds.w;
         nk_layout_row_begin(ctx,NK_STATIC,32*s,2);
         nk_layout_row_push(ctx,available-32*s-ctx->style.window.spacing.x);native_heading(d,"modal-title",title);
-        nk_layout_row_push(ctx,32*s); if (button(d,"cancel","Schließen")) command(d,SB_CMD_CANCEL);
+        nk_layout_row_push(ctx,32*s); if (button(d,"cancel",d->help_return ? "Zurück" : "Schließen")) command(d,SB_CMD_CANCEL);
         nk_layout_row_end(ctx);
         bool form=!d->backup && (d->form==SB_FORM_PROJECT || d->form==SB_FORM_NOTE || d->form==SB_FORM_WORKSPACE || d->form==SB_FORM_BACKUP || d->form==SB_FORM_RESTORE);
         float contents=fmaxf(40,h-shell);
@@ -2035,6 +2041,7 @@ static void popup(SBDesktop *d, int width, int height) {
         bool group=nk_group_begin(ctx,"Modal contents",NK_WINDOW_NO_SCROLLBAR);
         if (group) {
         scroll_gutter(d);
+        if(d->help_restore_scroll){*ctx->current->layout->offset_y=d->scrolling[3].applied;d->help_restore_scroll=false;}
         if (d->backup_feedback_reset) { *ctx->current->layout->offset_y=0; memset(&d->scrolling[3],0,sizeof(d->scrolling[3])); d->backup_feedback_reset=false; }
         smooth_scroll(d,3,ctx->current->layout->offset_y);
         if (d->backup) {
@@ -2138,7 +2145,7 @@ static void popup(SBDesktop *d, int width, int height) {
             if (button(d,"backup-project","Projekt sichern")) command(d,SB_CMD_BACKUP);
             if (button(d,"restore-project","Sicherung wiederherstellen")) command(d,SB_CMD_RESTORE);
             if (button(d, "settings-actions", "Darstellung")) d->form = SB_FORM_SETTINGS;
-            if (button(d, "help-actions", "Tastaturhilfe")) d->form = SB_FORM_HELP;
+            if (button(d, "help-actions", "Tastaturhilfe")) help_open(d);
         } else if (d->form == SB_FORM_SETTINGS) {
             nk_layout_row_dynamic(ctx, 24 * s, 1); native_label(d, "Projekte", NK_TEXT_LEFT);
             if (button(d, "project-settings", "Projekt wählen")) d->form = SB_FORM_PROJECTS;
@@ -2473,7 +2480,7 @@ static void welcome(SBDesktop *d,int width,int height,nk_flags flags) {
             if (d->model.projects.count && button(d,"project-settings","Projekte prüfen")) d->form=SB_FORM_PROJECTS;
             if (button(d,"workspace-detail","Arbeitsordner öffnen")) command(d,SB_CMD_WORKSPACE);
             if (button(d,"restore-project","Sicherung wiederherstellen")) command(d,SB_CMD_RESTORE);
-            if (button(d,"help-actions","Tastaturhilfe")) d->form=SB_FORM_HELP;
+            if (button(d,"help-actions","Tastaturhilfe")) help_open(d);
             if (button(d,"settings-actions","Darstellung")) d->form=SB_FORM_SETTINGS;
             nk_layout_row_dynamic(ctx,24*s,1); native_label(d,"Aktueller Arbeitsordner",NK_TEXT_LEFT);
             char path[SB_NAME_CAP]; compact_label(d,d->model.workspace,path,sizeof(path),w-80);
@@ -2490,6 +2497,7 @@ static void welcome(SBDesktop *d,int width,int height,nk_flags flags) {
     nk_end(ctx);
 }
 void sb_desktop_frame(SBDesktop *d) {
+    if(d->help_return && d->form!=SB_FORM_HELP)help_return_free(d);
     d->reader_preparation_used=false;d->reader_source_used=false;
     sb_native_text_free(&d->native_editor);
     sb_native_text_free(&d->reader_title_native);d->reader_title_display[0]=0;d->reader_title_claimed=false;

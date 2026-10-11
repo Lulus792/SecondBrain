@@ -84,3 +84,7 @@ Erneutes Anlegen leert den eingegebenen Titel. Die Ereignisprobe bestätigt
 Form 2→6→0→2 und den Verlust der noch nicht gespeicherten Eingabe, keinen Verlust
 einer vorhandenen Datei. Die künftige Korrektur muss die ursprüngliche Aufgabe,
 Fokus/Auswahl und Eingaben erhalten. Dieser Schritt schließt den Befund nicht.
+
+Ab 0.9.59 ist die [Rückkehr aus der Hilfe](HILFE_RUECKKEHR.md) im dokumentierten
+lokalen Umfang korrigiert und gezielt geprüft; dieser Abschnitt beschreibt den
+Befund in der vorherigen Fassung 0.9.58.

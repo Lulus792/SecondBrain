@@ -9,6 +9,7 @@
 #include "system_style.h"
 typedef struct SBReaderPreparation SBReaderPreparation;
 typedef struct SBReaderSource SBReaderSource;
+typedef struct SBHelpReturn SBHelpReturn;
 #define SB_NATIVE_FIELDS 7
 typedef struct {SBNativeText text;char *source;size_t anchor,caret;} SBFieldText;
 typedef struct {char *source;size_t anchor,caret;uint64_t context;bool pending;} SBFieldSelection;
@@ -70,6 +71,8 @@ typedef struct {
     struct nk_rect reader_title_bounds;
     SBStatus message;
     SBForm form;
+    SBHelpReturn *help_return;
+    bool help_restore_scroll;
     SBForm measured_form;
     float modal_content_height,modal_content_width,modal_content_scale;
     struct nk_rect modal_bounds;

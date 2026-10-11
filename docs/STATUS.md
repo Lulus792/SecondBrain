@@ -3965,3 +3965,24 @@ zuletzt queued; weitere aktuelle Zielplattformabnahmen offen. SBUI-079 im lokale
 Quellen-/SDL-/Bild-/Providerumfang geprüft. SBUI-080 (Hilfe aus begonnenem
 Formular), erste Vorbereitung/Bildspitzen, reale Geräte/IME/Screenreader und
 übrige Release-Arbeit bleiben offen. 1.0 nur nach ausdrücklicher Nutzerfreigabe.
+
+## Rückkehr aus der Hilfe (0.9.59, 11. Oktober)
+
+SBUI-080 ist im lokalen Ereignis-/Widget-/Providerumfang korrigiert: F1 und der
+Hilfeeintrag im Aktionsmenü halten die Ursprungsaufgabe; Escape und Zurück stellen
+sie einschließlich Feldern, Auswahl, Fokus, Fehlermeldung und Scrollposition
+wieder her. Umschalt+F10 verdrängt keine Modalaufgabe. [Vertrag](HILFE_RUECKKEHR.md).
+92 Hilfe-, 190 Feldaktions- und 621 native Mac-Prüfbedingungen bestehen auch unter
+haltendem ASan/UBSan: 39 eigene C-Dateien, 56 aktuelle Quell-/Include-Hashes.
+Externe UI-Bibliotheken nicht instrumentiert; kein Leak-/ThreadSanitizer-Nachweis.
+Vorher/Hilfe/Nachher-Bilder betrachtet; Rückkehrpfeil im finalen Hilfezustand
+geprüft. Alle 79 lokalen Release-Prüfungen bestehen (565,40 s). Originale:
+`build/help-return-verification/`, `build/help-return-sanitizers/`.
+
+Paket/Installation folgen; installiert bleibt zunächst 0.9.58. Der frühere
+CI-Lauf 38158192485 wurde erneut gelesen: Windows-UI-Build scheitert an
+`plain_native.inc:35` (C2036), Linux an Reader-Resize und nativer Textstilabfrage;
+UI-Paketabnahmen dadurch nicht ausgeführt. Windows-/Linux-Kern besteht, macOS
+weiter queued. Konkrete [Plattformbefunde](RELEASE.md) bleiben eigene nächste
+Arbeit. Leistung, menschliche Geräte-/IME-/Screenreaderabnahme und übrige
+Release-Aufgaben offen. 1.0 nur nach ausdrücklicher Nutzerfreigabe.

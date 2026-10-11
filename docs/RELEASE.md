@@ -141,6 +141,28 @@ werden. Entwicklungspakete werden bis dahin eindeutig als solche gekennzeichnet.
 - [ ] Die neue [Interaktionspolitur](INTERAKTION.md) auf den tatsächlichen
   Zielsystemen und mit menschlicher Bedienung/verschiedenen Geräten abnehmen.
 
+## Aktuelle Plattformbefunde vom 11. Oktober
+
+Die Jobs zum Quellstand 0.9.58 wurden erneut eingesehen:
+[CI-Lauf 38158192485](https://github.com/Lulus792/SecondBrain/actions/runs/38158192485).
+Ein zuvor beobachteter Wartestatus ist kein aktueller Erfolgsnachweis.
+
+- [ ] Windows-UI-Build korrigieren: MSVC meldet in `app/plain_native.inc:35`
+  C2036 (`void *`: unbekannte Größe). Die Cache-Inventur muss vor der
+  Indexberechnung einen typisierten Zeiger verwenden. Release-Job 114525404584;
+  Debug-Job 114525404631 ebenfalls fehlgeschlagen.
+- [ ] Linux-Resize-Prüfung untersuchen: `prepared-document-reader` scheitert
+  an `tests/test_reader_prepare.c:54`, unmittelbar nach Fenstergrößenänderung
+  bei `loading(&d)`. Ein bestandener Build ersetzt diese Laufzeitprüfung nicht.
+- [ ] Linux-native Textstilabfrage untersuchen: `native-accessibility` scheitert
+  bei AT-SPI-Operation 11 auf „Stilprüfung“ (`object/pattern not found`).
+  Release-Job 114525404659 und Debug-Job 114525404463 haben fehlgeschlagene
+  UI-Prüfungen; die Paketprüfungen wurden dadurch nicht ausgeführt.
+
+Windows-/Linux-Kernprüfungen bestehen in diesem Lauf; die macOS-Jobs wurden
+zuletzt weiterhin als queued beobachtet. Die UI-Befunde benötigen Korrekturen
+und neue native Nachweise. Logauszüge: `build/help-return-verification/prior-*-failure.log`.
+
 ## Textfortschritt vom 8. Oktober
 
 Ab 0.9.34 benutzt die formatierte Leseansicht den gemeinsamen Bidi-/Script-/
@@ -345,7 +367,8 @@ Formwechseln; Quelle/Worker bleiben gültig und der feste Titel bleibt einmalig.
 Bildnachweise und die Grenzen. SBUI-079 lokal nachgeprüft, keine Geräte-/
 Plattform-/assistive Gesamtabnahme.
 
-- [ ] SBUI-080: F1/Hilfe und vergleichbare Befehlswechsel aus begonnenen Formularen
-  erhalten Ursprungsaufgabe, Felder, Auswahl, Fokus und Scrollposition. Die
-  bestätigte Ereignisprobe verliert die Aufgabe und leert den Titel bei erneutem
-  Anlegen. Gespeicherte Dateien bleiben außerhalb dieses Befunds.
+- [x] SBUI-080 im lokalen Ereignis-/Widget-/Providerumfang: F1/Hilfe kehrt ab
+  0.9.59 zur Ursprungsaufgabe zurück; Felder, gerichtete Auswahl, Fokus,
+  Fehlermeldung und Scrollposition bleiben erhalten. Umschalt+F10 verdrängt
+  keine Modalaufgabe. [Vertrag und 92 gezielte Prüfbedingungen](HILFE_RUECKKEHR.md).
+  Menschliche Bedienung und aktuelle weitere Zielplattformen bleiben offen.
