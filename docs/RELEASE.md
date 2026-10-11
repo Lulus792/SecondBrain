@@ -462,3 +462,14 @@ aktuelle weitere Plattformen, reale Geräte und assistive Abnahmen bleiben offen
 
 Echte Monitor-/Pixeldichtewechsel, weitere Geräte/Plattformen und menschliche
 Flüssigkeitsabnahme bleiben offen. Die lokale Prüfung schließt diese nicht ein.
+
+## Windows-Kontrastfarben vom 12. Oktober
+
+- [x] Native Farbrollen im Windows-Adapter und der eigenen UI implementieren:
+  acht Rollen, passende Paare, Cache-/Aufnahmewechsel und erhaltene eigene
+  Auswahl; lokale Software-/Metal-/Sanitizerprüfungen mit synthetischen Paletten.
+- [ ] Tatsächliche Windows-SDK-/Paketabnahme der neuen Fassung und native
+  benutzerdefinierte/alle vier eingebauten Themen im laufenden System prüfen.
+
+[Umfang](SYSTEM_KONTRASTFARBEN.md). Synthetische Farbdaten auf dem Mac sind keine
+menschliche Windows-Kontrastthemenabnahme; übrige Release-Aufgaben bleiben offen.

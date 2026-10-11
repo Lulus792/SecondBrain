@@ -28,17 +28,19 @@ static bool reader_inline_styles_get(SBDesktop *d,size_t node,const SBStyledText
 static void reader_preparation_retire(SBDesktop *d);
 static bool reader_preparing(const SBDesktop *d);
 static void composition_dispatch(void *user,const SDL_Event *event){sb_desktop_event(user,event);}
-static void style_update(SBDesktop *d,bool force) {
-    d->system_style=sb_system_style_snapshot(d->style_monitor,force);
+void sb_desktop_apply_system_style(SBDesktop *d,SBSystemStyle snapshot,bool force) {
+    d->system_style=snapshot;
     SBStyleChoice effective=sb_style_resolve(d->requested_style,d->system_style);
-    SBStyleChoice old=d->applied_style;
-    if (force || effective.dark!=old.dark || effective.contrast!=old.contrast) {
-        d->ui.contrast=effective.contrast; sb_ui_theme(&d->ui,effective.dark);
+    SBStyleChoice old=d->applied_style;SBPalette palette=sb_style_palette(effective,d->system_style);
+    bool palette_changed=!sb_palette_equal(&d->ui.palette,&palette);
+    if (force || effective.dark!=old.dark || effective.contrast!=old.contrast || palette_changed) {
+        d->ui.contrast=effective.contrast;sb_ui_set_palette(&d->ui,palette); sb_ui_theme(&d->ui,effective.dark);
     }
     if (force || effective.solid!=old.solid) d->solid=effective.solid;
     if (force || effective.motion!=old.motion) d->reduced_motion=effective.motion;
     d->applied_style=effective;
 }
+static void style_update(SBDesktop *d,bool force){sb_desktop_apply_system_style(d,sb_system_style_snapshot(d->style_monitor,force),force);}
 void sb_desktop_set_style(SBDesktop *d,SBStyleChoice style) { d->requested_style=style; style_update(d,true); }
 static bool modal_reader(const SBDesktop *d) { return d->form==SB_FORM_CONTEXT || d->form==SB_FORM_NOTICE_TEXT; }
 static uint64_t accessible_context(const SBDesktop *d) {
@@ -388,7 +390,7 @@ static void tooltip(SBDesktop *d,const char *text) {
     struct nk_vec2 p=d->ui.ctx->input.mouse.pos;tooltip_at(d,text,nk_rect(p.x,p.y,0,0));
 }
 static bool focused(SBDesktop *d, const char *id) { return d->keyboard && !strcmp(d->focus, id); }
-static void ring(SBDesktop *d, const char *id) {
+static void ring_ink(SBDesktop *d,const char *id,struct nk_color ink) {
     if (focused(d, id) && d->target_count && !strcmp(d->targets[d->target_count-1].id,id)) {
         /* Shared control names do not give an obscured panel the modal focus. */
         if((d->form!=SB_FORM_NONE || d->model.guard) && d->targets[d->target_count-1].group!=3)return;
@@ -399,9 +401,10 @@ static void ring(SBDesktop *d, const char *id) {
             bounds.x+=inset; bounds.y+=inset; bounds.w-=2*inset; bounds.h-=2*inset;
         }
         nk_stroke_rect(nk_window_get_canvas(d->ui.ctx),bounds,9,2,
-            d->ui.contrast ? d->ui.ctx->style.text.color : nk_rgb(142,191,255));
+            d->ui.contrast ? ink : nk_rgb(142,191,255));
     }
 }
+static void ring(SBDesktop *d,const char *id){ring_ink(d,id,d->ui.ctx->style.text.color);}
 static bool activation(SBDesktop *d, const char *id) {
     if (strcmp(d->activate, id)) return false;
     d->activate[0] = 0; return true;
@@ -420,27 +423,29 @@ static bool button(SBDesktop *d, const char *id, const char *label) {
         !strcmp(id,"zoom-in") || !strcmp(id,"zoom-out") || !strncmp(id,"rotate-",7) || !strcmp(id,"camera-home") || !strcmp(id,"settings");
     only = only || (icon!=SB_ICON_NONE && bounds.w<70*d->ui.scale);
     struct nk_style_button old_button=d->ui.ctx->style.button;
-    if (clear) {
+    if (clear && !d->ui.palette.valid) {
         d->ui.ctx->style.button.normal=nk_style_item_color(nk_rgba(0,0,0,0));
         d->ui.ctx->style.button.hover=nk_style_item_color(d->ui.dark ? nk_rgba(180,198,220,28) : nk_rgba(50,75,110,20));
         d->ui.ctx->style.button.active=d->ui.ctx->style.button.hover;d->ui.ctx->style.button.border=0;d->ui.ctx->style.button.rounding=14*d->ui.scale;
     }
     bool clicked=nk_button_label(d->ui.ctx,"") != 0;
     d->ui.ctx->style.button=old_button;
+    bool hot=(d->ui.ctx->last_widget_state&(NK_WIDGET_STATE_HOVER|NK_WIDGET_STATE_ACTIVED))!=0;
+    struct nk_color ink=d->ui.palette.valid ? sb_ui_palette_color(&d->ui,hot ? SB_P_HIGHLIGHT_TEXT : SB_P_BUTTON_TEXT) : d->ui.ctx->style.text.color;
     struct nk_command_buffer *canvas=nk_window_get_canvas(d->ui.ctx);
     if (paint && icon!=SB_ICON_NONE) {
         float size=fminf(18*d->ui.scale,bounds.h-12);
-        sb_icon_draw(canvas,icon,nk_rect(only ? bounds.x+(bounds.w-size)/2 : bounds.x+12*d->ui.scale,bounds.y+(bounds.h-size)/2,size,size),d->ui.ctx->style.text.color);
+        sb_icon_draw(canvas,icon,nk_rect(only ? bounds.x+(bounds.w-size)/2 : bounds.x+12*d->ui.scale,bounds.y+(bounds.h-size)/2,size,size),ink);
     }
     if (paint && !only) {
         char shown[SB_NAME_CAP];
         float inset=(icon==SB_ICON_NONE ? 16 : 40)*d->ui.scale;
         compact_label(d,label,shown,sizeof(shown),bounds.w-inset-12);
         struct nk_rect text=nk_rect(bounds.x+inset,bounds.y+(bounds.h-d->ui.normal->handle.height)/2,bounds.w-inset-10,d->ui.normal->handle.height);
-        nk_draw_text(canvas,text,shown,(int)strlen(shown),&d->ui.normal->handle,nk_rgba(0,0,0,0),d->ui.ctx->style.text.color);
+        nk_draw_text(canvas,text,shown,(int)strlen(shown),&d->ui.normal->handle,nk_rgba(0,0,0,0),ink);
     }
     if (paint && nk_input_is_mouse_hovering_rect(&d->ui.ctx->input,clip) && nk_input_is_mouse_hovering_rect(&d->ui.ctx->input,bounds)) tooltip_at(d,label,bounds);
-    ring(d, id);
+    ring_ink(d,id,ink);
     return clicked || activation(d, id);
 }
 static bool selectable(SBDesktop *d, const char *id, const char *label, nk_bool *selected) {
@@ -449,7 +454,8 @@ static bool selectable(SBDesktop *d, const char *id, const char *label, nk_bool 
     d->ui.ctx->style.selectable.padding=nk_vec2(16*d->ui.scale,6*d->ui.scale);
     bool clicked = nk_selectable_label(d->ui.ctx, label, NK_TEXT_LEFT, selected) != 0;
     d->ui.ctx->style.selectable.padding=padding;
-    ring(d, id);
+    bool hot=*selected || (d->ui.ctx->last_widget_state&(NK_WIDGET_STATE_HOVER|NK_WIDGET_STATE_ACTIVED));
+    ring_ink(d,id,d->ui.palette.valid ? sb_ui_palette_color(&d->ui,hot ? SB_P_HIGHLIGHT_TEXT : SB_P_TEXT) : d->ui.ctx->style.text.color);
     return clicked || activation(d, id);
 }
 static void text_target(SBDesktop *d, const char *id) {
@@ -2396,7 +2402,7 @@ static void galaxy_annotations(SBDesktop *d,struct nk_command_buffer *canvas,str
         for (unsigned j = 0; j < label_count; ++j) if (r.x < labels[j].x+labels[j].w && r.x+r.w > labels[j].x && r.y < labels[j].y+labels[j].h && r.y+r.h > labels[j].y) collision = true;
         if ((!collision && label_count < 80) || p.selected || p.focused) {
             if (d->ui.contrast)
-                nk_fill_rect(canvas,r,0,d->ui.dark ? nk_rgb(0,0,0) : nk_rgb(255,255,255));
+                nk_fill_rect(canvas,r,0,d->ui.palette.valid ? sb_ui_palette_color(&d->ui,SB_P_WINDOW) : d->ui.dark ? nk_rgb(0,0,0) : nk_rgb(255,255,255));
             nk_draw_text(canvas,r,title,(int)strlen(title),&d->ui.normal->handle,nk_rgba(0,0,0,0),
                 d->ui.contrast ? ctx->style.text.color : d->ui.dark ? nk_rgb(220,233,251) : nk_rgb(40,61,89));
             if (label_count < 80) labels[label_count++] = r;

@@ -67,6 +67,7 @@ typedef struct {
     float scale, density;
     bool dark, testing,contrast;
     SBSpace space;
+    SBPalette palette;
     SDL_Texture *outgoing_texture;
     int snapshot_width,snapshot_height,snapshot_logical_width,snapshot_logical_height;
     SDL_FRect card_bounds,outgoing_bounds;
@@ -80,6 +81,8 @@ typedef struct {
 
 SBStatus sb_ui_init(SBUi *ui, const char *font_path, int width, int height, bool testing);
 SBStatus sb_ui_fonts(SBUi *ui, float scale);
+void sb_ui_set_palette(SBUi *ui,SBPalette palette);
+struct nk_color sb_ui_palette_color(const SBUi *ui,unsigned role);
 void sb_ui_theme(SBUi *ui, bool dark);
 void sb_ui_event(SBUi *ui, const SDL_Event *event);
 bool sb_ui_composition_event(SBUi *ui,const SDL_Event *event);

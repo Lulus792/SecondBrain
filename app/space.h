@@ -2,6 +2,7 @@
 #define SB_SPACE_H
 #include <SDL3/SDL.h>
 #include "graph.h"
+#include "palette.h"
 typedef struct { float x, y, depth; unsigned group; bool visible, selected, focused; } SBPoint;
 typedef struct { SDL_FRect rect; float radius; } SBGlass;
 typedef struct {
@@ -10,6 +11,7 @@ typedef struct {
     int width, height;
     bool dark, solid, contrast,sky_dark,sky_contrast, sky_ready, cached;
     uint64_t fingerprint;
+    SBPalette palette,sky_palette;
     SBPoint *points;
     size_t count;
     const SBGraph *graph;

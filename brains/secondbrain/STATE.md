@@ -55,8 +55,10 @@ Endprodukttexte erst abschließend beim vollständigen Produkt bereinigen.
 
 ## Nächster Schritt
 
-Windows-Custom-High-Contrast-Paletten in der UI bearbeiten; der Adapter liest
-bisher nur das Flag. Native Farbrollen und ihre Nutzung fehlen noch.
+0.9.69 implementiert Windows-Farbrollen und ihre UI-Anwendung; 427 lokale
+Bedingungen mit synthetischen Paletten in Software/Metal und ASan/UBSan bestehen.
+Native Windows-SDK-/Themen-/Paketabnahme und saubere Installation folgen.
+[Vertrag](../../docs/SYSTEM_KONTRASTFARBEN.md). Noch installiert: 0.9.68.
 Weitere technische Abnahmen und benötigte reale Umgebungen anhand der
 Abnahmeübersicht klären.
 

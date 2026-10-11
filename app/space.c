@@ -6,6 +6,10 @@
 static float clamp(float x, float a, float b) { return x < a ? a : x > b ? b : x; }
 static unsigned char byte(float x) { return (unsigned char)clamp(x, 0, 255); }
 static const unsigned char colors[5][3] = {{174,186,255},{139,214,230},{226,195,147},{168,202,225},{132,145,168}};
+static void contrast_rgb(const SBSpace *s,unsigned role,unsigned char color[3],unsigned char fallback){
+    if(s->palette.valid){SDL_Color c=s->palette.color[role];color[0]=c.r;color[1]=c.g;color[2]=c.b;}
+    else memset(color,fallback,3);
+}
 static void blend(SBSpace *s, int x, int y, const unsigned char *color, float alpha) {
     if (x < 0 || y < 0 || x >= s->width || y >= s->height) return;
     unsigned char *p = s->pixels + ((size_t)y * s->width + x) * 4;
@@ -24,7 +28,7 @@ static void line(SBSpace *s, SBPoint a, SBPoint b) {
     if (steps > s->width + s->height || steps < 1) return;
     const unsigned char accent[] = {112,154,197};
     unsigned char ink[3];
-    memset(ink, s->dark ? 170 : 85, sizeof(ink));
+    contrast_rgb(s,SB_P_TEXT,ink,s->dark ? 170 : 85);
     const unsigned char *color = s->contrast ? ink : accent;
     for (int i = 0; i <= steps; ++i) {
         int x = (int)(a.x + dx * i / steps), y = (int)(a.y + dy * i / steps);
@@ -59,10 +63,11 @@ fail:
    allocating another CPU raster or texture. UI text is drawn afterwards. */
 void sb_space_fallback(const SBSpace *s,SDL_Renderer *renderer){
     unsigned char sky[3]={s->dark ? 7 : 211,s->dark ? 14 : 224,s->dark ? 26 : 239};
-    if(s->contrast)memset(sky,s->dark ? 0 : 255,sizeof(sky));
+    if(s->contrast)contrast_rgb(s,SB_P_WINDOW,sky,s->dark ? 0 : 255);
     SDL_SetRenderDrawColor(renderer,sky[0],sky[1],sky[2],255);SDL_RenderClear(renderer);
     SDL_FColor color=s->contrast ? (SDL_FColor){s->dark ? 0 : 1,s->dark ? 0 : 1,s->dark ? 0 : 1,1} :
         s->dark ? (SDL_FColor){17/255.0f,29/255.0f,47/255.0f,1} : (SDL_FColor){237/255.0f,245/255.0f,1,1};
+    if(s->contrast && s->palette.valid){SDL_Color c=s->palette.color[SB_P_WINDOW];color=(SDL_FColor){c.r/255.0f,c.g/255.0f,c.b/255.0f,1};}
     SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_NONE);
     for(unsigned i=0;i<s->glass_count && i<64;++i){SDL_FRect b=s->glass[i].rect;float radius=s->glass[i].radius;
         if(!isfinite(b.x) || !isfinite(b.y) || !isfinite(b.w) || !isfinite(b.h) || !isfinite(radius) || b.w<=0 || b.h<=0)continue;
@@ -83,7 +88,7 @@ static void glass_interior(SBSpace *s,int first,int end,int y,const int *columns
     unsigned char *out=s->pixels+((size_t)y*s->width+first)*4;
     if(s->contrast || s->solid){
         unsigned char rgba[4]={0,0,0,255};
-        if(s->contrast)rgba[0]=rgba[1]=rgba[2]=s->dark ? 0 : 255;
+        if(s->contrast)contrast_rgb(s,SB_P_WINDOW,rgba,s->dark ? 0 : 255);
         else{const float tint[]={s->dark ? 49.0f : 235.0f,s->dark ? 67.0f : 243.0f,s->dark ? 93.0f : 252.0f};
             for(int k=0;k<3;++k)rgba[k]=(unsigned char)(tint[k]*(s->dark ? 0.48f : 1));}
         for(int x=first;x<end;++x,out+=4)memcpy(out,rgba,4);
@@ -105,10 +110,11 @@ bool sb_space_draw(SBSpace *s, SDL_Renderer *renderer, int width, int height) {
     fingerprint ^= sb_hash((const char *)&s->mouse_y, sizeof(s->mouse_y)) << 2;
     fingerprint ^= sb_hash((const char *)s->camera,sizeof(s->camera));
     fingerprint ^= (uint64_t)s->dark << 3; fingerprint ^= (uint64_t)s->solid << 4; fingerprint^=(uint64_t)s->contrast<<5;
+    if(s->contrast && s->palette.valid)fingerprint^=sb_hash((const char *)s->palette.color,sizeof(s->palette.color));
     if (s->graph) fingerprint ^= sb_hash((const char *)s->graph->edges, s->graph->edge_count * sizeof(*s->graph->edges));
     SDL_FRect rect = {0, 0, (float)width, (float)height};
     if (s->cached && s->fingerprint == fingerprint) return SDL_RenderTexture(renderer, s->texture, NULL, &rect);
-    if (!s->sky_ready || s->sky_dark != s->dark || s->sky_contrast!=s->contrast) {
+    if (!s->sky_ready || s->sky_dark != s->dark || s->sky_contrast!=s->contrast || (s->contrast && !sb_palette_equal(&s->palette,&s->sky_palette))) {
     for (int y = 0; y < h; ++y) for (int x = 0; x < w; ++x) {
         float nx = (float)x / w, ny = (float)y / h;
         float haze = fmaxf(0, 1 - ((nx - 0.38f) * (nx - 0.38f) * 2 + (ny - 0.48f) * (ny - 0.48f) * 2));
@@ -116,7 +122,7 @@ bool sb_space_draw(SBSpace *s, SDL_Renderer *renderer, int width, int height) {
         p[0] = byte((s->dark ? 7 : 211) + haze * (s->dark ? 4 : 9));
         p[1] = byte((s->dark ? 14 : 224) + haze * (s->dark ? 9 : 7));
         p[2] = byte((s->dark ? 26 : 239) + haze * (s->dark ? 17 : 5)); p[3] = 255;
-        if (s->contrast) p[0]=p[1]=p[2]=s->dark ? 0 : 255;
+        if (s->contrast)contrast_rgb(s,SB_P_WINDOW,p,s->dark ? 0 : 255);
     }
     const unsigned char dust[] = {157,182,221};
     for (unsigned i = 0; i < (s->contrast ? 0u : 390u); ++i) {
@@ -127,7 +133,7 @@ bool sb_space_draw(SBSpace *s, SDL_Renderer *renderer, int width, int height) {
         blend(s, (int)x, (int)y, dust, s->dark ? 0.15f + (hash % 20) / 100.0f : 0.3f);
     }
     memcpy(s->sky, s->pixels, (size_t)w * h * 4);
-    s->sky_ready = true; s->sky_dark = s->dark; s->sky_contrast=s->contrast;
+    s->sky_ready = true; s->sky_dark = s->dark; s->sky_contrast=s->contrast;s->sky_palette=s->palette;
     } else memcpy(s->pixels, s->sky, (size_t)w * h * 4);
     /* Decorative particles share world coordinates with the knowledge stars. */
     if (!s->contrast && s->camera[7]>0) for (unsigned i=0;i<280;++i) {
@@ -160,7 +166,7 @@ bool sb_space_draw(SBSpace *s, SDL_Renderer *renderer, int width, int height) {
         const unsigned char *c = colors[p.group % 5];
         float x = p.x * scale, y = p.y * scale, radius = (p.selected ? 4.5f : 2.8f) * scale * clamp(p.depth,0.65f,1.6f);
         if (s->contrast) {
-            unsigned char ink[3]; memset(ink, s->dark ? 255 : 0, sizeof(ink));
+            unsigned char ink[3];contrast_rgb(s,SB_P_TEXT,ink,s->dark ? 255 : 0);
             radius = fmaxf(radius, 2);
             int r = (int)ceilf(radius);
             for (int yy=-r; yy<=r; ++yy) for (int xx=-r; xx<=r; ++xx)
@@ -197,7 +203,7 @@ bool sb_space_draw(SBSpace *s, SDL_Renderer *renderer, int width, int height) {
             /* Away from the rim, refraction has zero bend and no highlight.
                Preserve that exact result without evaluating edge lighting. */
             if (distance<=-18*scale) {
-                if (s->contrast) p[0]=p[1]=p[2]=s->dark ? 0 : 255;
+                if (s->contrast)contrast_rgb(s,SB_P_WINDOW,p,s->dark ? 0 : 255);
                 else {
                     int sx=(int)clamp(cx+dx*0.982f,0,w-1),sy=(int)clamp(cy+dy*0.982f,0,h-1);
                     const unsigned char *sample=s->base+((size_t)sy*w+sx)*4;
@@ -232,7 +238,7 @@ bool sb_space_draw(SBSpace *s, SDL_Renderer *renderer, int width, int height) {
                 float substrate=s->dark ? fminf(sample[k],74) : sample[k];
                 float color = s->solid ? tint[k] * (s->dark ? 0.48f : 1) : substrate * 0.73f + tint[k] * 0.27f;
                 p[k] = byte(color + light * 130 + edge * edge * 3);
-                if (s->contrast) p[k]=distance>-1.5f*scale ? s->dark ? 255 : 0 : s->dark ? 0 : 255;
+                if (s->contrast){unsigned char rgb[3];contrast_rgb(s,distance>-1.5f*scale ? SB_P_TEXT : SB_P_WINDOW,rgb,distance>-1.5f*scale ? s->dark ? 255 : 0 : s->dark ? 0 : 255);p[k]=rgb[k];}
             }
         }
         }

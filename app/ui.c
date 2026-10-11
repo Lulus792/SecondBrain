@@ -300,6 +300,11 @@ SBStatus sb_ui_fonts(SBUi *ui, float scale) {
     return sb_ui_text_fonts(ui,scale,density);
 }
 
+struct nk_color sb_ui_palette_color(const SBUi *ui,unsigned role){SDL_Color c=ui->palette.color[role];return nk_rgb(c.r,c.g,c.b);}
+void sb_ui_set_palette(SBUi *ui,SBPalette palette){
+    if(!sb_palette_equal(&ui->palette,&palette)){SDL_DestroyTexture(ui->outgoing_texture);ui->outgoing_texture=NULL;ui->transitioning=false;ui->space.cached=false;ui->space.sky_ready=false;}
+    ui->palette=ui->space.palette=palette;
+}
 void sb_ui_theme(SBUi *ui, bool dark) {
     struct nk_color colors[NK_COLOR_COUNT];
     struct nk_color bg = dark ? nk_rgb(12, 22, 37) : nk_rgb(255, 255, 255);
@@ -336,6 +341,18 @@ void sb_ui_theme(SBUi *ui, bool dark) {
         colors[NK_COLOR_SCROLLBAR_CURSOR]=text;
         colors[NK_COLOR_SELECT_ACTIVE]=dark ? nk_rgb(80,80,80) : nk_rgb(175,175,175);
     }
+    bool custom=ui->contrast && ui->palette.valid;
+    if(custom){bg=sb_ui_palette_color(ui,SB_P_WINDOW);text=sb_ui_palette_color(ui,SB_P_TEXT);
+        for(int i=0;i<NK_COLOR_COUNT;++i)colors[i]=bg;
+        colors[NK_COLOR_TEXT]=text;colors[NK_COLOR_BORDER]=text;colors[NK_COLOR_EDIT_CURSOR]=text;
+        colors[NK_COLOR_BUTTON]=sb_ui_palette_color(ui,SB_P_BUTTON);
+        colors[NK_COLOR_BUTTON_HOVER]=colors[NK_COLOR_BUTTON_ACTIVE]=sb_ui_palette_color(ui,SB_P_HIGHLIGHT);
+        colors[NK_COLOR_TOGGLE]=sb_ui_palette_color(ui,SB_P_BUTTON);colors[NK_COLOR_TOGGLE_CURSOR]=text;
+        colors[NK_COLOR_SELECT_ACTIVE]=sb_ui_palette_color(ui,SB_P_HIGHLIGHT);
+        colors[NK_COLOR_SCROLLBAR_CURSOR]=text;colors[NK_COLOR_SCROLLBAR_CURSOR_HOVER]=colors[NK_COLOR_SCROLLBAR_CURSOR_ACTIVE]=text;
+        colors[NK_COLOR_SLIDER_CURSOR]=colors[NK_COLOR_SLIDER_CURSOR_HOVER]=colors[NK_COLOR_SLIDER_CURSOR_ACTIVE]=text;
+        colors[NK_COLOR_CHART_COLOR]=text;colors[NK_COLOR_CHART_COLOR_HIGHLIGHT]=text;
+    }
     nk_style_from_table(ui->ctx, colors);
     ui->ctx->style.edit.cursor_size=1.5f*ui->scale;
     ui->ctx->style.edit.cursor_text_normal = bg;
@@ -370,6 +387,15 @@ void sb_ui_theme(SBUi *ui, bool dark) {
     ui->ctx->style.combo.border = 0;
     ui->ctx->style.combo.content_padding = nk_vec2(10, 4);
     ui->ctx->style.combo.button.padding = nk_vec2(2, 2);
+    if(custom){struct nk_color selected=sb_ui_palette_color(ui,SB_P_HIGHLIGHT),ink=sb_ui_palette_color(ui,SB_P_HIGHLIGHT_TEXT);
+        ui->ctx->style.edit.selected_normal=ui->ctx->style.edit.selected_hover=selected;
+        ui->ctx->style.edit.selected_text_normal=ui->ctx->style.edit.selected_text_hover=ink;
+        ui->ctx->style.button.text_normal=ui->ctx->style.button.border_color=sb_ui_palette_color(ui,SB_P_BUTTON_TEXT);
+        ui->ctx->style.button.text_hover=ui->ctx->style.button.text_active=ink;
+        ui->ctx->style.selectable.hover=ui->ctx->style.selectable.pressed=nk_style_item_color(selected);
+        ui->ctx->style.selectable.text_hover=ui->ctx->style.selectable.text_pressed=ink;
+        ui->ctx->style.selectable.text_normal_active=ui->ctx->style.selectable.text_hover_active=ui->ctx->style.selectable.text_pressed_active=ink;
+    }
     ui->dark = dark;
 }
 
@@ -450,7 +476,7 @@ float sb_ui_hint_height(SBUi *ui,const char *text,float width) {
 void sb_ui_hint_draw(SBUi *ui,struct nk_rect bounds,const char *text,float text_width,const char *shortcut) {
     struct nk_context *ctx=ui->ctx;struct nk_command_buffer *canvas=&ctx->overlay;float s=ui->scale;
     nk_command_buffer_init(canvas,&ctx->memory,NK_CLIPPING_OFF);nk_start_buffer(ctx,canvas);
-    struct nk_color background=ui->dark ? nk_rgb(22,34,51) : nk_rgb(246,249,253);
+    struct nk_color background=ui->palette.valid && ui->contrast ? sb_ui_palette_color(ui,SB_P_WINDOW) : ui->dark ? nk_rgb(22,34,51) : nk_rgb(246,249,253);
     nk_fill_rect(canvas,bounds,7*s,background);nk_stroke_rect(canvas,bounds,7*s,ui->contrast ? 2 : 1,ui->contrast ? ctx->style.text.color : ui->dark ? nk_rgba(165,187,216,130) : nk_rgba(80,100,130,120));
     const struct nk_user_font *font=&ui->normal->handle;float y=bounds.y+6*s;size_t at=0,length=strlen(text);
     while(at<length && y+font->height<=bounds.y+bounds.h-4*s) {
@@ -461,7 +487,7 @@ void sb_ui_hint_draw(SBUi *ui,struct nk_rect bounds,const char *text,float text_
     if(shortcut) {
         float width=font->width(font->userdata,font->height,shortcut,(int)strlen(shortcut))+12*s;
         struct nk_rect badge=nk_rect(bounds.x+bounds.w-width-10*s,bounds.y+(bounds.h-font->height-4*s)/2,width,font->height+4*s);
-        nk_fill_rect(canvas,badge,4*s,ui->dark ? nk_rgba(170,190,220,35) : nk_rgba(60,85,120,22));
+        nk_fill_rect(canvas,badge,4*s,ui->palette.valid && ui->contrast ? sb_ui_palette_color(ui,SB_P_WINDOW) : ui->dark ? nk_rgba(170,190,220,35) : nk_rgba(60,85,120,22));
         nk_draw_text(canvas,nk_rect(badge.x+6*s,badge.y+2*s,width-12*s,font->height),shortcut,(int)strlen(shortcut),font,nk_rgba(0,0,0,0),ctx->style.text.color);
     }
     nk_finish_buffer(ctx,canvas);
@@ -501,7 +527,7 @@ static void material_panel_draw(void *canvas,short x,short y,unsigned short w,un
     SBUi *ui=data.ptr;struct nk_draw_list *list=canvas;struct nk_rect b=ui->material_bounds;
     bool texture=ui->material_ready && ui->space.texture && ui->material_width>0 && ui->material_height>0 &&
         SDL_SetTextureBlendMode(ui->space.texture,SDL_BLENDMODE_BLEND);
-    if(!texture){nk_draw_list_fill_rect(list,b,ui->contrast ? ui->dark ? nk_rgb(0,0,0) : nk_rgb(255,255,255) : ui->dark ? nk_rgb(17,29,47) : nk_rgb(237,245,255),ui->material_rounding);return;}
+    if(!texture){nk_draw_list_fill_rect(list,b,ui->contrast && ui->palette.valid ? sb_ui_palette_color(ui,SB_P_WINDOW) : ui->contrast ? ui->dark ? nk_rgb(0,0,0) : nk_rgb(255,255,255) : ui->dark ? nk_rgb(17,29,47) : nk_rgb(237,245,255),ui->material_rounding);return;}
     /* Rounded shape with opaque interior and an antialiased outer ring. */
     struct nk_vec2 points[32],normals[32];
     nk_draw_list_path_rect_to(list,nk_vec2(b.x,b.y),nk_vec2(b.x+b.w,b.y+b.h),ui->material_rounding);

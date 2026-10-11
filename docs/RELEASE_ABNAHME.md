@@ -76,9 +76,10 @@ automatische Änderung anderer Second Brains. App-Version bleibt 0.9.68.
 
 ## Nächster Schritt
 
-Als nächsten implementierbaren UI-Punkt die Windows-Custom-High-Contrast-Paletten
-bearbeiten: Der aktuelle Adapter liest nur das High-Contrast-Flag, keine nativen
-Farbrollen. Dafür sind eigener UI-Code und native Nachweise erforderlich.
+Die [Windows-Kontrastfarben](SYSTEM_KONTRASTFARBEN.md) sind ab 0.9.69 im Adapter
+und UI-Code implementiert und lokal mit synthetischen Paletten nachgeprüft.
+Jetzt die tatsächliche SDK-/Paketabnahme und benutzerdefinierte Systemthemen
+auf Windows abschließen; lokale Farben auf dem Mac ersetzen diese nicht.
 Den erfolgreichen Gesamt-/CI-Stand im Projektgedächtnis kurz halten. Offene technische
 Abnahmen bleiben Arbeitsumfang; erforderliche Geräte/Konten und Nutzerentscheidungen
 werden nicht durch weitere kleine Codeänderungen oder Statusnotizen ersetzt.

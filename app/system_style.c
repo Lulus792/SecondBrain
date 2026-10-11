@@ -23,14 +23,20 @@ SBStyleChoice sb_style_resolve(SBStyleChoice r,SBSystemStyle s) {
     if (((s.known&SB_SYS_TRANSPARENCY) && s.solid) || r.contrast) r.solid=true;
     return r;
 }
-static void merge(SBSystemStyle *last,SBSystemStyle s) {
+SBPalette sb_style_palette(SBStyleChoice effective,SBSystemStyle system){
+    if(effective.contrast && (system.known&SB_SYS_CONTRAST) && system.contrast && (system.known&SB_SYS_PALETTE) && system.palette.valid)return system.palette;
+    return (SBPalette){0};
+}
+void sb_system_style_merge(SBSystemStyle *last,SBSystemStyle s) {
     if (s.known&SB_SYS_THEME_NONE) last->known&=~(unsigned)SB_SYS_THEME;
     if (s.known&SB_SYS_THEME) last->known&=~(unsigned)SB_SYS_THEME_NONE;
     if (s.known&SB_SYS_THEME) last->dark=s.dark;
     if (s.known&SB_SYS_MOTION) last->motion=s.motion;
     if (s.known&SB_SYS_TRANSPARENCY) last->solid=s.solid;
     if (s.known&SB_SYS_CONTRAST) last->contrast=s.contrast;
+    if(s.known&SB_SYS_PALETTE)last->palette=s.palette;
     last->known|=s.known;
+    if((s.known&SB_SYS_CONTRAST) && !s.contrast){last->known&=~(unsigned)SB_SYS_PALETTE;last->palette=(SBPalette){0};}
 }
 #ifdef __linux__
 static void portal_value(SBSystemStyle *s,const char *name,DBusMessageIter *variant) {
@@ -88,6 +94,16 @@ static void gnome(SBSystemStyle *s) {
     if (schema) g_settings_schema_unref(schema);
 }
 #endif
+SBPalette sb_system_palette_read_native(void){
+    SBPalette palette={0};
+#ifdef _WIN32
+    const int roles[]={COLOR_WINDOW,COLOR_WINDOWTEXT,COLOR_3DFACE,COLOR_BTNTEXT,COLOR_HIGHLIGHT,COLOR_HIGHLIGHTTEXT,COLOR_HOTLIGHT,COLOR_GRAYTEXT};
+    palette.valid=true;
+    for(unsigned i=0;i<SB_P_COUNT;++i){if(!GetSysColorBrush(roles[i])){palette.valid=false;break;}
+        COLORREF color=GetSysColor(roles[i]);palette.color[i]=(SDL_Color){GetRValue(color),GetGValue(color),GetBValue(color),255};}
+#endif
+    return palette;
+}
 SBSystemStyle sb_system_style_read_native(void) {
     SBSystemStyle s={0};
 #ifdef __APPLE__
@@ -106,6 +122,8 @@ SBSystemStyle sb_system_style_read_native(void) {
     if (SystemParametersInfoW(SPI_GETDISABLEOVERLAPPEDCONTENT,0,&value,0)) { s.known|=SB_SYS_TRANSPARENCY; s.solid=value!=0; }
     HIGHCONTRASTW contrast={0}; contrast.cbSize=sizeof(contrast);
     if (SystemParametersInfoW(SPI_GETHIGHCONTRAST,sizeof(contrast),&contrast,0)) { s.known|=SB_SYS_CONTRAST; s.contrast=(contrast.dwFlags&HCF_HIGHCONTRASTON)!=0; }
+    if(s.contrast){s.palette=sb_system_palette_read_native();if(s.palette.valid)s.known|=SB_SYS_PALETTE;}
+
 #elif defined(__linux__)
     s=portal(); gnome(&s);
 #endif
@@ -116,7 +134,7 @@ static int worker(void *userdata) {
     SBStyleMonitor *m=userdata;
     for (;;) {
         SBSystemStyle style=sb_system_style_read_native();
-        SDL_LockMutex(m->mutex); merge(&m->last,style);
+        SDL_LockMutex(m->mutex); sb_system_style_merge(&m->last,style);
         if (!m->quit) SDL_WaitConditionTimeout(m->condition,m->mutex,1000);
         bool quit=m->quit; SDL_UnlockMutex(m->mutex); if (quit) break;
     }
@@ -137,7 +155,7 @@ SBSystemStyle sb_system_style_snapshot(SBStyleMonitor *m,bool force) {
 #ifdef __linux__
     SDL_LockMutex(m->mutex); s=m->last; if (force) SDL_SignalCondition(m->condition); SDL_UnlockMutex(m->mutex);
 #else
-    Uint64 now=SDL_GetTicks(); if (force || now>=m->next) { merge(&m->last,sb_system_style_read_native()); m->next=now+1000; } s=m->last;
+    Uint64 now=SDL_GetTicks(); if (force || now>=m->next) { sb_system_style_merge(&m->last,sb_system_style_read_native()); m->next=now+1000; } s=m->last;
 #endif
     SDL_SystemTheme theme=SDL_GetSystemTheme();
     if (!(s.known&SB_SYS_THEME) && theme!=SDL_SYSTEM_THEME_UNKNOWN) { s.known|=SB_SYS_THEME; s.dark=theme==SDL_SYSTEM_THEME_DARK; }

@@ -4445,3 +4445,17 @@ fertigen Kernfassung unverändert; Aufnahme angesehen.
 App-Version und Binärdateien unverändert. Nächster implementierbarer Punkt:
 Windows-Custom-High-Contrast-Paletten; bisher liest der Adapter nur das Flag.
 Originale: `build/release-audit-verification/`.
+
+## Windows-Kontrastpaletten 0.9.69
+
+Native Farbrollen und UI-Anwendung sind implementiert: bekannte aktive
+Systempalette, korrekte Fenster-/Button-/Auswahlpaare, Stern-/Karten-/Hinweis-
+und Ersatzflächen, farbabhängige Cache-/Aufnahmeinvalidierung. Eigene Auswahl
+bleibt gespeichert, normales Lumen/Mono unverändert. Drei synthetische Paletten,
+zwei Größen, 100/150 % Schrift: 427 Bedingungen in Software und Metal; tatsächliche
+Windows-SDK-Abfrage noch nativ zu prüfen. Material-/Interaktionsregression vier
+Tests (96,35 s), acht weitere aktuelle UI-/Versionsprüfungen (109,70 s).
+CPU-Rasterparität 1012 besteht. ASan/UBSan 427, 37 eigene C-Dateien / 61 aktuelle
+Hashes; externe UI nicht instrumentiert, Leaks aus, kein TSan. Metal-Aufnahme
+angesehen. Kein neuer vollständiger lokaler 85er-Lauf. Paket/Installation folgen.
+[Vertrag, Microsoft-Grundlagen und Grenzen](SYSTEM_KONTRASTFARBEN.md).

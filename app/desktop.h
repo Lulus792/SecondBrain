@@ -144,6 +144,7 @@ void sb_desktop_frame(SBDesktop *desktop);
 void sb_desktop_tick(SBDesktop *desktop, float seconds);
 bool sb_desktop_animating(const SBDesktop *desktop);
 void sb_desktop_apply(SBDesktop *desktop);
+void sb_desktop_apply_system_style(SBDesktop *desktop,SBSystemStyle snapshot,bool force);
 void sb_desktop_set_style(SBDesktop *desktop,SBStyleChoice style);
 int sb_desktop_keyboard_test(SBDesktop *desktop, const char *directory);
 int sb_desktop_self_test(SBDesktop *desktop, const char *directory);
