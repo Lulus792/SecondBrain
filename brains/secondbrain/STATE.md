@@ -13,15 +13,15 @@ Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt. Externe
 Bibliotheken bleiben auf UI beschränkt; eigene Lizenz MIT.
 
-Installiert **0.9.59 / 4f4d8fb9da88**, sauberer Intel/macOS-Release-Build.
+Installiert **0.9.60 / a6d6f094b0d6**, sauberer Intel/macOS-Release-Build.
 96 Dateien entsprechen dem geprüften Paket; 18 Gedächtnisdateien beim Öffnen
 unverändert. 126 Desktop-, 166 Tastatur-, 75 Sicherungs-Assertions, zwei Neustarts,
 produktive CLI und Runtime-/Lizenz-/Version bestehen. Tatsächliche App-Aufnahme
 angesehen. Prüfgerät: macOS 14.6.1/23G93, x86_64.
-Rückfallversion 0.9.58: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.58-20261011-195420`.
-CI 38161180159 zum aktuellen Quellcommit zuletzt queued. Der frühere Lauf
-38158192485 bestätigt Windows-UI-Buildfehler und zwei Linux-UI-Fehler.
-Neue Gesamt-Plattformabnahme offen.
+Rückfallversion 0.9.59: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.59-20261011-202739`.
+CI 38163682947 zu a6d6f09: Windows Release inklusive UI/Paket vollständig
+erfolgreich. Windows Debug/ Linux haben weiter UI-Prüferbefunde; native Mac-Jobs
+zuletzt queued. Keine vollständige aktuelle Plattformabnahme.
 Frühere Plattformnachweise ersetzen keine Prüfung dieser neuen Fassung.
 
 ## Geprüfte aktuelle Änderung
@@ -71,13 +71,16 @@ als Fehler ab. Fensterprüfer synchronisieren und bestätigen 780×900 bzw.
 780×520; der AT-SPI-Prüfer sucht den Inhalt im passenden Textbereich.
 525 Cache-, 117 Reader-, 93 Hilfe- und 621 Mac-Prüfbedingungen bestehen auch
 unter ASan/UBSan: 40 eigene C-Dateien/57 Hashes. Lokale gezielte Nachprüfung
-besteht. Gesamt- und neue native Zielplattformnachweise folgen; installiert
-bleibt 0.9.59. [Vertrag](../../docs/UI_PLATTFORMKORREKTUREN.md).
+besteht. 80/80 lokale Gesamtprüfungen zu fe7d18e bestanden (487,70 s), danach
+gezielte Prüferänderungen separat geprüft. Intel/macOS-Paket 0.9.60/a6d6f09
+vollständig geprüft und installiert. [Vertrag](../../docs/UI_PLATTFORMKORREKTUREN.md).
 
-Als nächstes die bestätigten Plattformbefunde korrigieren: Windows C2036 in
-`plain_native.inc:35`; Linux-Reader nach Resize und native Textstilabfrage
-„Stilprüfung“. [Originalbefunde](../../docs/RELEASE.md). Die frühere bloße
-Queued-Beobachtung des 0.9.58-Laufs ist dadurch ergänzt, kein Gesamtpass.
+Windows C2036 und Linux-Resize sind nativ nachgeprüft. Die verbleibenden
+Prüferbefunde sind eingegrenzt: Linux-Stilabfrage erreicht einen namensgleichen
+Textlauf des Kartenkopfs; sie erlaubt jetzt nur Dokument-/Eingabebereiche.
+Windows-Debug erwartet Struktur/letzten Link vor fertigem Reader; beide
+Prüfer warten jetzt begrenzt. Lokale gezielte Nachprüfung besteht, neuer
+nativer Lauf folgt. [Originalbefunde](../../docs/UI_PLATTFORMKORREKTUREN.md).
 Die erste 0.9.59-Paketprüfung fand einen frühen Scrollbefehl während der
 Lizenzreader-Vorbereitung. Der Tastaturprüfer wartet für seine fertige Ansicht
 jetzt begrenzt; sein gezielter Durchlauf besteht. Frühe Scrollbefehle bleiben

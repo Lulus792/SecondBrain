@@ -367,7 +367,10 @@ static AtspiAccessible *find(AtspiAccessible *object,const char *label,unsigned 
     if (!object || depth>12) return NULL;
     char *name=atspi_accessible_get_name(object,NULL);
     bool match=name && !strcmp(name,label); g_free(name);
-    if(match && word && atspi_accessible_get_role(object,NULL)==ATSPI_ROLE_HEADING)match=false;
+    if(match && word){
+        AtspiRole role=atspi_accessible_get_role(object,NULL);
+        match=role==ATSPI_ROLE_DOCUMENT_FRAME || role==ATSPI_ROLE_DOCUMENT_TEXT || role==ATSPI_ROLE_DOCUMENT_WEB || role==ATSPI_ROLE_ENTRY;
+    }
     /* A heading can share the document's name. A text-style query needs a
        matching text scope containing its requested word, not the first name. */
     if(match && word){

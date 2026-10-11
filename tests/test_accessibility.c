@@ -100,6 +100,13 @@ static void frame_run(SBDesktop *d,bool draw) {
     sb_desktop_apply(d);
 }
 static void frame(SBDesktop *d) { frame_run(d,true); }
+static bool reader_ready(SBDesktop *d){
+    Uint64 deadline=SDL_GetTicksNS()+UINT64_C(15000000000);
+    for(;;){bool pending=false;for(size_t i=0;i<d->passive_count;++i)if(!strcmp(d->passive[i].id,"reader:preparing")){pending=true;break;}
+        if(!pending)return true;if(SDL_GetTicksNS()>=deadline)return false;
+        SDL_Delay(1);frame_run(d,false);
+    }
+}
 #if defined(_WIN32) || defined(SB_ATSPI_TEST)
 /* Polling the real client still processes input, layout, native updates and
    actions. The next observed state is rasterized by frame()/capture. */
@@ -249,7 +256,7 @@ int main(int argc,char **argv) {
     size_t used=strlen(structured); memset(structured+used,'x',6000); used+=6000;
     strcpy(structured+used," Ende αΩ.\n\n## Letzter Abschnitt\n\nSchluss.\n");
     snprintf(d.model.editor,SB_TEXT_LIMIT+1,"%s",structured); OK(sb_app_save(&d.model));
-    d.editing=false; d.card=true; frame(&d); frame(&d);
+    d.editing=false; d.card=true; frame(&d); CHECK(reader_ready(&d));frame(&d);
     unsigned headings=0,paragraphs=0,codes=0; char first_id[100]={0},last_id[100]={0};
     for (size_t i=0;i<d.passive_count;++i) {
         SBPassiveText *p=&d.passive[i]; if (strcmp(p->parent,"reader")) continue;

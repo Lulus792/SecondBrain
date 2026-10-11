@@ -2,7 +2,7 @@
 
 Stand: 11. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.59. Die Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.60. Die Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -4008,3 +4008,34 @@ Quellcommit zuletzt queued; keine neue Gesamt-Plattformabnahme. Die bestätigten
 Windows-/Linux-Befunde des 0.9.58-Laufs, frühe Scrollbefehle während Vorbereitung,
 vollständige Leistung, reale Geräte/IME/Screenreader und übrige Release-Arbeit
 bleiben offen. 1.0 nur nach ausdrücklicher Nutzerfreigabe.
+
+
+## UI-Plattformkorrekturen und installiertes Paket 0.9.60
+
+Typisierte native Textcache-Inventur korrigiert MSVC C2036; GCC/Clang weisen
+void-Pointer-Arithmetik künftig ab. Fensterprüfer bestätigen tatsächliche
+780×900 bzw. 780×520 nach Synchronisierung. 525 Cache-, 117 Reader-, 93 Hilfe-
+und 621 Mac-Prüfbedingungen auch unter ASan/UBSan: 40 eigene C-Dateien,
+57 Hashes; externe UI nicht instrumentiert, kein Leak-/ThreadSanitizer.
+80/80 lokale Release-Prüfungen zu fe7d18e bestehen (487,70 s). Anschließende
+Prüferänderungen (Dokumentscope/semantischer Exportvergleich/Bereitschaft)
+gezielt lokal geprüft; erwartete Stilwerte/Geometrie unverändert streng.
+[Vertrag und originale native Befunde](UI_PLATTFORMKORREKTUREN.md).
+
+Sauberer Intel/macOS-Release-Build 0.9.60/a6d6f094b0d6; drei Versions-/Release-
+Nachprüfungen, entpacktes Paket mit 126 Desktop-, 166 Tastatur- und
+75 Sicherungs-Prüfbedingungen, zwei Neustarts, CLI-/Runtime-/Lizenzprüfung
+bestanden. 96 installierte Dateien paketgleich; 18 Gedächtnisdateien beim
+Öffnen unverändert. Tatsächliche C-App-Aufnahme betrachtet. Gerät:
+macOS 14.6.1/23G93, x86_64.
+Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.59-20261011-202739`.
+Archiv-SHA256: `203b199c1cc71a12d7ac7cb7d6e5a067d32fc8d90dbd739df7f2bbd9e33eeb11`.
+Originale: `build/platform-ui-verification/`, `build/platform-ui-sanitizers/`,
+`build/platform-ui-package/`.
+
+CI 38163682947 zu a6d6f09: Windows Release inklusive nativer UI- und
+Paketprüfung vollständig erfolgreich (114541692685). Windows Debug
+und Linux behalten eingegrenzte Prüferbefunde; neue Rolle-/Bereitschafts-
+Nachprüfung folgt. Native Mac-Jobs zuletzt queued; keine vollständige neue
+Plattformabnahme. Frühe Scrollbefehle, vollständige Leistung, tatsächliche
+Geräte/IME/Screenreader und übrige Release-Arbeit offen. 1.0 nur nach Freigabe.

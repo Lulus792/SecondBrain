@@ -264,6 +264,7 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
     CHECK(activate(d,"cancel") && d->form == SB_FORM_NONE);
     key(d,SDLK_F6,0); key(d,SDLK_F6,0); key(d,SDLK_F6,0);
     CHECK(!strcmp(d->focus,"project-picker"));
+    CHECK(reader_ready(d));frame(d);
     key(d,SDLK_TAB,SDL_KMOD_SHIFT); CHECK(!strcmp(d->focus,"link:299")); frame(d); frame(d);
     struct nk_window *detail = d->ui.ctx->begin;
     while (detail && strcmp(detail->name_string,"Detail")) detail = detail->next;

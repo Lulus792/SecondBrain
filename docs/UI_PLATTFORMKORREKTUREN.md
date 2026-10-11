@@ -84,6 +84,22 @@ Die Stilprüfer wählen jetzt den Dokumentbereich: Windows sucht unter allen
 Namensübereinstimmungen einen Document-/Edit-Bereich; Linux überspringt die
 namensgleiche Überschrift. Erwartete Stilwerte bleiben unverändert, Fehler
 nennen zusätzlich Wort, tatsächlichen und erwarteten Wert.
+Microsoft beschreibt für den [Document-Control-Typ](https://learn.microsoft.com/en-us/windows/win32/winauto/uiauto-supportdocumentcontroltype)
+den Dokumentcontainer und sein erforderliches Text-Pattern; Original am
+11. Oktober gelesen. Die zusätzliche Abgrenzung bei gleichen Namen ist
+eine eigene Prüferkorrektur, kein Ersatz für den nativen Nachweis.
+Der native Lauf zu a6d6f09 besteht auf Windows Release vollständig einschließlich
+Paketabnahme (Job 114541692685). Windows Debug scheitert noch an zwei Prüfungen
+vor abgeschlossener Reader-Vorbereitung. Linux findet bei „Stilprüfung“ weiterhin
+den Kartenkopf mit `400|0|Noto Sans|15.0` statt der Dokumentüberschrift.
+Die weitere Linux-Abgrenzung erlaubt nur Dokument-/Eingabebereiche; die
+[AT-SPI-Rollen](https://gnome.pages.gitlab.gnome.org/at-spi2-core/libatspi/enum.Role.html)
+wurden am 11. Oktober gelesen. Namensgleiche Textläufe reichen nicht als Scope.
+Die Struktur-/Tastaturprüfer warten begrenzt auf den fertigen Reader, bevor sie
+vollständige Überschriften beziehungsweise den letzten Link erwarten. Lokal
+bestehen beide danach (55,35 s); neue native Nachprüfung folgt. Originale:
+`ci-final-jobs-3.json`, `ci-final-linux-failure.log`,
+`ci-final-windows-debug-failure.log` und `ready-probes.log`.
 Der Editorprüfer vergleicht alle veröffentlichten Felder und verwendeten
 Arraywerte statt undefinierter C-Padding-Bytes. Die Auswahl-/Geometrieprüfung
 bleibt exakt und erkennt absichtlich veränderte Exporte. Die gezielten lokalen
