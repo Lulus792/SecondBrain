@@ -298,3 +298,12 @@ eines Buttons als aktuelle Mausposition. Die eigene UI behandelt Option-/
 Command-Pfeile auf macOS sowie Strg-Pfeile auf Windows/Linux und löscht
 auf Key-up auch bei inzwischen gelöstem Modifikator den passenden Tastenzustand.
 Original-Lizenztexte bleiben erhalten. Keine neue UI- oder Fachbibliothek.
+
+
+## Gemeinsame FreeType-Schriftliste ab 0.9.71
+
+`ui/ttf_face_lifetime.inc` sperrt die Face-Freigabe im festgelegten SDL_ttf 3.2.2
+mit dessen vorhandener Bibliothekssperre. Die Quellvorbereitung prüft Original,
+bekannte frühere Fassungen und korrigierten Hash; unbekannte Dateien bleiben
+unverändert. Eigener MIT-lizenzierter UI-Patch, Originallizenzen bleiben erhalten.
+[Reproduktion, Vertrag und Prüfgrenzen](../docs/SCHRIFT_LEBENSDAUER.md).

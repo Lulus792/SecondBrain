@@ -89,5 +89,12 @@ werden nicht durch weitere kleine Codeänderungen oder Statusnotizen ersetzt.
 Die oben genannten 84 lokalen Tests und bestätigten vier Plattformjobs gehören
 zur 0.9.68. Inzwischen ist [0.9.69 mit Kontrastfarben](SYSTEM_KONTRASTFARBEN.md)
 lokal gezielt geprüft und sauber installiert, einschließlich Paket und echtem
-68→69→68-Wechsel. Die neue CI läuft; tatsächliche Windows-Farbabfrage und
-benutzerdefinierte Themen bleiben separat offen. Kein neuer lokaler 85er-Gesamtlauf.
+68→69→68-Wechsel. Die Windows-Debug-/Release- und Linux-Releasejobs einschließlich
+Release-Paketen bestehen. Linux Debug scheitert in der Textvorbereitung; die
+Palettenprüfung besteht auch dort. Mac-CI bleibt queued, benutzerdefinierte Themen
+und menschliche Prüfung offen. Kein neuer lokaler 85er-Gesamtlauf zu 0.9.69.
+
+0.9.70 korrigiert die Schemanamenfreigabe, 0.9.71 einen reproduzierten
+[FreeType-Listenfehler](SCHRIFT_LEBENSDAUER.md). Acht lokale gezielte Tests sowie
+positive/negative ASan-/UBSan-Vergleiche sind dokumentiert. Neuer Gesamt-, nativer
+CI-, Paket- und Installationsstand folgt separat; installiert bleibt 0.9.69.

@@ -55,11 +55,16 @@ Endprodukttexte erst abschließend beim vollständigen Produkt bereinigen.
 
 ## Nächster Schritt
 
-0.9.69 implementiert Windows-Farbrollen und ihre UI-Anwendung; 427 lokale
-Bedingungen mit synthetischen Paletten in Software/Metal und ASan/UBSan bestehen.
-Sauberes Mac-Paket geprüft und installiert; native Windows-SDK-/Themen-/Paketabnahme
-folgt. Vier Desktopjobs der neuen CI38184984352 laufen, Mac queued.
-[Vertrag](../../docs/SYSTEM_KONTRASTFARBEN.md). Installiert ist 0.9.69.
+0.9.69-CI38184984352: Windows Debug/Release und Linux Release samt Release-Paketen
+bestehen. Linux Debug scheitert bei der Textvorbereitung; Palette besteht, Mac queued.
+0.9.70 gibt Windows-Schemanamen frei; neue native Allokatorprüfung noch offen.
+0.9.71 korrigiert einen lokal reproduzierten FreeType-Listenfehler beim parallelen
+Schließen privater Fonts. Alter Test hängt, alte ASan-Vergleichsfassung zeigt
+Use-after-free; korrigierter 1024er-Test und acht lokale Tests bestehen.
+[Schriftlebensdauer](../../docs/SCHRIFT_LEBENSDAUER.md),
+[Kontrastfarben](../../docs/SYSTEM_KONTRASTFARBEN.md). Installiert bleibt 0.9.69.
+Nächster Schritt: vollständiger aktueller lokaler Lauf, native CI und neue Pakete;
+der frühere Linux-Absturz ist damit noch nicht als nativ behoben abgenommen.
 Weitere technische Abnahmen und benötigte reale Umgebungen anhand der
 Abnahmeübersicht klären.
 

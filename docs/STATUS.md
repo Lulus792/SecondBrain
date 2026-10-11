@@ -4471,3 +4471,17 @@ unverändert, installierte Lumen-Aufnahme angesehen. Rückfall: `/Users/lulus/Pr
 [Vertrag und Archivhash](SYSTEM_KONTRASTFARBEN.md). CI38184984352: Windows-/Linux-
 Desktopjobs in Arbeit, Mac queued. SDK-Abfrage und echte benutzerdefinierte Windows-
 Themen noch nicht als bestanden behauptet; weitere Release-Abnahmen bleiben offen.
+
+
+## Schriftfreigabe 0.9.70/0.9.71
+
+12. Oktober: 0.9.70 gibt systemangelegte Windows-Schemanamen frei; neue native
+Allokatorprüfung steht aus. 0.9.69-CI: Windows Debug/Release und Linux Release
+samt Release-Paketen bestehen; Linux Debug stürzt in der Textvorbereitung ab.
+Deren Nachprüfung reproduziert einen gemeinsamen FreeType-Listenfehler bei
+parallelen privaten Fonts. Neue Freigabesicherung: gleicher 1024er-Test besteht
+in 0,42 s statt Timeout, acht gezielte Tests bestehen in 22,42 s. ASan/UBSan
+mit 49 Einheiten aus Test, SDL_ttf und FreeType: korrigiert erfolgreich, ohne
+Sperre Use-after-free durch anderen Worker. SDL/HarfBuzz nicht instrumentiert,
+Leaks aus, kein TSan. [Vertrag](SCHRIFT_LEBENSDAUER.md). Native Nachprüfung,
+Gesamtlauf und neue Pakete folgen; installiert bleibt 0.9.69. Kein 1.0-Abschluss.
