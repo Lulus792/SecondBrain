@@ -11,12 +11,12 @@ Lumen-Sternkarte, Glaskarten, Icons, direkte Pfeilnavigation, Kamerafahrt,
 Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert **0.9.51 / 2fbdf8e3ff3a**, sauberer Intel/macOS-Release-Build.
-95 Dateien entsprechen dem geprüften Paket;18 Gedächtnisdateien beim Laden
-unverändert.126 Desktop-,161 Tastatur-,75 Sicherungs-Assertions, zwei Neustarts,
+Installiert **0.9.52 / 4df171b5ae09**, sauberer Intel/macOS-Release-Build.
+95 Dateien entsprechen dem geprüften Paket; 18 Gedächtnisdateien beim Laden
+unverändert. 126 Desktop-, 161 Tastatur-, 75 Sicherungs-Assertions, zwei Neustarts,
 produktive CLI und Runtime-/Lizenz-/Version bestehen.
-Rückfallversion0.9.50: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.50-20261011-142143`.
-CI38138548919 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
+Rückfallversion 0.9.51: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.51-20261011-150738`.
+CI 38141637193 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
 
 Frühere Build-/Paket-/Diagnoseverzeichnisse waren am11.Oktober nicht mehr
 vorhanden. Historische Abnahmen bleiben in STATUS/Journal; entfernte Dateien
@@ -102,7 +102,7 @@ Vollständige Namen bleiben erhalten, dekorative Titel stehen außerhalb des
 Dokumenttexts. 76/76 Release-Prüfungen bestehen (624,51 s); 354 Titel-, 590 Reader-
 und 621 Mac-Provider-Assertions auch unter ASan/UBSan im dokumentierten Umfang.
 39 eigene C-Dateien instrumentiert; 53 Quell-/Include-Hashes stimmen.
-Paket/Installation folgen, installiert bleibt 0.9.51.
+Mac-Paket und Installation bestehen; andere Zielplattformen bleiben offen.
 [Vertrag](../../docs/NATIVE_TITELGEOMETRIE.md).
 
 ## Nächste Arbeiten
@@ -112,7 +112,7 @@ native Metadaten, Rasterung und Fälle über den Vorbereitungsbudgets profiliere
 Der Rückfall ist noch synchron; einzelne Bibliotheksaufrufe und Shutdown können
 warten. SBUI-074 bleibt für die vollständige Großdaten-/Geräteabnahme offen.
 
-Aktuelle Plattform-/Paketabnahme, echte IME und VoiceOver/NVDA/Orca,
+Aktuelle Plattformabnahme, echte IME und VoiceOver/NVDA/Orca,
 Dialog-/Geräte-/Monitor-/Langzeitprüfungen, Windows-/Linux-Speicherfehler,
 Mindest-OS/frische Rechner, vollständige Runtime-/Lizenzprüfung, Sicherheitskanal,
 Signierung und abschließende natürliche Texte bleiben Release-Arbeit.
