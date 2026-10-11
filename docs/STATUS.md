@@ -2,7 +2,7 @@
 
 Stand: 12. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.67/28cdea386abb. Die Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.68/0b0fdacda4fa. Die Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -4411,3 +4411,15 @@ Leaks aus, kein TSan. Kein neuer vollständiger lokaler 84er-Lauf. Paket folgt.
 Zielplattformen und menschliche Bedienabnahmen bleiben offen.
 Alle vier Windows-/Linux-Desktopjobs und Release-Pakete zu 28cdea3/CI38180524524
 bestehen inzwischen; sie belegen die vorherige 0.9.67-Materialfassung, nicht diese Änderung.
+
+## Übergangspaket 0.9.68 installiert
+
+Sauberer Intel/macOS-Release 0b0fdacda4fa: Versionsidentität geprüft (0,48 s).
+Paket: 126 Desktop-, 167 Tastatur-, 75 Sicherungsbedingungen, zwei Einstellungs-
+prozesse, CLI/Runtime/Lizenzen/Version und 20-Datei-Wiederöffnung bestehen.
+Echter 67→68→67-Wechsel erhält Dateien/Einstellungen und Sicherung/Wiederherstellung;
+drei Aufnahmen angesehen. 98 Dateien paketgleich installiert; 18 eigene Dateien
+beim Öffnen unverändert, installierte Aufnahme angesehen. Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.67-20261012-005030`.
+[Vertrag und Archivhash](UEBERGANG_BILD.md). Binärminimum 14.0/SDK 15.2;
+ausgeführt auf Intel/macOS 14.6.1/23G93. CI38181757771: vier Windows-/Linux-
+Desktopjobs in Arbeit, native Mac-Jobs queued. Weitere Release-Abnahmen offen.

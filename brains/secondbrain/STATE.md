@@ -12,11 +12,11 @@ Glaskarten, eigene Icons, direkte Pfeilnavigation, Kamerafahrt, Startfokus, Text
 und große Leseansicht sind implementiert. Originalbytes, Entwürfe und erkannte
 Konflikte bleiben geschützt. Externe Bibliotheken nur UI; MIT.
 
-Installiert **0.9.67/28cdea386abb**, sauberer Intel/macOS-Release-Build.
+Installiert **0.9.68/0b0fdacda4fa**, sauberer Intel/macOS-Release-Build.
 98 Dateien paketgleich;18 Gedächtnisdateien beim Öffnen unverändert.126 Desktop-,
 167 Tastatur-,75 Sicherungsbedingungen, zwei Einstellungs-Neustarts, CLI-/Runtime-/
 Lizenz-/Version bestehen. Tatsächliche App-Aufnahme angesehen. macOS14.6.1/23G93,x86_64.
-Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.66-20261012-003101`.
+Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.67-20261012-005030`.
 
 ## Neuester geprüfter Fortschritt
 
@@ -36,14 +36,15 @@ für beide Materialprüfer, 38 eigene C-Dateien / 60 Hashes, externe UI nicht
 instrumentiert, Leaks aus. Fünf weitere UI-/Versionsprüfungen bestehen. Kein neuer
 vollständiger lokaler 84er-Lauf. Sauberes Paket geprüft und installiert; echter
 66→67→66-Wechsel erhält 20 Dateien/Einstellungen und Sicherung/Wiederherstellung.
-[Vertrag](../../docs/MATERIAL_RUECKFALL.md). Übergangstextur-Pixelidentität bleibt offen.
+[Vertrag](../../docs/MATERIAL_RUECKFALL.md). Native Übergangsbild-Nachprüfung siehe 0.9.68; weitere Geräte/Dichtewechsel offen.
 
 0.9.68 beendet alte Kartenüberblendung bei geänderter Fenster-/Pixelgröße;
 Kamerafahrt/Notiz erhalten, neue passende Ladeaufnahme erlaubt. 173 Bedingungen
 in Metal und Software, zwölf schnelle Wechsel und zwei reale Resize-Fälle.
 Sieben UI-/Versionsprüfungen bestehen; ASan/UBSan 173, 36 eigene C-Dateien / 58
 Hashes, externe UI nicht instrumentiert, Leaks aus. Kein neuer 84er-Gesamtlauf.
-Paket/Installation folgen; installiert bleibt 67. [Vertrag](../../docs/UEBERGANG_BILD.md).
+Sauberes Paket geprüft und installiert; echter 67→68→67-Wechsel erhält
+20 Dateien/Einstellungen und Sicherung/Wiederherstellung. [Vertrag](../../docs/UEBERGANG_BILD.md).
 Früherer nativer Ausgangsbildfehler lag am Lesen nach Present; echter Resize-
 Zuschnittfehler unabhängig reproduziert und korrigiert. Reale Dichtewechsel offen.
 
