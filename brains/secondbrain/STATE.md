@@ -11,12 +11,12 @@ Lumen-Sternkarte, Glaskarten, Icons, direkte Pfeilnavigation, Kamerafahrt,
 Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert **0.9.46 / 24a16edbed09**, sauberer Intel/macOS-Release-Build.
-95 Dateien stimmen mit dem geprüften Paket überein; die18 Gedächtnisdateien
-blieben beim Laden unverändert.126 Desktop-,161 Tastatur-,75 Sicherungs-
-Assertions, zwei Neustarts, produktive CLI sowie Runtime-/Lizenz-/Version bestehen.
-Rückfallversion0.9.44: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.44-20261011-104519`.
-CI38125578620 zum Quellcommit zuletzt queued; kein neuer Gesamt-Plattformnachweis.
+Installiert **0.9.47 / 7df7dd2f63b9**, sauberer Intel/macOS-Release-Build.
+95 Dateien entsprechen dem geprüften Paket;18 Gedächtnisdateien beim Laden
+unverändert.126 Desktop-,161 Tastatur-,75 Sicherungs-Assertions, zwei Neustarts,
+produktive CLI und Runtime-/Lizenz-/Version bestehen.
+Rückfallversion0.9.46: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.46-20261011-114425`.
+CI38129123502 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
 
 Frühere Build-/Paket-/Diagnoseverzeichnisse waren am11.Oktober nicht mehr
 vorhanden. Historische Abnahmen bleiben in STATUS/Journal; entfernte Dateien
@@ -49,8 +49,8 @@ F6 zeigt sie wieder. Such-/Dialogrückkehr erhält sichtbaren Fokus. Die Karte
 öffnet sich erst nach akzeptiertem Notizwechsel, ohne den alten Editor vor
 einer Entwurfsentscheidung einzublenden. [Vertrag](../../docs/UI_EBENEN.md).
 135 neue Ebenenprüfungen auch unter ASan/UBSan und der gesamte Keyboardnachlauf
-bestehen.71/71 lokale Release-Prüfungen bestehen (626,20s); Paket/Installation
-folgen.
+bestehen.71/71 lokale Release-Prüfungen bestehen (626,20s); Intel/macOS-Paket
+und Installation geprüft. Weitere Zielplattformen bleiben offen.
 
 ## Nächste Arbeiten
 

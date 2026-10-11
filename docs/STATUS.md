@@ -3421,3 +3421,22 @@ Quellen liegt unter UI_reviewer/reviews/secondbrain/2026-10-11_10-49-09.
 71/71 lokale Release-Prüfungen bestehen (626,20s). Neue Paket-/Plattformabnahme
 folgt; installiert weiterhin0.9.46.
 Weitere Release-Aufgaben und1.0-Freigabe bleiben offen.
+
+## Ebenenpaket0.9.47 installiert
+
+Quellcommit7df7dd2f63b9f88b421fd412a637daa56da26170 nach origin/main gepusht.
+Saubere Rekonfiguration/Versionsprüfung besteht. Entpacktes Intel/macOS-Paket
+mit126 Desktop-,161 Tastatur-,75 Sicherungs-Assertions, zwei Neustarts,
+produktiver CLI und Runtime-/Lizenz-/Version geprüft.
+Archiv: `build/map-layer-package/SecondBrain-0.9.47-Darwin-x86_64.tar.gz`.
+SHA-256:`d074ac37fbfd5dfac0d889ba64f7a3b4aa06a35f635018831c4b7be7cba67369`.
+95 Dateien identisch unter `dist/SecondBrain` installiert, Ausgabe0.9.47/
+7df7dd2f63b9/Darwin-x86_64/Release.18 Gedächtnisdateien beim Laden unverändert.
+Vorige App: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.46-20261011-114425`.
+Protokolle/Hashmanifest: `build/map-layer-verification/`.
+
+[CI38129123502](https://github.com/Lulus792/SecondBrain/actions/runs/38129123502)
+zuletzt queued; keine neue Windows-/Linux-/ARM64-Gesamtabnahme behauptet.
+SBUI-075 ist im beschriebenen lokalen Umfang nachgeprüft. Vollständige Geräte-/
+assistive Prüfung, SBUI-074 und übrige Release-Aufgaben bleiben offen.
+1.0 nur nach ausdrücklicher Nutzerfreigabe.
