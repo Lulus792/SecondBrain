@@ -55,8 +55,14 @@ ThreadSanitizer-Nachweis. Originale: `build/reader-scroll-verification/`,
 
 Alle 81 lokalen Release-Prüfungen bestehen (437,82 s); Original:
 `build/reader-scroll-verification/ctest-release.log`.
-Paket- und neue native Zielplattformabnahme folgen. Installiert bleibt
-zunächst 0.9.60. Dies behebt den bestätigten Eingabeverlust, nicht die gesamte
+Das saubere Intel/macOS-Paket 0.9.61/e219bf47cbdb besteht 126 Desktop-,
+167 Tastatur- und 75 Sicherungs-Prüfbedingungen, zwei Neustarts und CLI-/
+Runtime-/Lizenz-/Versionsprüfung. Installierte 96 Dateien sind paketgleich;
+Öffnen der eigenen Instanz erhält ihre 18 Dateien. App-Aufnahme betrachtet.
+Windows/Linux bestehen zu dc5af86 in Debug/Release einschließlich beider
+Release-Pakete (CI 38165889862). Native Mac-Jobs zuletzt queued; lokale Intel-
+Abnahme separat. Originale im genannten Diagnoseordner, `ci-jobs-2.json`.
+Dies behebt den bestätigten Eingabeverlust, nicht die gesamte
 Leistungsaufgabe: erste Quell-/Parser-/Rasterarbeit, große echte Wissensbasen,
 reale Geräte/Monitore/Trackpads, IME und Screenreader bleiben offene Abnahmen.
 Die übrige [Release-Liste](RELEASE.md) und die ausdrückliche 1.0-Freigabe bleiben.

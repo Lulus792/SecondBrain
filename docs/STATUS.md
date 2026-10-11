@@ -2,7 +2,7 @@
 
 Stand: 11. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.60. Die Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.61. Die Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -4066,3 +4066,26 @@ Original: `build/reader-scroll-verification/ctest-release.log`. Paket und neue
 native Zielplattformabnahme folgen. Der sichtbare zweite Reader-Fokusrahmen
 im modalen Hintergrund ist in RELEASE als eigene UI-Nachprüfung aufgenommen;
 native Zielabschirmung bleibt bestehen. Gesamtziel/1.0 weiterhin offen.
+
+
+## Reader-Scrollpaket 0.9.61 installiert
+
+Sauberer Intel/macOS-Release-Build 0.9.61/e219bf47cbdb; drei Versions-/Release-
+Nachprüfungen bestehen. Entpacktes Paket besteht 126 Desktop-, 167 Tastatur-
+und 75 Sicherungs-Prüfbedingungen, zwei Einstellungs-Neustarts, produktive
+CLI sowie Runtime-/Lizenz-/Version. Alle 96 installierten Dateien paketgleich;
+18 Gedächtnisdateien beim Öffnen unverändert. Tatsächliche C-App-Aufnahme
+betrachtet. Gerät: macOS 14.6.1/23G93, x86_64.
+Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.60-20261011-210850`.
+Archiv-SHA256: `67d2ee081237c4bbecab1bbddd6aff5cc08b0a6c1f5ea2c319851bff3c17b3e5`.
+Originale: `build/reader-scroll-verification/package-check.log`, `installed.json`,
+`installed-brain-check.json` und `installed-brain.png`; Archiv unter
+`build/reader-scroll-package/`.
+
+CI 38165889862 zum Quellcommit dc5af8638d9e803e40310873534974f1345dd9dc:
+alle vier Windows-/Linux-UI-Jobs vollständig erfolgreich, einschließlich
+nativer Schnittstellen und beider Release-Pakete. Jobnachweis: `ci-jobs-2.json`.
+Native macOS-Jobs zuletzt queued; lokaler Intel-Nachweis separat, neue ARM64-
+Abnahme offen. Menschliche Geräte/IME/Screenreader, vollständige Leistung und
+übrige Release-Arbeit einschließlich visuellem Modal-Fokusrahmen bleiben offen.
+1.0 nur nach ausdrücklicher Nutzerfreigabe.

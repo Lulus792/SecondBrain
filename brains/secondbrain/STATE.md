@@ -9,102 +9,59 @@ Historische Schritte stehen im [Journal](journal/2026-10-11.md) und in STATUS.
 Eigene C17-App für Mensch und KI: Projekte/Notizen anlegen, lesen, bearbeiten,
 suchen, archivieren, sichern; Quellen lesen und gespeicherten Kontext kopieren.
 Lumen-Sternkarte, Glaskarten, eigene Icons, direkte Pfeilnavigation, Kamerafahrt,
-Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
-Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt. Externe
-Bibliotheken bleiben auf UI beschränkt; eigene Lizenz MIT.
+Startfokus, Textcursor und große Leseansicht sind implementiert. Originalbytes,
+Entwürfe und erkannte Konflikte bleiben geschützt. Externe Bibliotheken nur UI; MIT.
 
-Installiert **0.9.60 / a6d6f094b0d6**, sauberer Intel/macOS-Release-Build.
+Installiert **0.9.61 / e219bf47cbdb**, sauberer Intel/macOS-Release-Build.
 96 Dateien entsprechen dem geprüften Paket; 18 Gedächtnisdateien beim Öffnen
-unverändert. 126 Desktop-, 166 Tastatur-, 75 Sicherungs-Assertions, zwei Neustarts,
-produktive CLI und Runtime-/Lizenz-/Version bestehen. Tatsächliche App-Aufnahme
-angesehen. Prüfgerät: macOS 14.6.1/23G93, x86_64.
-Rückfallversion 0.9.59: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.59-20261011-202739`.
-CI 38164624696 zu b6490bd: alle vier Windows-/Linux-UI-Jobs vollständig
-erfolgreich, beide Release-Pakete geprüft. Native Mac-Jobs zuletzt queued;
-lokale Intel/macOS-Abnahme separat. Neue 0.9.61-Zielplattformprüfung folgt.
-Frühere Plattformnachweise ersetzen keine Prüfung dieser neuen Fassung.
+unverändert. 126 Desktop-, 167 Tastatur-, 75 Sicherungs-Prüfbedingungen, zwei
+Neustarts, CLI-/Runtime-/Lizenz-/Version bestehen. Tatsächliche App-Aufnahme
+betrachtet. Gerät: macOS 14.6.1/23G93, x86_64.
+Rückfall 0.9.60: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.60-20261011-210850`.
 
-## Geprüfte aktuelle Änderung
+CI 38165889862 zu dc5af86/0.9.61: alle vier Windows-/Linux-UI-Jobs erfolgreich,
+Debug/Release und beide Release-Pakete tatsächlich geprüft. Native Mac-Jobs
+zuletzt queued; lokaler Intel-Nachweis separat. ARM64 und frische Rechner offen.
+Frühere Nachweise ersetzen keine Prüfung neuer Änderungen.
 
-0.9.58 erhält Reader-/Quellpläne beim Öffnen/Schließen gewöhnlicher Menüs,
-Reader-/Editorposition und Inhaltshöhe. Die native Modalabschirmung bleibt.
-115 Reader-, 177 Quell-/Stil- und 621 Mac-Assertions auch unter ASan/UBSan;
-39 eigene C-Dateien, 55 aktuelle Hashes. 78/78 Release-Prüfungen bestehen
-(651,31 s). Finale Vorher/Menü/Nachher-Bilder angesehen; SBUI-079 lokal geprüft.
-SBUI-080 ist ab 0.9.59 lokal korrigiert: Hilfe kehrt zur Ursprungsaufgabe zurück.
-92 Hilfe-, 190 Feldaktions- und 621 native Mac-Prüfbedingungen auch unter
-ASan/UBSan; 39 eigene C-Dateien/56 Hashes. 79/79 lokale Release-Prüfungen
-bestehen (565,40 s); danach geänderter Lizenz-Tastaturprüfer separat bestanden.
-[Hilfe-Vertrag](../../docs/HILFE_RUECKKEHR.md). Finales Paket/Installation geprüft.
-[Vertrag](../../docs/READER_RUECKKEHR.md). Intel/macOS-Paket/Installation geprüft;
-weitere aktuelle Zielplattformabnahmen offen.
+## Geprüfte aktuelle Änderungen
 
-Zusätzlich bleiben graphemgebundene Stilgrenzen im Quellenbudget gehalten;
-Schrift- und Zeichenpositionen bleiben aktuell. [Stilplan](../../docs/READER_STILPLAN.md).
+0.9.61 erhält frühe Scrollbefehle während der Reader-Vorbereitung. Die erste
+Inhaltshöhe wird vor der Anwendung gemessen; große Eingaben bleiben begrenzt,
+Gegenrichtung und normale Animation erhalten. Notizwechsel verwerfen alte
+Eingaben. 45 Scroll-, 117 Reader- und 622 Mac-Prüfbedingungen auch unter
+ASan/UBSan: 39 eigene C-Dateien/56 Hashes; externe UI nicht instrumentiert,
+kein Leak-/ThreadSanitizer. 81/81 lokale Release-Prüfungen bestehen (437,82 s).
+Reader-/Kontextbilder betrachtet, Paket/Installation geprüft.
+[Vertrag](../../docs/SCROLLEN_BEIM_LADEN.md), Originale unter
+`build/reader-scroll-verification/` und `build/reader-scroll-sanitizers/`.
 
-0.9.56 hält Inline-Analysen von Absätzen/Überschriften mit Text und Referenzen
-im vorhandenen 16-MiB-Quellbudget. Iteratoren erhalten eigene Cursor; Änderungen
-ersetzen den gesamten Plan. Speicher-/Budgetrückfälle bleiben vollständig.
-Vor einem fehlgeschlagenen Quellenersatz werden frühere geliehene Ausgaben
-zurückgesetzt. [Vertrag](../../docs/READER_INLINE_PLAN.md).
+0.9.60 korrigiert typisierte Cache-Adressen und strenge C17-Compilerprüfung.
+Fensterprüfer bestätigen tatsächliche Größen; native Stilprüfer wählen den
+Dokumentbereich, Exportvergleich prüft veröffentlichte Felder statt C-Padding.
+80/80 lokal und alle vier Windows-/Linux-Jobs zu b6490bd bestehen.
+[Vertrag](../../docs/UI_PLATTFORMKORREKTUREN.md).
 
-## Weitere implementierte Grundlagen
-
-Der Reader hält seinen Dokumentbaum und genaue Glyphen-/Umbruchpläne. Lange
-formatierte Dokumente erhalten einen privaten Vorbereitungs-Worker; schnelles
-Retargeting wartet nicht auf dessen Abschluss. Native Editor-/Formular-/Reader-
-und Titelgeometrie folgt den gezeichneten Plänen. Die native Mac-Auswahl und
-Ersetzung sind an die vorhandenen Feldaktionen gebunden. Umfang und Grenzen:
-[Reader](../../docs/READER_VORBEREITUNG.md),
-[Textgeometrie](../../docs/NATIVE_TEXTGEOMETRIE.md),
-[Leseblöcke](../../docs/NATIVE_LESEGEOMETRIE.md).
-
-Dialogglas verdeckt konkurrierende Hintergrundtexte und erhält das Material;
-Icons und Exportzuordnungen sind nachgeprüft. [Dialogmaterial](../../docs/DIALOGMATERIAL.md).
-Die [Frame-Messung](../../docs/FRAME_MESSUNG.md) erfasst Eingabe, erste Bilder und
-reale Animationsabstände; Einzelausgaben ersetzen keine menschliche Bedienabnahme.
+Hilfe kehrt mit Eingaben, Auswahl, Fokus, Meldung und Scrollposition zur
+Ursprungsaufgabe zurück. Gewöhnliche Modalaufgaben erhalten Reader-/Editor-
+Position und gehaltene Quellen-/Glyphen-/Inline-/Stilpläne. Native Kontexte
+bleiben abgeschirmt. [Hilfe](../../docs/HILFE_RUECKKEHR.md),
+[Reader-Rückkehr](../../docs/READER_RUECKKEHR.md).
 
 ## Nächste Arbeiten und verbleibende Abnahmen
 
-0.9.61 hält frühe Scrollbefehle im ladenden Reader, misst die erste echte
-Inhaltshöhe vor Anwendung und begrenzt große Eingaben. 45 Scroll-, 117 Reader-
-und 622 Mac-Prüfbedingungen auch unter ASan/UBSan: 39 C-Dateien/56 Hashes.
-Vier gezielte Release-Läufe bestehen (36,05 s), tatsächliche Reader-/Kontext-
-Bilder betrachtet. [Vertrag](../../docs/SCROLLEN_BEIM_LADEN.md).
-81/81 lokale Release-Prüfungen bestehen (437,82 s). Paket-/Plattformprüfung
-folgen; installiert weiter 0.9.60. Doppelter visueller Reader-Fokusrahmen
-im modalen Hintergrund ist als nächste UI-Nachprüfung festgehalten.
+Visuellen Fokus auf die aktive Modalaufgabe begrenzen: Kontextaufnahme zeigt
+noch denselben Reader-Rahmen im abgeschirmten Hintergrund. Native Ziele dort
+sind gesperrt. [Release-Befund](../../docs/RELEASE.md).
 
-0.9.60 korrigiert Cache-Indexierung an `void *`; GCC/Clang weisen sie künftig
-als Fehler ab. Fensterprüfer synchronisieren und bestätigen 780×900 bzw.
-780×520; der AT-SPI-Prüfer sucht den Inhalt im passenden Textbereich.
-525 Cache-, 117 Reader-, 93 Hilfe- und 621 Mac-Prüfbedingungen bestehen auch
-unter ASan/UBSan: 40 eigene C-Dateien/57 Hashes. Lokale gezielte Nachprüfung
-besteht. 80/80 lokale Gesamtprüfungen zu fe7d18e bestanden (487,70 s), danach
-gezielte Prüferänderungen separat geprüft. Intel/macOS-Paket 0.9.60/a6d6f09
-vollständig geprüft und installiert. [Vertrag](../../docs/UI_PLATTFORMKORREKTUREN.md).
+Erste Quell-/Parser-/Worker-Aufbereitung, native Veröffentlichung, Tabellen,
+Rasterung, Budgetrückfälle, riesige Absätze und Shutdown weiter profilieren.
+SBUI-074 bleibt für vollständige Leistungs-/Geräte-/Großdatenabnahme offen.
+Native Snapshot-Pixelidentität und Material-Ersatzfläche bei Speicherfehler offen.
 
-Windows C2036 und Linux-Resize sind nativ nachgeprüft. Die verbleibenden
-Prüferbefunde sind eingegrenzt: Linux-Stilabfrage erreicht einen namensgleichen
-Textlauf des Kartenkopfs; sie erlaubt jetzt nur Dokument-/Eingabebereiche.
-Windows-Debug erwartet Struktur/letzten Link vor fertigem Reader; beide
-Prüfer warten jetzt begrenzt. Lokale und native Windows-/Linux-Nachprüfung
-zu b6490bd bestehen. [Originalbefunde](../../docs/UI_PLATTFORMKORREKTUREN.md).
-Die erste 0.9.59-Paketprüfung fand einen frühen Scrollbefehl während der
-Lizenzreader-Vorbereitung. Der Tastaturprüfer wartet für seine fertige Ansicht
-jetzt begrenzt; sein gezielter Durchlauf besteht. Frühe Scrollbefehle bleiben
-als Produktarbeit offen. Das finale Paket mit dem neuen Prüfer besteht.
-
-Native Blockausgaben/-veröffentlichung, erste Quell-/Parser-/Worker-Aufbereitung,
-Tabellenzellen, Rasterung und Fälle über den Vorbereitungsbudgets getrennt
-profilieren. Synchrone Rückfälle, große Einzelabsätze und Shutdown bleiben
-Leistungsfälle. SBUI-074 ist für die vollständige Geräte-/Großdatenabnahme offen.
-
-Aktuelle Windows-/Linux-/ARM64-Prüfungen, tatsächliche IME und VoiceOver/NVDA/Orca,
-native Dialog-/Geräte-/Monitor-/Langzeitprüfungen, Windows-/Linux-Speicherfehler,
-Mindest-OS und frische Rechner fehlen. Native Snapshot-Pixelidentität und
-Speicherfehlerabnahme der Material-Ersatzfläche bleiben getrennt offen.
-Vollständige Runtime-/Lizenzprüfung, vertraulicher Sicherheitskanal, Signierung,
+Tatsächliche IME/VoiceOver/NVDA/Orca, native Dialoge, Geräte/Monitore/Langzeit,
+Windows-/Linux-Zielvolumes und physische Persistenz, Mindest-OS/frische Rechner,
+vollständige Runtime-/Lizenzprüfung, vertraulicher Sicherheitskanal, Signierung,
 dauerhafte aktuelle Release-Pakete und abschließende natürliche Texte bleiben
 Release-Arbeit. Apple-Developer-Konto und Windows-Signaturzertifikat fehlen.
 **1.0 nur nach ausdrücklicher Nutzerfreigabe.**
