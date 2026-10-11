@@ -2,7 +2,7 @@
 
 Stand: 11. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.50. Die Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.51. Die Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -3625,3 +3625,21 @@ begründen keine allgemeine Beschleunigungs- oder Flüssigkeitsaussage.
 Paket/Installation folgen; installiert bleibt0.9.50. Weitere native Geometrie,
 neue Zielplattformen, echte IME/Screenreader/Geräte und übrige Release-Arbeit offen.
 1.0 nur nach ausdrücklicher Nutzerfreigabe.
+
+## Lesegeometriepaket0.9.51 installiert
+
+Quellcommit `2fbdf8e3ff3ac60423cd50b719c0f788dd1cf650` ist gepusht. Sauberer
+Intel/macOS-Release-Build0.9.51/2fbdf8e3ff3a; drei Versions-/Release-Nachprüfungen
+bestehen. Entpacktes Paket:126 Desktop-,161 Tastatur-,75 Sicherungs-Assertions,
+zwei Einstellungs-Neustarts, produktive CLI und Runtime-/Lizenz-/Version bestehen.
+95 installierte Dateien stimmen einzeln mit dem Paket überein. Die installierte
+App lädt die eigene Instanz ohne Änderung ihrer18 Dateien; PNG der tatsächlichen
+C-App angesehen. Prüfgerät: macOS14.6.1/23G93,x86_64.
+
+Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.50-20261011-142143`.
+Archiv-SHA256: `be130a895ddd4998625fb9cd93b433a9cfd0f7a0f0a2b9957943487e911c458c`.
+Originale: `build/reader-geometry-verification/` (Paketprotokoll, installierte
+Hashes/Version, Gedächtnisprüfung, Bild, Geräte-/Quellstand und CI-Snapshot).
+CI38138548919 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
+Weitere Titel-/Markierungs-/Kopfzellgeometrie, echte IME/Screenreader/Geräte und
+übrige Release-Arbeiten bleiben offen.1.0 nur nach Nutzerfreigabe.

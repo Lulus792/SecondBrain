@@ -11,12 +11,12 @@ Lumen-Sternkarte, Glaskarten, Icons, direkte Pfeilnavigation, Kamerafahrt,
 Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert **0.9.50 / bd61ba99535d**, sauberer Intel/macOS-Release-Build.
+Installiert **0.9.51 / 2fbdf8e3ff3a**, sauberer Intel/macOS-Release-Build.
 95 Dateien entsprechen dem geprüften Paket;18 Gedächtnisdateien beim Laden
 unverändert.126 Desktop-,161 Tastatur-,75 Sicherungs-Assertions, zwei Neustarts,
 produktive CLI und Runtime-/Lizenz-/Version bestehen.
-Rückfallversion0.9.49: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.49-20261011-133009`.
-CI38135305464 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
+Rückfallversion0.9.50: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.50-20261011-142143`.
+CI38138548919 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
 
 Frühere Build-/Paket-/Diagnoseverzeichnisse waren am11.Oktober nicht mehr
 vorhanden. Historische Abnahmen bleiben in STATUS/Journal; entfernte Dateien
@@ -83,7 +83,7 @@ Geometrie- und608 Provider-Assertions auch unter ASan/UBSan im dokumentierten
 Umfang. Mac-Paket und Installation bestehen; andere Zielplattformen bleiben offen.
 [Vertrag](../../docs/NATIVE_FELDAKTIONEN.md).
 
-## Neue Lesegeometrie (0.9.51, Paket noch ausstehend)
+## Neue Lesegeometrie (0.9.51)
 
 Textblöcke/Code und gezeichnete Tabellenzellen übernehmen ihre tatsächlichen
 Zeichenrechtecke. Pläne halten native Läufe; private Worker erzeugen sie mit,
@@ -91,7 +91,8 @@ Zeichenrechtecke. Pläne halten native Läufe; private Worker erzeugen sie mit,
 590 Reader-,5231 Layout-/Batch- und616 Mac-Provider-Assertions auch unter
 ASan/UBSan im dokumentierten Umfang. Drei Metal-Paare zeigen keinen großen
 neuen Einbruch, aber weiterhin Ausreißer; keine allgemeine Flüssigkeitsaussage.
-Installiert bleibt50. [Vertrag/Messung](../../docs/NATIVE_LESEGEOMETRIE.md).
+Mac-Paket und Installation bestehen; andere Zielplattformen bleiben offen.
+[Vertrag/Messung](../../docs/NATIVE_LESEGEOMETRIE.md).
 
 ## Nächste Arbeiten
 
