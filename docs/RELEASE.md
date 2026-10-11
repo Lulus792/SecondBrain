@@ -320,3 +320,11 @@ erste Bilder und tatsächliche Animationsabstände. Serielle Metal-/Software-
 Einzelwerte bestätigen verbleibende Anfangs- und Bewegungsarbeit. Das ist eine
 verbesserte Messgrundlage, keine abgeschlossene Leistungskorrektur. Erste Quell-/
 Inline-/native Aufbereitung, reale Eingaben und weitere Zielgeräte bleiben offen.
+
+## Wiederverwendung der Inline-Analyse vom 11. Oktober
+
+Ab 0.9.56 hält der [Reader-Inline-Plan](READER_INLINE_PLAN.md) Hervorhebungen und
+Verweise in seinem Quellenbudget. Lokale Gesamt-/Sanitizerprüfungen bestehen;
+serielle Metal-Paare zeigen weniger Layoutarbeit. Die erste Vorbereitung,
+Tabellenzellen, native Metadaten/Bildausgabe und vollständige Geräte-/Plattform-
+und Bedienabnahmen bleiben offen. Dieser Schritt schließt SBUI-074 nicht ab.

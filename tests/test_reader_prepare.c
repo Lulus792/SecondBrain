@@ -24,7 +24,10 @@ int main(int argc,char **argv){
     first_pending=last_layout;CHECK(d.reader_preparation && loading(&d) && sb_desktop_animating(&d));
     CHECK(wait_reader(&d));frame(&d);CHECK(d.reader_plan_hits>40);if(d.reader_plan_misses)fprintf(stderr,"prepared misses: %zu hits: %zu\n",d.reader_plan_misses,d.reader_plan_hits);CHECK(!d.reader_plan_misses);
     float maximum=d.scrolling[0].maximum;CHECK(maximum>1000);uint64_t prepared_geometry=geometry(&d);
-    size_t source_builds=d.reader_source_builds;CHECK(d.reader_source && d.reader_source_bytes<=16u*1024u*1024u);frame(&d);CHECK(d.reader_source_builds==source_builds && geometry(&d)==prepared_geometry);
+    size_t source_builds=d.reader_source_builds;CHECK(d.reader_source && d.reader_source_bytes<=16u*1024u*1024u);
+    size_t inline_builds=d.reader_inline_builds,inline_hits=d.reader_inline_hits;frame(&d);
+    CHECK(d.reader_source_builds==source_builds && geometry(&d)==prepared_geometry);
+    CHECK(d.reader_inline_builds==inline_builds && d.reader_inline_hits>inline_hits);
     d.ui.styled_cache_disabled=true;frame(&d);double reference_layout=last_layout;CHECK(geometry(&d)==prepared_geometry && d.scrolling[0].maximum==maximum);d.ui.styled_cache_disabled=false;frame(&d);
     printf("Fixture layout: initial pending %.2f ms; first ready %.2f ms; uncached synchronous reference %.2f ms.\n",first_pending,first_ready,reference_layout);
     d.scrolling[0].position=d.scrolling[0].destination=maximum/2;d.scrolling[0].active=true;frame(&d);float before=d.scrolling[0].position;

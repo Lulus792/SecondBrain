@@ -137,6 +137,14 @@ Hashes. Vier gültige Metalbilder angesehen; Aufnahme-/Snapshot-Grenzen dokument
 
 ## Nächste Arbeiten
 
+0.9.56 hält Inline-Analysen von Absätzen/Überschriften im vorhandenen 16-MiB-
+Quellbudget. Drei serielle Metal-Paare verbessern Layout beim Scrollen/Kamera
+im Median um 31,20/35,54%; erste Vorbereitung und Frame-Spitzen bleiben.
+56 Quell-, 49 Reader- und 621 Mac-Assertions auch unter ASan/UBSan; 39 eigene
+C-Dateien, 55 aktuelle Hashes. 78/78 Release-Prüfungen bestehen (552,41 s).
+Paket/Installation folgen; installiert weiterhin 0.9.55.
+[Vertrag und Grenzen](../../docs/READER_INLINE_PLAN.md).
+
 Der Diagnoseprüfer erfasst jetzt auch Eingabe und erste Bilder, alle 272
 Framewerte und reale Animationsabstände. Drei serielle Metal-Läufe zeigen
 114–126 ms Arbeit im ersten Bild der langen Notiz; Bewegungs-/Zeichenspitzen

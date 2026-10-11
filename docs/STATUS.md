@@ -3827,3 +3827,31 @@ Release-Prüferbuild und diff-Prüfung bestehen; kein neuer Produkt-Gesamttest u
 keine Leistungskorrektur behauptet. Originale: `build/frame-timing-verification/final/`.
 Installiert bleibt 0.9.55. CI 38148508446 erneut als queued beobachtet; keine neue
 Plattformabnahme. SBUI-074 und übrige Release-Arbeit bleiben offen.
+
+## Reader-Inline-Plan (0.9.56, 11. Oktober)
+
+Unveränderte Absätze und Überschriften behalten Hervorhebungen, aufbereiteten
+Text und Linkanalyse im vorhandenen 16-MiB-Quellbudget. Knotenbindung, genaue
+Textadresse/-länge und die gehaltene Referenzumgebung sichern Wiederverwendung;
+Iteratoren erhalten eigene Cursor. Änderungen ersetzen den ganzen Plan.
+Überbudget-/Speicherfälle liefern vollständige kurzlebige Ergebnisse. Beim
+fehlgeschlagenen Ersatz werden frühere geliehene Ausgaben zurückgesetzt.
+[Vertrag, Messmethodik und Grenzen](READER_INLINE_PLAN.md).
+
+56 Quell-, 49 produktive Reader- und 621 Mac-Assertions bestehen auch unter
+haltendem ASan/UBSan: 39 eigene C-Dateien, 55 aktuelle Quell-/Include-Hashes.
+UI-Bibliotheken sind nicht instrumentiert; kein Leak-/ThreadSanitizer-Nachweis.
+Gezielte Reader-Geometrie-/Interaktions-/Providerprüfung und alle 78 lokalen
+Release-Prüfungen bestehen (552,41 s). Originale: `build/reader-inline-verification/`,
+`build/reader-inline-sanitizers/`. Ein neuer Test fand zuerst eine fehlerhafte
+Auswahl des leeren Definitionsblocks; die spätere Prüfung des ungültigen
+Quellenersatzes bestätigte die korrigierte Referenzbereinigung.
+
+Zwei isolierte Diagnoseproben lokalisieren wiederholte Inline-Arbeit. Drei
+alternierende Produktionspaare mit eingefrorenem Desktop aus be6c1e2 zeigen
+median 31,20% weniger Scroll-Layout, 35,54% weniger Kamera-Layout und 22,63%
+weniger Wechsel-Layout. Die 18 Dateien der Profilkopie bleiben unverändert.
+Frame-p95 verbessert sich nicht überall; das erste Bild bleibt in einem Paar
+praktisch gleich. Erste Aufbereitung, Tabellenzellen, native Ausgaben/GPU,
+reale Geräte/Eingaben/Screenreader und neue Zielplattformen bleiben offen.
+Paket/Installation folgen; installiert weiterhin 0.9.55. 1.0 nur nach Freigabe.

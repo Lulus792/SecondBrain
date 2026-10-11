@@ -209,6 +209,17 @@ SBStatus sb_inline_init_references(SBInline *r,const char *text,size_t length,co
     return emphasis_init(r);
 }
 void sb_inline_free(SBInline *r) { if (r) { free(r->runs); free(r->pairs); free(r->marks); free(r->opaque); *r=(SBInline){0}; } }
+size_t sb_inline_storage_bytes(const SBInline *r) {
+    if (!r) return 0;
+    size_t bytes=0;
+    #define INLINE_STORAGE(cap,item) do { if ((cap)>(SIZE_MAX-bytes)/sizeof(item)) return SIZE_MAX; bytes+=(cap)*sizeof(item); } while(0)
+    INLINE_STORAGE(r->run_capacity,*r->runs);
+    INLINE_STORAGE(r->pair_capacity,*r->pairs);
+    INLINE_STORAGE(r->mark_capacity,*r->marks);
+    INLINE_STORAGE(r->opaque_capacity,*r->opaque);
+    #undef INLINE_STORAGE
+    return bytes;
+}
 static bool at(const SBInline *r,size_t p,size_t limit,SBInlineToken *t) {
     if (p>=limit) return false;
     SBInlineToken *opaque=opaque_at(r,p);

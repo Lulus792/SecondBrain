@@ -67,3 +67,10 @@ Speicherprüfungen: `build/reader-source-sanitizers/`.
 77/77 lokale Release-Prüfungen bestehen (539,97 s). Das Intel/macOS-Paket ist
 geprüft und als 0.9.53 installiert; neue Zielplattformabnahmen bleiben offen. Tatsächliche Geräte-, Screenreader-, Eingabe-
 und Langzeitabnahmen sowie der vollständige 1.0-Auftrag bleiben offen.
+
+Ab 0.9.56 teilen gehaltene [Inline-Analysen](READER_INLINE_PLAN.md) von Absätzen
+und Überschriften dieses Budget. Ihre Kapazitäten und Knotenplätze werden
+mitgezählt. Bei einem fehlgeschlagenen Quellenersatz werden vorangegangene
+geliehene Ausgaben vor der neuen Parserarbeit zurückgesetzt; alte Referenzen
+gelangen nicht in die Bereinigung des neuen Ergebnisses. Neue Nachweise und
+die gesonderten Grenzen stehen im Inline-Vertrag.

@@ -23,6 +23,7 @@ static void search_end(SBDesktop *d);
 static void focus_set(SBDesktop *d,const char *id);
 static void reader_preparation_free(SBDesktop *d);
 static void reader_source_free(SBDesktop *d);
+static SBStatus reader_inline_get(SBDesktop *d,size_t node,const char *text,size_t length,const SBReferences *references,SBInline *reader,SBStyledText *styled,bool *borrowed);
 static void reader_preparation_retire(SBDesktop *d);
 static bool reader_preparing(const SBDesktop *d);
 static void composition_dispatch(void *user,const SDL_Event *event){sb_desktop_event(user,event);}
@@ -1597,7 +1598,7 @@ cleanup:
     if (status.code!=SB_OK) { d->message=status; return false; }
     return true;
 }
-static void document_block(SBDesktop *d,const char *text,size_t length_total,SBMarkdownBlock block,unsigned slot,unsigned *link_number,const SBReferences *references,const SBProjection *projection,const char *parent,bool *first_heading) {
+static void document_block(SBDesktop *d,const char *text,size_t length_total,SBMarkdownBlock block,unsigned slot,unsigned *link_number,const SBReferences *references,const SBProjection *projection,const char *parent,bool *first_heading,size_t source_node) {
     struct nk_context *ctx=d->ui.ctx; size_t passive_start=d->passive_count;
 
         if (block.kind==SB_MD_REFERENCE) return;
@@ -1625,10 +1626,10 @@ static void document_block(SBDesktop *d,const char *text,size_t length_total,SBM
         if (block.kind==SB_MD_FENCE) return;
         if (block.kind==SB_MD_BLANK || (!length && !heading)) { nk_layout_row_dynamic(ctx,9*d->ui.scale,1); nk_spacer(ctx); }
         else {
-            SBInline inline_reader={0}; SBStyledText styled={0}; SBStatus inline_status=sb_ok(); char *plain=NULL;
+            SBInline inline_reader={0}; SBStyledText styled={0}; SBStatus inline_status=sb_ok(); char *plain=NULL;bool inline_borrowed=false;
             if (!code) {
-                inline_status=sb_inline_init_references(&inline_reader,content,length,references);
-                if (inline_status.code==SB_OK) { inline_status=sb_inline_styled(&inline_reader,0,length,&styled); plain=styled.text; }
+                inline_status=reader_inline_get(d,source_node,content,length,references,&inline_reader,&styled,&inline_borrowed);
+                if (inline_status.code==SB_OK) plain=styled.text;
                 if (inline_status.code!=SB_OK) d->message=inline_status;
             }
             const char *caption=d->model.source ? d->model.source_title : d->model.title;
@@ -1666,9 +1667,9 @@ static void document_block(SBDesktop *d,const char *text,size_t length_total,SBM
                 else nk_text_wrap(ctx,shown,(int)shown_length);
             }
             }
-            sb_styled_free(&styled);
+            if(!inline_borrowed)sb_styled_free(&styled);
             if (!code && inline_status.code==SB_OK) document_links(d,&inline_reader,link_number,parent,NULL);
-            sb_inline_free(&inline_reader);
+            if(!inline_borrowed)sb_inline_free(&inline_reader);
         }
     for (size_t i=passive_start;i<d->passive_count;++i) if (!strcmp(d->passive[i].parent,"reader")) snprintf(d->passive[i].parent,sizeof(d->passive[i].parent),"%s",parent);
 }
@@ -1741,10 +1742,10 @@ static bool document_tree(SBDesktop *d,const SBDocument *document,const SBRefere
                 for (size_t at=node->content;at<end;) {
                     size_t next=at;while (next<end && node->view.text[next]!='\n') ++next;
                     block.content=at;block.length=next-at;sb_projection_source(&node->view,at,&block.offset);
-                    document_block(d,node->view.text,node->view.length,block,slot,links,references,&node->view,parent,first_heading);
+                    document_block(d,node->view.text,node->view.length,block,slot,links,references,&node->view,parent,first_heading,i);
                     at=next<end ? next+1 : next;
                 }
-            } else document_block(d,node->view.text,node->view.length,block,slot,links,references,&node->view,parent,first_heading);
+            } else document_block(d,node->view.text,node->view.length,block,slot,links,references,&node->view,parent,first_heading,i);
             if (d->passive_count>before) { mark_bounds=d->passive[before].bounds; mark_bounds.y=d->passive[before].document_y+panel->clip.y-d->scrolling[slot].position-d->scrolling[slot].elastic; }
             for (size_t p=before;p<d->passive_count;++p) if (!strcmp(d->passive[p].parent,parent) && node->parent && layout[node->parent].passive<d->passive_count) document_union(&d->passive[layout[node->parent].passive],&d->passive[p]);
             for (size_t t=target_before;t<d->target_count;++t) if (node->parent && layout[node->parent].passive<d->passive_count) {
@@ -1826,7 +1827,7 @@ static void document(SBDesktop *d, const char *text, float height) {
     if (ready && !whole_code && !document_tree(d,&parsed,&references,slot,&link_number,&first_heading)) whole_code=true;
     if (ready && whole_code) {
         SBMarkdown reader; SBMarkdownBlock block; sb_markdown_init(&reader,text,text_length,true);
-        while (sb_markdown_next(&reader,&block)) document_block(d,text,text_length,block,slot,&link_number,&references,NULL,"reader",&first_heading);
+        while (sb_markdown_next(&reader,&block)) document_block(d,text,text_length,block,slot,&link_number,&references,NULL,"reader",&first_heading,SIZE_MAX);
     }
     d->ui.prepared_lookup=NULL;d->ui.prepared_data=NULL;
     nk_style_set_font(ctx, &d->ui.normal->handle);
