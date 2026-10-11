@@ -4221,3 +4221,21 @@ Frühere63-Erfolge sind getrennte Nachweise. Menschliche Geräte-/Screenreader-,
 Mindestversions-, große Graph-/Leistungs- und weitere Release-Abnahmen bleiben
 offen. Mindest-OS-Vorschlag ist ausgearbeitet; keine automatische Änderung der
 Supportuntergrenzen.1.0 nur nach ausdrücklicher Nutzerfreigabe.
+
+## Laufzeitanforderungen und aktuelle Plattformprüfung
+
+Am11.Oktober erneut geprüft: CI38171616070 zu
+`bef4816d3e403ad7d6719366349030e6273707ef` besteht in allen vier Windows-/Linux-
+Desktopjobs einschließlich beider entpackten Release-Pakete. Die Mac-Jobs
+stehen weiterhin auf queued. Das ersetzt keine Windows11-, Wayland-, ARM64-
+oder menschliche Screenreader-Abnahme.
+
+Der Entwickler-Paketprüfer erfasst jetzt die direkten ELF-Versionstags pro
+Bibliothek und die Architektur. Das heruntergeladene originale Linux0.9.64-
+Artefakt ist per GitHub-Digest verifiziert: App GLIBC_2.39/GCC_4.2.0,
+CLI GLIBC_2.34. Auf dem Mac statisch ausgewertet, nicht als Linux-App ausgeführt.
+42/42 ausführbare Python-Prüfungen bestehen (3,983s), eine native Windows-
+Prüfung auf dem Mac übersprungen. Sechs gezielte Laufzeitprüfungen bestehen
+ebenfalls; installierte Intel0.9.64-Mac-Importprüfung ohne Probleme, minos14.0.
+Keine Produkt-/Versionsänderung. Neue native Scanner-CI, transitive Runtime-
+und frische Nutzerplattformprüfung bleiben offen. [Vertrag](PAKET_LAUFZEIT.md).

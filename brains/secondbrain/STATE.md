@@ -24,9 +24,16 @@ Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.63-2026101
 Prioritäre Sternlabels werden zuerst reserviert, keine teilweise übermalten
 normalen Wörter. Neun Darstellungen und18 SDL-Aktions-/Escapeabläufe geprüft;
 9/9 passende Produktprüfungen bestehen (141,20s). Paket geprüft und installiert;
-neue CI38171616070: Windows/Linux in Arbeit, native Mac-Jobs queued. [Vertrag](../../docs/ERSTELLEN_ICONS.md).
+CI38171616070: alle vier Windows-/Linux-Desktopjobs einschließlich beider
+Release-Pakete erfolgreich, native Mac-Jobs queued. [Vertrag](../../docs/ERSTELLEN_ICONS.md).
 [Mindestversionsvorschlag](../../docs/PLATTFORM_VORSCHLAG.md): technische Voraussetzungen,
 tatsächlich geprüfte CI-Umgebungen und offene Nutzerplattform-Abnahme getrennt.
+Die Linux-App0.9.64 verlangt direkt GLIBC_2.39, die CLI GLIBC_2.34;
+der Paketprüfer erfasst jetzt ELF-Versionstags pro Bibliothek. Statische Analyse
+des verifizierten Linux-Artefakts auf dem Mac, keine dortige Linux-Ausführung.
+42 Python-Prüfungen bestehen, eine Windows-Prüfung übersprungen; installierte
+Mac-Paketimporte weiterhin geprüft. Neue Scanner-CI und transitive ABI-Abnahme
+offen. [Laufzeitnachweis](../../docs/PAKET_LAUFZEIT.md).
 
 ## Geprüfter Fortschritt
 

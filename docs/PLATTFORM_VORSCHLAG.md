@@ -11,7 +11,7 @@ Dies ist ein Prüfziel, keine bereits bestätigte Freigabe oder Kompatibilitäts
 
 ## Begründung und tatsächliche Nachweise
 
-**macOS:** Die aktuelle installierte Intel-App0.9.63/92ab260e4203 deklariert in
+**macOS:** Die aktuelle installierte Intel-App0.9.64/bef4816d3e40 deklariert in
 `LC_BUILD_VERSION` tatsächlich `minos14.0`, SDK15.2. Ausgeführt ist sie auf
 macOS14.6.1/23G93. Das eingebettete Minimum ist eine technische Startbedingung,
 kein ausgeführter14.0-Test.14 als Zieluntergrenze erhält die vorhandene Mac-
@@ -43,6 +43,12 @@ passt zum heutigen Paketbau und hält eine länger gepflegte Basis. Die aktuelle
 Das ist keine Zusage für jede Linux-Distribution. Ein Ubuntu-Build kann neue
 Systemsymbole benötigen; glibc-/C++-/Rust-Runtimeanforderungen der tatsächlichen
 Pakete müssen vor einer breiteren Distributionszusage ausgewertet werden.
+Das heruntergeladene, per SHA256 verifizierte Linux-Paket0.9.64 verlangt direkt
+GLIBC-Versionstags bis2.39 (App) beziehungsweise2.34 (CLI). Die App verlangt
+außerdem GCC_4.2.0 und LIBDBUS_1_3. Der neue
+[ABI-Nachweis](PAKET_LAUFZEIT.md#elf-anforderungen-vom-11-oktober) erfasst die
+Anforderungen pro Bibliothek; transitive Systembibliotheken und dynamisch
+geladene Komponenten sind damit noch nicht vollständig abgenommen.
 Wayland, native Ordnerauswahl, GPU und menschliche Orca-Bedienung sind keine
 bereits bestandenen Xvfb-Prüfungen.
 

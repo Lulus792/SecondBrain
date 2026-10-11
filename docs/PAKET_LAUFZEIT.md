@@ -83,3 +83,41 @@ entpackten Release-Pakete bestehen. Im geprüften Windows-Paket bleibt keine
 externe Visual-C++-Runtime erforderlich. Der lokale 0.9.23-Mac-Importbericht
 steht in build/crt-package-check/runtime-dependencies.json. Optionale dynamische
 Imports und frische Nutzerrechner sind davon nicht abgedeckt.
+
+## ELF-Anforderungen vom 11. Oktober
+
+Der Linux-Prüfweg erfasst zusätzlich Architektur, direkte `NEEDED`-Bibliotheken
+und die **Version References** aus `objdump -p`. Alle Versionstags bleiben mit
+Bibliotheksnamen und Flags erhalten. Die höchsten numerischen GLIBC-, GLIBCXX-,
+CXXABI- und GCC-Tags werden getrennt ausgewertet. Exportierte Versionen werden
+nicht als Anforderungen gezählt; ein Vergleich als Zeichenkette würde etwa2.9
+fälschlich über2.10 einordnen. Unvollständige oder unbekannte Tabellen brechen
+die Prüfung ab. Eine reine Suche nach undefinierten Symbolen würde unter anderem
+Copy-Relocations übersehen. Grundlage für das Binärwerkzeug:
+[LLVM objdump](https://llvm.org/docs/CommandGuide/llvm-objdump.html).
+
+Tatsächlich untersucht ist das unveränderte Linux-x86_64-Paket0.9.64 zu
+`bef4816d3e403ad7d6719366349030e6273707ef`, CI38171616070,
+Artefakt11714189375. Der heruntergeladene ZIP-Hash entspricht dem GitHub-Digest:
+`950347bfc983ae253fddc52ba16e7fb3784eb357ed9e893f43f9389b39efe9f2`.
+
+| Programm | Höchster direkter GLIBC-Tag | Weitere Anforderungen |
+| --- | --- | --- |
+| App | GLIBC_2.39 | GCC_4.2.0, LIBDBUS_1_3; vollständige Tagliste im Bericht |
+| CLI | GLIBC_2.34 | libc.so.6; vollständige Tagliste im Bericht |
+
+Das Paket wurde auf dem Intel-Mac nur gelesen, nicht als Linux-Programm
+ausgeführt. Seine bereits bestandene native Linux-Paketprüfung gehört zum
+ursprünglichen CI-Lauf. Der neue Scanner benötigt noch seine eigene native
+Linux-CI-Prüfung mit GNU objdump. Lokal bestehen sechs Python-Prüfungen;
+eine Windows-spezifische Prüfung ist entsprechend übersprungen. Die komplette
+macOS-Abhängigkeitsprüfung des installierten0.9.64-Pakets besteht weiterhin,
+mit `minos14.0` und SDK15.2 für beide Programme.
+
+Die Tags beschreiben die direkten Anforderungen der zwei Programme. Sie sind
+kein vollständiger Kernel-/Distributionsvertrag. Transitive Systembibliotheken,
+dlopen-Komponenten, frische Desktopinstallationen und tatsächliche
+Mindestversionsbedienung bleiben offen. Die App-Version bleibt0.9.64;
+geändert sind Entwicklerprüfwerkzeuge, keine Anwendungsfunktionen.
+Originale: `build/runtime-abi-verification/linux-abi.json`,
+`linux-headers.txt`, `linux-symbols.txt` und `macos-runtime.json`.

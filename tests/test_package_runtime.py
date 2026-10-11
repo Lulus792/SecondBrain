@@ -23,6 +23,54 @@ target_link_libraries(runtime_fixture PRIVATE sb_runtime_fixture)
 '''
 
 
+class ElfRequirementTests(unittest.TestCase):
+    def test_required_versions_keep_provider_flags_and_numeric_order(self):
+        listing = '''Dynamic Section:
+  NEEDED libc.so.6
+  NEEDED libcustom.so
+  VERNEEDNUM 0x0000000000000002
+Version Definitions:
+  0x00000001 GLIBC_99.0
+Version References:
+  required from libc.so.6:
+    0x01234567 0x00 02 GLIBC_2.9
+    0x01234568 0x02 03 GLIBC_2.10
+  required from libcustom.so:
+    0x01234569 0x00 04 LIBCUSTOM_1_3
+    0x01234570 0x00 05 GLIBCXX_3.4.9
+    0x01234571 0x00 06 GLIBCXX_3.4.30
+'''
+        result = inspector.elf_requirements(listing)
+        self.assertEqual(result['highest_required_version_tags'],
+                         {'GLIBC': 'GLIBC_2.10', 'GLIBCXX': 'GLIBCXX_3.4.30'})
+        self.assertEqual(result['needed_libraries'], ['libc.so.6', 'libcustom.so'])
+        self.assertEqual(result['version_requirements']['libc.so.6'][1]['flags'], '0x02')
+        self.assertEqual(result['version_requirements']['libcustom.so'][0]['name'], 'LIBCUSTOM_1_3')
+
+    def test_incomplete_or_unknown_version_tables_are_rejected(self):
+        for listing in (
+            '  VERNEEDNUM 1\n',
+            '  VERNEED 0x1234\n',
+            '  VERNEEDNUM 1\nVersion References:\n  required from libc.so.6:\n',
+            '  VERNEEDNUM 1\nVersion References:\n  required from libc.so.6:\n    unknown row\n',
+            '  VERNEEDNUM 1\nVersion References:\n  0x00000001 0x00 02 GLIBC_2.34\n',
+        ):
+            with self.subTest(listing=listing), self.assertRaises(ValueError):
+                inspector.elf_requirements(listing)
+
+    def test_unversioned_imports_do_not_invent_an_os_minimum(self):
+        result = inspector.elf_requirements('Dynamic Section:\n  NEEDED libcustom.so\n')
+        self.assertEqual(result['highest_required_version_tags'], {})
+        self.assertEqual(result['version_requirements'], {})
+
+    def test_invalid_binary_is_rejected_before_tool_execution(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / 'bad'
+            path.write_bytes(b'not an ELF')
+            with self.assertRaises(ValueError):
+                inspector.inspect_elf(path, 'nonexistent-tool')
+
+
 @unittest.skipUnless(shutil.which('cmake'), 'CMake unavailable')
 class PackageRuntimeTests(unittest.TestCase):
     def test_windows_os_boundary_retains_redistributables_with_both_path_separators(self):
@@ -96,6 +144,11 @@ endif()
             self.assertEqual(result.returncode, 0, result.stdout.decode(errors='replace') + result.stderr.decode(errors='replace'))
             data = json.loads(output.read_text(encoding='utf-8'))
             self.assertTrue(any(d['category'] == 'bundled' and 'sb_runtime_fixture' in d['path'] for d in data['dependencies']))
+            if sys.platform.startswith('linux'):
+                for metadata in data['binary_os_metadata'].values():
+                    self.assertIn('libsb_runtime_fixture.so', metadata['needed_libraries'])
+                    self.assertTrue(metadata['version_requirements']['libc.so.6'])
+                    self.assertIn('GLIBC', metadata['highest_required_version_tags'])
             for path in package.rglob(library.name): path.unlink()
             result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             self.assertNotEqual(result.returncode, 0)
