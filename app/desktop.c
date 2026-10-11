@@ -1965,6 +1965,7 @@ static void popup(SBDesktop *d, int width, int height) {
         h=fminf(height-40.0f,shell+content);d->modal_bounds=nk_rect((width-w)/2,(height-h)/2,w,h);
         glass(d,d->modal_bounds,16);
         if(nk_begin(ctx,"Änderungen erhalten",d->modal_bounds,NK_WINDOW_NO_SCROLLBAR)){
+            sb_ui_material_panel(&d->ui,d->modal_bounds,16);
             float available=ctx->current->layout->bounds.w;
             nk_layout_row_begin(ctx,NK_STATIC,header,2);
             nk_layout_row_push(ctx,available-32*s-ctx->style.window.spacing.x);native_heading(d,"modal-title","Änderungen erhalten");
@@ -2011,6 +2012,7 @@ static void popup(SBDesktop *d, int width, int height) {
     d->modal_bounds=nk_rect((width-w)/2,(height-h)/2,w,h);
     glass(d,nk_rect((width-w)/2,(height-h)/2,w,h),16);
     if (nk_begin(ctx,title,nk_rect((width-w)/2,(height-h)/2,w,h),NK_WINDOW_NO_SCROLLBAR)) {
+        sb_ui_material_panel(&d->ui,d->modal_bounds,16);
         float available=ctx->current->layout->bounds.w;
         nk_layout_row_begin(ctx,NK_STATIC,32*s,2);
         nk_layout_row_push(ctx,available-32*s-ctx->style.window.spacing.x);native_heading(d,"modal-title",title);
@@ -2548,7 +2550,7 @@ void sb_desktop_frame(SBDesktop *d) {
     if (d->form!=SB_FORM_NONE || d->model.guard) { d->target_count = 0; passive_clear(d); d->focus_group = 3; }
     d->semantic_context=accessible_context(d);
     struct nk_style_item old_background = d->ui.ctx->style.window.fixed_background;
-    d->ui.ctx->style.window.fixed_background = nk_style_item_color(d->ui.contrast ? d->ui.dark ? nk_rgb(0,0,0) : nk_rgb(255,255,255) : d->ui.dark ? nk_rgba(17,29,47,245) : nk_rgba(237,245,255,245));
+    d->ui.ctx->style.window.fixed_background = nk_style_item_color(nk_rgba(0,0,0,0));
     popup(d,width,height);
     d->ui.ctx->style.window.fixed_background = old_background;
     for (size_t i = 1; i < d->target_count; ++i) {

@@ -126,9 +126,18 @@ vorhandene Zuordnungen/Punktflächen. 136 Interaktions-Assertions vorher/nachher
 SBUI-077 bleibt offen: konkurrierende Dialog-Hintergrundtexte beruhigen und
 Glascharakter erhalten. [Bericht](/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-11_15-36-09/UI_REVIEW.md).
 
+## Dialogmaterial (0.9.55)
+
+SBUI-077 im lokalen Pixel-/Darstellungsumfang nachgeprüft: aktuelle Glasfläche
+vor eigenem Dialoginhalt, keine fremden Beschriftungen.352/136/621 Material-/
+Interaktions-/Provider-Assertions auch unter ASan/UBSan,39 C-Dateien,54 aktuelle
+Hashes. Vier gültige Metalbilder angesehen; Aufnahme-/Snapshot-Grenzen dokumentiert.
+78/78 lokale Release-Prüfungen bestehen (546,80 s). Paket/Installation folgen; installiert bleibt 0.9.54.
+[Vertrag](../../docs/DIALOGMATERIAL.md), [Bericht](/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-11_16-38-09/UI_REVIEW.md).
+
 ## Nächste Arbeiten
 
-Dialogmaterial (SBUI-077), Quelllesen, Parser/Inline-Aufbereitung,
+Aktuelle Dialog-/Geräteabnahme, Quelllesen, Parser/Inline-Aufbereitung,
 native Metadaten, Rasterung und Fälle über den Vorbereitungsbudgets profilieren.
 Der Rückfall ist noch synchron; einzelne Bibliotheksaufrufe und Shutdown können
 warten. SBUI-074 bleibt für die vollständige Großdaten-/Geräteabnahme offen.

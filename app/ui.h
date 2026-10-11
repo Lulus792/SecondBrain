@@ -71,6 +71,10 @@ typedef struct {
     SDL_FRect card_bounds,outgoing_bounds;
     float transition;
     bool transitioning,capture_pending;
+    struct nk_rect material_bounds;
+    float material_rounding,material_pixel_x,material_pixel_y;
+    int material_width,material_height;
+    bool material_ready;
 } SBUi;
 
 SBStatus sb_ui_init(SBUi *ui, const char *font_path, int width, int height, bool testing);
@@ -87,6 +91,8 @@ void sb_ui_input_barrier(SBUi *ui);
 void sb_ui_input_layout_changed(SBUi *ui);
 void sb_ui_focus_input(SBUi *ui);
 void sb_ui_draw(SBUi *ui);
+/* One foreground panel per frame, before its text and controls. */
+void sb_ui_material_panel(SBUi *ui,struct nk_rect bounds,float rounding);
 void sb_ui_transition_begin(SBUi *ui);
 void sb_ui_transition_tick(SBUi *ui,float seconds,bool reduced_motion);
 float sb_ui_hint_height(SBUi *ui,const char *text,float width);

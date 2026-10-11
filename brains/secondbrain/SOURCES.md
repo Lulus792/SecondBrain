@@ -206,3 +206,10 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   SBUI-077 offen; aktuelle HIG-Kapitel, 100/200%-Aufnahmen und Export-Referenz.
 - [Icondefinitionen](../../tools/export_icons.py): eigene C-/SVG-Motive,
   vollständige Zuordnung und erhaltene Punktflächen beim Export.
+
+- [Dialogmaterial](../../docs/DIALOGMATERIAL.md): aktuelle Texturauflösung,
+  gerundete Ebenenkomposition, Softwaredreiecke und Aufnahme-/Abnahmegrenzen.
+- [Materialprüfer](../../tests/test_material_panel.c): unabhängiger Vergleich
+  von Hintergrundtext, Vordergrundtext und Außenrand in sechs Darstellungsmodi.
+- [SBUI-077-Nachprüfung](/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-11_16-38-09/UI_REVIEW.md): Software-/Metalbilder und offene native
+  Snapshot-, Plattform-, Geräte- und assistive Abnahmen.

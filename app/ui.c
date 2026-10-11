@@ -475,6 +475,57 @@ void sb_ui_transition_tick(SBUi *ui,float seconds,bool reduced_motion) {
     ui->transition=reduced_motion ? 1 : fminf(1,ui->transition+seconds/0.18f);
     if (ui->transition>=1) {SDL_DestroyTexture(ui->outgoing_texture);ui->outgoing_texture=NULL;ui->transitioning=false;}
 }
+typedef struct {struct nk_vec2 position;float alpha;} SBMaterialVertex;
+static void material_triangle(SBUi *ui,struct nk_draw_list *list,SBMaterialVertex a,SBMaterialVertex b,SBMaterialVertex c,unsigned depth){
+    float left=fminf(a.position.x,fminf(b.position.x,c.position.x)),right=fmaxf(a.position.x,fmaxf(b.position.x,c.position.x));
+    float top=fminf(a.position.y,fminf(b.position.y,c.position.y)),bottom=fmaxf(a.position.y,fmaxf(b.position.y,c.position.y));
+    /* SDL's pinned software triangle path stores source-coordinate * area in
+       a signed int. Bound backing-pixel triangles, including rounding slack. */
+    double area=((right-left)*ui->material_pixel_x+2)*((bottom-top)*ui->material_pixel_y+2)*4;
+    if(depth<16 && area*fmax(ui->space.width,ui->space.height)>536870912.0){
+        float ab=(a.position.x-b.position.x)*(a.position.x-b.position.x)+(a.position.y-b.position.y)*(a.position.y-b.position.y);
+        float bc=(b.position.x-c.position.x)*(b.position.x-c.position.x)+(b.position.y-c.position.y)*(b.position.y-c.position.y);
+        float ca=(c.position.x-a.position.x)*(c.position.x-a.position.x)+(c.position.y-a.position.y)*(c.position.y-a.position.y);
+        if(bc>ab && bc>=ca){SBMaterialVertex temp=a;a=b;b=c;c=temp;}
+        else if(ca>ab && ca>=bc){SBMaterialVertex temp=a;a=c;c=b;b=temp;}
+        SBMaterialVertex middle={nk_vec2((a.position.x+b.position.x)/2,(a.position.y+b.position.y)/2),(a.alpha+b.alpha)/2};
+        material_triangle(ui,list,a,middle,c,depth+1);material_triangle(ui,list,middle,b,c,depth+1);return;
+    }
+    nk_draw_index base=(nk_draw_index)list->vertex_count;void *vertices=nk_draw_list_alloc_vertices(list,3);nk_draw_index *indices=nk_draw_list_alloc_elements(list,3);
+    if(!vertices || !indices)return;SBMaterialVertex points[]={a,b,c};
+    for(unsigned i=0;i<3;++i){struct nk_vec2 p=points[i].position;struct nk_colorf color={1,1,1,points[i].alpha};
+        vertices=nk_draw_vertex(vertices,&list->config,p,nk_vec2(p.x/ui->material_width,p.y/ui->material_height),color);indices[i]=(nk_draw_index)(base+i);}
+}
+static void material_panel_draw(void *canvas,short x,short y,unsigned short w,unsigned short h,nk_handle data){
+    (void)x;(void)y;(void)w;(void)h;
+    SBUi *ui=data.ptr;struct nk_draw_list *list=canvas;struct nk_rect b=ui->material_bounds;
+    bool texture=ui->material_ready && ui->space.texture && ui->material_width>0 && ui->material_height>0 &&
+        SDL_SetTextureBlendMode(ui->space.texture,SDL_BLENDMODE_BLEND);
+    if(!texture){nk_draw_list_fill_rect(list,b,ui->contrast ? ui->dark ? nk_rgb(0,0,0) : nk_rgb(255,255,255) : ui->dark ? nk_rgb(17,29,47) : nk_rgb(237,245,255),ui->material_rounding);return;}
+    /* Rounded shape with opaque interior and an antialiased outer ring. */
+    struct nk_vec2 points[32],normals[32];
+    nk_draw_list_path_rect_to(list,nk_vec2(b.x,b.y),nk_vec2(b.x+b.w,b.y+b.h),ui->material_rounding);
+    unsigned count=list->path_count;if(count<3 || count>32){nk_draw_list_path_clear(list);return;}
+    memcpy(points,nk_buffer_memory(list->buffer),count*sizeof(*points));nk_draw_list_path_clear(list);
+
+    nk_draw_list_push_image(list,nk_handle_ptr(ui->space.texture));
+    for(unsigned i=0;i<count;++i){unsigned next=(i+1)%count;float dx=points[next].x-points[i].x,dy=points[next].y-points[i].y,length=sqrtf(dx*dx+dy*dy);normals[i]=length>0 ? nk_vec2(dy/length,-dx/length) : nk_vec2(0,0);}
+    SBMaterialVertex inner[32],outer[32],center={nk_vec2(b.x+b.w/2,b.y+b.h/2),1};
+    for(unsigned i=0;i<count;++i){unsigned previous=(i+count-1)%count;struct nk_vec2 m=nk_vec2((normals[previous].x+normals[i].x)/2,(normals[previous].y+normals[i].y)/2);
+        float length=m.x*m.x+m.y*m.y,factor=length>0.000001f ? fminf(100,1/length)*0.5f : 0;m.x*=factor;m.y*=factor;
+        inner[i]=(SBMaterialVertex){nk_vec2(points[i].x-m.x,points[i].y-m.y),1};outer[i]=(SBMaterialVertex){nk_vec2(points[i].x+m.x,points[i].y+m.y),0};}
+    for(unsigned i=0;i<count;++i){unsigned next=(i+1)%count;
+        material_triangle(ui,list,center,inner[i],inner[next],0);
+        material_triangle(ui,list,inner[i],outer[i],inner[next],0);
+        material_triangle(ui,list,outer[i],outer[next],inner[next],0);}
+
+}
+void sb_ui_material_panel(SBUi *ui,struct nk_rect bounds,float rounding){
+    if(!ui || !ui->ctx || !ui->ctx->current || !isfinite(bounds.x) || !isfinite(bounds.y) || !isfinite(bounds.w) || !isfinite(bounds.h) || !isfinite(rounding) || bounds.w<=0 || bounds.h<=0)return;
+    ui->material_bounds=bounds;ui->material_rounding=fminf(fmaxf(0,rounding),fminf(bounds.w,bounds.h)/2);
+    struct nk_command_buffer *canvas=nk_window_get_canvas(ui->ctx);struct nk_rect clip=canvas->clip;
+    nk_push_scissor(canvas,bounds);nk_push_custom(canvas,bounds,material_panel_draw,nk_handle_ptr(ui));nk_push_scissor(canvas,clip);
+}
 void sb_ui_draw(SBUi *ui) {
     /* Nuklear uses window coordinates, independent of backing-pixel density. */
     struct nk_window *owner=sb_ui_input_owner(ui->ctx);
@@ -500,7 +551,11 @@ void sb_ui_draw(SBUi *ui) {
     }
     SDL_SetRenderLogicalPresentation(ui->renderer,width,height,SDL_LOGICAL_PRESENTATION_STRETCH);
     SDL_SetRenderDrawColor(ui->renderer,ui->dark ? 28 : 255,ui->dark ? 29 : 255,ui->dark ? 33 : 255,255);SDL_RenderClear(ui->renderer);
-    if (!sb_space_draw(&ui->space,ui->renderer,width,height)) {SDL_SetRenderDrawColor(ui->renderer,7,14,26,255);SDL_RenderClear(ui->renderer);}
+    ui->material_width=width;ui->material_height=height;
+    int material_pixels_w=width,material_pixels_h=height;SDL_GetCurrentRenderOutputSize(ui->renderer,&material_pixels_w,&material_pixels_h);
+    ui->material_pixel_x=fmaxf(1,(float)material_pixels_w/fmaxf(1,width));ui->material_pixel_y=fmaxf(1,(float)material_pixels_h/fmaxf(1,height));
+    ui->material_ready=sb_space_draw(&ui->space,ui->renderer,width,height);
+    if (!ui->material_ready) {SDL_SetRenderDrawColor(ui->renderer,7,14,26,255);SDL_RenderClear(ui->renderer);}
     nk_sdl_render(ui->ctx,NK_ANTI_ALIASING_ON);sb_ui_text_frame_end(ui);edit_cache_frame_end(ui);
     if (ui->transitioning && ui->outgoing_texture) {
         SDL_FRect dest=ui->outgoing_bounds,source={dest.x*ui->snapshot_width/width,dest.y*ui->snapshot_height/height,dest.w*ui->snapshot_width/width,dest.h*ui->snapshot_height/height};

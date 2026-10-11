@@ -302,3 +302,13 @@ nachgeprüft; der Export erhält die vorhandenen Anschlüsse. Die neue Bildprüf
 hält SBUI-077 offen: Beschriftungen hinter Dialogen passend beruhigen, während
 der gewünschte Glascharakter erhalten bleibt. Aktuelle Paket-/Zielplattform-,
 reale Bedien- und weitere Leistungsabnahmen bleiben getrennte Release-Arbeit.
+
+## Dialogmaterial-Nachprüfung vom 11. Oktober
+
+Ab 0.9.55 ist SBUI-077 im lokalen Pixel-/Darstellungs-/Ereignisumfang nachgeprüft:
+Dialoge setzen ihre aktuelle Glastextur vor eigenem Inhalt wieder ein, ohne die
+Beschriftungen anderer UI-Fenster durchscheinen zu lassen. Material- und
+Gesamtprüfung sowie gezielte ASan/UBSan bestehen. [Vertrag](DIALOGMATERIAL.md).
+Vier korrekt vor Present erfasste Metalbilder wurden angesehen; native Snapshot-
+Pixelidentität und weitere Geräte-/Plattform-/assistive Abnahmen bleiben getrennt
+offen. Die vollständige Leistungs- und Release-Aufgabe bleibt bestehen.

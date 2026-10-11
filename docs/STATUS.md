@@ -3768,3 +3768,24 @@ zuletzt queued; neue Gesamt-Plattformabnahme bleibt offen. SBUI-076/078
 im beschriebenen lokalen Bild-/Export-/Ereignisumfang nachgeprüft. SBUI-077,
 Leistungs-, reale Geräte-/Eingabe-/Screenreader- und übrige Release-Abnahmen offen.
 1.0 nur nach ausdrücklicher Nutzerfreigabe.
+
+## Dialogmaterial vor dem Inhalt (0.9.55)
+
+SBUI-077: der Dialog setzt seine bereits berechnete Glasfläche vor den eigenen
+Texten wieder ein. Beschriftungen anderer Fenster scheinen nicht mehr durch;
+Sternszene, Materialrand und Darstellungsmodi bleiben erhalten. Der Befehl löst
+die aktuelle Textur erst nach Raster/Resize auf, ohne Material-Readback oder
+zusätzliche Textur. [Vertrag](DIALOGMATERIAL.md).
+
+352 Material-Pixel-, 136 produktive Interaktions- und 621 native Mac-Provider-
+Assertions bestehen, auch unter haltendem ASan/UBSan im dokumentierten Umfang.
+39 eigene C-Dateien instrumentiert; 54 Quell-/Include-Hashes stimmen. Vier
+aktuelle Metalbilder mit Dichte 2,00 angesehen; 48 Aufnahmen erzeugt. Aufnahmen
+nach Present und der an Snapshot-Pixelidentität gescheiterte direkte Native-
+Interaktionsversuch sind keine positiven Abnahmen. Originale:
+`build/material-panel-verification/`, `build/material-panel-sanitizers/`;
+[UI-Nachprüfung](/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-11_16-38-09/UI_REVIEW.md).
+
+78/78 lokale Release-Prüfungen bestehen (546,80 s). Paket/Installation folgen; installiert bleibt
+0.9.54. Aktuelle Zielplattformen, reale Eingaben/Screenreader/Geräte, Leistung
+und übrige Release-Arbeit bleiben offen. 1.0 nur nach Nutzerfreigabe.
