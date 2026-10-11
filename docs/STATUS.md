@@ -3366,3 +3366,24 @@ weiterhin0.9.44. Parser/Inline, native Metadaten, Rasterung, Spitzenverbrauch,
 synchrone Budget-Rückfälle, Shutdown und echte Geräte/assistive Bedienung bleiben
 offen. SBUI-074 ist für die vollständige Abnahme nicht geschlossen.1.0 bleibt
 an ausdrückliche Nutzerfreigabe gebunden.
+
+## Sauberes Reader-Paket installiert (0.9.46)
+
+Quellcommit24a16edbed095ff8c13d4064854694bd30f0bf3d ist erfolgreich nach
+origin/main veröffentlicht. Nach sauberer Rekonfiguration bestehen Versions-/
+Release-Vertrag erneut. Intel/macOS-Archiv:
+`build/reader-package/SecondBrain-0.9.46-Darwin-x86_64.tar.gz`.
+SHA-256:`66cf09ec12e8d87011c8a296e5afd45e85af07f0450ade2c4ee39e60b10d1477`.
+
+Das entpackte Paket besteht126 Desktop-,161 Tastatur-,75 Sicherungs-Assertions,
+zwei Einstellungen-/Neustartprozesse, produktive CLI und Runtime-/Lizenz-/
+Versionsprüfung.95 Dateien entsprechen danach unter `dist/SecondBrain` exakt
+dem geprüften Paket. Versionsausgabe0.9.46/24a16edbed09/Darwin-x86_64/Release.
+Beim Laden des eigenen Gedächtnisses sind alle18 Dateien unverändert.
+Vorige App0.9.44 bleibt unter `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.44-20261011-104519` erhalten.
+Protokolle/Hashmanifest: `build/reader-verification/`.
+
+[CI38125578620](https://github.com/Lulus792/SecondBrain/actions/runs/38125578620)
+zum Quellcommit ist zuletzt queued; kein neuer Windows-/Linux-/ARM64-
+Gesamtnachweis. Vollständige Leistungs-/Geräte-/assistive Abnahme und übrige
+Release-Liste bleiben offen;1.0 nur nach ausdrücklicher Nutzerfreigabe.

@@ -11,11 +11,16 @@ Lumen-Sternkarte, Glaskarten, Icons, direkte Pfeilnavigation, Kamerafahrt,
 Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert weiterhin **0.9.44 / 0455e5a276f8**; Versionsaufruf am 11. Oktober
-bestätigt. Die früheren lokalen Build-/Paket-/Diagnoseverzeichnisse sind nicht
-mehr vorhanden. Historische Abnahmen bleiben in STATUS und im Journal erhalten;
-ihre entfernten Dateien sind keine aktuell zugänglichen Prüfbelege.
-Ein frischer Release-Build liegt unter `build/current-ui`.
+Installiert **0.9.46 / 24a16edbed09**, sauberer Intel/macOS-Release-Build.
+95 Dateien stimmen mit dem geprüften Paket überein; die18 Gedächtnisdateien
+blieben beim Laden unverändert.126 Desktop-,161 Tastatur-,75 Sicherungs-
+Assertions, zwei Neustarts, produktive CLI sowie Runtime-/Lizenz-/Version bestehen.
+Rückfallversion0.9.44: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.44-20261011-104519`.
+CI38125578620 zum Quellcommit zuletzt queued; kein neuer Gesamt-Plattformnachweis.
+
+Frühere Build-/Paket-/Diagnoseverzeichnisse waren am11.Oktober nicht mehr
+vorhanden. Historische Abnahmen bleiben in STATUS/Journal; entfernte Dateien
+sind keine aktuell zugänglichen Prüfbelege. Neuer Build: `build/current-ui`.
 
 ## Aktuelle Arbeit (0.9.46)
 
@@ -33,13 +38,12 @@ Aktuelle Hover-/Tastaturhinweise unterbrechen eine überlagernde Überblendung.
 auch unter haltendem ASan/UBSan im dokumentierten Teilumfang. Native
 Blockgeometrie/Scrollmaximum stimmen mit dem synchronen Referenzpfad überein.
 Interaktions- und Tastaturprüfung bestehen nach den Anschlusskorrekturen.
-70/70 lokale Release-Prüfungen bestehen (488,53s). Paket/Installation und
-Zielplattformen folgen.
+70/70 lokale Release-Prüfungen bestehen (488,53s). Intel/macOS-Paket und
+Installation bestehen; weitere Zielplattformen folgen.
 
 ## Nächste Arbeiten
 
-Die aktuelle Gesamt-/Paketprüfung abschließen, geprüften Schritt veröffentlichen
-und die Mac-App aktualisieren. Danach Quelllesen, Parser/Inline-Aufbereitung,
+Quelllesen, Parser/Inline-Aufbereitung,
 native Metadaten, Rasterung und Fälle über den Vorbereitungsbudgets profilieren.
 Der Rückfall ist noch synchron; einzelne Bibliotheksaufrufe und Shutdown können
 warten. SBUI-074 bleibt für die vollständige Großdaten-/Geräteabnahme offen.
