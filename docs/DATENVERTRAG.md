@@ -1,8 +1,9 @@
 # Datenvertrag der lokalen Entwicklungsversion
 
-Stand: 6. Oktober 2026. Die Metadaten- und Textprüfung wird in 0.7.1 vereinheitlicht.
-Dies legt das vorhandene lokale Format fest; ein vollständiger 1.0-Vertrag benötigt
-zusätzlich die unten genannten Plattform- und Migrationsabnahmen.
+Stand: 12. Oktober 2026. Metadaten- und Textprüfung sind seit 0.7.1 vereinheitlicht.
+Dieses Dokument beschreibt das vorhandene lokale Format, nicht eine neue Migration.
+Der Abnahmestand für 1.0 steht in [RELEASE_ABNAHME.md](RELEASE_ABNAHME.md);
+Betriebssystemzusagen und die dort genannten tatsächlichen Abnahmen bleiben offen.
 
 ## Projektordner und Metadaten
 
@@ -67,14 +68,16 @@ Datei wird gemeldet, nicht gekürzt, bereinigt oder überschrieben. Externe Quel
 verwenden denselben Textvertrag und bleiben schreibgeschützt. Bei abgewiesener
 Quelle bleiben die bisherige Quelle und ein offener Entwurf erhalten.
 
-Markdown ist das Speicherformat; der aktuelle Renderer ist kein vollständiger
-CommonMark-Parser. Ab 0.9.4 teilen Titel und Leseansicht eigene Regeln für
-Absätze, ATX-/Setext-Überschriften, eingerückten und fenced Code. Inline-Links
-sind begrenzt aufbereitet; Listen, Zitate und Tabellen haben weiterhin eine
-vorläufige Textdarstellung. [Umfang und Grenzen](MARKDOWN.md). Schreiben und
-Sicherung erhalten den eigenen gespeicherten Markdown-Text.
-Schriftabdeckung, Unicode-Textgeometrie und eine abschließende Markdown-Abnahme
-bleiben Release-Aufgaben.
+Markdown ist das Speicherformat. Die eigene C-Leseansicht unterstützt Absätze,
+ATX-/Setext-Überschriften, eingerückten und fenced Code, Trennlinien,
+verschachtelte Listen/Zitate und adaptive Tabellen. Inline-Code, Hervorhebungen,
+Zeichenreferenzen, direkte und Referenzlinks sowie E-Mail-/URI-Autolinks verwenden
+geteilte Regeln. [Umfang und Grenzen](MARKDOWN.md), [Container](CONTAINER_UI.md)
+und [Tabellen](TABELLEN.md). HTML bleibt literal; die App führt es nicht aus.
+Dies ist eine dokumentierte Teilmenge, keine vollständige CommonMark-/GFM-Zusage.
+Schreiben und Sicherung erhalten den eigenen gespeicherten Markdown-Text.
+Schriftabdeckung, native/menschliche Textbedienung und die abschließende
+Abnahme dieses dokumentierten Umfangs bleiben Release-Aufgaben.
 
 Anwendungspfade verwenden UTF-8 und Puffer unter 4096 Bytes; reale Dateisystem-
 und OS-Grenzen können niedriger sein. Wissensunterordner haben eine Rekursionsgrenze

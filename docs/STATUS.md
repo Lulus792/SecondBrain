@@ -4423,3 +4423,25 @@ beim Öffnen unverändert, installierte Aufnahme angesehen. Rückfall: `/Users/l
 [Vertrag und Archivhash](UEBERGANG_BILD.md). Binärminimum 14.0/SDK 15.2;
 ausgeführt auf Intel/macOS 14.6.1/23G93. CI38181757771: vier Windows-/Linux-
 Desktopjobs in Arbeit, native Mac-Jobs queued. Weitere Release-Abnahmen offen.
+
+## Vollständige Release-Nachprüfung und kompakter Projektkern
+
+12. Oktober 2026: alle 84 lokalen Release-CTest-Prüfungen bestehen (707,14 s).
+Build- und installierte App 0.9.68/0b0fdacda4fa sind vor/nach dem Lauf bytegleich;
+SHA256 ade288ab84195382a64f8c5b24fed8f1713b11aad0616c5a846b8ad958b8869e.
+Alle vier Windows-/Linux-Desktopjobs zu 0b0fdac/CI38181757771 erfolgreich;
+Paketprüfschritte in beiden Release-Jobs einzeln bestätigt. Native Mac-CI queued,
+Intel lokal geprüft. Server 2025/Xvfb sind keine Windows-11-/Wayland-/menschliche Abnahme.
+
+[Aktuelle Abnahmeübersicht](RELEASE_ABNAHME.md) trennt heutige Funktion, begrenzte
+Nachweise und ausstehende Arbeit. Der Datenvertrag beschreibt die tatsächlich
+implementierten Container/Tabellen/Inline-Regeln, ohne vollständige CommonMark-/
+GFM- oder Migrationszusage. Der eigene Projektkern wurde gekürzt; vollständige
+historische Stand-/Entscheidungs-/Quellenfassungen sind mit reversibel angepassten
+Verweisen im Archiv erhalten. Alle 22 Entscheidungskennungen bleiben vorhanden.
+Kopierbarer Kontext 46.118→18.012 Bytes, rund 61 % weniger. 523 lokale Verweise
+geprüft und elf frühere Journalverweise korrigiert. 21 Dateien beim Öffnen der
+fertigen Kernfassung unverändert; Aufnahme angesehen.
+App-Version und Binärdateien unverändert. Nächster implementierbarer Punkt:
+Windows-Custom-High-Contrast-Paletten; bisher liest der Adapter nur das Flag.
+Originale: `build/release-audit-verification/`.

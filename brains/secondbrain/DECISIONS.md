@@ -1,235 +1,115 @@
 # SecondBrain Entscheidungen
 
-Stand: 6. Oktober 2026.
+Stand: 12. Oktober 2026. Nutzerentscheidungen und Implementierungsentscheidungen
+sind getrennt benannt. Die [detaillierte historische Fassung](archive/decisions-2026-10-12.md)
+bleibt erhalten; aktuelle Prüfgrenzen stehen in [STATE.md](STATE.md).
 
 ## D01: Eigene Anwendung in C auf drei Plattformen
 
-Beschlossen durch den Nutzer. Der normale Arbeitsablauf gehört in die eigene App.
-Der Kern verwendet C und Betriebssystem-APIs; externe Bibliotheken sind nur für UI
-zulässig. Windows, macOS und Linux werden tatsächlich geprüft.
-Beleg: [Projektplan](../../docs/PROJEKTPLAN.md).
+Nutzerentscheidung: eigene C17-App für Windows, macOS und Linux; fachlicher Kern mit Standard-/OS-APIs, externe Bibliotheken ausschließlich UI.
+[Maßgebliche Quelle](../../docs/PROJEKTPLAN.md).
 
 ## D02: Gemeinsames, lesbares Projektwissen
 
-Beschlossen durch den Nutzer: Das System dient Mensch und KI gemeinsam.
-Implementierungsentscheidung: UTF-8-Markdown und kleine JSON-Metadaten übernehmen
-die bestehende Struktur. Der Kern exportiert gespeicherte Kerninformationen als
-kopierbaren Kontext. Kein bestimmter KI-Anbieter ist dafür erforderlich.
-Beleg: [Konzept](../../docs/KONZEPT.md), [Architektur](../../docs/ARCHITEKTUR.md).
+Nutzerentscheidung: Mensch und KI verwenden dieselben lesbaren Projektdateien. UTF-8-Markdown, JSON-Metadaten und kopierbarer Kontext; kein festgelegter KI-Anbieter.
+[Maßgebliche Quelle](../../docs/KONZEPT.md).
 
 ## D03: UI-Recherche vor Gestaltung
 
-Beschlossen durch den Nutzer. Apple ist die gestalterische Orientierung.
-Originalquellen und abgeleitete Prinzipien wurden vor dem Entwurf dokumentiert.
-Die Implementierung verwendet eigene Flächen, Noto-Schriften und Systemfenster.
-Beleg: [UI-Recherche](../../docs/UI_RECHERCHE.md),
-[UI-Entwurf](../../docs/UI_ENTWURF.md).
+Nutzerentscheidung: UI-Grundlagen und Apple HIG vor dem Entwurf recherchieren. Erkenntnisse und eigene Übertragung dokumentieren.
+[Maßgebliche Quelle](../../docs/UI_RECHERCHE.md).
 
 ## D04: SDL3 und Nuklear ausschließlich in der UI
 
-Implementierungsentscheidung. Beide passen zur C-Anwendung und den Zielplattformen.
-Der unabhängige Kern enthält sie nicht. SDL wird statisch eingebunden; Nuklear wurde
-für UTF-8-Paste und große Cursorpositionen korrigiert.
-Grenze: keine native Screenreader-Anbindung in Version 0.1.
-Beleg: [Architektur](../../docs/ARCHITEKTUR.md),
-[Versionen und Lizenzen](../../third_party/README.md).
+Implementierungsentscheidung: SDL3/Nuklear bilden die eigene Oberfläche; Textformung und Zugänglichkeitsbibliotheken gehören ebenfalls nur zur UI. Der Kern bleibt unabhängig.
+[Maßgebliche Quelle](../../docs/ARCHITEKTUR.md).
 
 ## D05: Bewusst speichern und Wissen erhalten
 
-Implementierungsentscheidung. Speichern prüft den gelesenen Stand und ersetzt
-Dateien atomar. Ungespeicherte Wechsel fragen nach Speichern, Verwerfen oder
-Abbrechen. Bei externen Konflikten kann eine eigene Notizkopie angelegt werden.
-Beleg: [Kern](../../src/sb.c), [Anwendungszustand](../../app/model.c),
-[Bedienprüfung](../../app/self_test.c).
+Implementierungsentscheidung: bewusste Speicherung mit gelesener Revision, atomarem Ersetzen, Save-Guard und Konfliktkopie; erkannte fremde Inhalte erhalten.
+[Maßgebliche Quelle](../../docs/DATENVERTRAG.md).
 
 ## D06: Geprüfte Schritte auf GitHub
 
-Beschlossen durch den Nutzer. Schritte werden ohne erzwungene Pushes veröffentlicht.
-Plattformnachweise nennen tatsächlich erfolgreiche Läufe. Pakettests starten die
-wirklich entpackte App.
-Beleg: [Projektanweisungen](../../AGENTS.md),
-[Plattformnachweise](../../docs/PLATTFORMEN.md).
+Nutzerentscheidung: jeden abgeschlossenen, geprüften Schritt committen und ohne Force-Push veröffentlichen. Nur ausgeführte Prüfungen als Plattformnachweise nennen.
+[Maßgebliche Quelle](../../AGENTS.md).
 
 ## D07: Gestaltung der räumlichen Wissensansicht
 
-Bestätigte Nutzerpräferenzen vom 6. Oktober 2026: dunkel und elegant mit
-dezenten Farben; kleine leuchtende Sterne mit klaren Beschriftungen; wenige
-schwebende Bedienelemente und Notizen bei Auswahl. Zusätzlich soll eine Variante
-mit glasartigen Karten über der Galaxie gezeigt werden.
-
-Lumen, Glas und Fokus waren die ersten Entwürfe zur Auswahl.
-Beleg: [Designrecherche](../../docs/UI_GALAXIE.md).
+Nutzerpräferenz: dunkel/elegant, dezente Farben, kleine leuchtende Sterne und klare Beschriftungen; wenige schwebende Elemente.
+[Maßgebliche Quelle](../../docs/UI_GALAXIE.md).
 
 ## D08: Lumen-Farben mit Liquid-Glass-Material
 
-Der Nutzer hat am 6. Oktober 2026 die Farbgestaltung von Lumen ausgewählt.
-Karten und weitere Bedienelemente sollen einen ausgeprägten Liquid-Glass-Look
-wie bei Apple erhalten. Die verfeinerte Designstudie zeigt diese Kombination
-mit Hintergrundbrechung und reagierenden Lichtkanten.
-
-Die Vorschau ist eine eigene optische Nachbildung. Ein Originalmaterial von
-Apple ist damit noch nicht in die C-App integriert. Materialanbindung und
-Plattformnachweise gehören zum nächsten Implementierungsschritt.
-Beleg: [Verfeinerte Studie](../../docs/UI_GALAXIE.md).
+Nutzerwahl: Lumen-Farben und Liquid-Glass-Anmutung. Eigener plattformübergreifender Materialrenderer; keine native Apple-Materialkomponente.
+[Maßgebliche Quelle](../../docs/UI_GALAXIE.md).
 
 ## D09: Vollständige Tastaturwege im neuen Design
 
-Am 6. Oktober hat der Nutzer die Umsetzung des neuen Designs und problemlose
-Navigation ausschließlich per Tastatur beauftragt. Tab folgt einer sichtbaren,
-stabilen Reihenfolge; F6 wechselt Gruppen. Die ursprüngliche getrennte Sternwahl
-wurde durch den Folgeauftrag zur direkten Navigation ersetzt (D10).
-Dialoge, Quellen, Kontext und Bearbeitung bleiben erreichbar. Ein eigener
-SDL-Tastaturdurchlauf prüft die Abläufe ohne injizierte Mausereignisse.
-Quelle: Nutzerauftrag; [Bedienvertrag](../../docs/UI_TASTATUR.md).
+Nutzerauftrag: vollständige Tastaturwege, sichtbarer Fokus, Tab/F6-Gruppen sowie erreichbare Dialoge, Quellen, Kontext und Bearbeitung.
+[Maßgebliche Quelle](../../docs/UI_TASTATUR.md).
 
 ## D10: Direkte Navigation und kurze Übergänge
 
-Der Folgeauftrag vom 6. Oktober verlangt sofortiges Öffnen der nächsten Notiz mit
-Pfeiltasten und flüssigere Bewegungen. Kamera und Scrollposition verwenden kurze,
-unterbrechbare Übergänge; reduzierte Bewegung ist in der App wählbar. Der Schutz
-ungespeicherter Änderungen bleibt maßgeblich. Ein fremdes Projektbeispiel wurde
-auf Nutzerwunsch vollständig aus der aktuellen Arbeitsfassung entfernt; neutrale
-Testdaten ersetzen es. Die Git-Historie bleibt erhalten.
-
-Die README orientiert sich nach Recherche an üblichen Desktop-Projekten. Eine
-abschließende sprachliche Prüfung des Endprodukts folgt erst vor 1.0; die
-Entwicklungsdokumentation bleibt erhalten. [Release-Aufgaben](../../docs/RELEASE.md)
-und [README-Recherche](../../docs/README_RECHERCHE.md).
+Nutzerauftrag: Pfeile öffnen direkt die nächste Notiz; kurze unterbrechbare Kamera-/Scrollbewegungen mit reduziertem Bewegungsmodus. Neutrale Beispiele, Schlussredaktion erst vor dem fertigen Produkt.
+[Maßgebliche Quelle](../../docs/INTERAKTION.md).
 
 ## D11: Vollständige Vorbereitung vor 1.0
 
-Der Nutzer hat Archiv-Rückkehr, stärkere Raumfahrt, stabile Scrollgrenzen,
-Menüpfeile, überarbeitete Layouts, große Leseansicht, integrierte Suchfeld-Löschung
-und eigene Icons beauftragt. Die übrigen offenen Release-Arbeiten gehören zum
-selben Auftrag. Die Versionsnummer 1.0 bleibt ausdrücklich bis zu seiner Freigabe
-gesperrt. Recherche und Abnahme stehen in [UI_POLITUR.md](../../docs/UI_POLITUR.md).
-
-Die eigene Lizenz ist auf direkte Nutzerentscheidung MIT. Apple-Developer-Konto
-und Windows-Code-Signing-Zertifikat sind noch nicht vorhanden. Signierungswege
-werden vorbereitet; tatsächliche Herausgeber-Signierung wird erst mit den nötigen
-Konten und Zertifikaten belegt. [Release-Liste](../../docs/RELEASE.md).
-
+Nutzerauftrag: vollständige Release-Vorbereitung und UI-Politur. Eigener Code MIT. 1.0 erst nach ausdrücklicher Freigabe; Signierungskonten/Zertifikate fehlen.
+[Maßgebliche Quelle](../../docs/RELEASE_ABNAHME.md).
 
 ## D12: Inhaltsarchive und neue Wiederherstellungsziele
 
-Der vollständige Release-Auftrag wird mit eigener C-Sicherung umgesetzt.
-Versionierte Archive enthalten gespeicherte reguläre Projektdateien einschließlich
-Anhängen und leerer Ordner; verknüpfte externe Repositories bleiben außerhalb.
-SHA-256 prüft Inhalte und bindet die UI-Vorschau an die importierte Datei.
-Wiederherstellen veröffentlicht ausschließlich einen neuen freien Projektordner.
-Bestehende Projekte und Sicherungen werden nicht ersetzt. Die gewählte neue
-Ordnerkennung wird im Metadaten-id angepasst; andere Inhalte bleiben erhalten.
-
-Die UI arbeitet im Hintergrund, wahrt Save-Konflikte und erhält andere offene
-Entwürfe. Abbruch und Beenden haben explizite Zustände. Quelle: Nutzerauftrag
-vor 1.0, ursprüngliche Release-Liste und [Sicherungsvertrag](../../docs/SICHERUNG.md).
-
+Implementierungsentscheidung: eigene versionierte Inhaltsarchive, SHA-256-Prüfung und Wiederherstellung in ein freies neues Ziel; bestehende Projekte/Archive erhalten.
+[Maßgebliche Quelle](../../docs/SICHERUNG.md).
 
 ## D13: Native Zugänglichkeit ausschließlich in der UI
 
-AccessKit-C 0.23.1 ergänzt SDL3/Nuklear als UI-Abhängigkeit. Der Anwendungscode
-bleibt C; die vorgebaute Bibliothek ist intern Rust. Der fachliche Kern bleibt
-unabhängig. Eigene Snapshots und eine begrenzte Aktionswarteschlange verbinden
-native Semantik mit bestehenden Schutz- und Fokuswegen. Kontextwechsel erzeugen
-neue native Kennungen und verwerfen alte Aktionen. Windows verwendet die DLL,
-macOS/Linux die statische Bibliothek. Original-Lizenzen werden ausgeliefert.
-Die Entscheidung setzt den beauftragten Screenreader-Umfang technisch um;
-vollständige native und assistive Abnahme ist weiterhin erforderlich.
-[Anbindung und Nachweise](../../docs/BARRIEREFREIHEIT_PLAN.md).
-
+Implementierungsentscheidung: AccessKit als externe UI-Anbindung, eigene C-Snapshots und begrenzte Aktionen mit Kontextkennungen. Menschliche assistive Abnahme bleibt erforderlich.
+[Maßgebliche Quelle](../../docs/BARRIEREFREIHEIT_PLAN.md).
 
 ## D14: Linux-UI-Cachekorrektur aus festgelegter Quelle
 
-Die Release-Arbeit hat eine tatsächlich fehlerhafte AT-SPI-Signalstruktur in der
-UI-Abhängigkeit bestätigt. Linux baut AccessKit-C 0.23.1 mit accesskit_unix 0.24.0
-und einer Korrektur von zwei Signalaufrufen aus verifizierter Quelle. Die
-Anwendungsimplementierung bleibt C; Cargo/Rust baut ausschließlich die externe
-UI-Bibliothek. macOS-/Windows-Bibliotheken bleiben auf derselben Version.
-Der Kern und fertige Pakete benötigen keine Rust-Toolchain. Eigene C-Protokoll-
-prüfung und Client mit tatsächlichem Cache belegen die Korrektur. Die Quelldaten,
-Hashschutz und Wiederholbarkeit sind dokumentiert; unbekannte Quelländerungen
-werden für den Patch abgewiesen. [Abhängigkeiten](../../third_party/README.md)
-und [native Abnahme](../../docs/BARRIEREFREIHEIT_PLAN.md).
-
+Implementierungsentscheidung: festgelegte AccessKit-Quellen mit überprüften UI-Korrekturen und Hashschutz; Rust/Cargo nur zum Bauen dieser UI-Abhängigkeit, nicht für normale Nutzung.
+[Maßgebliche Quelle](../../third_party/README.md).
 
 ## D15: Eigene Auswahl und wirksame Systemdarstellung trennen
 
-Lumen bleibt die vom Nutzer gewählte Basis. Optional folgt die App der
-Systemdarstellung; bekannte Vorgaben für Bewegung, Transparenz und Kontrast
-ergänzen manuelle Einschränkungen. Die Einstellungsdatei speichert ausschließlich
-die eigene Auswahl, damit normale Systemwerte diese wiederherstellen können.
-Linux fragt das Portal außerhalb des UI-Threads ab. Fehlende Antworten erhalten
-den letzten gültigen Stand. Version 1 bleibt lesbar; Speichern schreibt Version 2.
-[Vertrag, Plattformumfang und Grenzen](../../docs/EINSTELLUNGEN.md).
-
+Implementierungsentscheidung: eigene Auswahl speichern, wirksame Systemdarstellung getrennt anwenden. Portalabfragen außerhalb des UI-Threads; unbekannte Werte ersetzen keinen gültigen Stand.
+[Maßgebliche Quelle](../../docs/EINSTELLUNGEN.md).
 
 ## D16: Einstieg aus dem tatsächlichen Projektzustand
 
-Ohne geöffnetes Projekt bündelt eine schwebende Karte die direkten fachlichen
-Wege; das erste Projekt führt zur normalen Arbeitsansicht. Es gibt keinen
-verpflichtenden Tutorial-Schritt und keinen getrennten Erststart-Schalter.
-Große Schrift scrollt die Aktionen unter einer festen Überschrift. Dialogabbruch
-stellt den Ursprungsfokus wieder her. Apple HIG Onboarding dient als Grundlage;
-Kartengestaltung und Zustandsmodell sind eigene Übertragung.
-[Entwurf und Nachweise](../../docs/ERSTER_START.md).
-
+Implementierungsentscheidung: erster Einstieg aus tatsächlichem Projektzustand, direkte fachliche Wege und Rückkehrfokus; kein verpflichtendes Tutorial.
+[Maßgebliche Quelle](../../docs/ERSTER_START.md).
 
 ## D17: Alte Metadaten erhalten und unbekannte Schemas abweisen
 
-Der Leser unterstützt weiterhin Minimalmetadaten mit Name, prüft vorhandene
-bekannte Felder jedoch konsistent. Schema 1 ist bekannt; spätere Schemas werden
-nicht als aktuelles Format verwendet. Vorlagenversion ist Herkunft, kein Auftrag
-zur Änderung bestehender Dateien. Längenbasierte Prüfung und Neuidentifizierung
-verwenden begrenzte Kopien. Notizen/Quellen müssen UTF-8 ohne NUL sein, um einen
-unsichtbaren Rest nicht durch C-Textverwendung zu verlieren. Fehler verändern
-die Originale nicht. [Datenvertrag](../../docs/DATENVERTRAG.md).
-
+Implementierungsentscheidung: Minimalmetadaten erhalten, Schema 1 unterstützen und unbekannte Schemas ablehnen. Keine automatische Vorlagenmigration; UTF-8 ohne NUL.
+[Maßgebliche Quelle](../../docs/DATENVERTRAG.md).
 
 ## D18: Fehler je Projekt statt globaler Sperre
 
-Eine neue Scan-Funktion liefert auch nicht verfügbare Einträge. Die bisherige
-strikte Liste bleibt als Kernvertrag erhalten. Das Modell öffnet einen verwendbaren
-Kandidaten und prüft aktuelle Metadaten erneut. Die UI nennt Fehler und Adresse
-und bietet bewusstes erneutes Prüfen; dabei bleibt der Entwurf bestehen. CLI nennt
-Teilfehler getrennt und signalisiert die unvollständige Liste mit Exit 1. Dateien
-werden nicht automatisch repariert. [Datenvertrag](../../docs/DATENVERTRAG.md).
-
+Implementierungsentscheidung: Fehler je Projekt mit Grund/Pfad anzeigen, andere gültige Projekte öffnen und erneutes Prüfen ermöglichen; Dateien nicht automatisch reparieren.
+[Maßgebliche Quelle](../../docs/DATENVERTRAG.md).
 
 ## D19: Metadaten nicht allein beim Öffnen vertrauen
 
-Eigene C-Schreibwege prüfen das aktuelle Projektformat vor der Aktion und die
-Metadatenrevision vor Ersetzen/Verschieben. Der Metadatenleser öffnet nur reguläre
-Dateien über die vorhandene geprüfte Dateihandle-Schicht. Erkanntes unbekanntes
-Schema, defekte/entfernte Metadaten erhalten Datei, Entwurf und Save-Guard. Dies
-ist keine globale Transaktionssperre. [Datenvertrag](../../docs/DATENVERTRAG.md).
-
+Implementierungsentscheidung: aktuelle Metadaten und Revision vor Schreibaktionen erneut prüfen. Keine globale Transaktionssperre; Datei und Entwurf bei erkannten Fehlern erhalten.
+[Maßgebliche Quelle](../../docs/DATENVERTRAG.md).
 
 ## D20: Vorabversion erst nach vollständiger Paketabnahme veröffentlichen
 
-Ein v0-Tag muss zur CMake-Version passen. Der Publisher verwendet denselben
-vollständigen Test-Workflow und prüft vier native Pakete einschließlich Intel-
-macOS. SHA256SUMS bindet die heruntergeladenen Releasebytes an die geprüften
-Archive. Erst danach wird der Entwurf öffentlich. Vorhandene Releases werden
-nicht ersetzt; automatische 1.0-Veröffentlichung bleibt gesperrt. Der Nutzer
-hat die vollständige Release-Vorbereitung und laufende GitHub-Veröffentlichung
-beauftragt. [Veröffentlichungsvertrag](../../docs/DISTRIBUTION.md).
+Implementierungsentscheidung: dauerhafte Vorabversion erst nach vier nativen Paketabnahmen, Versionsgleichheit und verifizierten Prüfsummen veröffentlichen; vorhandene Releases nicht ersetzen.
+[Maßgebliche Quelle](../../docs/DISTRIBUTION.md).
 
 ## D21: Gemeinsame schreibgeschützte Dokumentblockregeln
 
-Implementierungsentscheidung vom 7. Oktober 2026 im beauftragten Release-Umfang:
-Titel und Leseansicht verwenden ab 0.9.4 denselben eigenen C-Blockleser.
-Quellpositionen bleiben die Grundlage für native Textblöcke und Navigation;
-Anzeigen verändert keine Originalbytes. Die Regeln werden am CommonMark-Original
-geprüft und unabhängig vom UI getestet. Weitere Container-/Inline-Regeln und
-vollständige assistive Abnahme bleiben eigener Umsetzungsumfang.
-[Vertrag](../../docs/MARKDOWN.md) und [Nachweise](../../docs/STATUS.md).
+Implementierungsentscheidung: gemeinsamer eigener C-Dokumentbaum mit Quellpositionen und schreibgeschützter Projektion für Titel, Reader und native Struktur. Dokumentierte Markdown-Teilmenge.
+[Maßgebliche Quelle](../../docs/MARKDOWN.md).
 
 ## D22: Gemeinsame Inline-Verweise und geschützte Originale
 
-Implementierungsentscheidung vom 7. Oktober 2026: eigener C-Leser für
-Inline-Code, Maskierungen und Inline-Verweise in Titel, Leseansicht und Sternkarte.
-Code-/Bildbeispiele sind keine Beziehungen. Darstellung und echte Aktionen
-benutzen dieselben Quellbereiche; Originalbytes bleiben unverändert.
-Begrenzte Strukturtiefe und Sucharbeit melden überkomplexe Eingaben statt
-unbegrenzt zu suchen. Vollständige Inline-/Container-Regeln bleiben offen.
-[Vertrag](../../docs/INLINE_LINKS.md), [Nachweise](../../docs/STATUS.md).
+Implementierungsentscheidung: gemeinsame Inline-/Linkregeln und begrenzte Suche/Strukturtiefe. Code-/Bildbeispiele erzeugen keine Beziehungen; Originalbytes bleiben erhalten.
+[Maßgebliche Quelle](../../docs/INLINE_LINKS.md).

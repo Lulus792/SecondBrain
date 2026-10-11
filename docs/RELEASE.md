@@ -1,12 +1,17 @@
 # Auf dem Weg zu 1.0
 
-Stand: 11. Oktober 2026. Diese Liste bewertet den vorhandenen Code und die
+Stand: 12. Oktober 2026. Diese Liste bewertet den vorhandenen Code und die
 [Distribution](DISTRIBUTION.md). Der Nutzer hat die offenen Arbeiten als Umsetzungsauftrag bestätigt. Die
 Versionsnummer 1.0 darf erst nach seiner ausdrücklichen Freigabe gesetzt werden.
 Die unterstützten Umgebungen und konkreten Abnahmen werden dabei festgelegt.
 Die heutige Desktop-App deckt bereits Anlegen, Lesen, Bearbeiten, Suche, Quellen,
 Archiv, Kontext und Tastaturbedienung ab. Ein vollständiger Release braucht darüber
 hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
+
+Die [aktuelle Abnahmeübersicht](RELEASE_ABNAHME.md) fasst heutigen Umfang,
+Nachweise und verbleibende Voraussetzungen zusammen. Die folgenden datierten
+Einträge dokumentieren die Entwicklung; frühere offene Befunde sind anhand
+der späteren Nachprüfungen zu lesen.
 
 ## Vor einer stabilen Veröffentlichung
 

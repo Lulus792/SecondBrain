@@ -12,6 +12,8 @@ könnt. Die Dateien bleiben als Markdown und kleine JSON-Metadaten lesbar.
 **In Entwicklung.** Die lokale Arbeit mit Projekten ist umgesetzt. Die App hat
 noch keinen stabilen 1.0-Release. Aktuelle Nachweise stehen im
 [Umsetzungsstand](docs/STATUS.md), offene Aufgaben in der [Release-Liste](docs/RELEASE.md).
+Der [aktuelle Abnahmestand](docs/RELEASE_ABNAHME.md) trennt implementierten Umfang,
+ausgeführte Prüfungen und offene Voraussetzungen.
 Die Vorschau oben stammt aus der echten C-App.
 
 ## Was du damit machen kannst
