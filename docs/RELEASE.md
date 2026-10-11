@@ -294,3 +294,11 @@ Sanitizerprüfungen bestehen; der [Vertrag](READER_QUELLPLAN.md) benennt die
 Metal-Messung und den vollständigen synchronen Rückfall. Erste Aufbereitung,
 Inline-Parsing, Rasterung, reale Geräte und die aktuellen Zielplattformen bleiben
 weitere Leistungs- und Release-Arbeit.
+
+## Erneute Icon-/Materialprüfung vom 11. Oktober
+
+Ab 0.9.54 sind das Reloadmotiv und die gemeinsame Sicherungs-Iconspalte
+nachgeprüft; der Export erhält die vorhandenen Anschlüsse. Die neue Bildprüfung
+hält SBUI-077 offen: Beschriftungen hinter Dialogen passend beruhigen, während
+der gewünschte Glascharakter erhalten bleibt. Aktuelle Paket-/Zielplattform-,
+reale Bedien- und weitere Leistungsabnahmen bleiben getrennte Release-Arbeit.

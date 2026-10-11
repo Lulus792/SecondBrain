@@ -117,9 +117,18 @@ Drei Metal-Paare senken Wechsel-Layoutzeit; Bildausgabespitzen bleiben.
 77/77 lokale Release-Prüfungen bestehen (539,97 s). Mac-Paket und Installation bestehen; andere Zielplattformen bleiben offen.
 [Vertrag und genaue Grenzen](../../docs/READER_QUELLPLAN.md).
 
+## Aktionsicons und Export (0.9.54)
+
+SBUI-076/078: Reloadbögen, Sicherungsicon und regenerativer Export erhalten
+vorhandene Zuordnungen/Punktflächen. 136 Interaktions-Assertions vorher/nachher,
+100/200%-Aufnahmen, fünf gezielte Prüfungen und Python unittest bestehen;
+31 Exportdateien reproduzierbar. Paket/Installation folgen, installiert bleibt53.
+SBUI-077 bleibt offen: konkurrierende Dialog-Hintergrundtexte beruhigen und
+Glascharakter erhalten. [Bericht](/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-11_15-36-09/UI_REVIEW.md).
+
 ## Nächste Arbeiten
 
-Quelllesen, Parser/Inline-Aufbereitung,
+Dialogmaterial (SBUI-077), Quelllesen, Parser/Inline-Aufbereitung,
 native Metadaten, Rasterung und Fälle über den Vorbereitungsbudgets profilieren.
 Der Rückfall ist noch synchron; einzelne Bibliotheksaufrufe und Shutdown können
 warten. SBUI-074 bleibt für die vollständige Großdaten-/Geräteabnahme offen.

@@ -201,3 +201,8 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   exakte Quellbindung, Referenzen, Speicherbudget und serialisierte Metal-Messung.
 - [Quellprüfer](../../tests/test_reader_source.c): Quellenbesitz, Änderungen
   gleicher Länge, Referenzumgebung und vollständiger Budget-Rückfall.
+
+- [Icon-/Materialnachprüfung](/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-11_15-36-09/UI_REVIEW.md): SBUI-076/078 lokal korrigiert,
+  SBUI-077 offen; aktuelle HIG-Kapitel, 100/200%-Aufnahmen und Export-Referenz.
+- [Icondefinitionen](../../tools/export_icons.py): eigene C-/SVG-Motive,
+  vollständige Zuordnung und erhaltene Punktflächen beim Export.

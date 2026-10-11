@@ -18,7 +18,7 @@ icons={
 'archive':[(3,4,21,4),(21,4,21,9),(21,9,3,9),(3,9,3,4),(5,9,5,20),(5,20,19,20),(19,20,19,9),(10,13,14,13)],
 'copy':[(8,8,20,8),(20,8,20,20),(20,20,8,20),(8,20,8,8),(4,16,4,4),(4,4,16,4)],
 'filter':[(4,6,20,6),(7,12,17,12),(10,18,14,18)],
-'reload':[(19,8,19,3),(19,8,14,8),(5,16,5,21),(5,16,10,16)]+[(12+8*math.cos(a),12+8*math.sin(a),12+8*math.cos(b),12+8*math.sin(b)) for a,b in [(x*math.pi/12,(x+1)*math.pi/12) for x in range(3,14)]],
+'reload':[(19,8,19,3),(19,8,14,8),(5,16,5,21),(5,16,10,16)]+[(12+8*math.cos(a),12+8*math.sin(a),12+8*math.cos(b),12+8*math.sin(b)) for a,b in [(x*math.pi/12,(x+1)*math.pi/12) for x in [*range(14,22),*range(2,10)]]],
 'eye':[(3,12,7,7),(7,7,17,7),(17,7,21,12),(21,12,17,17),(17,17,7,17),(7,17,3,12)]+[(12+3*math.cos(a),12+3*math.sin(a),12+3*math.cos(b),12+3*math.sin(b)) for a,b in [(x*math.pi/8,(x+1)*math.pi/8) for x in range(16)]],
 'actions':[(5,12,5.01,12),(12,12,12.01,12),(19,12,19.01,12)],
 'search':[(16,16,21,21)]+[(10+7*math.cos(a),10+7*math.sin(a),10+7*math.cos(b),10+7*math.sin(b)) for a,b in [(x*math.pi/12,(x+1)*math.pi/12) for x in range(24)]],
@@ -30,6 +30,7 @@ icons={
 'motion':[(3,8,9,8),(3,12,7,12),(3,16,9,16),(12,6,20,12),(20,12,12,18),(12,18,12,6)],
 'font':[(5,20,12,4),(12,4,19,20),(8,14,16,14)],
 'glass':[(7,4,17,4),(17,4,20,10),(20,10,20,18),(20,18,4,18),(4,18,4,10),(4,10,7,4),(7,10,17,10)],
+'backup':[(4,13,4,20),(4,20,20,20),(20,20,20,13),(4,13,8,13),(16,13,20,13),(12,3,12,14),(8,10,12,14),(12,14,16,10)],
 }
 root=Path('assets/icons');root.mkdir(exist_ok=True)
 h='''#ifndef SB_ICONS_H\n#define SB_ICONS_H\n#include "ui.h"\ntypedef enum { SB_ICON_NONE, '''+', '.join('SB_ICON_'+n.upper() for n in icons)+''', SB_ICON_COUNT } SBIcon;\nSBIcon sb_icon_for(const char *id);\nvoid sb_icon_draw(struct nk_command_buffer *canvas, SBIcon icon, struct nk_rect bounds, struct nk_color color);\n#endif\n'''
@@ -49,12 +50,15 @@ c+='''    default: return;
     for (size_t i=0;i<count;++i) {
         float x1=b.x+lines[i].x1*scale,y1=b.y+lines[i].y1*scale;
         float x2=b.x+lines[i].x2*scale,y2=b.y+lines[i].y2*scale;
-        if (icon==SB_ICON_ACTIONS) nk_fill_circle(canvas,nk_rect(x1-1.2f*scale,y1-1.2f*scale,2.4f*scale,2.4f*scale),color);
+        if (icon==SB_ICON_ACTIONS || (icon==SB_ICON_HELP && i==1)) {
+            float diameter=icon==SB_ICON_HELP ? weight : 2.4f*scale;
+            nk_fill_circle(canvas,nk_rect(x1-diameter/2,y1-diameter/2,diameter,diameter),color);
+        }
         else nk_stroke_line(canvas,x1,y1,x2,y2,weight,color);
     }
 }
 SBIcon sb_icon_for(const char *id) {
 '''
-mapping={'close':['close-card','cancel','clear-search'],'add':['zoom-in','new-note','new-project','new-project-settings','new-project-detail'],'minus':['zoom-out'],'left':['rotate-left','source-back','page-prev','project-prev'],'right':['rotate-right','page-next','project-next'],'home':['camera-home'],'expand':['expand'],'list':['list'],'project':['project-picker','project-settings','workspace-settings','workspace-detail'],'edit':['edit'],'save':['save','guard-save'],'archive':['archive'],'copy':['save-copy','copy-context','guard-copy'],'filter':['filter','list-filter'],'reload':['reload'],'eye':['read'],'actions':['actions'],'settings':['settings','settings-actions'],'help':['help','help-actions'],'context':['context'],'palette':['theme'],'motion':['motion'],'font':['font-minus','font-plus'],'glass':['transparency']}
+mapping={'close':['close-card','cancel','clear-search'],'add':['zoom-in','new-note','new-project','new-project-settings','new-project-detail'],'minus':['zoom-out'],'left':['rotate-left','source-back','page-prev','project-prev'],'right':['rotate-right','page-next','project-next'],'home':['camera-home'],'expand':['expand'],'list':['list'],'project':['project-picker','project-settings','workspace-settings','workspace-detail'],'edit':['edit'],'save':['save','guard-save'],'archive':['archive'],'copy':['save-copy','copy-context','guard-copy'],'filter':['filter','list-filter'],'reload':['reload','restore-project','refresh-projects'],'eye':['read'],'actions':['actions'],'settings':['settings','settings-actions'],'help':['help','help-actions'],'context':['context'],'palette':['theme','system-theme','contrast'],'motion':['motion'],'font':['font-minus','font-plus'],'glass':['transparency'],'backup':['backup-project']}
 for n,ids in mapping.items():c+='    if ('+' || '.join(f'!strcmp(id,"{x}")' for x in ids)+f') return SB_ICON_{n.upper()};\n'
 c+='    if (!strncmp(id,"link:",5)) return SB_ICON_LINK;\n    return SB_ICON_NONE;\n}\n';Path('app/icons.c').write_text(c)

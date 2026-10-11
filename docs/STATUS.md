@@ -3726,3 +3726,27 @@ CI 38143419075 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme
 bleibt offen. Erste Aufbereitung, Inline-Parsing, Rasterung, synchrone Budget-
 Rückfälle und reale Geräte-/Eingabe-/Screenreader-Abnahme bleiben weitere Arbeit.
 1.0 nur nach ausdrücklicher Nutzerfreigabe.
+
+## Aktionsicons und Export (0.9.54, 11. Oktober)
+
+Die erneute UI-Bildprüfung bestätigt SBUI-076: das Reloadmotiv hatte einen
+unvollständigen Bogen, „Projekt sichern“ keine gemeinsame Icon-/Textspalte.
+Zwei passende Pfeilbögen und ein eigenes Sicherungsmotiv korrigieren diese
+Darstellung. Definitionen, C/Header und SVG sind gemeinsam aktualisiert.
+SBUI-078: ein isolierter Export der Vorfassung verlor vier vorhandene
+Zuordnungen und die Hilfe-Punktfläche. Der aktualisierte Export erhält diese
+Anschlüsse und reproduziert alle 31 Ausgabedateien bytegleich.
+
+136 Interaktions-Assertions vorher/nachher, tatsächliche Aufnahmen bei 100/200%
+Schrift, fünf gezielte native-/Tastatur-/Versions-/Release-Prüfungen (66,97 s)
+und Python unittest (39 Tests, einer übersprungen) bestehen im genannten Umfang.
+Keine neue 77er-Gesamtprüfung oder Windows-/Linux-/ARM64-Abnahme behauptet.
+Der vollständige 0.9.53-Lauf bleibt ein früherer Nachweis. Originale:
+`build/icon-polish-verification/`, UI-Bericht und Bilder:
+`/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-11_15-36-09/UI_REVIEW.md`.
+
+Apple Layout, Search fields, Menus und Materials erneut aus titelgeprüften
+Originaldaten gelesen. SBUI-077 bleibt offen: konkurrierende Texte hinter
+Dialogflächen beruhigen und den gewählten Glascharakter erhalten. SBUI-074,
+reale assistive/Geräteprüfungen und übrige Release-Arbeit ebenfalls offen.
+Paket und Installation folgen; installiert bleibt 0.9.53. 1.0 nur nach Freigabe.
