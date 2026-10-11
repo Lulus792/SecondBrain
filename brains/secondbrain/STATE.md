@@ -72,6 +72,19 @@ Windows-Prüfung übersprungen. CI38174603923 zu1a19bee: Linux-Release samt Pake
 erfolgreich; Windows/Linux-Debug in Arbeit, Mac queued. Die neue Windows-
 Fixtureabnahme bleibt bis zum erfolgreichen Paket offen.
 
+CI38174603923 zu1a19bee ist inzwischen in allen vier Windows-/Linux-Desktopjobs
+einschließlich Release-Paketen erfolgreich. Damit sind Readerlayout und korrigierte
+LF-Updatefixture dort nativ bestätigt. Mac-Jobs weiter queued.
+
+Der Timingprüfer trennt nun gezeichnete Notiz, angenommenen Modellpfad,
+Vorbereitungszustand und Übergangsende. Drei Metal-Läufe: lange Übergabe erstmals
+vorbereitete Textkommandos484–785ms, übergangsfreies Bild632–913ms ab Notizaufruf.
+Ein schneller Retarget erreicht keine Bereitschaft und bleibt ausdrücklich ohne
+Meilenstein.19 Kopie-/18 Originaldateien unverändert; fünf serielle Messläufe,
+CLI-/CSV-Schutz und50 Python-Prüfungen bestehen (eine Windows-Prüfung übersprungen).
+App65 unverändert; nächster Leistungsansatz: Worker und erster Bereitschaftsframe.
+[Vertrag und Grenzen](../../docs/FRAME_MESSUNG.md).
+
 Alle vier Windows-/Linux-Desktopjobs zu d575caf/CI38172915154 bestehen
 einschließlich Release-Paketen und neuer Compiler-/Lizenzquellengrenze.
 Neuer Update-Prüfer zu a5a5127: Linux-Debug/Release und Paket sowie Windows-Debug

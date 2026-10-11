@@ -4313,3 +4313,20 @@ Neue CI38174603923 zu1a19bee: Linux-Release samt Paket erfolgreich;
 Windows/Linux-Debug in Arbeit, Mac-Jobs queued. Neue Windows-Fixtureabnahme,
 andere Darstellungen und menschliche Geräte-/assistive Abnahme bleiben offen.
 1.0 wird weiterhin erst auf ausdrückliche Nutzerfreigabe gesetzt.
+
+## Textpräsentation statt allein Modellwechsel messen
+
+CI38174603923 zu1a19bee besteht inzwischen in allen vier Windows-/Linux-
+Desktopjobs einschließlich Release-Paketen; die neue Readerreihe und LF-
+Updatefixture sind nativ bestätigt. Mac-Jobs weiterhin queued.
+
+Der Diagnoseprüfer erfasst gezeichnete Notiz vor `apply`, Ladehinweis,
+Text-/Glyphenbildkommandos, Übergangsende, Requestbindung und erfolgreichen
+Present. Drei serielle Metal-Läufe zeigen für die lange Übergabe vorbereitete
+Kommandos nach484–785ms, übergangsfreie Bilder nach632–913ms ab Notizaufruf.
+Das sind interne Renderermeilensteine, keine menschliche Lesbarkeits-/Scanout-
+Messung und kein Optimierungsgewinn. Ein vorzeitig ersetzter langer Wechsel
+bleibt ausdrücklich ohne Meilenstein. Fünf serielle Messläufe mit272 Bildern,
+CLI-/Ausgabeschutz und50 Python-Prüfungen bestehen; eine Windows-Prüfung
+übersprungen.19 Kopie-/18 Originaldateien unverändert. App0.9.65 unverändert.
+[Originale, Meilensteine und nächste Untersuchung](FRAME_MESSUNG.md).
