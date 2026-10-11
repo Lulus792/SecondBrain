@@ -41,6 +41,17 @@ Interaktions- und Tastaturprüfung bestehen nach den Anschlusskorrekturen.
 70/70 lokale Release-Prüfungen bestehen (488,53s). Intel/macOS-Paket und
 Installation bestehen; weitere Zielplattformen folgen.
 
+## Neue Ebenen-/Fokuspolitur (0.9.47)
+
+Sternkarten-Fokus/Namen scheinen nicht mehr durch Karten, Liste und Kameraleiste.
+Verdeckte Mapziele und die Map eines offenen Editors sind keine Tabstopps;
+F6 zeigt sie wieder. Such-/Dialogrückkehr erhält sichtbaren Fokus. Die Karte
+öffnet sich erst nach akzeptiertem Notizwechsel, ohne den alten Editor vor
+einer Entwurfsentscheidung einzublenden. [Vertrag](../../docs/UI_EBENEN.md).
+135 neue Ebenenprüfungen auch unter ASan/UBSan und der gesamte Keyboardnachlauf
+bestehen.71/71 lokale Release-Prüfungen bestehen (626,20s); Paket/Installation
+folgen.
+
 ## Nächste Arbeiten
 
 Quelllesen, Parser/Inline-Aufbereitung,

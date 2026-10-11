@@ -733,6 +733,9 @@ void sb_desktop_apply(SBDesktop *d) {
         unsigned previous_generation=d->model.generation;
         bool blend=action.kind==SB_ACT_NOTE && !d->editing && !d->model.source && d->card && !d->model.guard && !d->reduced_motion;
         result(d,sb_app_request(&d->model,action.kind,action.value),NULL);
+        /* Open the accepted document, not the old editor during the input
+           frame. A guarded switch keeps the map and its return focus intact. */
+        if(action.kind==SB_ACT_NOTE && d->message.code==SB_OK && !d->model.guard)d->card=true;
         if (blend && d->message.code==SB_OK && !d->model.guard && d->model.generation!=previous_generation) sb_ui_transition_begin(&d->ui);
         else if (!d->ui.transitioning) {SDL_DestroyTexture(d->ui.outgoing_texture);d->ui.outgoing_texture=NULL;}
         if (action.kind==SB_ACT_NOTE && d->message.code==SB_OK && !d->model.guard && d->model.generation!=previous_generation && !strcmp(d->graph_project,d->model.project.root)) {
@@ -1011,7 +1014,7 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
                 float dx = d->ui.space.points[i].x - event->button.x, dy = d->ui.space.points[i].y - event->button.y;
                 if (dx * dx + dy * dy < best) { best = dx * dx + dy * dy; found = i; }
             }
-            if (found < d->graph_notes.count) { d->star = found; d->card = true; request(d, SB_ACT_NOTE, d->graph_notes.items[found].path); }
+            if (found < d->graph_notes.count) { d->star = found; request(d, SB_ACT_NOTE, d->graph_notes.items[found].path); }
         }
     }
     if (event->type == SDL_EVENT_MOUSE_WHEEL) {
@@ -1084,7 +1087,7 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
         }
         if (!modifier && !text && (key == SDLK_RETURN || key == SDLK_SPACE)) {
             if (!strcmp(d->focus, "galaxy") && d->star < d->graph_notes.count) {
-                d->card = true; request(d, SB_ACT_NOTE, d->graph_notes.items[d->star].path);
+                request(d, SB_ACT_NOTE, d->graph_notes.items[d->star].path);
             } else snprintf(d->activate, sizeof(d->activate), "%s", d->focus);
             return;
         }
@@ -1099,7 +1102,7 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
                 } else {
                     size_t previous = d->star; star_step(d,key);
                     if (d->star != previous && d->star < d->graph_notes.count) {
-                        d->follow_star = true; d->card = true;
+                    d->follow_star = true;
                         request(d,SB_ACT_NOTE,d->graph_notes.items[d->star].path);
                     }
                 }
@@ -2217,6 +2220,61 @@ static void graph_refresh(SBDesktop *d) {
     for(size_t i=0;i<notes.count;++i)if(!strcmp(focused_path,notes.items[i].path))d->star=i;
     for(size_t i=0;i<notes.count;++i)if(!strcmp(d->model.path,notes.items[i].path))d->star=i;
 }
+/* Annotation geometry belongs only to exposed map content. Transparent
+   foreground cards must not reveal focus/labels as if they were card content. */
+static size_t map_regions(struct nk_rect base,const struct nk_rect *covers,size_t count,struct nk_rect regions[16]) {
+    regions[0]=base;size_t used=base.w>0 && base.h>0 ? 1 : 0;
+    for(size_t c=0;c<count;++c){struct nk_rect next[16];size_t n=0;
+        /* Whole-point conservative edges also cover the card's antialiasing. */
+        float left=floorf(covers[c].x)-1,top=floorf(covers[c].y)-1;
+        float right=ceilf(covers[c].x+covers[c].w)+1,bottom=ceilf(covers[c].y+covers[c].h)+1;
+        for(size_t i=0;i<used;++i){struct nk_rect r=regions[i];float x=fmaxf(r.x,left),y=fmaxf(r.y,top),end_x=fminf(r.x+r.w,right),end_y=fminf(r.y+r.h,bottom);
+            if(end_x<=x || end_y<=y){next[n++]=r;continue;}
+            if(y>r.y)next[n++]=nk_rect(r.x,r.y,r.w,y-r.y);
+            if(end_y<r.y+r.h)next[n++]=nk_rect(r.x,end_y,r.w,r.y+r.h-end_y);
+            if(x>r.x)next[n++]=nk_rect(r.x,y,x-r.x,end_y-y);
+            if(end_x<r.x+r.w)next[n++]=nk_rect(end_x,y,r.x+r.w-end_x,end_y-y);
+        }
+        used=n;memcpy(regions,next,n*sizeof(*regions));
+    }
+    return used;
+}
+static void galaxy_annotations(SBDesktop *d,struct nk_command_buffer *canvas,struct nk_rect card,struct nk_rect list,int width,float cy) {
+    struct nk_context *ctx=d->ui.ctx;SBSpace *space=&d->ui.space;
+    if (focused(d, "galaxy")) {
+        struct nk_rect focus=nk_rect(d->map_bounds.x+2,d->map_bounds.y+2,d->map_bounds.w-4,d->map_bounds.h-4);
+        nk_stroke_rect(canvas,focus,24,d->ui.contrast ? 2 : 1,d->ui.contrast ? ctx->style.text.color : nk_rgba(142,191,255,90));
+    }
+    struct nk_rect labels[80]; unsigned label_count = 0;
+    for (size_t i = 0; i < space->count; ++i) {
+        SBPoint p = space->points[i];
+        if (!p.visible || (d->card && inside(p.x,p.y,card)) || (d->browser && inside(p.x,p.y,list))) continue;
+        if (p.selected) nk_stroke_circle(canvas, nk_rect(p.x-8,p.y-8,16,16), d->ui.contrast ? 2 : 1, d->ui.contrast ? ctx->style.text.color : nk_rgba(142,191,255,145));
+        if (p.focused) nk_stroke_circle(canvas, nk_rect(p.x-13,p.y-13,26,26), 2.5f, d->ui.contrast ? ctx->style.text.color : nk_rgb(190,223,255));
+        char title[SB_NAME_CAP]; compact_label(d, d->graph_notes.items[i].title, title, sizeof(title), 200);
+        float tw = d->ui.normal->handle.width(d->ui.normal->handle.userdata, d->ui.normal->handle.height, title, (int)strlen(title));
+        struct nk_rect r = nk_rect(p.x+12,p.y-8,tw+5,24*d->ui.scale);
+        if (d->card && r.x < card.x+card.w && r.x+r.w > card.x && r.y < card.y+card.h && r.y+r.h > card.y)
+            r.x = p.x-tw-12;
+        if (d->browser && r.x < list.x+list.w && r.x+r.w > list.x && r.y < list.y+list.h && r.y+r.h > list.y) continue;
+        bool collision = false;
+        for (unsigned j = 0; j < label_count; ++j) if (r.x < labels[j].x+labels[j].w && r.x+r.w > labels[j].x && r.y < labels[j].y+labels[j].h && r.y+r.h > labels[j].y) collision = true;
+        if ((!collision && label_count < 80) || p.selected || p.focused) {
+            if (d->ui.contrast)
+                nk_fill_rect(canvas,r,0,d->ui.dark ? nk_rgb(0,0,0) : nk_rgb(255,255,255));
+            nk_draw_text(canvas,r,title,(int)strlen(title),&d->ui.normal->handle,nk_rgba(0,0,0,0),
+                d->ui.contrast ? ctx->style.text.color : d->ui.dark ? nk_rgb(220,233,251) : nk_rgb(40,61,89));
+            if (label_count < 80) labels[label_count++] = r;
+        }
+    }
+    if (!space->count && d->model.has_project) nk_draw_text(canvas, nk_rect(60,cy-20,width-120.0f,70),
+        "Dein Projektwissen wird hier zur Sternkarte.", (int)strlen("Dein Projektwissen wird hier zur Sternkarte."),
+        &d->ui.body->handle,nk_rgba(0,0,0,0),d->ui.contrast ? ctx->style.text.color : d->ui.dark ? nk_rgb(166,185,211) : nk_rgb(70,88,112));
+}
+static struct nk_rect camera_bounds(SBDesktop *d,int width,int height,float available) {
+    float s=d->ui.scale,w=fminf(available,fminf(width-36.0f,380*s));
+    return nk_rect(18,height-80*s,w,64*s);
+}
 static void galaxy(SBDesktop *d, int width, int height, struct nk_rect card, struct nk_rect list) {
     struct nk_context *ctx = d->ui.ctx; SBSpace *space = &d->ui.space;
     float cy = d->map_bounds.y + d->map_bounds.h / 2;
@@ -2265,42 +2323,32 @@ static void galaxy(SBDesktop *d, int width, int height, struct nk_rect card, str
     }
     d->focus_group = 1;
     if (nk_begin(ctx, "Galaxy", nk_rect(0,0,(float)width,(float)height), NK_WINDOW_NO_INPUT | NK_WINDOW_BACKGROUND | NK_WINDOW_NO_SCROLLBAR)) {
-        target_add(d,"galaxy",d->map_bounds,SB_FOCUS_MAP,1);
-        struct nk_command_buffer *canvas = nk_window_get_canvas(ctx);
-        if (focused(d, "galaxy")) nk_stroke_rect(canvas, d->map_bounds, 24, d->ui.contrast ? 2 : 1, d->ui.contrast ? ctx->style.text.color : nk_rgba(142,191,255,90));
-        struct nk_rect labels[80]; unsigned label_count = 0;
-        for (size_t i = 0; i < space->count; ++i) {
-            SBPoint p = space->points[i];
-            if (!p.visible || (d->card && inside(p.x,p.y,card)) || (d->browser && inside(p.x,p.y,list))) continue;
-            if (p.selected) nk_stroke_circle(canvas, nk_rect(p.x-8,p.y-8,16,16), d->ui.contrast ? 2 : 1, d->ui.contrast ? ctx->style.text.color : nk_rgba(142,191,255,145));
-            if (p.focused) nk_stroke_circle(canvas, nk_rect(p.x-13,p.y-13,26,26), 2.5f, d->ui.contrast ? ctx->style.text.color : nk_rgb(190,223,255));
-            char title[SB_NAME_CAP]; compact_label(d, d->graph_notes.items[i].title, title, sizeof(title), 200);
-            float tw = d->ui.normal->handle.width(d->ui.normal->handle.userdata, d->ui.normal->handle.height, title, (int)strlen(title));
-            struct nk_rect r = nk_rect(p.x+12,p.y-8,tw+5,24*d->ui.scale);
-            if (d->card && r.x < card.x+card.w && r.x+r.w > card.x && r.y < card.y+card.h && r.y+r.h > card.y)
-                r.x = p.x-tw-12;
-            if (d->browser && r.x < list.x+list.w && r.x+r.w > list.x && r.y < list.y+list.h && r.y+r.h > list.y) continue;
-            bool collision = false;
-            for (unsigned j = 0; j < label_count; ++j) if (r.x < labels[j].x+labels[j].w && r.x+r.w > labels[j].x && r.y < labels[j].y+labels[j].h && r.y+r.h > labels[j].y) collision = true;
-            if ((!collision && label_count < 80) || p.selected || p.focused) {
-                if (d->ui.contrast)
-                    nk_fill_rect(canvas,r,0,d->ui.dark ? nk_rgb(0,0,0) : nk_rgb(255,255,255));
-                nk_draw_text(canvas,r,title,(int)strlen(title),&d->ui.normal->handle,nk_rgba(0,0,0,0),
-                    d->ui.contrast ? ctx->style.text.color : d->ui.dark ? nk_rgb(220,233,251) : nk_rgb(40,61,89));
-                if (label_count < 80) labels[label_count++] = r;
-            }
+        struct nk_rect covers[2],regions[16];size_t cover_count=0;
+        if(d->card)covers[cover_count++]=card;
+        if(d->browser && !d->expanded)covers[cover_count++]=list;
+        else if(d->model.has_project && !d->browser && !(d->card && (d->editing || d->expanded))){
+            struct nk_rect camera=camera_bounds(d,width,height,d->card ? card.x-36 : width-36.0f);
+            if(camera.w>=220)covers[cover_count++]=camera;
         }
-        if (!space->count && d->model.has_project) nk_draw_text(canvas, nk_rect(60,cy-20,width-120.0f,70),
-            "Dein Projektwissen wird hier zur Sternkarte.", (int)strlen("Dein Projektwissen wird hier zur Sternkarte."),
-            &d->ui.body->handle,nk_rgba(0,0,0,0),d->ui.contrast ? ctx->style.text.color : d->ui.dark ? nk_rgb(166,185,211) : nk_rgb(70,88,112));
+        size_t region_count=map_regions(d->map_bounds,covers,cover_count,regions);
+        /* Editing already removes native star options. Keep its background
+           map out of Tab as well; F6 explicitly reveals it with card=false. */
+        if(region_count && !(d->card && d->editing))target_add(d,"galaxy",d->map_bounds,SB_FOCUS_MAP,1);
+        struct nk_command_buffer *canvas=nk_window_get_canvas(ctx);struct nk_rect previous=canvas->clip;
+        for(size_t r=0;r<region_count;++r){
+            float x=fmaxf(previous.x,regions[r].x),y=fmaxf(previous.y,regions[r].y);
+            struct nk_rect clip=nk_rect(x,y,fmaxf(0,fminf(previous.x+previous.w,regions[r].x+regions[r].w)-x),fmaxf(0,fminf(previous.y+previous.h,regions[r].y+regions[r].h)-y));
+            if(clip.w<=0 || clip.h<=0)continue;
+            nk_push_scissor(canvas,clip);galaxy_annotations(d,canvas,card,list,width,cy);
+        }
+        nk_push_scissor(canvas,previous);
     }
     nk_end(ctx);
 }
 static void camera_tools(SBDesktop *d, int width, int height, float available, nk_flags flags) {
     struct nk_context *ctx = d->ui.ctx; float s = d->ui.scale;
-    float w = fminf(available, fminf(width-36.0f,380*s));
+    struct nk_rect rect=camera_bounds(d,width,height,available);float w=rect.w;
     if (w < 220) return;
-    struct nk_rect rect = nk_rect(18,height-80*s,w,64*s);
     glass(d,rect,18); d->focus_group = 1;
     struct nk_vec2 padding=ctx->style.window.padding;
     ctx->style.window.padding.y=(rect.h-28*s)/2;
@@ -2388,7 +2436,12 @@ void sb_desktop_frame(SBDesktop *d) {
     bool enter = modal && (!before || d->form != d->focus_form || d->model.guard != d->focus_guard);
     if (enter) memset(d->scrolling,0,sizeof(d->scrolling));
     if (modal && !before) snprintf(d->saved_focus,sizeof(d->saved_focus),"%s",d->focus);
-    if (!modal && before) focus_set(d,d->saved_focus[0] ? d->saved_focus : "project-picker");
+    if (!modal && before) {
+        /* A cancelled map navigation can leave the old editor card open.
+           Restore the actual map, not an invisible focus behind that card. */
+        if(!d->focus_editor && !strcmp(d->saved_focus,"galaxy") && d->card && (d->editing || d->expanded)){d->card=false;d->browser=false;}
+        focus_set(d,d->saved_focus[0] ? d->saved_focus : "project-picker");
+    }
     if (!modal && d->focus_editor && d->editing) focus_set(d,"editor");
     d->focus_form = d->form; d->focus_guard = d->model.guard;
     float s = d->ui.scale;
@@ -2451,7 +2504,16 @@ void sb_desktop_frame(SBDesktop *d) {
         if(reader_preparing(d) && !strncmp(d->focus,"link:",5)){
             snprintf(d->reader_pending_focus,sizeof(d->reader_pending_focus),"%s",d->focus);
             d->reader_pending_context=accessible_context(d);focus_set(d,"reader");
-        }else focus_set(d,d->targets[0].id);
+        }else {
+            /* Ending search can let the document cover the map that Tab just
+               reached. Continue into that document instead of restarting the
+               toolbar/search cycle at the first control. */
+            if(!strcmp(d->focus,"galaxy") && d->card && !modal){
+                const char *document=d->editing && !d->model.source ? "editor" : "reader";
+                for(size_t i=0;i<d->target_count;++i)if(!strcmp(d->targets[i].id,document)){focus_set(d,document);break;}
+            }
+            if(!focus_target(d))focus_set(d,d->targets[0].id);
+        }
     }
     d->activate[0] = 0;
     for (unsigned i=0;i<4;++i) if (!d->scrolling[i].used) {

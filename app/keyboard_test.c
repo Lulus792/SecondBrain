@@ -73,7 +73,9 @@ static bool reach(SBDesktop *d, const char *id) {
         if (!strcmp(d->focus, id)) return true;
         key(d, SDLK_TAB, 0);
     }
-    fprintf(stderr,"Unreachable focus: %s (current %s)\n",id,d->focus); return false;
+    fprintf(stderr,"Unreachable focus: %s (current %s, card=%d editing=%d expanded=%d search=%d)\n",id,d->focus,d->card,d->editing,d->expanded,d->search_session);
+    for(size_t i=0;i<d->target_count;++i)fprintf(stderr,"  target %zu: %s\n",i,d->targets[i].id);
+    return false;
 }
 static bool activate(SBDesktop *d, const char *id) {
     if (!reach(d,id)) return false;

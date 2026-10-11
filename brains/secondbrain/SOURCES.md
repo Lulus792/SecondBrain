@@ -166,3 +166,8 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Schriftbesitz](../../docs/FONT_SNAPSHOTS.md): private CPU-Kontexte, Batch-Budgets und Freigabe.
 - [Produktiver Prüfer](../../tests/test_reader_prepare.c): Umbruch-/Tabellen-/Scrollvergleich, Resize, Retarget, Schriftwechsel, modaler Reader und CRLF-Quellen.
 - [Batch-Prüfer](../../tests/test_prepare.c): genaue Glyphenbindung, über 2048 gehaltene Pläne, Budgetabweisung und Abbruch.
+
+- [Ebenen-/Fokusvertrag](../../docs/UI_EBENEN.md): transparente Vordergrundflächen,
+  sichtbare Tabziele und akzeptierte Notizwechsel, erneut geprüfte HIG-Quellen.
+- [Ebenenprüfer](../../tests/test_map_layers.c): tatsächliche Karten-/Listen-/
+  Werkzeugpixel, sichtbarer Fokus, Größen/Kontrast, Suchrückkehr und F6.

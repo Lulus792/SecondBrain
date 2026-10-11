@@ -3387,3 +3387,37 @@ Protokolle/Hashmanifest: `build/reader-verification/`.
 zum Quellcommit ist zuletzt queued; kein neuer Windows-/Linux-/ARM64-
 Gesamtnachweis. Vollständige Leistungs-/Geräte-/assistive Abnahme und übrige
 Release-Liste bleiben offen;1.0 nur nach ausdrücklicher Nutzerfreigabe.
+
+## Sternkartenannotation vor Glasflächen (0.9.47, 11. Oktober)
+
+Fokusrahmen, Auswahlringe und Namen der Sternkarte werden auf exponierte Flächen
+begrenzt. Karten/Liste/Kameraleiste werden mit tatsächlicher Geometrie ausgespart;
+Kamera verwendet eine gemeinsame Größenberechnung. Dekorative Sterne, Linien
+und Glasmaterial bleiben erhalten. Vollständig verdeckte Maps sowie die Map
+eines offenen Editors sind keine Tabziele; F6 deckt sie weiterhin auf.
+[Vertrag und Quellen](UI_EBENEN.md).
+
+Die Baseline0.9.46 verletzt die dunkle Karten-Pixelprüfung.135 Assertions für
+hell/dunkel, hohen Kontrast, kleine/große Fenster,100/200-Prozent-Schrift, Karten,
+Liste, Kameraleiste, sichtbaren Fokus, Editor, Suchrückkehr und F6 bestehen
+auch unter haltendem ASan/UBSan.21 Quell-/Include-Hashes stimmen. Eigene
+Desktop/UI/Text/Space/Icons/NativeText/Prepare/Shape/Carets/Scripts/Bidi samt
+Includes und der Prüfer instrumentiert; andere Objekte, native Provider und
+externe UI-Bibliotheken uninstrumentiert. Mac-Leakprüfung aus; kein ThreadSanitizer.
+Protokolle/Hashes: `build/map-layer-sanitizers/`.
+
+Die erste Gesamtprüfung70/71 findet eine Abhängigkeit der Such-Tabfolge von einem
+später verdeckten Mapziel. Suchende setzt den Fokus nun im Dokument fort.
+Dialogrückkehr deckt eine vorher aktive Map tatsächlich auf; eine angeforderte
+neue Editieraufgabe bleibt vorrangig. Notiznavigation öffnet die Karte erst nach
+akzeptiertem Modellwechsel, damit der alte Editor den Entwurfsentscheid nicht
+vorwegnimmt. Vollständige Keyboardnachprüfung besteht109,92s.
+
+Die Animationsprüfung trennt nun Navigation vom früheren Hover-Szenario; der
+Mauszeiger steht dabei außerhalb der Bedienelemente. Ein nach350ms eingeblendeter
+Hinweis soll die Überblendung weiter absichtlich abbrechen. Die bestehende
+Tooltip-/Pixelprüfung bleibt erhalten. Ein getrenntes Review mit Bildern und
+Quellen liegt unter UI_reviewer/reviews/secondbrain/2026-10-11_10-49-09.
+71/71 lokale Release-Prüfungen bestehen (626,20s). Neue Paket-/Plattformabnahme
+folgt; installiert weiterhin0.9.46.
+Weitere Release-Aufgaben und1.0-Freigabe bleiben offen.

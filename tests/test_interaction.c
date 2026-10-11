@@ -80,6 +80,10 @@ int main(int argc,char **argv) {
             frame(&d);CHECK(d.modal_bounds.w<= (scale ? 740 : 1296) && d.modal_bounds.h<=(scale ? 600 : 800));char artifact[64];snprintf(artifact,sizeof(artifact),"modal-%u-%u.bmp",scale,(unsigned)forms[f]);OK(capture(&d,root,artifact));}
     }
     d.form=SB_FORM_NONE;OK(sb_ui_fonts(&d.ui,1));CHECK(SDL_SetWindowSize(d.ui.window,1336,840));CHECK(SDL_SyncWindow(d.ui.window));frame(&d);frame(&d);
+    /* Hover guidance intentionally interrupts the snapshot transition. Test
+       navigation separately from the earlier tooltip scenario, independent
+       of how long software rendering takes to reach the hover threshold. */
+    e.type=SDL_EVENT_MOUSE_MOTION;e.motion.windowID=SDL_GetWindowID(d.ui.window);e.motion.x=2;e.motion.y=2;CHECK(SDL_PushEvent(&e));frame(&d);
     d.navigation.kind=SB_ACT_NOTE;strcpy(d.navigation.value,"knowledge/a.md");d.follow_star=true;d.ui.capture_pending=true;frame(&d);frame(&d);CHECK(d.ui.transitioning);
     for(unsigned repeat=0;repeat<12;++repeat) {
         const char *path=repeat%2 ? "knowledge/a.md" : "knowledge/b.md";
