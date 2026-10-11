@@ -41,6 +41,19 @@ mitgelieferten Quellmanifest. Windows-/Linux-CI verlangen jetzt den Abgleich
 von Compilercommit, Release, explizitem Ziel und Lizenztext-Hash.46 lokale
 Python-Prüfungen bestehen, eine Windows-Prüfung übersprungen. Diese neue
 CI-Grenze braucht noch ihren eigenen Lauf. [Vertrag](../../docs/RUST_RUNTIME_NACHWEIS.md).
+In CI38172915154 zu d575caf bestehen inzwischen die Compiler-/Quellen-
+Recordschritte in allen vier Windows-/Linux-Desktopjobs; Gesamt-/Paketjobs
+laufen noch, Mac-Jobs queued.
+
+Der tatsächliche Intel/macOS-Paketwechsel63→64→63 erhält20 Testdateien,
+gespeicherte Notiz/Darstellung, Kontext-/Suchausgaben und vollständige Sicherung/
+Wiederherstellung. Drei App-Aufnahmen angesehen. Neuer Prüfer und automatische
+Wiederöffnungsprüfung desselben Pakets ergänzen den manuellen Updatevertrag.
+Neue Windows-/Linux-/ARM64-Updateabnahmen bleiben offen.
+Erweiterte lokale0.9.64-Paketprüfung besteht:20 unveränderte Dateien,126 Desktop-,
+167 Tastatur-,75 Sicherungsbedingungen, zwei Einstellungsprozesse sowie CLI,
+Runtime und Versionsidentität. Kein neuer Gesamtlauf der Produkt-CTest-Suite.
+[Vertrag](../../docs/UPDATE_NACHWEIS.md).
 
 ## Geprüfter Fortschritt
 

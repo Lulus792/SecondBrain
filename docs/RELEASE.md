@@ -90,8 +90,11 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   Prüfsummen, Änderungsübersicht und reproduzierbare Paketabnahme. Actions-Artefakte
   verfallen nach 30 Tagen. Signierung, macOS-Notarisierung und einfache Installation
   müssen für die gewählten Vertriebswege geklärt werden. Ein automatischer Updater
-  ist optional, ein dokumentierter Updateweg notwendig. Die dauerhafte Vorabversion
-  [v0.7.3](https://github.com/Lulus792/SecondBrain/releases/tag/v0.7.3) ist am
+  ist optional, ein dokumentierter Updateweg notwendig.
+  Der manuelle Paketwechsel63→64→63 ist inzwischen auf Intel/macOS mit erhaltenen
+  Originalbytes, Einstellungen und Sicherung/Wiederherstellung geprüft;
+  [Umfang und weitere Plattformabnahmen](UPDATE_NACHWEIS.md).
+  Die dauerhafte Vorabversion [v0.7.3](https://github.com/Lulus792/SecondBrain/releases/tag/v0.7.3) ist am
   7. Oktober veröffentlicht: vier geprüfte Plattformarchive und SHA256SUMS,
   Uploads vor Veröffentlichung erneut verifiziert. Signierung und die vollständige
   Abnahme auf frischen Nutzerrechnern bleiben offen.

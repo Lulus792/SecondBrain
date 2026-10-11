@@ -4256,3 +4256,23 @@ CI38172648396 zu402adb5 besteht bei beiden Linux-/Windows-Python-Versionen;
 der reale ELF-Paket-Fixture ist damit nativ auf Linux bestätigt. Die vier
 Desktopjobs einschließlich Release-Paketen laufen noch, Mac-Jobs queued.
 Die neue Compiler-/Quellgrenze benötigt nach dem Push ihre eigene native CI.
+
+## Tatsächlicher Paketwechsel und Bestandsschutz
+
+Intel/macOS14.6.1: zwei tatsächliche entpackte Release-Pakete
+0.9.63/92ab260e4203→0.9.64/bef4816d3e40→0.9.63 geprüft.20 isolierte Testdateien
+bleiben bytegleich; gespeicherte Notiz/Projekt/Darstellung, Kontext/Suche,
+Sicherung und Wiederherstellung bleiben erhalten. Drei echte App-Aufnahmen
+angesehen. Entwicklerprüfer ergänzt, neue gleichartige Wiederöffnungsprüfung
+in Paketabnahme; unterschiedliche Builds sind im Report gekennzeichnet.
+[Prüfumfang und Grenzen](UPDATE_NACHWEIS.md). Keine App-Versionsänderung.
+
+Die neue Compiler-/Quellgrenze zu d575caf/CI38172915154 besteht tatsächlich in
+allen vier Windows-/Linux-Desktopjobs. Gesamt-/Paketjobs laufen noch,
+Mac-Jobs queued. Das ist keine abgeschlossene native Update- oder Nutzerabnahme.
+
+Die erweiterte lokale0.9.64-Paketprüfung besteht einschließlich20-Datei-
+Wiederöffnung,126 Desktop-,167 Tastatur-,75 Sicherungsbedingungen, zwei
+Einstellungsprozessen, CLI-Sicherung, Runtime- und Versionsidentität. Originale:
+`build/package-update-verification/package-check/`. Kein neuer Produkt-CTest-
+Gesamtlauf; neue native Paketprüfung folgt nach Veröffentlichung des Prüfers.

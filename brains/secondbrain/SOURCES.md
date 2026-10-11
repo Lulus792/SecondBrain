@@ -237,3 +237,4 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 
 - [Erstellmotive](../../docs/ERSTELLEN_ICONS.md): eigene Vektoren, kompakte Leiste und Sternlabelpriorität.
 - [Plattformvorschlag](../../docs/PLATTFORM_VORSCHLAG.md): vorgeschlagene Mindeststände, tatsächliche Binär-/CI-Belege und offene Abnahmen.
+- [Update-Nachweis](../../docs/UPDATE_NACHWEIS.md): tatsächlicher Intel/macOS-Paketwechsel, bytegleiche Projektdateien, gespeicherte Notiz und Wiederherstellung; getrennte Wiederöffnungsprüfung in CI.

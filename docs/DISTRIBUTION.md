@@ -124,6 +124,12 @@ Archiv herunterladen; die berechnete SHA-256-Zeile mit der Zeile dieses Archivs
 vergleichen. macOS: shasum -a 256 DATEI; Linux: sha256sum DATEI; PowerShell:
 Get-FileHash DATEI -Algorithm SHA256.
 
+Der [Update-Nachweis](UPDATE_NACHWEIS.md) prüft bestehende Inhaltsbytes,
+gespeicherte Navigation, Sicherung/Wiederherstellung und Rückkehr zur alten
+App mit zwei tatsächlichen Paketen. Die reguläre Paketprüfung prüft zusätzlich
+Bestandsschutz beim erneuten Öffnen desselben Builds. Die unterschiedlichen
+Nachweise werden ausdrücklich getrennt.
+
 Grundlagen am 6. Oktober 2026 gelesen:
 [Workflow-Wiederverwendung](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows),
 [GitHub CLI Releases](https://cli.github.com/manual/gh_release_create),
