@@ -1,8 +1,8 @@
 # Umsetzungsstand von SecondBrain
 
-Stand: 11. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
+Stand: 12. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.61. Die Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.66/b3b93709f823. Die Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -4349,3 +4349,18 @@ C-Dateien und 58 aktuelle Quell-/Includehashes, externe UI nicht instrumentiert,
 Leaks aus, kein TSan. Reader-Aufnahme angesehen. Sauberes Paket und Installation
 folgen. [Vertrag und Originale](TEXT_VORBEREITUNG_OPTIMIERUNG.md).
 Neue Windows-/Linux-/ARM64- und reale Geräteabnahme bleiben offen; SBUI-074 ebenfalls.
+
+## Textvorbereitungspaket 0.9.66 installiert
+
+Sauberer Intel/macOS-Build b3b93709f823; fünf abschließende Glyphen-/Vorbereitungs-/
+Reader-/Versionsprüfungen bestehen (8,87 s). Entpacktes Paket: 126 Desktop-,
+167 Tastatur-, 75 Sicherungsbedingungen, zwei Einstellungsprozesse, CLI-/Runtime-/
+Lizenz-/Versionsidentität und Wiederöffnung mit 20 unveränderten Dateien.
+Echter 65→66→65-Wechsel erhält Dateien/Einstellungen und Sicherung/Wiederherstellung;
+drei Aufnahmen angesehen. 98 Dateien paketgleich installiert, 18 eigene
+Gedächtnisdateien beim Öffnen unverändert. Installierte Aufnahme angesehen.
+Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.65-20261012-001235`.
+macOS 14.6.1/23G93, x86_64; Binärminimum 14.0, SDK 15.2. Minimum nicht nativ abgenommen.
+[Vertrag und Archivhash](TEXT_VORBEREITUNG_OPTIMIERUNG.md).
+CI38179225359 zu b3b9370: Windows-/Linux-Kern und Python erfolgreich;
+vier Desktopjobs in Arbeit, Mac queued. Keine neue vollständige Plattformzusage.

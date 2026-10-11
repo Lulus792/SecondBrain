@@ -69,7 +69,22 @@ und Reader bestehen (8,39 s). Alle 83 lokalen Release-CTest-Prüfungen bestehen 
 ASan/UBSan bestehen für 5385 Vorbereitungs-, 120 Reader- und 1019 Glyphenbedingungen.
 38 eigene C-Dateien und 58 aktuelle Quell-/Includehashes wurden bestätigt.
 Externe UI-Bibliotheken sind nicht instrumentiert; Leakerkennung ist aus, kein TSan.
-Paketnachweise werden nach Abschluss ergänzt. Schwächere Geräte, Trackpads, Windows/Linux/ARM64,
+Das saubere Intel/macOS-Paket 0.9.66/b3b93709f823 besteht 126 Desktop-,
+167 Tastatur- und 75 Sicherungsbedingungen, zwei Einstellungsprozesse sowie
+CLI-/Laufzeit-/Lizenz-/Versionsprüfung. Die Paketwiederöffnung erhält 20 Dateien.
+Der echte Wechsel 0.9.65 → 0.9.66 → 0.9.65 erhält diese Dateien und Einstellungen;
+Sicherung/Wiederherstellung bestehen. Alle drei App-Aufnahmen wurden angesehen.
+98 Dateien paketgleich unter `dist/SecondBrain` installiert; 18 eigene
+Gedächtnisdateien beim Öffnen unverändert. Installierte App-Aufnahme angesehen.
+Die Binärdatei deklariert macOS 14.0, SDK 15.2; ausgeführt auf 14.6.1/23G93,
+x86_64. Dies ist keine ausgeführte Abnahme auf 14.0 oder ARM64.
+
+Archive SHA256: `0bb4974d8d9e56d0355e78ec0095ccaacb2a0efc3402334770aa970421d42ef0`.
+Rückfallkopie: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.65-20261012-001235`.
+Originale: `build/text-optimization-package-check`, `build/text-optimization-update`,
+`build/text-optimization-verification/installed.json` und
+`installed-brain-check.json`. Fünf abschließende Prüfungen am sauberen Build
+für Glyphen, Vorbereitung, Reader und Versionsidentität bestehen (8,87 s). Schwächere Geräte, Trackpads, Windows/Linux/ARM64,
 menschliche Bedienung und große reale Wissensbasen bleiben gesonderte Abnahmen.
 SBUI-074 ist weiter offen; diese Verbesserung erfüllt nicht die gesamte Release-Liste.
 

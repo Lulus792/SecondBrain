@@ -12,11 +12,11 @@ Glaskarten, eigene Icons, direkte Pfeilnavigation, Kamerafahrt, Startfokus, Text
 und große Leseansicht sind implementiert. Originalbytes, Entwürfe und erkannte
 Konflikte bleiben geschützt. Externe Bibliotheken nur UI; MIT.
 
-Installiert **0.9.65/1a19bee557ca**, sauberer Intel/macOS-Release-Build.
+Installiert **0.9.66/b3b93709f823**, sauberer Intel/macOS-Release-Build.
 98 Dateien paketgleich;18 Gedächtnisdateien beim Öffnen unverändert.126 Desktop-,
 167 Tastatur-,75 Sicherungsbedingungen, zwei Einstellungs-Neustarts, CLI-/Runtime-/
 Lizenz-/Version bestehen. Tatsächliche App-Aufnahme angesehen. macOS14.6.1/23G93,x86_64.
-Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.64-20261011-230732`.
+Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.65-20261012-001235`.
 
 ## Neuester geprüfter Fortschritt
 
@@ -26,8 +26,8 @@ teilen einen Plan bei erhaltenen Eingabegrenzen. 83/83 lokale Release-Tests
 bestehen (summiert 504,86 s), ASan/UBSan: 5385 Vorbereitungs-, 120 Reader- und
 1019 Glyphenbedingungen. Externe UI nicht instrumentiert, Leaks aus, kein TSan.
 Drei Metal-Paare: lange Notiz median 10,54 % früher vorbereitet, 6,64 % früher
-übergangsfrei. Keine allgemeine Geräte-/Bediengarantie. Paket/Installation folgen;
-installiert bleibt bis dahin 0.9.65. [Vertrag](../../docs/TEXT_VORBEREITUNG_OPTIMIERUNG.md).
+übergangsfrei. Keine allgemeine Geräte-/Bediengarantie. Sauberes Paket geprüft und 98 Dateien paketgleich installiert; echter
+65→66→65-Wechsel erhält 20 Dateien und Einstellungen. [Vertrag](../../docs/TEXT_VORBEREITUNG_OPTIMIERUNG.md).
 
 ## Aktueller Darstellungsschritt
 
