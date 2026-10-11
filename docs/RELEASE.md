@@ -312,3 +312,11 @@ Gesamtprüfung sowie gezielte ASan/UBSan bestehen. [Vertrag](DIALOGMATERIAL.md).
 Vier korrekt vor Present erfasste Metalbilder wurden angesehen; native Snapshot-
 Pixelidentität und weitere Geräte-/Plattform-/assistive Abnahmen bleiben getrennt
 offen. Die vollständige Leistungs- und Release-Aufgabe bleibt bestehen.
+
+## Reaktionszeitmessung vom 11. Oktober
+
+Der [Diagnoseprüfer](FRAME_MESSUNG.md) berücksichtigt jetzt Eingabeverarbeitung,
+erste Bilder und tatsächliche Animationsabstände. Serielle Metal-/Software-
+Einzelwerte bestätigen verbleibende Anfangs- und Bewegungsarbeit. Das ist eine
+verbesserte Messgrundlage, keine abgeschlossene Leistungskorrektur. Erste Quell-/
+Inline-/native Aufbereitung, reale Eingaben und weitere Zielgeräte bleiben offen.

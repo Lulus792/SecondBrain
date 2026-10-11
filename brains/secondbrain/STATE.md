@@ -137,6 +137,13 @@ Hashes. Vier gültige Metalbilder angesehen; Aufnahme-/Snapshot-Grenzen dokument
 
 ## Nächste Arbeiten
 
+Der Diagnoseprüfer erfasst jetzt auch Eingabe und erste Bilder, alle 272
+Framewerte und reale Animationsabstände. Drei serielle Metal-Läufe zeigen
+114–126 ms Arbeit im ersten Bild der langen Notiz; Bewegungs-/Zeichenspitzen
+bleiben. CSV-/Prozess-/Bestandsschutzprüfung besteht. Keine Produktoptimierung
+oder neue Version; installiert bleibt 0.9.55.
+[Messung und Grenzen](../../docs/FRAME_MESSUNG.md).
+
 Aktuelle Dialog-/Geräteabnahme, Quelllesen, Parser/Inline-Aufbereitung,
 native Metadaten, Rasterung und Fälle über den Vorbereitungsbudgets profilieren.
 Der Rückfall ist noch synchron; einzelne Bibliotheksaufrufe und Shutdown können

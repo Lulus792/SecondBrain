@@ -3808,3 +3808,22 @@ beschriebenen lokalen Pixel-/Darstellungs-/Ereignisumfang nachgeprüft. Native
 Snapshot-Pixelidentität, Speicherfehlerabnahme der Ersatzfläche, reale Geräte/
 Eingaben/Screenreader, vollständige Leistung und übrige Release-Arbeit offen.
 1.0 nur nach ausdrücklicher Nutzerfreigabe.
+
+## Vollständigerer Reaktionszeitprüfer (11. Oktober, Produkt weiter 0.9.55)
+
+`secondbrain-ui-profile` misst jetzt Eingabe, erste Bilder, Start und Beenden
+zusätzlich zur bisherigen warmen Zusammenfassung. Optionaler CSV-Export erhält
+alle 272 Frames, Notizanforderungen/-pfade und Reader-Zähler; vorhandene Ausgaben
+werden abgewiesen. Animation verwendet nach dem ersten Frame die tatsächlich
+verstrichene Zeit. Die unabhängige Counterzeit vermeidet den bei SDL_Quit
+zurückgesetzten Tickursprung. [Methodik, Aufruf und Grenzen](FRAME_MESSUNG.md).
+
+Drei serielle Metal-Läufe und ein Softwarelauf bestehen mit Abschnitts-/Summen-,
+CSV-Pfad-, Wechsel-, Tick- und Bestandsschutzprüfung; ein zusätzlicher Softwarelauf
+prüft den bisherigen Aufruf. Alle 19 Fixture- und 18 ursprünglichen Gedächtnisdateien
+bleiben unverändert. Erstes Bild der 62.212-Byte-Notiz in Metal 113,91–126,26 ms;
+Wechselmaximum 27,12–43,50 ms, weitere Bewegungs-/Zeichenspitzen bestehen.
+Release-Prüferbuild und diff-Prüfung bestehen; kein neuer Produkt-Gesamttest und
+keine Leistungskorrektur behauptet. Originale: `build/frame-timing-verification/final/`.
+Installiert bleibt 0.9.55. CI 38148508446 erneut als queued beobachtet; keine neue
+Plattformabnahme. SBUI-074 und übrige Release-Arbeit bleiben offen.

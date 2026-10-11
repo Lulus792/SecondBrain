@@ -211,5 +211,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   gerundete Ebenenkomposition, Softwaredreiecke und Aufnahme-/Abnahmegrenzen.
 - [Materialprüfer](../../tests/test_material_panel.c): unabhängiger Vergleich
   von Hintergrundtext, Vordergrundtext und Außenrand in sechs Darstellungsmodi.
+- [Frame-Messung](../../docs/FRAME_MESSUNG.md): Eingabe, erste Bilder, reale
+  Tickabstände und CSV-Einzelwerte; serielle Metal-/Software-Nachweise und Grenzen.
 - [SBUI-077-Nachprüfung](/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-11_16-38-09/UI_REVIEW.md): Software-/Metalbilder und offene native
   Snapshot-, Plattform-, Geräte- und assistive Abnahmen.
