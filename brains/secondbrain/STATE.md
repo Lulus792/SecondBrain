@@ -34,6 +34,13 @@ des verifizierten Linux-Artefakts auf dem Mac, keine dortige Linux-Ausführung.
 42 Python-Prüfungen bestehen, eine Windows-Prüfung übersprungen; installierte
 Mac-Paketimporte weiterhin geprüft. Neue Scanner-CI und transitive ABI-Abnahme
 offen. [Laufzeitnachweis](../../docs/PAKET_LAUFZEIT.md).
+Der neue ELF-Fixture besteht inzwischen nativ in beiden Linux-Python-Jobs
+zu402adb5/CI38172648396; Desktop-/Paketprüfungen laufen noch, Mac-CI queued.
+Der originale Linux64-Nachweis identifiziert Rust1.99.0/b940084d, bereits im
+mitgelieferten Quellmanifest. Windows-/Linux-CI verlangen jetzt den Abgleich
+von Compilercommit, Release, explizitem Ziel und Lizenztext-Hash.46 lokale
+Python-Prüfungen bestehen, eine Windows-Prüfung übersprungen. Diese neue
+CI-Grenze braucht noch ihren eigenen Lauf. [Vertrag](../../docs/RUST_RUNTIME_NACHWEIS.md).
 
 ## Geprüfter Fortschritt
 

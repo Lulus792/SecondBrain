@@ -39,10 +39,10 @@ jobs:
         run: cmake -DSB_BUILD_DIR=build/ui -DSB_BUILD_CONFIG=${{ matrix.config }} -P tools/build_checked.cmake
       - name: Record Windows accessibility compiler
         if: runner.os == 'Windows'
-        run: python tools/record_ui_rust_compiler.py --target-dir build/ui/accesskit-windows-build --output build/ui/ui-rust-compiler.json
+        run: python tools/record_ui_rust_compiler.py --target-dir build/ui/accesskit-windows-build --output build/ui/ui-rust-compiler.json --runtime-manifest third_party/rust-runtime-manifest.json --target x86_64-pc-windows-msvc
       - name: Record Linux accessibility compiler
         if: runner.os == 'Linux'
-        run: python tools/record_ui_rust_compiler.py --target-dir build/ui/accesskit-linux-build --output build/ui/ui-rust-compiler.json
+        run: python tools/record_ui_rust_compiler.py --target-dir build/ui/accesskit-linux-build --output build/ui/ui-rust-compiler.json --runtime-manifest third_party/rust-runtime-manifest.json --target x86_64-unknown-linux-gnu
       - name: Verify UI on Linux
         if: runner.os == 'Linux'
         run: sh tools/run_linux_ui_tests.sh cmake -DSB_TEST_DIR=build/ui -DSB_TEST_CONFIG=${{ matrix.config }} -P tools/test_checked.cmake

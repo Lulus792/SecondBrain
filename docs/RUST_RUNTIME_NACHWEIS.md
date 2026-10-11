@@ -105,3 +105,41 @@ Der Abgleich sämtlicher tatsächlich gelinkter In-tree-/SDK-/Systemruntime-
 Anteile sowie abweichender Toolchain-Konfigurationen bleibt offen.
 Die vollständige transitive Release-Abnahme wird durch diesen Schritt nicht
 als abgeschlossen markiert.
+
+## Abgleich mit dem tatsächlichen CI-Compiler vom 11. Oktober
+
+Der SHA256-geprüfte Linux-Release-Nachweis zu0.9.64/bef4816d3e40
+([CI38171616070](https://github.com/Lulus792/SecondBrain/actions/runs/38171616070),
+Artefakt11714700207) nennt tatsächlich **Rust1.99.0**, Commit
+`b940084d7eb6a299eb4bfeb8e34901bc051e7ac4`, Host
+`x86_64-unknown-linux-gnu`. Dieser Stand ist bereits im mitgelieferten Manifest
+enthalten. Die App-/CLI-Hashes im nativen Importbericht stimmen genau mit den
+statisch untersuchten heruntergeladenen Programmen überein. Der Report löst22
+Systembibliotheken auf; im Paket sind keine separaten Shared Libraries
+mitgeliefert. Systemdateien wurden für diesen Abgleich nicht kopiert oder ausgeführt.
+
+Der Recorder bietet jetzt `--runtime-manifest` zusammen mit `--target`.
+Windows-/Linux-CI verlangen diesen Abgleich nach dem Cargo-Build: tatsächlicher
+vollständiger Compilercommit und Release müssen genau einen inventarisierten
+Quellstand treffen, das explizite Buildziel muss darin enthalten sein, und der
+Hash der mitgelieferten Rust-Lizenzsammlung muss stimmen. Ein Compilerhost allein
+ist kein Nachweis eines Cross-Compile-Ziels. Windows verwendet laut eigenem
+CMake-Build explizit x86_64-pc-windows-msvc; der Linux-CI-Build ist nativ x86_64.
+Fehlende Abdeckung bricht den CI-Schritt vor Paketveröffentlichung ab und
+verlangt eine neue Quelleninventur. Das macht künftige Toolchainwechsel sichtbar.
+
+Geprüft sind bekannte Quellen/Ziele, unbekannter Commit/Release, unzulässiges
+Ziel und geänderte Lizenzsammlung. Ein echter isolierter Cargo-Build prüft
+Identität und bei abgedecktem Compiler auch den CLI-Abgleich. Eine synthetische
+unbekannte Identität bestätigt die Abweisung ohne neuen Erfolgsbericht.
+Das ursprüngliche Linux-CI-Compilerrecord besteht den lokalen Quellenabgleich.
+Die neue Windows-/Linux-CI-Grenze benötigt ihren eigenen tatsächlichen Lauf;
+ihre Konfiguration allein ist keine bestandene Plattformprüfung.
+
+Originale: `build/runtime-abi-verification/linux-evidence.zip` (SHA256
+`dd96d3ac59a756957af340e854d25299f7f0bdf779eb4505e7d9b39e3857c783`),
+`linux-ui-rust-compiler.json`, `linux-runtime-notice-coverage.json` und
+`linux-runtime-dependencies.json`. Der Abgleich ist konservative Quellenabdeckung,
+keine vollständige Bestimmung jedes gelinkten In-tree-/SDK-/Systemanteils und
+keine allgemeine Lizenzfreigabe beliebiger Builds. Die vollständige Release-
+Aufgabe bleibt offen; die App-Version bleibt0.9.64.

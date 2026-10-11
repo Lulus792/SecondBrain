@@ -4239,3 +4239,20 @@ Prüfung auf dem Mac übersprungen. Sechs gezielte Laufzeitprüfungen bestehen
 ebenfalls; installierte Intel0.9.64-Mac-Importprüfung ohne Probleme, minos14.0.
 Keine Produkt-/Versionsänderung. Neue native Scanner-CI, transitive Runtime-
 und frische Nutzerplattformprüfung bleiben offen. [Vertrag](PAKET_LAUFZEIT.md).
+
+## Buildcompiler und mitgelieferte Laufzeitquellen
+
+Der originale Linux64-CI-Nachweis zu bef4816d3e40 nennt Rust1.99.0/b940084d;
+dieser Compiler ist bereits im mitgelieferten Rust-Quellmanifest enthalten.
+Die CI verlangt künftig vor Paketveröffentlichung den Abgleich des tatsächlichen
+Compilers und expliziten Zielsystems sowie des Lizenztext-Hashes. Unbekannte
+Compilerstände, fehlende Ziele und geänderte Texte werden abgewiesen.
+Ein echter Cargo-Build sowie positive/negative Quellen-/CLI-Fälle sind geprüft.
+47 Python-Tests entdeckt:46 bestanden, eine native Windows-Prüfung auf dem Mac
+übersprungen (3,504s). App unverändert0.9.64; keine vollständige Lizenzfreigabe.
+[Umfang und Belege](RUST_RUNTIME_NACHWEIS.md).
+
+CI38172648396 zu402adb5 besteht bei beiden Linux-/Windows-Python-Versionen;
+der reale ELF-Paket-Fixture ist damit nativ auf Linux bestätigt. Die vier
+Desktopjobs einschließlich Release-Paketen laufen noch, Mac-Jobs queued.
+Die neue Compiler-/Quellgrenze benötigt nach dem Push ihre eigene native CI.
