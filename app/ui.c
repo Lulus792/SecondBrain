@@ -260,6 +260,15 @@ bool sb_ui_wrap_geometry(SBUi *ui,const struct nk_user_font *font,const char *te
     if(plan)for(size_t i=0;i<plan->count && ok;++i)ok=visitor(user,&plan->lines[i].shape,plan->lines[i].source_offset,plan->lines[i].y);
     styled_plan_free(&fresh);free(source.text.text);return ok;
 }
+bool sb_ui_wrap_native(SBUi *ui,const struct nk_user_font *font,const char *text,size_t length,const SBTextSpan *styles,size_t style_count,struct nk_rect bounds,SBNativeText *out){
+    if(!ui || sb_ui_font_owner(font)!=ui || !ui->ctx || !out || style_count>1 || (style_count && (!styles || styles[0].offset || styles[0].length!=length)) || !isfinite(bounds.x) || !isfinite(bounds.y) || !isfinite(bounds.w) || !isfinite(bounds.h) || bounds.w<=0 || bounds.h<0)return false;
+    SBWrappedSource source;StyledPlan fresh={0};if(!wrapped_source(text,length,&source))return false;
+    const StyledPlan *plan=wrapped_plan(ui,font,&source,bounds.w,ui->ctx->style.text.padding,&fresh);bool ok=false;
+    if(plan){SBStyledText formatted=source.text.text ? (SBStyledText){.text=source.text.text,.spans=(SBTextSpan *)styles,.count=style_count} : source.text;
+        if(!styles)formatted=source.text;
+        ok=styled_native_export(ui,font,&formatted,plan,bounds,ui->ctx->style.text.padding,NK_TEXT_LEFT,out);}
+    styled_plan_free(&fresh);free(source.text.text);return ok;
+}
 static void paste(nk_handle user, struct nk_text_edit *edit) {
     char *text;
     size_t length;

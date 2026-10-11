@@ -186,6 +186,18 @@ int main(int argc,char **argv) {
     /* A value action is never applied to the read-only document surface. */
     d.editing=false; d.card=true; frame(&d);
     void *reader=native_find(view,d.model.title,0); CHECK(reader!=NULL);
+    SBPassiveText *native_paragraph=NULL;for(size_t i=0;i<d.passive_count;++i)if(d.passive[i].role==ACCESSKIT_ROLE_PARAGRAPH && d.passive[i].native.count){native_paragraph=&d.passive[i];break;}
+    CHECK(native_paragraph && native_paragraph->native.runs[0].geometry && native_paragraph->native.runs[0].characters);
+    void *paragraph_node=native_find(view,native_paragraph->text,0);CHECK(paragraph_node);
+    size_t document_characters=((size_t(*)(void *,SEL))objc_msgSend)(reader,sel_registerName("accessibilityNumberOfCharacters"));CHECK(document_characters>0);
+    void *document_string=((void *(*)(void *,SEL,TextRange))objc_msgSend)(reader,sel_registerName("accessibilityStringForRange:"),(TextRange){0,document_characters});CHECK(document_string);
+    TextRange paragraph_range=((TextRange(*)(void *,SEL,void *))objc_msgSend)(document_string,sel_registerName("rangeOfString:"),string(native_paragraph->text));CHECK(paragraph_range.location<document_characters);
+    TextRect paragraph_rect=native_text_rect(reader,(TextRange){paragraph_range.location,1}),paragraph_frame=native_frame(paragraph_node);SBNativeTextRun *paragraph_run=&native_paragraph->native.runs[0];
+    float paragraph_x=(paragraph_run->level&1) ? paragraph_run->x+paragraph_run->width-paragraph_run->positions[0]-paragraph_run->widths[0] : paragraph_run->x+paragraph_run->positions[0];
+    if(fabs(paragraph_rect.size.width-paragraph_run->widths[0])>=0.1 || fabs(paragraph_rect.size.height-paragraph_run->height)>=0.1)fprintf(stderr,"Native paragraph %s role=%s: range=%.2f,%.2f expected=%.2f,%.2f frame=%.2f,%.2f\n",native_paragraph->text,utf8(send(paragraph_node,"accessibilityRole")),paragraph_rect.size.width,paragraph_rect.size.height,paragraph_run->widths[0],paragraph_run->height,paragraph_frame.size.width,paragraph_frame.size.height);
+    CHECK(fabs(paragraph_rect.size.width-paragraph_run->widths[0])<0.1 && fabs(paragraph_rect.size.height-paragraph_run->height)<0.1);
+    CHECK(fabs(paragraph_rect.origin.x-(paragraph_frame.origin.x+paragraph_x-native_paragraph->bounds.x))<0.1);
+    CHECK(fabs(paragraph_rect.origin.y-(paragraph_frame.origin.y+native_paragraph->bounds.h-(paragraph_run->y-native_paragraph->bounds.y)-paragraph_run->height))<0.1);
     CHECK(!((BOOL(*)(void *,SEL,SEL))objc_msgSend)(reader,sel_registerName("isAccessibilitySelectorAllowed:"),sel_registerName("setAccessibilitySelectedText:")));
     ((void(*)(void *,SEL,void *))objc_msgSend)(reader,sel_registerName("setAccessibilitySelectedText:"),string("Must stay read-only"));frame(&d);CHECK(!strstr(d.model.editor,"Must stay read-only"));
     const char *read_value=utf8(send(reader,"accessibilityValue")); CHECK(read_value && strstr(read_value,"Projekt"));

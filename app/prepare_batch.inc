@@ -48,7 +48,8 @@ static void batch_blocks_free(SBPrepareBatch *b){
 static bool batch_encode(SBPrepareBatch *b,SBPreparedBlock *p,SBUi *cpu){
     SBStyledPlan *plan=&p->plan;
     if(!batch_charge(&b->output_bytes,plan->capacity,sizeof(*plan->lines),SB_PREPARE_OUTPUT_BYTES) ||
-       !batch_charge(&b->output_bytes,plan->count,sizeof(*p->tokens),SB_PREPARE_OUTPUT_BYTES))return false;
+       !batch_charge(&b->output_bytes,plan->count,sizeof(*p->tokens),SB_PREPARE_OUTPUT_BYTES) ||
+       !batch_charge(&b->output_bytes,plan->native.capacity,sizeof(*plan->native.runs),SB_PREPARE_OUTPUT_BYTES))return false;
     p->tokens=plan->count ? calloc(plan->count,sizeof(*p->tokens)) : NULL;
     if(plan->count && !p->tokens)return false;
     for(size_t l=0;l<plan->count;++l){
@@ -56,7 +57,8 @@ static bool batch_encode(SBPrepareBatch *b,SBPreparedBlock *p,SBUi *cpu){
         SBShapedLine *line=&plan->lines[l].shape;
         if(!batch_charge(&b->output_bytes,line->capacity,sizeof(*line->glyphs),SB_PREPARE_OUTPUT_BYTES) ||
            !batch_charge(&b->output_bytes,line->run_capacity,sizeof(*line->runs),SB_PREPARE_OUTPUT_BYTES) ||
-           !batch_charge(&b->output_bytes,line->count,1,SB_PREPARE_OUTPUT_BYTES))return false;
+           !batch_charge(&b->output_bytes,line->count,1,SB_PREPARE_OUTPUT_BYTES) ||
+           !batch_charge(&b->output_bytes,plan->lines[l].box_count,sizeof(SBNativeCharBox),SB_PREPARE_OUTPUT_BYTES))return false;
         p->tokens[l]=line->count ? malloc(line->count) : NULL;p->token_count=l+1;
         if(line->count && !p->tokens[l])return false;
         for(size_t g=0;g<line->count;++g){unsigned token=sb_ui_font_token(cpu,line->glyphs[g].font);

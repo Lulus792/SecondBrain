@@ -48,6 +48,16 @@ typedef struct {const SBStyledPlan *plan;size_t at;bool valid;} LayoutCompare;
 static bool compare_layout(void *data,const SBShapedLine *line,size_t offset,float y){LayoutCompare *p=data;if(p->at>=p->plan->count){p->valid=false;return false;}const SBStyledLine *expected=&p->plan->lines[p->at++];Compare compare={.result=&expected->shape,.valid=true};
     /* Reuse numeric glyph comparison, with this paragraph's actual origin. */
     p->valid=offset==expected->source_offset && y==expected->y && compare_line(&compare,line,0,0);return p->valid;}
+static int compare_native(const SBNativeText *a,const SBNativeText *b){
+    CHECK(a->count==b->count && a->scalar_fallback==b->scalar_fallback);
+    for(size_t i=0;i<a->count;++i){const SBNativeTextRun *x=&a->runs[i],*y=&b->runs[i];
+        CHECK(x->span.offset==y->span.offset && x->span.length==y->span.length && x->span.style==y->span.style && x->characters==y->characters);
+        CHECK(x->geometry==y->geometry && x->level==y->level && x->x==y->x && x->y==y->y && x->width==y->width && x->height==y->height);
+        CHECK(!memcmp(x->lengths,y->lengths,x->characters) && !memcmp(x->scalars,y->scalars,(x->characters+1)*sizeof(*x->scalars)));
+        CHECK(!memcmp(x->positions,y->positions,x->characters*sizeof(float)) && !memcmp(x->widths,y->widths,x->characters*sizeof(float)));
+        CHECK(x->word_count==y->word_count && !memcmp(x->words,y->words,x->word_count));}
+    return 0;
+}
 static int layout_case(SBUi *ui,unsigned role,float width,bool terminal){
     const char *source="AV **ffi é** אב12גד *ببب سلام* `code` 👩‍💻 words words\r\n\nאבג AB more words\n";SBInline reader;SBStyledText styled={0};OK(sb_inline_init(&reader,source,strlen(source)));OK(sb_inline_styled(&reader,0,strlen(source),&styled));
     const struct nk_user_font *font=role==0 ? &ui->normal->handle : role==1 ? &ui->body->handle : role==2 ? &ui->heading->handle : &ui->code->handle;
@@ -58,6 +68,7 @@ static int layout_case(SBUi *ui,unsigned role,float width,bool terminal){
     unsigned old_style=styled.spans[0].style;styled.spans[0].style^=SB_TEXT_BOLD;CHECK(sb_prepare_layout_take(job,ui,&styled,role,width,padding,gap,terminal,77,&result).code==SB_CONFLICT && !result.lines);styled.spans[0].style=old_style;
     OK(sb_prepare_layout_take(job,ui,&styled,role,width,padding,gap,terminal,77,&result));CHECK(sb_prepare_layout_take(job,ui,&styled,role,width,padding,gap,terminal,77,&result).code==SB_INVALID);sb_prepare_layout_free(job);
     SBStyledPlan reference={0};CHECK(sb_ui_styled_plan(ui,font,&styled,width,padding,gap,terminal,&reference));CHECK(reference.count==result.count && reference.height==result.height);
+    CHECK(!compare_native(&reference.native,&result.native));
     for(size_t i=0;i<result.count;++i){CHECK(result.lines[i].y==reference.lines[i].y && result.lines[i].source_offset==reference.lines[i].source_offset);Compare compare={.result=&result.lines[i].shape,.valid=true};CHECK(compare_line(&compare,&reference.lines[i].shape,0,0));}
     if(!terminal){LayoutCompare compare={.plan=&result,.valid=true};CHECK(sb_ui_styled_geometry(ui,font,&styled,width,compare_layout,&compare));CHECK(compare.valid && compare.at==result.count);CHECK(sb_ui_styled_height(ui,font,&styled,width)==result.height);}
     sb_ui_styled_plan_free(&reference);sb_ui_styled_plan_free(&result);sb_styled_free(&styled);sb_inline_free(&reader);return 0;
@@ -97,6 +108,7 @@ static int batch_cases(SBUi *ui){
     for(unsigned i=0;i<4;++i){const SBStyledPlan *plan=sb_prepare_batch_lookup(b,ui,&requests[i]);CHECK(plan);
         const struct nk_user_font *font=i==0 ? &ui->normal->handle : i==1 ? &ui->body->handle : i==2 ? &ui->heading->handle : &ui->code->handle;
         SBStyledPlan reference={0};CHECK(sb_ui_styled_plan(ui,font,&styled,requests[i].width,padding,4,false,&reference));CHECK(reference.count==plan->count && reference.height==plan->height);
+        CHECK(!compare_native(&reference.native,&plan->native));
         for(size_t l=0;l<reference.count;++l){Compare c={.result=&plan->lines[l].shape,.valid=true};CHECK(compare_line(&c,&reference.lines[l].shape,0,0));CHECK(plan->lines[l].source_offset==reference.lines[l].source_offset && plan->lines[l].y==reference.lines[l].y);}
         sb_ui_styled_plan_free(&reference);
     }

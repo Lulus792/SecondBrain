@@ -3588,3 +3588,40 @@ Hashes/Version, Gedächtnisprüfung, Bild, Geräte-/Quellstand und CI-Snapshot).
 CI38135305464 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
 Native Leseblock-Geometrie, echte IME/Screenreader/Geräte und übrige Release-
 Arbeiten bleiben offen.1.0 nur nach Nutzerfreigabe.
+
+## Native Leseblöcke (0.9.51, 11. Oktober)
+
+Styled-/Wrap-Pläne halten Graphemrechtecke aus dem tatsächlichen Glyphen-/
+Cursorplan und die dazugehörigen nativen Läufe/Wortanfänge. Die private
+Hintergrundvorbereitung erzeugt sie mit; Ursprung/Ausrichtung verschieben
+besessene Kopien ohne erneute Unicode-Aufbereitung. Ausgeblendete Wrap-Leerzeichen/
+Trenner erhalten Breite null. Laufkapazität und Rechtecke zählen zu den bestehenden
+32-/64-MiB-Budgets. [Vertrag](NATIVE_LESEGEOMETRIE.md).
+
+Absätze, Körperüberschriften, Code und gezeichnete Tabellenzellen veröffentlichen
+nun diese Geometrie; Listen-/Zitatinhalte eingeschlossen. Separate Titel,
+Markierungen und Kopfzellen ohne eigenes Widget bleiben weitere Integration.
+Der unabhängige Latein-/Arabisch-/Fettschriftplan prüft Zeichenpositionen,
+Richtung, Höhe, alle Ausrichtungen und verschobene Ursprünge bei100/150/200%.
+Der echte Mac-Provider fragt den ersten Absatzbuchstaben über den Dokument-
+Textbereich ab: der festgelegte Consumer bietet Absatzcontainern selbst keine
+Textbereiche. Semantische Rollen bleiben erhalten.
+
+75/75 lokale Release-Prüfungen bestehen (591,50s).590 Reader-,5231 private
+Font-/Glyphen-/Layout-/Batch- und616 Provider-Assertions bestehen auch unter
+haltendem ASan/UBSan.39 eigene C-Dateien aus Kern/Modell/UI/Desktop/Text-/
+Glyphenlayout neu instrumentiert;51 Quell-/Include-Hashes stimmen. Externe
+Bibliotheken/Bidi-Engine uninstrumentiert, Mac-Leakerkennung aus, kein TSan.
+Originale: `build/reader-geometry-verification/` und
+`build/reader-geometry-sanitizers/{build.log,reader-test.log,prepare-test.log,native-test.log,sources.json}`.
+
+Drei abwechselnde Metal-Paare vergleichen dieselbe unveränderte18-Dateien-Kopie
+mit den eingefrorenen App-/UI-Quellen0.9.50. Wechsel-Layoutmittelwerte2,48→2,87ms,
+7,38→2,70ms,2,53→2,57ms; Frame-p95 27,38→28,31ms,99,70→26,11ms,
+32,37→32,53ms. Der Ausreißer und weiterhin bestehende Raster-/Presentspitzen
+begründen keine allgemeine Beschleunigungs- oder Flüssigkeitsaussage.
+[Referenzweg und Grenzen](NATIVE_LESEGEOMETRIE.md).
+
+Paket/Installation folgen; installiert bleibt0.9.50. Weitere native Geometrie,
+neue Zielplattformen, echte IME/Screenreader/Geräte und übrige Release-Arbeit offen.
+1.0 nur nach ausdrücklicher Nutzerfreigabe.

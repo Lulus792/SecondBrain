@@ -186,3 +186,8 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   Vertrag, Quellen-/Kontextschutz und eigene Mac-Setter-/Besitzeranbindung ab50.
 - [Aktionsprüfer](../../tests/test_field_actions.c): produktive Queue und Widgets,
   Graphemgrenzen, Kapazität, Fokusrückkehr und geschlossene/geänderte Felder.
+
+- [Native Leseblöcke](../../docs/NATIVE_LESEGEOMETRIE.md): gezeichnete
+  Graphemflächen, gehaltene Metadaten/Worker-Budgets und Metal-Vergleich ab51.
+- [Readerprüfer](../../tests/test_reader_native.c): unabhängige Glyphen-/
+  Ausrichtungs-/Ursprungsprüfung und produktive Absatz-/Code-/Tabellenquellen.

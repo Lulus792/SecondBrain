@@ -3,15 +3,15 @@
 #include <SDL3_ttf/SDL_ttf.h>
 typedef SBStyledLine StyledLine;
 typedef SBStyledPlan StyledPlan;
-static void styled_plan_free(StyledPlan *plan){for(size_t i=0;i<plan->count;++i)sb_shape_line_free(&plan->lines[i].shape);free(plan->lines);memset(plan,0,sizeof(*plan));}
-static bool styled_line_add(StyledPlan *plan,SBShapedLine *line,SBUi *ui,const struct nk_user_font *base,float gap) {
+static void styled_plan_free(StyledPlan *plan){for(size_t i=0;i<plan->count;++i){sb_shape_line_free(&plan->lines[i].shape);free(plan->lines[i].boxes);}free(plan->lines);sb_native_text_free(&plan->native);memset(plan,0,sizeof(*plan));}
+static bool styled_line_add(StyledPlan *plan,SBShapedLine *line,SBUi *ui,const struct nk_user_font *base,float gap,SBNativeCharBox *boxes,size_t box_count) {
     if(ui->layout_budget){
-        size_t bytes=line->capacity*sizeof(*line->glyphs)+line->run_capacity*sizeof(*line->runs)+line->count+sizeof(uint8_t *);
+        size_t bytes=line->capacity*sizeof(*line->glyphs)+line->run_capacity*sizeof(*line->runs)+line->count+sizeof(uint8_t *)+box_count*sizeof(*boxes);
         if(plan->count==plan->capacity)bytes+=(plan->capacity ? plan->capacity : 16)*sizeof(*plan->lines);
         if(bytes>*ui->layout_budget)return false;*ui->layout_budget-=bytes;
     }
     if(plan->count==plan->capacity){size_t next=plan->capacity ? plan->capacity*2 : 16;StyledLine *grown=realloc(plan->lines,next*sizeof(*grown));if(!grown)return false;plan->lines=grown;plan->capacity=next;}
-    plan->lines[plan->count++]=(StyledLine){*line,plan->height};memset(line,0,sizeof(*line));
+    plan->lines[plan->count++]=(StyledLine){.shape=*line,.y=plan->height,.boxes=boxes,.box_count=box_count};memset(line,0,sizeof(*line));
     const SBShapedLine *last=&plan->lines[plan->count-1].shape;
     plan->height+=fmaxf(base->height,(last->ascent+last->descent)/ui->density)+gap;return true;
 }
@@ -65,6 +65,23 @@ static bool styled_fonts(SBUi *ui,const struct nk_user_font *base,const SBStyled
     sb_script_plan_free(&scripts);*out=fonts;*count=used;return true;
 }
 static bool styled_blank(const char *text,size_t a,size_t b){return b==a+1 && (text[a]==' ' || text[a]=='\t');}
+static bool styled_boxes(SBUi *ui,const struct nk_user_font *base,const SBShapeParagraph *paragraph,const SBShapedLine *line,const char *source,size_t consumed,SBNativeCharBox **out,size_t *count){
+    SBCaretPlan carets={0};size_t end=line->byte+line->length;
+    if(line->length && sb_caret_plan(paragraph,line,&carets).code!=SB_OK)return false;
+    SBGrapheme reader;SBGraphemeBoundary b;size_t extra=0;
+    if(!sb_grapheme_init(&reader,source+end,consumed-end)){sb_caret_plan_free(&carets);return false;}
+    sb_grapheme_next(&reader,&b);while(sb_grapheme_next(&reader,&b))++extra;
+    size_t n=carets.cluster_count+extra;if(!n)n=1;
+    if(ui->layout_budget && n>*ui->layout_budget/sizeof(SBNativeCharBox)){sb_caret_plan_free(&carets);return false;}
+    SBNativeCharBox *boxes=calloc(n,sizeof(*boxes));if(!boxes){sb_caret_plan_free(&carets);return false;}
+    float height=fmaxf(base->height,(line->ascent+line->descent)/ui->density),edge=0;size_t at=0;
+    for(size_t i=0;i<carets.cluster_count;++i){SBCaretCluster c=carets.clusters[i];boxes[at++]=(SBNativeCharBox){c.byte,c.length,c.left/ui->density,0,(c.right-c.left)/ui->density,height,c.level};}
+    SBCaret caret;if(sb_caret_find(&carets,end,SB_CARET_AFTER,line->base_level,&caret))edge=caret.x/ui->density;
+    sb_grapheme_init(&reader,source+end,consumed-end);size_t previous=0;sb_grapheme_next(&reader,&b);
+    while(sb_grapheme_next(&reader,&b)){boxes[at++]=(SBNativeCharBox){end+previous,b.byte-previous,edge,0,0,height,line->base_level};previous=b.byte;}
+    if(!at)boxes[at++]=(SBNativeCharBox){end,0,edge,0,0,height,line->base_level};
+    sb_caret_plan_free(&carets);*out=boxes;*count=at;return true;
+}
 static bool styled_paragraph(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,size_t start,size_t length,float available,float gap,StyledPlan *plan) {
     SBTextParagraph *bidi=NULL;SBShapeParagraph *prepared=NULL;SBShapeFontSpan *fonts=NULL;size_t font_count=0;
     if(sb_bidi_paragraph_create(text->text+start,length,SB_BIDI_AUTO_LTR,&bidi).code!=SB_OK)return false;
@@ -118,11 +135,26 @@ static bool styled_paragraph(SBUi *ui,const struct nk_user_font *base,const SBSt
         if(end<terminal && end>begin+1){size_t space=end;while(space>begin && !styled_blank(text->text+start,boundaries[space-1],boundaries[space]))--space;if(space>begin)end=space;}
         size_t visible=end;while(visible>begin+1 && styled_blank(text->text+start,boundaries[visible-1],boundaries[visible]))--visible;
         if(success)success=sb_shape_paragraph_line(prepared,boundaries[begin],boundaries[visible]-boundaries[begin],&trial).code==SB_OK;
-        if(success){success=styled_line_add(plan,&trial,ui,base,gap);if(success)plan->lines[plan->count-1].source_offset=start;}sb_shape_line_free(&trial);
         begin=end;while(begin<terminal && styled_blank(text->text+start,boundaries[begin],boundaries[begin+1]))++begin;
+        size_t consumed=begin==terminal ? length : boundaries[begin];SBNativeCharBox *boxes=NULL;size_t box_count=0;
+        if(success)success=styled_boxes(ui,base,prepared,&trial,text->text+start,consumed,&boxes,&box_count);
+        if(success){success=styled_line_add(plan,&trial,ui,base,gap,boxes,box_count);if(success)plan->lines[plan->count-1].source_offset=start;}
+        if(!success)free(boxes);sb_shape_line_free(&trial);
     }
-    if(success && !terminal){SBShapedLine empty={.base_level=sb_bidi_paragraph_level(bidi)};success=styled_line_add(plan,&empty,ui,base,gap);if(success)plan->lines[plan->count-1].source_offset=start;}
+    if(success && !terminal){SBShapedLine empty={.base_level=sb_bidi_paragraph_level(bidi)};SBNativeCharBox *boxes=NULL;size_t box_count=0;
+        success=styled_boxes(ui,base,prepared,&empty,text->text+start,length,&boxes,&box_count) && styled_line_add(plan,&empty,ui,base,gap,boxes,box_count);
+        if(success)plan->lines[plan->count-1].source_offset=start;else free(boxes);}
     free(prefix);free(boundaries);free(fonts);sb_shape_paragraph_free(prepared);sb_bidi_paragraph_free(bidi);return success;
+}
+static bool styled_native_build(SBUi *ui,const SBStyledText *text,StyledPlan *plan){
+    size_t count=0;for(size_t i=0;i<plan->count;++i){if(SIZE_MAX-count<plan->lines[i].box_count)return false;count+=plan->lines[i].box_count;}
+    if(!count || count>SIZE_MAX/sizeof(SBNativeCharBox))return false;
+    SBNativeCharBox *boxes=malloc(count*sizeof(*boxes));if(!boxes)return false;size_t at=0;
+    for(size_t i=0;i<plan->count;++i){StyledLine *line=&plan->lines[i];for(size_t j=0;j<line->box_count;++j){SBNativeCharBox box=line->boxes[j];box.byte+=line->source_offset;box.y+=line->y;boxes[at++]=box;}}
+    bool ok=sb_native_text_geometry(text->text,strlen(text->text),text->spans,text->count,boxes,count,&plan->native).code==SB_OK;free(boxes);
+    if(ok && plan->native.count<plan->native.capacity){SBNativeTextRun *compact=realloc(plan->native.runs,plan->native.count*sizeof(*compact));if(compact){plan->native.runs=compact;plan->native.capacity=plan->native.count;}}
+    if(ok && ui->layout_budget){size_t bytes=plan->native.capacity*sizeof(*plan->native.runs);if(bytes>*ui->layout_budget)ok=false;else *ui->layout_budget-=bytes;}
+    return ok;
 }
 static bool styled_build(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,float width,struct nk_vec2 padding,float gap,bool terminal_line,StyledPlan *plan) {
     SBStyledText display={.text=text->text};if(!sb_ui_styled_spans(text,&display.spans,&display.count))return false;
@@ -130,11 +162,13 @@ static bool styled_build(SBUi *ui,const struct nk_user_font *base,const SBStyled
     while(start<length && ok){if(ui->layout_cancel && SDL_GetAtomicInt(ui->layout_cancel)){ok=false;break;}size_t end=styled_paragraph_end(text->text,start,length);ok=styled_paragraph(ui,base,&display,start,end-start,available,gap,plan);start=end;}
     const char *last=text->text+length;
     bool trailing=terminal_line && length && sb_bidi_separator(SDL_StepBackUTF8(text->text,&last));
-    if(ok && (!length || trailing)){SBShapedLine empty={0};ok=styled_line_add(plan,&empty,ui,base,gap);if(ok)plan->lines[plan->count-1].source_offset=length;}
+    if(ok && (!length || trailing)){SBShapedLine empty={0};SBNativeCharBox *box=calloc(1,sizeof(*box));if(box)*box=(SBNativeCharBox){0,0,0,0,0,base->height,0};
+        ok=box && styled_line_add(plan,&empty,ui,base,gap,box,1);if(ok)plan->lines[plan->count-1].source_offset=length;else free(box);}
+    if(ok)ok=styled_native_build(ui,&display,plan);
     free(display.spans);if(!ok){styled_plan_free(plan);return false;}plan->height+=2*padding.y;return true;
 }
 bool sb_ui_styled_plan(SBUi *ui,const struct nk_user_font *font,const SBStyledText *text,float width,struct nk_vec2 padding,float gap,bool terminal_line,SBStyledPlan *out){
-    if(!ui || !font || sb_ui_font_owner(font)!=ui || !text || !text->text || !out || out->lines || out->count || out->capacity || !isfinite(width) || width<=0 || !isfinite(padding.x) || !isfinite(padding.y) || padding.x<0 || padding.y<0 || !isfinite(gap) || gap<0)return false;
+    if(!ui || !font || sb_ui_font_owner(font)!=ui || !text || !text->text || !out || out->lines || out->count || out->capacity || out->native.runs || out->native.count || out->native.capacity || !isfinite(width) || width<=0 || !isfinite(padding.x) || !isfinite(padding.y) || padding.x<0 || padding.y<0 || !isfinite(gap) || gap<0)return false;
     return styled_build(ui,font,text,width,padding,gap,terminal_line,out);
 }
 void sb_ui_styled_plan_free(SBStyledPlan *plan){if(plan)styled_plan_free(plan);}
@@ -162,7 +196,8 @@ static StyledMemo *styled_memo(SBUi *ui,const struct nk_user_font *base,const SB
     memcpy(next.text.text,text->text,length+1);next.text.count=text->count;if(text->count)memcpy(next.text.spans,text->spans,text->count*sizeof(*text->spans));
     if(!styled_build(ui,base,&next.text,width,padding,gap,terminal_line,&next.plan)){styled_memo_free(&next);return NULL;}
     next.bytes=length+1+text->count*sizeof(*text->spans)+next.plan.capacity*sizeof(*next.plan.lines);
-    for(size_t i=0;i<next.plan.count;++i)next.bytes+=next.plan.lines[i].shape.capacity*sizeof(SBShapeGlyph)+next.plan.lines[i].shape.run_capacity*sizeof(SBShapeRun);
+    next.bytes+=next.plan.native.capacity*sizeof(*next.plan.native.runs);
+    for(size_t i=0;i<next.plan.count;++i)next.bytes+=next.plan.lines[i].shape.capacity*sizeof(SBShapeGlyph)+next.plan.lines[i].shape.run_capacity*sizeof(SBShapeRun)+next.plan.lines[i].box_count*sizeof(SBNativeCharBox);
     if(next.bytes>SB_STYLED_BYTES){styled_memo_free(&next);return NULL;}
     if(cache->bytes+next.bytes>SB_STYLED_BYTES){sb_ui_styled_cache_clear(ui);ui->styled_cache=calloc(1,sizeof(*ui->styled_cache));if(!ui->styled_cache){styled_memo_free(&next);return NULL;}cache=ui->styled_cache;slot=&cache->entries[hash%SB_STYLED_SETS][0];}
     cache->bytes-=slot->bytes;styled_memo_free(slot);next.stamp=++cache->stamp;*slot=next;cache->bytes+=next.bytes;return slot;
@@ -179,6 +214,25 @@ bool sb_ui_styled_geometry(SBUi *ui,const struct nk_user_font *base,const SBStyl
     const StyledPlan *plan=memo ? memo : &fresh;bool ok=true;
     for(size_t i=0;i<plan->count && ok;++i)ok=visitor(user,&plan->lines[i].shape,plan->lines[i].source_offset,plan->lines[i].y);
     styled_plan_free(&fresh);return ok;
+}
+static bool styled_native_export(SBUi *ui,const struct nk_user_font *font,const SBStyledText *text,const StyledPlan *plan,struct nk_rect bounds,struct nk_vec2 padding,nk_flags alignment,SBNativeText *out){
+    if(!plan->native.count)return false;SBNativeText native=plan->native;native.capacity=native.count;native.runs=malloc(native.count*sizeof(*native.runs));if(!native.runs)return false;
+    memcpy(native.runs,plan->native.runs,native.count*sizeof(*native.runs));float available=fmaxf(1,bounds.w-2*padding.x);size_t line_index=0;
+    for(size_t i=0;i<native.count;++i){SBNativeTextRun *run=&native.runs[i];if(!run->geometry)continue;
+        while(line_index+1<plan->count && plan->lines[line_index+1].y<=run->y)++line_index;
+        const StyledLine *line=&plan->lines[line_index];float measured=line->shape.advance/ui->density,shift=0;
+        if(alignment&NK_TEXT_ALIGN_RIGHT)shift=fmaxf(0,available-measured);else if(alignment&NK_TEXT_ALIGN_CENTERED)shift=fmaxf(0,(available-measured)/2);
+        run->x+=bounds.x+padding.x+shift;run->y+=bounds.y+padding.y;
+    }
+    /* Literal code changes native style without changing its wrapping/font. */
+    if(text->count==1 && !text->spans[0].offset && text->spans[0].length==strlen(text->text))for(size_t i=0;i<native.count;++i)native.runs[i].span.style=text->spans[0].style;
+    *out=native;(void)font;return true;
+}
+bool sb_ui_styled_native(SBUi *ui,const struct nk_user_font *font,const SBStyledText *text,struct nk_rect bounds,nk_flags alignment,SBNativeText *out){
+    if(!ui || sb_ui_font_owner(font)!=ui || !ui->ctx || !text || !text->text || !out || !isfinite(bounds.x) || !isfinite(bounds.y) || !isfinite(bounds.w) || !isfinite(bounds.h) || bounds.w<=0 || bounds.h<0)return false;
+    struct nk_vec2 padding=ui->ctx->style.text.padding;const StyledPlan *memo=styled_lookup(ui,font,text,bounds.w,padding,4*ui->scale,false);StyledPlan fresh={0};
+    if(!memo && !styled_build(ui,font,text,bounds.w,padding,4*ui->scale,false,&fresh))return false;
+    bool ok=styled_native_export(ui,font,text,memo ? memo : &fresh,bounds,padding,alignment,out);styled_plan_free(&fresh);return ok;
 }
 void sb_ui_styled_aligned(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,nk_flags alignment) {
     struct nk_rect bounds;if(nk_widget(&bounds,ui->ctx)==NK_WIDGET_INVALID)return;

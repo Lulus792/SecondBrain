@@ -266,3 +266,12 @@ Fokusrückkehr. Die eigene Mac-Anbindung ergänzt den im festgelegten Provider
 fehlenden Setter für ausgewählten Text, auch im Notizeditor. [Vertrag](NATIVE_FELDAKTIONEN.md).
 Neue Zielplattform-, IME-/Screenreader-/Geräteabnahmen und native Leseblock-Geometrie
 bleiben offen.
+
+## Native Leseblöcke vom 11. Oktober
+
+Ab0.9.51 halten die Glyphenpläne Rechtecke und native Läufe für Absätze,
+Code und gezeichnete Tabellenzellen. Die Hintergrundvorbereitung erzeugt diese
+mit; Quelle, Zeilen, Bidi, Stile und Ausrichtung bleiben an der Zeichnung.
+[Vertrag/Messung](NATIVE_LESEGEOMETRIE.md). Separate Kartentitel, Listenmarkierungen,
+logische Kopfzellen ohne Widget, neue Zielplattformen und tatsächliche assistive/
+IME-/Geräte-/Langzeitabnahmen bleiben offen.

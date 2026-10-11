@@ -95,8 +95,8 @@ void sb_ui_text_aligned(struct nk_context *ctx,const char *text,size_t length,nk
 float sb_ui_wrap_height(struct nk_context *ctx,const struct nk_user_font *font,const char *text,size_t length,float width);
 /* Returned spans are owned by the caller; text remains borrowed. */
 bool sb_ui_styled_spans(const SBStyledText *text,SBTextSpan **spans,size_t *count);
-typedef struct {SBShapedLine shape;float y;size_t source_offset;} SBStyledLine;
-struct SBStyledPlan {SBStyledLine *lines;size_t count,capacity;float height;};
+typedef struct {SBShapedLine shape;float y;size_t source_offset;SBNativeCharBox *boxes;size_t box_count;} SBStyledLine;
+struct SBStyledPlan {SBStyledLine *lines;size_t count,capacity;float height;SBNativeText native;};
 /* Same CPU layout as rendering; no context/window/renderer is needed. */
 bool sb_ui_styled_plan(SBUi *ui,const struct nk_user_font *font,const SBStyledText *text,
     float width,struct nk_vec2 padding,float gap,bool terminal_line,SBStyledPlan *out);
@@ -114,6 +114,9 @@ typedef bool (*SBStyledGeometryVisitor)(void *user,const SBShapedLine *line,size
 /* Plain wrapped source slices keep paragraph context and explicit terminal lines. */
 bool sb_ui_wrap_geometry(SBUi *ui,const struct nk_user_font *font,const char *text,size_t length,float width,SBStyledGeometryVisitor visitor,void *user);
 bool sb_ui_styled_geometry(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,float width,SBStyledGeometryVisitor visitor,void *user);
+/* Owned native units from the same styled/wrapped layout and paint rectangle. */
+bool sb_ui_styled_native(SBUi *ui,const struct nk_user_font *font,const SBStyledText *text,struct nk_rect bounds,nk_flags alignment,SBNativeText *out);
+bool sb_ui_wrap_native(SBUi *ui,const struct nk_user_font *font,const char *text,size_t length,const SBTextSpan *styles,size_t style_count,struct nk_rect bounds,SBNativeText *out);
 SBStatus sb_ui_capture(SBUi *ui, const char *path);
 void sb_ui_shutdown(SBUi *ui);
 void sb_ui_reset_editor(SBUi *ui);

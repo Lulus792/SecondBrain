@@ -199,7 +199,7 @@ static SBTarget *target_add(SBDesktop *d, const char *id, struct nk_rect rect, S
     return item;
 }
 static void passive_clear(SBDesktop *d) {
-    for (size_t i=0;i<d->passive_count;++i) { free(d->passive[i].text); free(d->passive[i].styles); }
+    for (size_t i=0;i<d->passive_count;++i) { free(d->passive[i].text); free(d->passive[i].styles);sb_native_text_free(&d->passive[i].native); }
     d->passive_count=0;
 }
 static void passive_span(SBDesktop *d,const char *id,const char *text,size_t length,accesskit_role role,struct nk_rect bounds) {
@@ -229,6 +229,11 @@ static void passive_styles(SBDesktop *d,size_t before,const SBStyledText *styled
     if (d->passive_count!=before+1 || !styled || strcmp(d->passive[before].text,styled->text)) return;
     SBPassiveText *p=&d->passive[before];
     if (sb_ui_styled_spans(styled,&p->styles,&p->style_count)) p->font_size=font_size;
+}
+static void passive_geometry(SBDesktop *d,size_t before,const struct nk_user_font *font,const SBStyledText *styled,struct nk_rect bounds,nk_flags alignment){
+    if(d->passive_count!=before+1)return;SBPassiveText *p=&d->passive[before];
+    if(styled && !strcmp(p->text,styled->text))sb_ui_styled_native(&d->ui,font,styled,bounds,alignment,&p->native);
+    else if(!styled)sb_ui_wrap_native(&d->ui,font,p->text,strlen(p->text),p->styles,p->style_count,bounds,&p->native);
 }
 static void document_span(SBDesktop *d,const char *text,size_t length,size_t offset,accesskit_role role,unsigned level,struct nk_rect bounds,unsigned slot,bool title) {
     char id[100]; snprintf(id,sizeof(id),"reader:block:%zu",offset);
@@ -871,6 +876,7 @@ static void accessible_publish(SBDesktop *d) {
         v->id=p->id; v->label=p->role==ACCESSKIT_ROLE_LIST || p->role==ACCESSKIT_ROLE_LIST_ITEM || p->role==ACCESSKIT_ROLE_BLOCKQUOTE || p->role==ACCESSKIT_ROLE_LIST_MARKER || p->role==ACCESSKIT_ROLE_TABLE || p->role==ACCESSKIT_ROLE_ROW || p->role==ACCESSKIT_ROLE_CELL || p->role==ACCESSKIT_ROLE_COLUMN_HEADER || p->role==ACCESSKIT_ROLE_SPLITTER || !p->parent[0] || p->role==ACCESSKIT_ROLE_HEADING ? p->text : ""; v->value=p->role==ACCESSKIT_ROLE_LIST || p->role==ACCESSKIT_ROLE_LIST_ITEM || p->role==ACCESSKIT_ROLE_BLOCKQUOTE || p->role==ACCESSKIT_ROLE_TABLE || p->role==ACCESSKIT_ROLE_ROW || p->role==ACCESSKIT_ROLE_SPLITTER ? NULL : p->text; v->bounds=p->bounds; v->role=p->role;
         v->row=p->row; v->column=p->column; v->rows=p->rows; v->columns=p->columns;
         v->styles=p->styles; v->style_count=p->style_count; v->font_size=p->font_size;
+        if(p->native.count)v->native_text=&p->native;
         v->parent=p->parent; v->level=p->level; v->order=((uint64_t)p->group<<32)|p->order;
     }
     qsort(items,controls,sizeof(*items),accessible_order);
@@ -1544,6 +1550,7 @@ static bool document_table(SBDesktop *d,const char *text,size_t length,size_t of
             float h=sb_ui_styled_height(&d->ui,font,&cell->styled,text_width);
             nk_layout_space_push(ctx,nk_rect(x+padding,y,column_width-2*padding,h));
             nk_flags align=stacked ? NK_TEXT_LEFT : table.alignment[c]==SB_TABLE_RIGHT ? NK_TEXT_RIGHT : table.alignment[c]==SB_TABLE_CENTER ? NK_TEXT_CENTERED : NK_TEXT_LEFT;
+            passive_geometry(d,before,font,&cell->styled,nk_widget_bounds(ctx),align);
             sb_ui_styled_aligned(&d->ui,font,&cell->styled,align); y+=h;
             struct nk_rect placement=nk_rect(x+padding,y,column_width-2*padding,32*s);
             document_links(d,&cell->inline_reader,link_number,cell_id,&placement);
@@ -1613,6 +1620,7 @@ static void document_block(SBDesktop *d,const char *text,size_t length_total,SBM
                 SBStyledText literal={.text=d->passive_count==before+1 ? d->passive[before].text : "",.spans=&code_span,.count=1};
                 passive_styles(d,before,&literal,font->height);
             }
+            passive_geometry(d,before,font,plain ? &styled : NULL,nk_widget_bounds(ctx),NK_TEXT_LEFT);
             if (plain) sb_ui_styled_draw(&d->ui,font,&styled);
             else {
                 /* Literal rows still contribute layout and native text above.

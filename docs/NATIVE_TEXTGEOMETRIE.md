@@ -96,8 +96,9 @@ Schriftgröße, horizontalen Scrollversatz, IME und den erhaltenen Editorcache.
 Der macOS-Providerprüfer ergänzt einen UTF-16-Zeichenbereich nach Akzent und
 Familien-Emoji im Notiztitel mit Breite, Höhe und Bildschirmposition.
 
-Die genaue Geometrie gilt für die Eingabefelder. Die Leseansicht benötigt weitere
-Integration. Ab0.9.50 ergänzt der [Aktionsvertrag](NATIVE_FELDAKTIONEN.md) native
+Die genaue Geometrie gilt für die Eingabefelder. Ab0.9.51 ergänzt die
+[Lesegeometrie](NATIVE_LESEGEOMETRIE.md) Textblöcke und gezeichnete Tabellenzellen;
+separate Titel/Markierungen und logische Kopfzellen bleiben offen. Ab0.9.50 ergänzt der [Aktionsvertrag](NATIVE_FELDAKTIONEN.md) native
 Auswahl und Ersetzung in den einzeiligen Feldern; der ursprüngliche Set-Value-Weg
 bleibt erhalten.
 Die Leistung großer realer

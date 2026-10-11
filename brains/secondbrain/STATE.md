@@ -83,6 +83,16 @@ Geometrie- und608 Provider-Assertions auch unter ASan/UBSan im dokumentierten
 Umfang. Mac-Paket und Installation bestehen; andere Zielplattformen bleiben offen.
 [Vertrag](../../docs/NATIVE_FELDAKTIONEN.md).
 
+## Neue Lesegeometrie (0.9.51, Paket noch ausstehend)
+
+Textblöcke/Code und gezeichnete Tabellenzellen übernehmen ihre tatsächlichen
+Zeichenrechtecke. Pläne halten native Läufe; private Worker erzeugen sie mit,
+32-/64-MiB-Budgets zählen die Kapazität.75/75 Release-Prüfungen bestehen591,50s;
+590 Reader-,5231 Layout-/Batch- und616 Mac-Provider-Assertions auch unter
+ASan/UBSan im dokumentierten Umfang. Drei Metal-Paare zeigen keinen großen
+neuen Einbruch, aber weiterhin Ausreißer; keine allgemeine Flüssigkeitsaussage.
+Installiert bleibt50. [Vertrag/Messung](../../docs/NATIVE_LESEGEOMETRIE.md).
+
 ## Nächste Arbeiten
 
 Quelllesen, Parser/Inline-Aufbereitung,
@@ -90,7 +100,7 @@ native Metadaten, Rasterung und Fälle über den Vorbereitungsbudgets profiliere
 Der Rückfall ist noch synchron; einzelne Bibliotheksaufrufe und Shutdown können
 warten. SBUI-074 bleibt für die vollständige Großdaten-/Geräteabnahme offen.
 
-Native Leseblock-Geometrie, echte IME und VoiceOver/NVDA/Orca,
+Native Titel-/Markierungs-/logische Kopfzellgeometrie, echte IME und VoiceOver/NVDA/Orca,
 Dialog-/Geräte-/Monitor-/Langzeitprüfungen, Windows-/Linux-Speicherfehler,
 Mindest-OS/frische Rechner, vollständige Runtime-/Lizenzprüfung, Sicherheitskanal,
 Signierung und abschließende natürliche Texte bleiben Release-Arbeit.
