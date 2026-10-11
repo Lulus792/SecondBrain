@@ -215,7 +215,21 @@ static bool query(Probe *p) {
     VARIANT value; VariantInit(&value); value.vt=VT_BSTR; value.bstrVal=SysAllocString(label); free(label);
     hr=IUIAutomation_CreatePropertyCondition(client,UIA_NamePropertyId,value,&condition); VariantClear(&value);
     if (FAILED(hr) || !condition) goto done;
-    hr=IUIAutomationElement_FindFirst(root,TreeScope_Descendants,condition,&element); if (FAILED(hr) || !element) goto done;
+    if(p->operation==SB_NATIVE_TEXT_STYLE){
+        IUIAutomationElementArray *matches=NULL;int count=0;
+        hr=IUIAutomationElement_FindAll(root,TreeScope_Descendants,condition,&matches);
+        if(SUCCEEDED(hr) && matches)hr=IUIAutomationElementArray_get_Length(matches,&count);
+        for(int i=0;SUCCEEDED(hr) && i<count && !element;++i){
+            IUIAutomationElement *candidate=NULL;CONTROLTYPEID role=0;
+            HRESULT result=IUIAutomationElementArray_GetElement(matches,i,&candidate);
+            if(SUCCEEDED(result) && candidate)result=IUIAutomationElement_get_CurrentControlType(candidate,&role);
+            /* The named heading is not the document text scope. */
+            if(SUCCEEDED(result) && (role==UIA_DocumentControlTypeId || role==UIA_EditControlTypeId))element=candidate;
+            else if(candidate)IUIAutomationElement_Release(candidate);
+        }
+        if(matches)IUIAutomationElementArray_Release(matches);
+    }else hr=IUIAutomationElement_FindFirst(root,TreeScope_Descendants,condition,&element);
+    if (FAILED(hr) || !element) goto done;
     if (p->operation==SB_NATIVE_PRESS) {
         CONTROLTYPEID role=0; hr=IUIAutomationElement_get_CurrentControlType(element,&role);
         if (FAILED(hr) || role!=UIA_ButtonControlTypeId) goto done;
@@ -353,6 +367,7 @@ static AtspiAccessible *find(AtspiAccessible *object,const char *label,unsigned 
     if (!object || depth>12) return NULL;
     char *name=atspi_accessible_get_name(object,NULL);
     bool match=name && !strcmp(name,label); g_free(name);
+    if(match && word && atspi_accessible_get_role(object,NULL)==ATSPI_ROLE_HEADING)match=false;
     /* A heading can share the document's name. A text-style query needs a
        matching text scope containing its requested word, not the first name. */
     if(match && word){

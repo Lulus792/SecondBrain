@@ -73,6 +73,27 @@ auch unter haltendem ASan/UBSan: 40 eigene C-Dateien, 57 aktuelle Quell-/Include
 Hashes vor und nach dem Lauf geprüft. Externe UI-Bibliotheken nicht instrumentiert;
 kein Leak-/ThreadSanitizer-Nachweis. Originale: `build/platform-ui-sanitizers/`.
 Gesamtprüfungen und neue native Zielplattformnachweise folgen.
+Der lokale Gesamtlauf zu fe7d18e besteht mit 80/80 Prüfungen (487,70 s).
+Die anschließende native CI bestätigt den Linux-Resize-Fall; dort besteht
+79/80, nur die Textstilprüfung scheitert noch an einem Wert. Windows Release
+besteht 77/79: native Stilabfrage und ein Rohbyte-Vergleich der Editorläufe
+scheitern. Beide UI-Builds in Debug/Release bleiben erfolgreich. Originale:
+`ci-jobs-3.json`, `ci-failure-114538327335.log`, `ci-failure-114538327369.log`.
+
+Die Stilprüfer wählen jetzt den Dokumentbereich: Windows sucht unter allen
+Namensübereinstimmungen einen Document-/Edit-Bereich; Linux überspringt die
+namensgleiche Überschrift. Erwartete Stilwerte bleiben unverändert, Fehler
+nennen zusätzlich Wort, tatsächlichen und erwarteten Wert.
+Der Editorprüfer vergleicht alle veröffentlichten Felder und verwendeten
+Arraywerte statt undefinierter C-Padding-Bytes. Die Auswahl-/Geometrieprüfung
+bleibt exakt und erkennt absichtlich veränderte Exporte. Die gezielten lokalen
+Prüfungen bestehen (15,76 s, danach erweiterter Editorprüfer 2,11 s); die neue
+native CI-Nachprüfung folgt. Das sind Prüferänderungen, keine Behauptung einer
+abgeschlossenen assistiven oder allgemeinen Windows-/Linux-Abnahme.
+Im [CI-Lauf 38162552488](https://github.com/Lulus792/SecondBrain/actions/runs/38162552488)
+zu fe7d18e bestehen inzwischen die tatsächlichen Windows-UI-Builds mit MSVC
+in Debug und Release sowie die Linux-UI-Builds mit GCC. Die native UI- und
+Paketprüfung lief bei der Abfrage noch. Original: `ci-jobs-2.json` in der Verifikation.
 Installiert bleibt zunächst 0.9.59. Leistung, frühe Scrollbefehle, tatsächliche
 IME-/Screenreader-/Gerätebedienung und die übrige [Release-Liste](RELEASE.md)
 bleiben offen. 1.0 nur nach ausdrücklicher Nutzerfreigabe.

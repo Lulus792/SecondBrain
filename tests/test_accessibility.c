@@ -411,6 +411,7 @@ int main(int argc,char **argv) {
 #elif defined(_WIN32) || defined(SB_ATSPI_TEST)
         CHECK(sb_native_probe(d.ui.window,d.model.title,style_words[i],SB_NATIVE_TEXT_STYLE,value,sizeof(value),pump,&d));
 #endif
+        if(strcmp(value,style_values[i]))fprintf(stderr,"Native style for '%s': actual '%s', expected '%s'\n",style_words[i],value,style_values[i]);
         CHECK(!strcmp(value,style_values[i]));
     }
     /* The plain text is unchanged: style metadata alone must refresh the provider. */

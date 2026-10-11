@@ -151,17 +151,21 @@ Die Jobs zum Quellstand 0.9.58 wurden erneut eingesehen:
 [CI-Lauf 38158192485](https://github.com/Lulus792/SecondBrain/actions/runs/38158192485).
 Ein zuvor beobachteter Wartestatus ist kein aktueller Erfolgsnachweis.
 
-- [ ] Windows-UI-Build korrigieren: MSVC meldet in `app/plain_native.inc:35`
+- [x] Windows-UI-Build korrigieren: MSVC meldete in `app/plain_native.inc:35`
   C2036 (`void *`: unbekannte Größe). Die Cache-Inventur muss vor der
   Indexberechnung einen typisierten Zeiger verwenden. Release-Job 114525404584;
   Debug-Job 114525404631 ebenfalls fehlgeschlagen.
   Ab 0.9.60 typisiert korrigiert und lokal mit strenger C17-Prüfung/Cache-
-  Belastung/Sanitizern geprüft; tatsächlicher neuer MSVC-Nachweis folgt.
+  Belastung/Sanitizern geprüft. Im Lauf 38162552488 zu fe7d18e bestehen die
+  tatsächlichen MSVC-UI-Builds in Debug (114538327441) und Release
+  (114538327369). UI-/Paketprüfungen liefen bei dieser Abfrage noch.
 - [ ] Linux-Resize-Prüfung untersuchen: `prepared-document-reader` scheitert
   an `tests/test_reader_prepare.c:54`, unmittelbar nach Fenstergrößenänderung
   bei `loading(&d)`. Ein bestandener Build ersetzt diese Laufzeitprüfung nicht.
   Ab 0.9.60 synchronisiert der Prüfer die zulässige tatsächliche Größe;
   die lokale Nachprüfung besteht, native Linux-Nachprüfung folgt.
+  Im neuen Release-Lauf 38162552488 besteht der Reader-Resize-Test tatsächlich;
+  der Linux-Debug-/Release-Gesamtlauf scheitert noch an der getrennten Stilprüfung.
 - [ ] Linux-native Textstilabfrage untersuchen: `native-accessibility` scheitert
   bei AT-SPI-Operation 11 auf „Stilprüfung“ (`object/pattern not found`).
   Release-Job 114525404659 und Debug-Job 114525404463 haben fehlgeschlagene
