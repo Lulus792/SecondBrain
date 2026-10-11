@@ -61,3 +61,11 @@ Leaks aus, kein ThreadSanitizer. Originale `build/reader-preflight-sanitizers/`.
 22a8504ddb84e8c6a0428005697339dd78adda05 ist veröffentlicht. CI38169362014:
 Linux-Release einschließlich Paket erfolgreich; andere Windows-/Linux-Desktopjobs
 zuletzt in Arbeit, native Mac-Jobs queued. Sauberer Paketbuild folgt.
+
+Paket0.9.63/92ab260e4203 ist lokal geprüft und installiert;96 Dateien paketgleich,
+18 Gedächtnisdateien beim Öffnen unverändert, Aufnahme angesehen. Windows-Release
+und beide Linux-Jobs zu22a8504 bestehen. Windows-Debug zeigte eine verfrühte
+Hilfe-Kontextprüfung nach zwei Bildern. Der Prüfer wartet jetzt begrenzt auf die
+fertige Ansicht; alle Höhen-/Rückkehrassertionen bleiben bestehen. Hilfe/Reader
+lokal und94 Hilfebedingungen unter ASan/UBSan nachgeprüft, neuer Windows-Debug-
+Nachweis folgt. Mac-CI zuletzt queued; keine menschliche assistive Abnahme.

@@ -15,6 +15,15 @@ static void key(SBDesktop *d,SDL_Keycode code,SDL_Keymod modifiers) {
     SDL_Event event={0};event.type=SDL_EVENT_KEY_DOWN;event.key.key=code;event.key.mod=modifiers;event.key.down=true;
     sb_desktop_event(d,&event);frame(d);frame(d);
 }
+static bool reader_ready(SBDesktop *d) {
+    Uint64 deadline=SDL_GetTicksNS()+UINT64_C(15000000000);
+    for(;;){bool pending=false;
+        for(size_t i=0;i<d->passive_count;++i)if(!strcmp(d->passive[i].id,"reader:preparing")){pending=true;break;}
+        if(!pending)return true;
+        if(SDL_GetTicksNS()>=deadline)return false;
+        SDL_Delay(1);frame(d);
+    }
+}
 static accesskit_node_id focused_node(SBDesktop *d) {
     accesskit_tree_update *tree=sb_accessibility_tree(d->accessibility);char *dump=accesskit_tree_update_debug(tree);accesskit_tree_update_free(tree);
     const char *p=dump ? strstr(dump,"focus: #") : NULL;accesskit_node_id id=p ? strtoull(p+8,NULL,10) : 0;accesskit_string_free(dump);return id;
@@ -68,7 +77,7 @@ int main(int argc,char **argv) {
     key(&d,SDLK_F1,0);key(&d,SDLK_ESCAPE,0);CHECK(d.form==SB_FORM_SETTINGS && fabsf(d.scrolling[3].position-position)<1);frame(&d);CHECK(fabsf(d.scrolling[3].position-position)<1);
     /* A read-only modal document retains its separate reading bookmark. */
     d.context=calloc(1,16000);CHECK(d.context);for(unsigned i=0;i<100;++i)strcat(d.context,"Ein längerer Absatz mit **Wissen** und einer Quelle.\n\n");
-    d.form=SB_FORM_CONTEXT;frame(&d);frame(&d);CHECK(d.scrolling[2].maximum>100);
+    d.form=SB_FORM_CONTEXT;frame(&d);CHECK(reader_ready(&d));frame(&d);CHECK(d.scrolling[2].maximum>100);
     d.scrolling[2].position=d.scrolling[2].destination=d.scrolling[2].maximum/2;d.scrolling[2].active=true;frame(&d);position=d.scrolling[2].position;char reader_focus[100];strcpy(reader_focus,d.focus);
     key(&d,SDLK_F1,0);key(&d,SDLK_ESCAPE,0);CHECK(d.form==SB_FORM_CONTEXT && !strcmp(d.focus,reader_focus) && fabsf(d.scrolling[2].position-position)<1);
     d.form=SB_FORM_NONE;frame(&d);key(&d,SDLK_F10,SDL_KMOD_SHIFT);CHECK(d.form==SB_FORM_ACTIONS);key(&d,SDLK_DOWN,0);char focus[100];strcpy(focus,d.focus);

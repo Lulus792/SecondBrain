@@ -404,3 +404,17 @@ Plattform-/assistive Gesamtabnahme.
   Fehlermeldung und Scrollposition bleiben erhalten. Umschalt+F10 verdrängt
   keine Modalaufgabe. [Vertrag und 92 gezielte Prüfbedingungen](HILFE_RUECKKEHR.md).
   Menschliche Bedienung und aktuelle weitere Zielplattformen bleiben offen.
+
+## Ladezustand und aktuelle Windows-Debug-Nachprüfung
+
+0.9.63 ist auf Intel/macOS lokal und im Paket geprüft. Die native Ausgabe folgt
+dem sichtbaren Ladezustand; gemessene erste Bilddauer in drei Metal-Paaren etwa
+20Prozent geringer. [Vertrag](LADEZUSTAND_NATIVE.md). Kein allgemeiner
+Flüssigkeits- oder menschlicher Eingabenachweis.
+
+- [ ] Windows-Debug-Hilfeprüfung erneut nativ abnehmen: Im Lauf38169362014 zu
+  22a8504 war nach zwei Bildern der Kontextreader noch nicht bereit. Der Prüfer
+  wartet jetzt begrenzt auf die tatsächliche Bereitschaft; Höhen- und Rückkehr-
+  assertions bleiben erhalten. Lokal und unter ASan/UBSan nachgeprüft.
+  Windows-Release und beide Linux-Jobs einschließlich Release-Paketen bestehen
+  für22a8504; sie schließen diesen Debug-Nachweis nicht ein. Mac-CI queued.
