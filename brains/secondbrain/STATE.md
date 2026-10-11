@@ -52,6 +52,16 @@ einer Entwurfsentscheidung einzublenden. [Vertrag](../../docs/UI_EBENEN.md).
 bestehen.71/71 lokale Release-Prüfungen bestehen (626,20s); Intel/macOS-Paket
 und Installation geprüft. Weitere Zielplattformen bleiben offen.
 
+## Neue Rasteroptimierung (0.9.48)
+
+Glasinnenflächen werden ohne Randgeometrie und wiederholte Spaltenberechnung
+gezeichnet; Rand/Schatten/Reihenfolge bleiben gleich.1012 vollständige Pixel-
+vergleiche gegen0.9.47 auch unter ASan/UBSan bestehen. Drei alternierende Metal-
+Paare verbessern Kamera-Zeichenzeit im Median um19,36%; Profilkopie unverändert.
+Die tatsächlichen Frames haben weiterhin Layout-/Presentspitzen.
+[Vertrag/Messung](../../docs/RASTER_LEISTUNG.md).72/72 lokale Release-Prüfungen
+bestehen (395,24s). Paket/Installation folgen.
+
 ## Nächste Arbeiten
 
 Quelllesen, Parser/Inline-Aufbereitung,

@@ -51,6 +51,23 @@ static bool resize(SBSpace *s, SDL_Renderer *r, int width, int height) {
     s->width = width; s->height = height;
     return true;
 }
+/* The flat interior has no edge light/bend. Sample columns are invariant for
+   the whole pane; keep the exact old float expression when calculating them. */
+static void glass_interior(SBSpace *s,int first,int end,int y,const int *columns,int sample_y) {
+    unsigned char *out=s->pixels+((size_t)y*s->width+first)*4;
+    if(s->contrast || s->solid){
+        unsigned char rgba[4]={0,0,0,255};
+        if(s->contrast)rgba[0]=rgba[1]=rgba[2]=s->dark ? 0 : 255;
+        else{const float tint[]={s->dark ? 49.0f : 235.0f,s->dark ? 67.0f : 243.0f,s->dark ? 93.0f : 252.0f};
+            for(int k=0;k<3;++k)rgba[k]=(unsigned char)(tint[k]*(s->dark ? 0.48f : 1));}
+        for(int x=first;x<end;++x,out+=4)memcpy(out,rgba,4);
+    }else{
+        const unsigned char *row=s->base+(size_t)sample_y*s->width*4;
+        const float tint[]={s->dark ? 49.0f : 235.0f,s->dark ? 67.0f : 243.0f,s->dark ? 93.0f : 252.0f};
+        for(int x=first;x<end;++x,out+=4){const unsigned char *sample=row+(size_t)columns[x]*4;
+            for(int k=0;k<3;++k){float substrate=s->dark ? fminf(sample[k],74) : sample[k];out[k]=(unsigned char)(substrate*0.73f+tint[k]*0.27f);}}
+    }
+}
 bool sb_space_draw(SBSpace *s, SDL_Renderer *renderer, int width, int height) {
     /* A bounded logical raster keeps material work independent of Retina density. */
     float scale = fminf(1, fminf(1600.0f / width, 1100.0f / height));
@@ -136,9 +153,18 @@ bool sb_space_draw(SBSpace *s, SDL_Renderer *renderer, int width, int height) {
         float radius = fminf(g.radius * scale, fminf(hw, hh));
         int x0 = (int)fmaxf(0, cx - hw - 12), y0 = (int)fmaxf(0, cy - hh - 12);
         int x1 = (int)fminf(w, cx + hw + 12), y1 = (int)fminf(h, cy + hh + 12);
-        for (int y = y0; y < y1; ++y) for (int x = x0; x < x1; ++x) {
-            float dx = x - cx, dy = y - cy;
-            float qx = fabsf(dx) - hw + radius, qy = fabsf(dy) - hh + radius;
+        if(x0>=x1 || y0>=y1)continue;
+        int first=x1,end=x1,columns[4096];
+        for(int x=x0;x<x1;++x){float dx=x-cx,qx=fabsf(dx)-hw+radius;
+            if(qx<=0 && qx-radius<=-18*scale){if(first==x1)first=x;end=x+1;columns[x]=(int)clamp(cx+dx*0.982f,0,w-1);}}
+        for (int y = y0; y < y1; ++y) {
+            float dy=y-cy,qy=fabsf(dy)-hh+radius;
+            bool interior=first<end && qy<=0 && qy-radius<=-18*scale;
+            if(interior)glass_interior(s,first,end,y,columns,(int)clamp(cy+dy*0.982f,0,h-1));
+            for (int x = x0; x < x1; ++x) {
+            if(interior && x==first){x=end-1;continue;}
+            float dx = x - cx;
+            float qx = fabsf(dx) - hw + radius;
             float ax = fmaxf(qx, 0), ay = fmaxf(qy, 0), length = sqrtf(ax * ax + ay * ay);
             float distance = length + fminf(fmaxf(qx, qy), 0) - radius;
             unsigned char *p = s->pixels + ((size_t)y * w + x) * 4;
@@ -182,6 +208,7 @@ bool sb_space_draw(SBSpace *s, SDL_Renderer *renderer, int width, int height) {
                 p[k] = byte(color + light * 130 + edge * edge * 3);
                 if (s->contrast) p[k]=distance>-1.5f*scale ? s->dark ? 255 : 0 : s->dark ? 0 : 255;
             }
+        }
         }
     }
     if (!SDL_UpdateTexture(s->texture, NULL, s->pixels, w * 4)) return false;

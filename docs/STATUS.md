@@ -3440,3 +3440,30 @@ zuletzt queued; keine neue Windows-/Linux-/ARM64-Gesamtabnahme behauptet.
 SBUI-075 ist im beschriebenen lokalen Umfang nachgeprüft. Vollständige Geräte-/
 assistive Prüfung, SBUI-074 und übrige Release-Aufgaben bleiben offen.
 1.0 nur nach ausdrücklicher Nutzerfreigabe.
+
+## Glasinnenflächen effizienter rastern (0.9.48, 11. Oktober)
+
+Sicher flache Innenbereiche werden zeilenweise mit einmaligen Abtastspalten
+gerastert. Rundung, Schatten, Randlicht, Reihenfolge und Auflösung bleiben gleich.
+Ein leerer Schnitt wird übersprungen, auch bei vollständig außerhalb liegenden
+Flächen. Kein dauerhafter neuer Cache oder externe Bibliothek.
+[Algorithmus/Pixelvertrag/Messung](RASTER_LEISTUNG.md).
+
+1012 vollständige RGBA-/Himmel-/Szene-/Glas-/Cache-/Resize-Assertions gegen die
+eingefrorene eigene0.9.47-Fassung bestehen, auch unter haltendem ASan/UBSan.
+Instrumentiert: eigene UI/Text/Space/Icons/NativeText/Prepare/Shape/Carets/
+Scripts/Bidi samt Includes, der neue Prüfer und das unabhängige Rasterorakel.
+Andere Objekte und externe UI-Bibliotheken bleiben uninstrumentiert; Mac-
+Leakprüfung aus, kein ThreadSanitizer.22 Quell-/Include-Hashes stimmen.
+Protokolle: `build/space-raster-sanitizers/`.
+
+Drei alternierende produktive Metal-Paare auf derselben18-Dateien-Profilkopie:
+Kamerazeichnen12,58→10,15ms;21,80→17,58ms;23,06→12,73ms. Median der paarweisen
+Verbesserung19,36%. Wechselzeichnen14,24→12,57;23,23→19,01;20,34→12,95ms.
+Die Kopie bleibt unverändert. Frame-/Present-/Layoutspitzen schwanken weiter;
+kein allgemeiner Bildraten- oder weiterer Plattformnachweis. Protokolle/
+Parameter/Hashes: `build/space-raster-verification/`.
+
+72/72 lokale Release-Prüfungen bestehen (395,24s). Paket/Installation und neue
+Zielplattformen folgen. Installiert weiterhin0.9.47. SBUI-074 und übrige Release-Aufgaben bleiben offen;
+1.0 nur nach ausdrücklicher Nutzerfreigabe.

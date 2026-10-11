@@ -171,3 +171,8 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   sichtbare Tabziele und akzeptierte Notizwechsel, erneut geprüfte HIG-Quellen.
 - [Ebenenprüfer](../../tests/test_map_layers.c): tatsächliche Karten-/Listen-/
   Werkzeugpixel, sichtbarer Fokus, Größen/Kontrast, Suchrückkehr und F6.
+
+- [Rasterleistung](../../docs/RASTER_LEISTUNG.md): bitgleiche Glasinnenflächen,
+  eingefrorene Versionsreferenz und alternierende produktive Metal-Messung.
+- [Rasterprüfer](../../tests/test_space_raster.c): vollständige RGBA-Daten,
+  Modi, Cache/Resize, Randfälle und64 Flächen gegen die0.9.47-Referenz.
