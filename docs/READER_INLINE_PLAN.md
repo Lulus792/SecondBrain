@@ -73,8 +73,8 @@ Leak-/ThreadSanitizer- oder menschliche Screenreader-Abnahme.
 
 Originale: `build/reader-inline-verification/` und
 `build/reader-inline-sanitizers/`. 78/78 lokale Release-Prüfungen bestehen
-(552,41 s). Paket- und Installationsnachweise werden nach Abschluss im
-[Umsetzungsstand](STATUS.md) ergänzt; installiert ist noch 0.9.55.
+(552,41 s). Das Intel/macOS-Paket ist geprüft und als 0.9.56 installiert. Weitere
+Zielplattformabnahmen bleiben offen; Details im [Umsetzungsstand](STATUS.md).
 
 ## Alternierende Metal-Messung
 

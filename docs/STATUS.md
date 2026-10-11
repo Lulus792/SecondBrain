@@ -2,7 +2,7 @@
 
 Stand: 11. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.55. Die Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.56. Die Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -3855,3 +3855,22 @@ Frame-p95 verbessert sich nicht überall; das erste Bild bleibt in einem Paar
 praktisch gleich. Erste Aufbereitung, Tabellenzellen, native Ausgaben/GPU,
 reale Geräte/Eingaben/Screenreader und neue Zielplattformen bleiben offen.
 Paket/Installation folgen; installiert weiterhin 0.9.55. 1.0 nur nach Freigabe.
+
+
+## Reader-Inline-Paket 0.9.56 installiert
+
+Quellcommit `bb2fe497dd7412f88cbb9f515f6d314ca359e871` ist gepusht. Sauberer
+Intel/macOS-Release-Build 0.9.56/bb2fe497dd74; zwei gezielte Versions-/Release-
+Nachprüfungen bestehen. Das entpackte Paket besteht 126 Desktop-, 161 Tastatur-
+und 75 Sicherungs-Assertions, zwei Einstellungs-Neustarts, produktive CLI sowie
+Runtime-/Lizenz-/Versionsprüfung beider ausgelieferter Programme. Alle 96
+installierten Dateien entsprechen einzeln dem Paket. Die App öffnet das eigene
+Projektgedächtnis ohne Änderung seiner 18 Dateien; tatsächliche C-App-Aufnahme
+angesehen. Prüfgerät: macOS 14.6.1/23G93, x86_64.
+
+Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.55-20261011-173958`.
+Archiv-SHA256: `31624fc30bd22e1e9f6f326d07345e8527c0f59444edcb031831b26ef00d44f8`.
+Originale: `build/reader-inline-verification/`. CI 38151902742 zum Quellcommit
+zuletzt queued; keine neue Windows-/Linux-/ARM64-Abnahme. Erste Vorbereitung,
+Tabellenzellen, native Ausgaben/Bildausgabe, reale Geräte/Eingaben/Screenreader
+und weitere Release-Arbeit bleiben offen. 1.0 nur nach Nutzerfreigabe.
