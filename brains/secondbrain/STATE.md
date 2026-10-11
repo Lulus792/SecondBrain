@@ -13,14 +13,15 @@ Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt. Externe
 Bibliotheken bleiben auf UI beschränkt; eigene Lizenz MIT.
 
-Installiert **0.9.58 / 4d984a6330c2**, sauberer Intel/macOS-Release-Build.
+Installiert **0.9.59 / 4f4d8fb9da88**, sauberer Intel/macOS-Release-Build.
 96 Dateien entsprechen dem geprüften Paket; 18 Gedächtnisdateien beim Öffnen
-unverändert. 126 Desktop-, 161 Tastatur-, 75 Sicherungs-Assertions, zwei Neustarts,
+unverändert. 126 Desktop-, 166 Tastatur-, 75 Sicherungs-Assertions, zwei Neustarts,
 produktive CLI und Runtime-/Lizenz-/Version bestehen. Tatsächliche App-Aufnahme
 angesehen. Prüfgerät: macOS 14.6.1/23G93, x86_64.
-Rückfallversion 0.9.57: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.57-20261011-191238`.
-CI 38158192485 erneut gelesen: Windows-UI-Build und zwei Linux-UI-Prüfungen
-fehlgeschlagen; macOS zuletzt queued. Neue Gesamt-Plattformabnahme offen.
+Rückfallversion 0.9.58: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.58-20261011-195420`.
+CI 38161180159 zum aktuellen Quellcommit zuletzt queued. Der frühere Lauf
+38158192485 bestätigt Windows-UI-Buildfehler und zwei Linux-UI-Fehler.
+Neue Gesamt-Plattformabnahme offen.
 Frühere Plattformnachweise ersetzen keine Prüfung dieser neuen Fassung.
 
 ## Geprüfte aktuelle Änderung
@@ -31,6 +32,10 @@ Reader-/Editorposition und Inhaltshöhe. Die native Modalabschirmung bleibt.
 39 eigene C-Dateien, 55 aktuelle Hashes. 78/78 Release-Prüfungen bestehen
 (651,31 s). Finale Vorher/Menü/Nachher-Bilder angesehen; SBUI-079 lokal geprüft.
 SBUI-080 ist ab 0.9.59 lokal korrigiert: Hilfe kehrt zur Ursprungsaufgabe zurück.
+92 Hilfe-, 190 Feldaktions- und 621 native Mac-Prüfbedingungen auch unter
+ASan/UBSan; 39 eigene C-Dateien/56 Hashes. 79/79 lokale Release-Prüfungen
+bestehen (565,40 s); danach geänderter Lizenz-Tastaturprüfer separat bestanden.
+[Hilfe-Vertrag](../../docs/HILFE_RUECKKEHR.md). Finales Paket/Installation geprüft.
 [Vertrag](../../docs/READER_RUECKKEHR.md). Intel/macOS-Paket/Installation geprüft;
 weitere aktuelle Zielplattformabnahmen offen.
 
@@ -61,16 +66,14 @@ reale Animationsabstände; Einzelausgaben ersetzen keine menschliche Bedienabnah
 
 ## Nächste Arbeiten und verbleibende Abnahmen
 
-0.9.59 hält Ursprungsaufgabe, Eingaben, Fokus/Auswahl, Fehlermeldung und
-Scrollposition bei der Hilfe. 92 Hilfe-, 190 Feldaktions- und 621 native
-Mac-Prüfbedingungen auch unter ASan/UBSan; 39 eigene C-Dateien/56 Hashes.
-79/79 lokale Release-Prüfungen bestehen (565,40 s). Bilder betrachtet.
-[Vertrag](../../docs/HILFE_RUECKKEHR.md). Paket/Installation folgen.
-
 Als nächstes die bestätigten Plattformbefunde korrigieren: Windows C2036 in
 `plain_native.inc:35`; Linux-Reader nach Resize und native Textstilabfrage
 „Stilprüfung“. [Originalbefunde](../../docs/RELEASE.md). Die frühere bloße
 Queued-Beobachtung des 0.9.58-Laufs ist dadurch ergänzt, kein Gesamtpass.
+Die erste 0.9.59-Paketprüfung fand einen frühen Scrollbefehl während der
+Lizenzreader-Vorbereitung. Der Tastaturprüfer wartet für seine fertige Ansicht
+jetzt begrenzt; sein gezielter Durchlauf besteht. Frühe Scrollbefehle bleiben
+als Produktarbeit offen. Das finale Paket mit dem neuen Prüfer besteht.
 
 Native Blockausgaben/-veröffentlichung, erste Quell-/Parser-/Worker-Aufbereitung,
 Tabellenzellen, Rasterung und Fälle über den Vorbereitungsbudgets getrennt

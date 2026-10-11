@@ -68,6 +68,13 @@ besteht (53,12 s); die Produktlogik blieb dabei unverändert. Frühe Scrollbefeh
 während der Vorbereitung bleiben eine eigene offene Leistungs-/Bedienaufgabe.
 Originale: `build/help-return-verification/package-check.log`, `keyboard-ready.log`.
 
+Das finale Paket 0.9.59/4f4d8fb9da88 besteht 126 Desktop-, 166 Tastatur- und
+75 Sicherungs-Prüfbedingungen, zwei Neustarts sowie CLI-/Runtime-/Lizenz- und
+Versionsprüfungen. Alle 96 installierten Dateien sind paketgleich; die App öffnet
+die eigene Instanz ohne Änderung ihrer 18 Dateien. Installation und tatsächliche
+App-Aufnahme geprüft. Originale: `build/help-return-verification/final-package-check.log`
+und `installed.json`. Weitere Plattformabnahmen bleiben offen.
+
 Das sind SDL-Ereignis-, Widget-, Provider- und Bildnachweise auf Intel/macOS,
 keine menschliche Tastatur-/Screenreader-/IME-Abnahme oder aktuelle Windows-/
 Linux-/ARM64-Abnahme. Leistung und übrige [Release-Aufgaben](RELEASE.md) bleiben
