@@ -51,7 +51,9 @@ int main(int argc,char **argv){
     CHECK(d.reader_preparation==held_preparation && d.reader_source==held_source && fabsf(d.scrolling[0].position-before)<1);
     d.model.guard=false;frame(&d);CHECK(!loading(&d) && d.reader_source_builds==source_builds && fabsf(d.scrolling[0].position-before)<1);
     /* A resized reader keeps its logical position while the new plan runs. */
-    SDL_SetWindowSize(d.ui.window,750,900);frame(&d);CHECK(loading(&d));CHECK(fabsf(d.scrolling[0].position-before)<1);CHECK(wait_reader(&d));frame(&d);CHECK(d.reader_plan_hits>40 && !d.reader_plan_misses);CHECK(d.reader_source_builds==source_builds);
+    CHECK(SDL_SetWindowSize(d.ui.window,780,900) && SDL_SyncWindow(d.ui.window));
+    int width,height;CHECK(SDL_GetWindowSize(d.ui.window,&width,&height) && width==780 && height==900);
+    frame(&d);CHECK(loading(&d));CHECK(fabsf(d.scrolling[0].position-before)<1);CHECK(wait_reader(&d));frame(&d);CHECK(d.reader_plan_hits>40 && !d.reader_plan_misses);CHECK(d.reader_source_builds==source_builds);
     /* A short replacement remains immediately usable; stale output is retired. */
     OK(sb_app_new_note(&d.model,"knowledge","short","Short"));frame(&d);CHECK(!loading(&d));
     OK(sb_app_request(&d.model,SB_ACT_NOTE,"knowledge/long.md"));frame(&d);CHECK(loading(&d));

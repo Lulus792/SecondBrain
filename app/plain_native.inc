@@ -31,8 +31,9 @@ bool sb_ui_text_command_native(SBUi *ui,const struct nk_command_text *command,SB
     if(!source->count){ok=plain_native_build(face,plan,&temporary);source=&temporary;
         size_t bytes=temporary.capacity*sizeof(*temporary.runs);
         if(ok && (plan==&scratch || (plan->bytes<=SB_PLAIN_BYTES && bytes<=SB_PLAIN_BYTES-plan->bytes))){
+            SBPlainPlan *entries=system->plain;
             while(plan!=&scratch && system->plain_bytes+bytes>SB_PLAIN_BYTES){SBPlainPlan *oldest=NULL;
-                for(unsigned i=0;i<SB_PLAIN_ENTRIES;++i){SBPlainPlan *entry=&system->plain[i];if(entry!=plan && entry->text && (!oldest || entry->stamp<oldest->stamp))oldest=entry;}
+                for(unsigned i=0;i<SB_PLAIN_ENTRIES;++i){SBPlainPlan *entry=&entries[i];if(entry!=plan && entry->text && (!oldest || entry->stamp<oldest->stamp))oldest=entry;}
                 if(!oldest)break;system->plain_bytes-=oldest->bytes;plain_free(oldest);}
             if(plan==&scratch || system->plain_bytes+bytes<=SB_PLAIN_BYTES){plan->native=temporary;memset(&temporary,0,sizeof(temporary));plan->bytes+=bytes;if(plan!=&scratch)system->plain_bytes+=bytes;source=&plan->native;}
         }

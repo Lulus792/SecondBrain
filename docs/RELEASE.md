@@ -155,13 +155,19 @@ Ein zuvor beobachteter Wartestatus ist kein aktueller Erfolgsnachweis.
   C2036 (`void *`: unbekannte Größe). Die Cache-Inventur muss vor der
   Indexberechnung einen typisierten Zeiger verwenden. Release-Job 114525404584;
   Debug-Job 114525404631 ebenfalls fehlgeschlagen.
+  Ab 0.9.60 typisiert korrigiert und lokal mit strenger C17-Prüfung/Cache-
+  Belastung/Sanitizern geprüft; tatsächlicher neuer MSVC-Nachweis folgt.
 - [ ] Linux-Resize-Prüfung untersuchen: `prepared-document-reader` scheitert
   an `tests/test_reader_prepare.c:54`, unmittelbar nach Fenstergrößenänderung
   bei `loading(&d)`. Ein bestandener Build ersetzt diese Laufzeitprüfung nicht.
+  Ab 0.9.60 synchronisiert der Prüfer die zulässige tatsächliche Größe;
+  die lokale Nachprüfung besteht, native Linux-Nachprüfung folgt.
 - [ ] Linux-native Textstilabfrage untersuchen: `native-accessibility` scheitert
   bei AT-SPI-Operation 11 auf „Stilprüfung“ (`object/pattern not found`).
   Release-Job 114525404659 und Debug-Job 114525404463 haben fehlgeschlagene
   UI-Prüfungen; die Paketprüfungen wurden dadurch nicht ausgeführt.
+  Der Prüfer sucht ab 0.9.60 für Textstile einen namensgleichen Textbereich mit
+  angefordertem Inhalt. Native Linux-Nachprüfung bleibt erforderlich.
 
 Windows-/Linux-Kernprüfungen bestehen in diesem Lauf; die macOS-Jobs wurden
 zuletzt weiterhin als queued beobachtet. Die UI-Befunde benötigen Korrekturen

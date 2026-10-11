@@ -66,6 +66,14 @@ reale Animationsabstände; Einzelausgaben ersetzen keine menschliche Bedienabnah
 
 ## Nächste Arbeiten und verbleibende Abnahmen
 
+0.9.60 korrigiert Cache-Indexierung an `void *`; GCC/Clang weisen sie künftig
+als Fehler ab. Fensterprüfer synchronisieren und bestätigen 780×900 bzw.
+780×520; der AT-SPI-Prüfer sucht den Inhalt im passenden Textbereich.
+525 Cache-, 117 Reader-, 93 Hilfe- und 621 Mac-Prüfbedingungen bestehen auch
+unter ASan/UBSan: 40 eigene C-Dateien/57 Hashes. Lokale gezielte Nachprüfung
+besteht. Gesamt- und neue native Zielplattformnachweise folgen; installiert
+bleibt 0.9.59. [Vertrag](../../docs/UI_PLATTFORMKORREKTUREN.md).
+
 Als nächstes die bestätigten Plattformbefunde korrigieren: Windows C2036 in
 `plain_native.inc:35`; Linux-Reader nach Resize und native Textstilabfrage
 „Stilprüfung“. [Originalbefunde](../../docs/RELEASE.md). Die frühere bloße

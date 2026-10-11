@@ -349,15 +349,22 @@ done:
     CoUninitialize(); return success;
 }
 #elif defined(SB_ATSPI_TEST)
-static AtspiAccessible *find(AtspiAccessible *object,const char *label,unsigned depth) {
+static AtspiAccessible *find(AtspiAccessible *object,const char *label,unsigned depth,const char *word) {
     if (!object || depth>12) return NULL;
     char *name=atspi_accessible_get_name(object,NULL);
     bool match=name && !strcmp(name,label); g_free(name);
+    /* A heading can share the document's name. A text-style query needs a
+       matching text scope containing its requested word, not the first name. */
+    if(match && word){
+        AtspiText *text=atspi_accessible_get_text_iface(object);
+        char *content=text ? atspi_text_get_text(text,0,-1,NULL) : NULL;
+        match=content && strstr(content,word);g_free(content);if(text)g_object_unref(text);
+    }
     if (match) return g_object_ref(object);
     int count=atspi_accessible_get_child_count(object,NULL);
     for (int i=0;i<count;++i) {
         AtspiAccessible *child=atspi_accessible_get_child_at_index(object,i,NULL);
-        AtspiAccessible *found=find(child,label,depth+1); if (child) g_object_unref(child);
+        AtspiAccessible *found=find(child,label,depth+1,word); if (child) g_object_unref(child);
         if (found) return found;
     }
     return NULL;
@@ -378,7 +385,7 @@ static bool query(Probe *p) {
             int count=atspi_accessible_get_child_count(desktop,NULL);
             for (int i=0;i<count && !element;++i) {
                 AtspiAccessible *app=atspi_accessible_get_child_at_index(desktop,i,NULL);
-                if (app && atspi_accessible_get_process_id(app,NULL)==sb_process_id()) element=find(app,p->label,0);
+                if (app && atspi_accessible_get_process_id(app,NULL)==sb_process_id()) element=find(app,p->label,0,p->operation==SB_NATIVE_TEXT_STYLE ? p->value : NULL);
                 if (app) g_object_unref(app);
             }
             g_object_unref(desktop);

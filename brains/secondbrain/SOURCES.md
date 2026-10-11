@@ -221,6 +221,9 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   gewöhnlichen Modalaufgaben, Scrollkörper-/Titelregeln und offener Formularbefund.
 - [Hilfe-Rückkehr](../../docs/HILFE_RUECKKEHR.md): Ursprungsaufgabe, Feldauswahl,
   Scrollposition und modale Befehlsgrenzen ab 0.9.59; lokale Prüfgrenzen.
+- [UI-Plattformkorrekturen](../../docs/UI_PLATTFORMKORREKTUREN.md): typisierte
+  Cache-Adressen, bestätigte Fenstergrößen und AT-SPI-Textbereichsauswahl ab
+  0.9.60; Originalbefunde, offizielle API-Quellen und verbleibende Nachweise.
 - [Produktiver Hilfeprüfer](../../tests/test_help_return.c): SDL-Ereignisse,
   native Auswahl/Ersetzung, gescrollte Einstellungen, Kontextreader und Hilfe-Schaltfläche.
 - [SBUI-077-Nachprüfung](/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-11_16-38-09/UI_REVIEW.md): Software-/Metalbilder und offene native

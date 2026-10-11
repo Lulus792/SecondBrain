@@ -62,7 +62,8 @@ int main(int argc,char **argv) {
     key(&d,SDLK_F1,0);key(&d,SDLK_ESCAPE,0);CHECK(d.native_fields[1].anchor==12 && d.native_fields[1].caret==2);
     node=focused_node(&d);CHECK(sb_accessibility_submit(d.accessibility,node,ACCESSKIT_ACTION_REPLACE_SELECTED_TEXT,"Ω",0,0));frame(&d);CHECK(!strcmp(d.name,"A Ω אב Z"));
     /* Large text in a small window makes the settings body genuinely scroll. */
-    d.form=SB_FORM_SETTINGS;d.message=sb_ok();OK(sb_ui_fonts(&d.ui,1.5f));CHECK(SDL_SetWindowSize(d.ui.window,780,520));frame(&d);frame(&d);CHECK(d.scrolling[3].maximum>100);
+    d.form=SB_FORM_SETTINGS;d.message=sb_ok();OK(sb_ui_fonts(&d.ui,1.5f));CHECK(SDL_SetWindowSize(d.ui.window,780,520) && SDL_SyncWindow(d.ui.window));
+    int width,height;CHECK(SDL_GetWindowSize(d.ui.window,&width,&height) && width==780 && height==520);frame(&d);frame(&d);CHECK(d.scrolling[3].maximum>100);
     d.scrolling[3].position=d.scrolling[3].destination=d.scrolling[3].maximum/2;d.scrolling[3].active=true;frame(&d);float position=d.scrolling[3].position;
     key(&d,SDLK_F1,0);key(&d,SDLK_ESCAPE,0);CHECK(d.form==SB_FORM_SETTINGS && fabsf(d.scrolling[3].position-position)<1);frame(&d);CHECK(fabsf(d.scrolling[3].position-position)<1);
     /* A read-only modal document retains its separate reading bookmark. */
