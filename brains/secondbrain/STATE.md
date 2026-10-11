@@ -12,11 +12,11 @@ Glaskarten, eigene Icons, direkte Pfeilnavigation, Kamerafahrt, Startfokus, Text
 und große Leseansicht sind implementiert. Originalbytes, Entwürfe und erkannte
 Konflikte bleiben geschützt. Externe Bibliotheken nur UI; MIT.
 
-Installiert **0.9.66/b3b93709f823**, sauberer Intel/macOS-Release-Build.
+Installiert **0.9.67/28cdea386abb**, sauberer Intel/macOS-Release-Build.
 98 Dateien paketgleich;18 Gedächtnisdateien beim Öffnen unverändert.126 Desktop-,
 167 Tastatur-,75 Sicherungsbedingungen, zwei Einstellungs-Neustarts, CLI-/Runtime-/
 Lizenz-/Version bestehen. Tatsächliche App-Aufnahme angesehen. macOS14.6.1/23G93,x86_64.
-Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.65-20261012-001235`.
+Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.66-20261012-003101`.
 
 ## Neuester geprüfter Fortschritt
 
@@ -34,7 +34,8 @@ Teilpuffer sofort frei, erfolgreicher Versuch stellt Glas wieder her. 1122 Fehle
 und 352 normale Pixelbedingungen in Software/Metal, CPU-Parität 1012. ASan/UBSan
 für beide Materialprüfer, 38 eigene C-Dateien / 60 Hashes, externe UI nicht
 instrumentiert, Leaks aus. Fünf weitere UI-/Versionsprüfungen bestehen. Kein neuer
-vollständiger lokaler 84er-Lauf. Paket/Installation folgen; installiert bleibt 66.
+vollständiger lokaler 84er-Lauf. Sauberes Paket geprüft und installiert; echter
+66→67→66-Wechsel erhält 20 Dateien/Einstellungen und Sicherung/Wiederherstellung.
 [Vertrag](../../docs/MATERIAL_RUECKFALL.md). Übergangstextur-Pixelidentität bleibt offen.
 
 ## Aktueller Darstellungsschritt

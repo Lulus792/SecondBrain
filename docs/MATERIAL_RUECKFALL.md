@@ -52,7 +52,7 @@ Quell-/Includehashes bestätigt. Externe UI-Bibliotheken nicht instrumentiert,
 Leakerkennung aus, kein ThreadSanitizer. Fünf weitere Prüfungen für
 Systemdarstellung, Interaktion/Bewegung/Layout, Editor und beide Versionswege
 bestehen (51,95 s). Kein neuer vollständiger lokaler 84er-Lauf. Sauberes Paket
-und Installation folgen.
+und Installation sind nachfolgend dokumentiert.
 Originale: `build/material-failure-verification/negative.log`,
 `negative-light.log`, `targeted.log`, `failure-recovery.log`, `native-normal.log`,
 `native-failures.log`, die Metal-Aufnahmen und `tests/fixtures/space_faults.c`.
@@ -64,3 +64,21 @@ des Prozesses oder Verlust des GPU-Geräts. Nuklear-/Schrift-/Backendzuweisungen
 können eigene Fehler haben; die externen UI-Bibliotheken werden nicht durch diese
 Interzeption ersetzt. Windows/Linux/ARM64, reale Geräte, menschliche Bedienung
 und die vollständige Release-Abnahme bleiben offen. 1.0 nur nach Nutzerfreigabe.
+
+## Geprüftes Paket und Installation
+
+Sauberer Intel/macOS-Release 0.9.67/28cdea386abb. Beide Versionsprüfungen bestehen
+(0,45 s). Entpacktes Paket: 126 Desktop-, 167 Tastatur-, 75 Sicherungsbedingungen,
+zwei Einstellungsprozesse, CLI-/Laufzeit-/Lizenz-/Versionsprüfung und Wiederöffnung
+mit 20 unveränderten Dateien. Der echte 66→67→66-Wechsel erhält Dateien und
+Einstellungen; Sicherung/Wiederherstellung bestehen. Drei App-Aufnahmen angesehen.
+98 Dateien paketgleich installiert, 18 eigene Gedächtnisdateien beim Öffnen
+unverändert; installierte Aufnahme angesehen. Binärminimum macOS 14.0, SDK 15.2;
+ausgeführt auf Intel/macOS 14.6.1/23G93, keine 14.0- oder ARM64-Abnahme.
+
+Archiv-SHA256: `ff08ec7aff336991572dc23111c227457c6d2483bc21a628214375134e295642`.
+Rückfallkopie: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.66-20261012-003101`.
+Originale: `build/material-failure-package-check`, `build/material-failure-update`,
+`build/material-failure-verification/installed.json` und `installed-brain-check.json`.
+CI38180524524 zu 28cdea3: Windows/Linux-Kern und Python erfolgreich,
+vier Desktopjobs in Arbeit, native Mac-Jobs queued. Weitere Plattformabnahme offen.

@@ -2,7 +2,7 @@
 
 Stand: 12. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.66/b3b93709f823. Die Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.67/28cdea386abb. Die Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -4381,3 +4381,15 @@ prüfungen bestehen (51,95 s). Kein neuer vollständiger lokaler 84er-Lauf.
 Paket und Installation folgen. [Vertrag und Grenzen](MATERIAL_RUECKFALL.md).
 Alle vier Windows-/Linux-Desktopjobs und beide Pakete zu b3b9370/CI38179225359
 bestehen inzwischen. Sie belegen 0.9.66, nicht diese neue Materialänderung.
+
+## Materialrückfallpaket 0.9.67 installiert
+
+Sauberer Intel/macOS-Release 28cdea386abb: Versionsprüfungen bestehen (0,45 s).
+Paket: 126 Desktop-, 167 Tastatur-, 75 Sicherungsbedingungen, zwei Einstellungs-
+prozesse, CLI-/Laufzeit-/Lizenz-/Version und Wiederöffnung mit 20 erhaltenen Dateien.
+Echter 66→67→66-Wechsel erhält Dateien/Einstellungen und Sicherung/Wiederherstellung;
+drei Aufnahmen angesehen. 98 Dateien paketgleich installiert; 18 eigene Dateien
+beim Öffnen unverändert, Aufnahme angesehen. Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.66-20261012-003101`.
+Binärminimum 14.0/SDK 15.2; tatsächlich ausgeführt auf Intel/macOS 14.6.1/23G93.
+[Vertrag und Archivhash](MATERIAL_RUECKFALL.md). CI38180524524: Kern/Python auf
+Windows/Linux erfolgreich, vier Desktopjobs in Arbeit, Mac queued.
