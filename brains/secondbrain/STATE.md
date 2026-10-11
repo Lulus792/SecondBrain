@@ -12,19 +12,19 @@ Glaskarten, eigene Icons, direkte Pfeilnavigation, Kamerafahrt, Startfokus, Text
 und große Leseansicht sind implementiert. Originalbytes, Entwürfe und erkannte
 Konflikte bleiben geschützt. Externe Bibliotheken nur UI; MIT.
 
-Installiert **0.9.63/92ab260e4203**, sauberer Intel/macOS-Release-Build.
-96 Dateien paketgleich;18 Gedächtnisdateien beim Öffnen unverändert.126 Desktop-,
+Installiert **0.9.64/bef4816d3e40**, sauberer Intel/macOS-Release-Build.
+98 Dateien paketgleich;18 Gedächtnisdateien beim Öffnen unverändert.126 Desktop-,
 167 Tastatur-,75 Sicherungsbedingungen, zwei Einstellungs-Neustarts, CLI-/Runtime-/
 Lizenz-/Version bestehen. Tatsächliche App-Aufnahme angesehen. macOS14.6.1/23G93,x86_64.
-Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.62-20261011-215805`.
+Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.63-20261011-222221`.
 
 ## Aktueller Darstellungsschritt
 
 0.9.64 unterscheidet kompakte Erstellaktionen durch Dokument-/Ordnerplusse.
 Prioritäre Sternlabels werden zuerst reserviert, keine teilweise übermalten
 normalen Wörter. Neun Darstellungen und18 SDL-Aktions-/Escapeabläufe geprüft;
-9/9 passende Produktprüfungen bestehen (141,20s). Paket/neue Plattformen folgen,
-installiert bleibt0.9.63. [Vertrag](../../docs/ERSTELLEN_ICONS.md).
+9/9 passende Produktprüfungen bestehen (141,20s). Paket geprüft und installiert;
+neue CI38171616070: Windows/Linux in Arbeit, native Mac-Jobs queued. [Vertrag](../../docs/ERSTELLEN_ICONS.md).
 [Mindestversionsvorschlag](../../docs/PLATTFORM_VORSCHLAG.md): technische Voraussetzungen,
 tatsächlich geprüfte CI-Umgebungen und offene Nutzerplattform-Abnahme getrennt.
 
@@ -56,8 +56,8 @@ bei der Hilfe-Kontextprüfung: zwei Bilder garantieren keinen fertigen Reader.
 Der Prüfer wartet jetzt begrenzt auf Bereitschaft und behält sämtliche Höhen-/
 Rückkehrassertionen. Hilfe/Reader lokal bestehen (17,26s),94 Hilfebedingungen auch
 unter ASan/UBSan mit bestätigten Bibliotheks-/Helperhashes. Alle vier Windows-/Linux-Desktopjobs zu798b84e bestehen im
-Lauf38170374268 einschließlich Release-Paketen. Installierter Produktcode entspricht weiter92ab260; nur Prüfer
-geändert. Native Mac-CI zuletzt queued; lokale Intel-Prüfung separat. ARM64 und
+Lauf38170374268 einschließlich Release-Paketen. Die installierte64-Fassung enthält zusätzlich Icons und Labelpriorität;
+798b84e belegt den vorherigen63-Stand. Native Mac-CI zuletzt queued; lokale Intel-Prüfung separat. ARM64 und
 frische Nutzerrechner offen. Frühere Erfolge ersetzen keine neue Prüfung.
 
 ## Verbleibende Release-Arbeit

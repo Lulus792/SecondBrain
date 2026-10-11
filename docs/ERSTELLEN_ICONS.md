@@ -48,3 +48,9 @@ Originale: `build/creation-icons-verification/`. Review mit SBUI-082/083 außerh
 Paket und neue Zielplattformabnahme folgen. Frühere82/82 von0.9.63 sind kein
 neu ausgeführter64-Gesamtlauf; für diesen begrenzten Darstellungsschritt wurden
 die neun passenden vorhandenen Prüfungen ausgeführt.
+
+0.9.64/bef4816d3e40 als sauberes Paket geprüft und installiert:98 Dateien
+paketgleich,18 Gedächtnisdateien unverändert, aktuelle Aufnahme angesehen.
+126 Desktop-,167 Tastatur-,75 Sicherungsbedingungen, Neustarts und CLI-/
+Runtime-/Lizenzprüfung bestehen. Neue CI38171616070 zu bef4816d3e40 zuletzt
+Windows/Linux in Arbeit, Mac queued; keine neue pauschale Plattformabnahme.

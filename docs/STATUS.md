@@ -4203,3 +4203,21 @@ erarbeitet: macOS14.0 (Intel/ARM64), Windows11 25H2x64 und Ubuntu24.04LTSx64.
 Mach-O-Mindestwert14.0 tatsächlich gelesen; ausgeführter Mac14.6.1. CI-Umgebungen
 sind WindowsServer2025/10.0.26100 und Ubuntu24.04.5, keine Windows11-Nutzerabnahme.
 Zusage, Mindestversions-/Wayland-/frische-Rechner-Abnahme und1.0-Freigabe bleiben offen.
+
+## Darstellungspaket0.9.64 installiert
+
+Sauberer Intel/macOS-Release-Build0.9.64/bef4816d3e40. Drei Versions-/Release-
+Nachprüfungen bestehen; entpacktes Paket besteht126 Desktop-,167 Tastatur-,
+75 Sicherungsbedingungen, zwei Einstellungs-Neustarts, CLI-/Runtime-/Lizenzprüfung.
+98 installierte Dateien paketgleich;18 Gedächtnisdateien beim Öffnen unverändert.
+Aktuelle App-Aufnahme angesehen. Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.63-20261011-222221`.
+Archiv-SHA256: `5d17d3ed6b5698725b1bd8b300b14c67f11689a4b73cc22c9ac03ad34689bc1b`.
+Originale: `build/creation-icons-verification/` und `build/creation-icons-package/`.
+Neun passende Produktprüfungen bestehen (141,20s), kein neuer82er-Gesamtlauf.
+
+Neue CI38171616070 zu bef4816d3e403ad7d6719366349030e6273707ef: vier Windows-/
+Linux-Desktopjobs bei der letzten Abfrage in Arbeit, native Mac-Jobs queued.
+Frühere63-Erfolge sind getrennte Nachweise. Menschliche Geräte-/Screenreader-,
+Mindestversions-, große Graph-/Leistungs- und weitere Release-Abnahmen bleiben
+offen. Mindest-OS-Vorschlag ist ausgearbeitet; keine automatische Änderung der
+Supportuntergrenzen.1.0 nur nach ausdrücklicher Nutzerfreigabe.
