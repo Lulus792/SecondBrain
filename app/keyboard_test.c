@@ -243,6 +243,7 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
         CHECK(activate(d,"copy-notice"));
         text=take_copy(); CHECK(same_clipboard_text(text,d->notice)); SDL_free(text); text=NULL;
         CHECK(reach(d,"reader"));
+        CHECK(reader_ready(d));frame(d);
         key(d,SDLK_PAGEDOWN,0);
         CHECK(d->scrolling[2].maximum==0 || d->scrolling[2].destination>0);
         if (i==14) {

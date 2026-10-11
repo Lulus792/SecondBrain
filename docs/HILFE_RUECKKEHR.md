@@ -60,6 +60,14 @@ umfasst auch den bisherigen Desktop-/Tastatur-/Sicherungsablauf, Reader,
 Texteingabe, native Mac-Anbindung, Material und Versions-/Release-Verträge.
 Original: `build/help-return-verification/ctest-release.log`.
 
+Die erste Paketprüfung bestand den Desktopablauf, scheiterte aber im bestehenden
+Tastaturprüfer: Bild ab wurde vor abgeschlossener Vorbereitung eines langen
+Lizenztexts ausgelöst. Der Prüfer verwendet jetzt seine vorhandene begrenzte
+Bereitschaftsprüfung vor dem Scrolltest. Der gezielte Tastaturdurchlauf danach
+besteht (53,12 s); die Produktlogik blieb dabei unverändert. Frühe Scrollbefehle
+während der Vorbereitung bleiben eine eigene offene Leistungs-/Bedienaufgabe.
+Originale: `build/help-return-verification/package-check.log`, `keyboard-ready.log`.
+
 Das sind SDL-Ereignis-, Widget-, Provider- und Bildnachweise auf Intel/macOS,
 keine menschliche Tastatur-/Screenreader-/IME-Abnahme oder aktuelle Windows-/
 Linux-/ARM64-Abnahme. Leistung und übrige [Release-Aufgaben](RELEASE.md) bleiben

@@ -79,6 +79,10 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   GPU-Treiber auf allen Zielsystemen. Die bisherigen Tests verwenden versteckte
   Fenster und den SDL-Softwarerenderer. Große Dateien und Graphgrenzen sind benannt,
   aber noch kein belastbarer Leistungsnachweis auf schwächerer Hardware.
+  Die 0.9.59-Paketprüfung bestätigt außerdem eine Timing-Grenze: Ein Scrollbefehl
+  während der Lizenzreader-Vorbereitung kann vor der fertigen Ansicht verpuffen.
+  Der Tastaturtest wartet für seine Prüfung der fertigen Leseansicht begrenzt
+  auf deren Bereitschaft. Der Umgang mit frühen Scrollbefehlen bleibt Produktarbeit.
 - [ ] **Dauerhafte Release-Pakete veröffentlichen:** versionierte GitHub Releases,
   Prüfsummen, Änderungsübersicht und reproduzierbare Paketabnahme. Actions-Artefakte
   verfallen nach 30 Tagen. Signierung, macOS-Notarisierung und einfache Installation
