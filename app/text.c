@@ -267,6 +267,7 @@ bool sb_ui_text_metrics(const struct nk_user_font *font,const char *value,size_t
     if(memo){memo->ascent=*ascent;memo->descent=*descent;memo->metrics_ready=true;}return true;
 }
 
+#include "plain_native.inc"
 void sb_ui_text_draw(struct nk_draw_list *list, const struct nk_command_text *command) {
     if(!command->font || command->length<=0 || !command->foreground.a)return;
     SBTextFace *face=command->font->userdata.ptr;if(!face || !face->owner)return;

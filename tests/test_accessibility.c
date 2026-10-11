@@ -58,9 +58,14 @@ static void *native_find(void *object,const char *label,unsigned depth) {
     }
     return NULL;
 }
+static void *native_reader(void *view,const char *label){
+    void *reader=native_find(view,"reader",0);if(reader){const char *name=utf8(send(reader,"accessibilityLabel"));if(name && !strcmp(name,label))return reader;
+        name=utf8(send(reader,"accessibilityTitle"));if(name && !strcmp(name,label))return reader;name=utf8(send(reader,"accessibilityDescription"));if(name && !strcmp(name,label))return reader;}
+    return native_find(view,label,0);
+}
 static bool native_text_style(void *view,const char *label,const char *word,char *output,size_t capacity) {
     typedef struct { size_t location,length; } Range;
-    void *reader=native_find(view,label,0); if (!reader) return false;
+    void *reader=native_reader(view,label); if (!reader) return false;
     size_t count=((size_t(*)(void *,SEL))objc_msgSend)(reader,sel_registerName("accessibilityNumberOfCharacters"));
     if (!count) return false;
     void *rich=((void *(*)(void *,SEL,Range))objc_msgSend)(reader,sel_registerName("accessibilityAttributedStringForRange:"),(Range){0,count});
@@ -185,7 +190,14 @@ int main(int argc,char **argv) {
     CHECK(!strstr(d.model.editor,"Falsches Dokument") && !sb_app_dirty(&d.model));
     /* A value action is never applied to the read-only document surface. */
     d.editing=false; d.card=true; frame(&d);
-    void *reader=native_find(view,d.model.title,0); CHECK(reader!=NULL);
+    void *reader=native_reader(view,d.model.title); CHECK(reader!=NULL);
+    SBPassiveText *native_title=NULL;for(size_t i=0;i<d.passive_count;++i)if(d.passive[i].role==ACCESSKIT_ROLE_HEADING && d.passive[i].level==1 && d.passive[i].display && d.passive[i].native.count){native_title=&d.passive[i];break;}
+    CHECK(native_title && native_title->native.runs[0].geometry);void *title_node=native_find(view,native_title->id,0);CHECK(title_node);
+    TextRect native_title_rect=native_text_rect(reader,(TextRange){0,1}),native_title_frame=native_frame(title_node);SBNativeTextRun *title_run=&native_title->native.runs[0];
+    float visible_title_x=(title_run->level&1) ? title_run->x+title_run->width-title_run->positions[0]-title_run->widths[0] : title_run->x+title_run->positions[0];
+    CHECK(fabs(native_title_rect.size.width-title_run->widths[0])<0.1 && fabs(native_title_rect.size.height-title_run->height)<0.1);
+    CHECK(fabs(native_title_rect.origin.x-(native_title_frame.origin.x+visible_title_x-native_title->bounds.x))<0.1);
+    CHECK(fabs(native_title_rect.origin.y-(native_title_frame.origin.y+native_title->bounds.h-(title_run->y-native_title->bounds.y)-title_run->height))<0.1);
     SBPassiveText *native_paragraph=NULL;for(size_t i=0;i<d.passive_count;++i)if(d.passive[i].role==ACCESSKIT_ROLE_PARAGRAPH && d.passive[i].native.count){native_paragraph=&d.passive[i];break;}
     CHECK(native_paragraph && native_paragraph->native.runs[0].geometry && native_paragraph->native.runs[0].characters);
     void *paragraph_node=native_find(view,native_paragraph->text,0);CHECK(paragraph_node);
@@ -257,7 +269,7 @@ int main(int argc,char **argv) {
 #ifdef __APPLE__
     void *native_heading=native_find(view,"Erster Abschnitt",0); CHECK(native_heading);
     CHECK(!strcmp(utf8(send(native_heading,"accessibilityRole")),heading_role ? utf8(*heading_role) : "Heading"));
-    void *native_document=native_find(view,d.model.title,0); CHECK(native_document);
+    void *native_document=native_reader(view,d.model.title); CHECK(native_document);
     SEL number_selector=sel_registerName("accessibilityNumberOfCharacters");
     size_t native_count=((size_t(*)(void *,SEL))objc_msgSend)(native_document,number_selector); CHECK(native_count>6000 && native_count<7000);
     const char *native_text=utf8(((void *(*)(void *,SEL,NativeRange))objc_msgSend)(native_document,sel_registerName("accessibilityStringForRange:"),(NativeRange){0,native_count}));
@@ -462,7 +474,7 @@ int main(int argc,char **argv) {
     for (size_t i=0;i<d.target_count;++i) if (!strncmp(d.targets[i].id,"link:",5)) { ++entity_actions;CHECK(!strcmp(d.targets[i].label,"Ziel & Datei")); }
     CHECK(entity_actions==1);
 #ifdef __APPLE__
-    void *entity_reader=native_find(view,d.model.title,0);CHECK(entity_reader);
+    void *entity_reader=native_reader(view,d.model.title);CHECK(entity_reader);
     size_t entity_characters=((size_t(*)(void *,SEL))objc_msgSend)(entity_reader,sel_registerName("accessibilityNumberOfCharacters"));
     const char *entity_native=utf8(((void *(*)(void *,SEL,NativeRange))objc_msgSend)(entity_reader,sel_registerName("accessibilityStringForRange:"),(NativeRange){0,entity_characters}));
     CHECK(entity_native && strstr(entity_native,"≫⃒") && strstr(entity_native,"©") && !strstr(entity_native,"&nGt;"));
@@ -517,7 +529,7 @@ int main(int argc,char **argv) {
     }
     OK(sb_ui_fonts(&d.ui,1));d.reset_reader=true;frame(&d);frame(&d);
 #ifdef __APPLE__
-    void *reference_reader=native_find(view,d.model.title,0);CHECK(reference_reader);
+    void *reference_reader=native_reader(view,d.model.title);CHECK(reference_reader);
     size_t reference_characters=((size_t(*)(void *,SEL))objc_msgSend)(reference_reader,sel_registerName("accessibilityNumberOfCharacters"));
     const char *reference_native=utf8(((void *(*)(void *,SEL,NativeRange))objc_msgSend)(reference_reader,sel_registerName("accessibilityStringForRange:"),(NativeRange){0,reference_characters}));
     CHECK(reference_native && strstr(reference_native,"Ziel und Straße.") && strstr(reference_native,"Tabelle") && !strstr(reference_native,"[strasse]:"));
@@ -561,7 +573,7 @@ int main(int argc,char **argv) {
     CHECK(!strcmp(utf8(send(native_ordered_list,"accessibilityRole")),"AXList"));
     void *native_list_children=send(native_ordered_list,"accessibilityChildren");CHECK(native_list_children);
     CHECK(((size_t(*)(void *,SEL))objc_msgSend)(native_list_children,sel_registerName("count"))>=2);
-    void *container_reader=native_find(view,d.model.title,0);CHECK(container_reader);
+    void *container_reader=native_reader(view,d.model.title);CHECK(container_reader);
     size_t container_chars=((size_t(*)(void *,SEL))objc_msgSend)(container_reader,sel_registerName("accessibilityNumberOfCharacters"));
     const char *container_native=utf8(((void *(*)(void *,SEL,NativeRange))objc_msgSend)(container_reader,sel_registerName("accessibilityStringForRange:"),(NativeRange){0,container_chars}));
     CHECK(container_native && strstr(container_native,"Erster Fortsetzung.") && strstr(container_native,"Gamma") && !strstr(container_native,"[ziel]:"));

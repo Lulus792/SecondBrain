@@ -3643,3 +3643,25 @@ Hashes/Version, Gedächtnisprüfung, Bild, Geräte-/Quellstand und CI-Snapshot).
 CI38138548919 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
 Weitere Titel-/Markierungs-/Kopfzellgeometrie, echte IME/Screenreader/Geräte und
 übrige Release-Arbeiten bleiben offen.1.0 nur nach Nutzerfreigabe.
+
+## Native Titel und Markierungen (0.9.52, 11. Oktober)
+
+Kartentitel, Dialogtitel, Einstieg und vorhandene native Beschriftungen übernehmen
+die tatsächlichen Textbefehle: sichtbare Quelle, Schrift und Ursprung. Vollständige
+Namen bleiben erhalten; gekürzte Textwerte veröffentlichen nur die gezeichneten
+Zeichen. Nummerierte Listen verwenden ihren Textplan, Aufzählungspunkte ihre
+wirklich gezeichnete Kreisfläche. Dekorative Kartentitel stehen außerhalb des
+Dokumenttexts; stabile Dokumentkennungen verhindern doppelte Textabfragen.
+[Vertrag](NATIVE_TITELGEOMETRIE.md).
+
+76/76 lokale Release-Prüfungen bestehen (624,51 s). 354 Titel-/Befehls-, 590 Reader-
+und 621 native Mac-Provider-Assertions bestehen auch unter haltendem ASan/UBSan.
+39 eigene C-Dateien sind instrumentiert; 53 Quell-/Include-Hashes stimmen.
+UI-Abhängigkeiten sind nicht instrumentiert; kein ThreadSanitizer-, Leak- oder
+menschlicher Screenreader-Nachweis. Prüfgerät: Intel/macOS 14.6.1, Retina.
+Originale: `build/title-geometry-verification/ctest-release.log`,
+`build/title-geometry-sanitizers/{build.log,title-test.log,reader-test.log,native-test.log,sources.json}`.
+
+Paket und Installation folgen; installiert bleibt 0.9.51. Neue Zielplattformen,
+echte Eingabemethoden/Screenreader/Geräte und übrige Release-Arbeit bleiben offen.
+1.0 wird erst nach ausdrücklicher Nutzerfreigabe gesetzt.

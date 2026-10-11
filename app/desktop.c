@@ -199,7 +199,7 @@ static SBTarget *target_add(SBDesktop *d, const char *id, struct nk_rect rect, S
     return item;
 }
 static void passive_clear(SBDesktop *d) {
-    for (size_t i=0;i<d->passive_count;++i) { free(d->passive[i].text); free(d->passive[i].styles);sb_native_text_free(&d->passive[i].native); }
+    for (size_t i=0;i<d->passive_count;++i) { free(d->passive[i].text); free(d->passive[i].styles);sb_native_text_free(&d->passive[i].native);free(d->passive[i].display); }
     d->passive_count=0;
 }
 static void passive_span(SBDesktop *d,const char *id,const char *text,size_t length,accesskit_role role,struct nk_rect bounds) {
@@ -235,6 +235,24 @@ static void passive_geometry(SBDesktop *d,size_t before,const struct nk_user_fon
     if(styled && !strcmp(p->text,styled->text))sb_ui_styled_native(&d->ui,font,styled,bounds,alignment,&p->native);
     else if(!styled)sb_ui_wrap_native(&d->ui,font,p->text,strlen(p->text),p->styles,p->style_count,bounds,&p->native);
 }
+static const struct nk_command_text *native_command(SBDesktop *d,nk_size before){
+    struct nk_command_buffer *canvas=nk_window_get_canvas(d->ui.ctx);if(canvas->end==before)return NULL;
+    const struct nk_command *command=(const struct nk_command *)((const char *)nk_buffer_memory(canvas->base)+canvas->last);
+    return command->type==NK_COMMAND_TEXT ? (const struct nk_command_text *)command : NULL;
+}
+static void passive_command_at(SBDesktop *d,size_t index,const struct nk_command_text *command){
+    if(!command || index>=d->passive_count)return;SBPassiveText *p=&d->passive[index];
+    char *display=malloc((size_t)command->length+1);if(!display)return;memcpy(display,command->string,(size_t)command->length);display[command->length]=0;
+    if(sb_ui_text_command_native(&d->ui,command,&p->native)){p->display=display;p->font_size=command->font->height;}else free(display);
+}
+static void passive_command(SBDesktop *d,size_t before,const struct nk_command_text *command){if(d->passive_count==before+1)passive_command_at(d,before,command);}
+static void passive_title(SBDesktop *d,size_t before){
+    if(d->passive_count!=before+1)return;d->reader_title_claimed=true;SBPassiveText *p=&d->passive[before];p->order=d->reader_title_order;
+    if(!d->reader_title_native.count)return;size_t n=strlen(d->reader_title_display);
+    p->display=malloc(n+1);p->native=d->reader_title_native;p->native.capacity=p->native.count;p->native.runs=malloc(p->native.count*sizeof(*p->native.runs));
+    if(p->display && p->native.runs){memcpy(p->display,d->reader_title_display,n+1);memcpy(p->native.runs,d->reader_title_native.runs,p->native.count*sizeof(*p->native.runs));p->font_size=d->ui.normal->handle.height;}
+    else{free(p->display);p->display=NULL;sb_native_text_free(&p->native);}
+}
 static void document_span(SBDesktop *d,const char *text,size_t length,size_t offset,accesskit_role role,unsigned level,struct nk_rect bounds,unsigned slot,bool title) {
     char id[100]; snprintf(id,sizeof(id),"reader:block:%zu",offset);
     size_t before=d->passive_count; passive_span(d,id,text,length,role,bounds);
@@ -266,12 +284,22 @@ static void heading_step(SBDesktop *d,int direction) {
     }
 }
 static void native_wrap(SBDesktop *d,const char *text) {
+    size_t before=d->passive_count;struct nk_rect bounds=nk_widget_bounds(d->ui.ctx);const struct nk_user_font *font=d->ui.ctx->style.font;
     passive_add(d,NULL,text,ACCESSKIT_ROLE_LABEL,nk_widget_bounds(d->ui.ctx));
     nk_label_wrap(d->ui.ctx,text);
+    passive_geometry(d,before,font,NULL,bounds,NK_TEXT_LEFT);
+    if(d->passive_count==before+1 && d->passive[before].native.count)d->passive[before].font_size=font->height;
 }
 static void native_label(SBDesktop *d,const char *text,nk_flags alignment) {
+    size_t before=d->passive_count;nk_size last=nk_window_get_canvas(d->ui.ctx)->end;
     passive_add(d,NULL,text,ACCESSKIT_ROLE_LABEL,nk_widget_bounds(d->ui.ctx));
     nk_label(d->ui.ctx,text,alignment);
+    passive_command(d,before,native_command(d,last));
+}
+static void native_heading(SBDesktop *d,const char *id,const char *text){
+    size_t before=d->passive_count;nk_size end=nk_window_get_canvas(d->ui.ctx)->end;
+    passive_add(d,id,text,ACCESSKIT_ROLE_HEADING,nk_widget_bounds(d->ui.ctx));nk_label(d->ui.ctx,text,NK_TEXT_LEFT);
+    passive_command(d,before,native_command(d,end));
 }
 static void target(SBDesktop *d, const char *id) {
     SBTarget *item = target_add(d,id,nk_widget_bounds(d->ui.ctx),SB_FOCUS_BUTTON,d->focus_group);
@@ -580,6 +608,7 @@ void sb_desktop_free(SBDesktop *d) {
     sb_dialogs_free(d->dialogs);
     if (d->text_edit_ready) nk_textedit_free(&d->text_edit);
     sb_native_text_free(&d->native_editor);
+    sb_native_text_free(&d->reader_title_native);
     native_fields_clear(d);
     field_selections_free(d);
     free(d->targets); passive_clear(d); free(d->passive);
@@ -877,6 +906,7 @@ static void accessible_publish(SBDesktop *d) {
         v->row=p->row; v->column=p->column; v->rows=p->rows; v->columns=p->columns;
         v->styles=p->styles; v->style_count=p->style_count; v->font_size=p->font_size;
         if(p->native.count)v->native_text=&p->native;
+        if(v->value && p->display)v->value=p->display;
         v->parent=p->parent; v->level=p->level; v->order=((uint64_t)p->group<<32)|p->order;
     }
     qsort(items,controls,sizeof(*items),accessible_order);
@@ -1602,7 +1632,9 @@ static void document_block(SBDesktop *d,const char *text,size_t length_total,SBM
             const char *caption=d->model.source ? d->model.source_title : d->model.title;
             bool fixed_title=*first_heading && heading==1 && d->form==SB_FORM_NONE && plain &&
                 styled.count==1 && !styled.spans[0].style && !strcmp(plain,caption);
-            if (fixed_title) document_span(d,plain,strlen(plain),block.offset,ACCESSKIT_ROLE_HEADING,1,d->reader_title_bounds,slot,true);
+            if (fixed_title){size_t before=d->passive_count;document_span(d,plain,strlen(plain),block.offset,ACCESSKIT_ROLE_HEADING,1,d->reader_title_bounds,slot,true);
+                passive_title(d,before);
+            }
             *first_heading=false;
             if (!fixed_title) {
             struct nk_user_font *font = heading ? &d->ui.heading->handle : code ? &d->ui.code->handle : &d->ui.body->handle;
@@ -1730,13 +1762,16 @@ static bool document_tree(SBDesktop *d,const SBDocument *document,const SBRefere
             float marker_width=layout[item->parent].marker_width;
             struct nk_rect rect=nk_rect(base_x+margin-marker_width-6*s,bounds.y,marker_width,d->ui.body->handle.height+4*s);
             const SBDocumentNode *list=&document->nodes[item->parent]; char label[32];
+            nk_size last=nk_window_get_canvas(ctx)->end;struct nk_rect bullet={0};
             if (list->ordered) { snprintf(label,sizeof(label),"%u%c",mark->ordinal,list->marker); nk_draw_text(nk_window_get_canvas(ctx),rect,label,(int)strlen(label),&d->ui.body->handle,nk_rgba(0,0,0,0),ctx->style.text.color); }
-            else { strcpy(label,"•"); float diameter=4*s; nk_fill_circle(nk_window_get_canvas(ctx),nk_rect(rect.x+marker_width-6*s,rect.y+(rect.h-diameter)/2,diameter,diameter),ctx->style.text.color); }
+            else { strcpy(label,"•"); float diameter=4*s;bullet=nk_rect(rect.x+marker_width-6*s,rect.y+(rect.h-diameter)/2,diameter,diameter);nk_fill_circle(nk_window_get_canvas(ctx),bullet,ctx->style.text.color); }
             if (mark->marker<d->passive_count && mark->passive<d->passive_count) {
                 SBPassiveText *p=&d->passive[mark->marker]; struct nk_rect clip=panel->clip;
                 float left=fmaxf(rect.x,clip.x),top=fmaxf(rect.y,clip.y);
                 p->bounds=nk_rect(left,top,fmaxf(0,fminf(rect.x+rect.w,clip.x+clip.w)-left),fmaxf(0,fminf(rect.y+rect.h,clip.y+clip.h)-top));
                 p->document_y=fmaxf(0,rect.y-panel->clip.y+d->scrolling[slot].position+d->scrolling[slot].elastic);document_union(&d->passive[mark->passive],p);
+                if(list->ordered)passive_command_at(d,mark->marker,native_command(d,last));
+                else{SBNativeCharBox box={0,strlen(p->text),bullet.x,bullet.y,bullet.w,bullet.h,0};sb_native_text_geometry(p->text,strlen(p->text),NULL,0,&box,1,&p->native);}
             }
         }
     }
@@ -1815,7 +1850,11 @@ static void detail(SBDesktop *d, float x, float y, float width, float height, nk
         nk_layout_row_push(ctx,fmaxf(40,content-32*s-ctx->style.window.spacing.x));
         char short_title[SB_NAME_CAP]; compact_label(d,title,short_title,sizeof(short_title),content-44*s);
         d->reader_title_bounds=nk_widget_bounds(ctx);
-        nk_label(ctx,short_title,NK_TEXT_LEFT); if (nk_widget_is_hovered(ctx)) tooltip(d,title);
+        d->reader_title_order=d->semantic_order++;
+        nk_size title_last=nk_window_get_canvas(ctx)->end;nk_label(ctx,short_title,NK_TEXT_LEFT);
+        const struct nk_command_text *title_command=native_command(d,title_last);
+        if(title_command && (size_t)title_command->length<sizeof(d->reader_title_display) && sb_ui_text_command_native(&d->ui,title_command,&d->reader_title_native)){memcpy(d->reader_title_display,title_command->string,(size_t)title_command->length);d->reader_title_display[title_command->length]=0;}
+        if (nk_widget_is_hovered(ctx)) tooltip(d,title);
         nk_layout_row_push(ctx,32*s);
         if (button(d,"close-card","Dokument schließen")) { d->card=false; d->expanded=false; focus_set(d,"galaxy"); }
         nk_layout_row_end(ctx);
@@ -1864,6 +1903,12 @@ static void detail(SBDesktop *d, float x, float y, float width, float height, nk
                 if (button(d,"workspace-detail","Arbeitsordner öffnen")) command(d,SB_CMD_WORKSPACE);
                 nk_group_end(ctx);
             }
+        }
+        if((d->model.source || (d->model.editor && !d->editing)) && !d->reader_title_claimed && d->reader_title_native.count){
+            size_t before=d->passive_count;passive_add(d,"reader:title",title,ACCESSKIT_ROLE_LABEL,d->reader_title_bounds);
+            if(d->passive_count==before+1){SBPassiveText *p=&d->passive[before];size_t n=strlen(title)+strlen("Dokumenttitel: ")+1;char *name=malloc(n);
+                if(name){snprintf(name,n,"Dokumenttitel: %s",title);free(p->text);p->text=name;}
+                p->bounds=d->reader_title_bounds;passive_title(d,before);}
         }
         nk_layout_row_dynamic(ctx,(compact ? 20 : 26)*s,1);
         const char *feedback=d->message.message[0] ? d->message.message : d->model.source ? d->model.source_path : d->model.path;
@@ -1919,7 +1964,7 @@ static void popup(SBDesktop *d, int width, int height) {
         if(nk_begin(ctx,"Änderungen erhalten",d->modal_bounds,NK_WINDOW_NO_SCROLLBAR)){
             float available=ctx->current->layout->bounds.w;
             nk_layout_row_begin(ctx,NK_STATIC,header,2);
-            nk_layout_row_push(ctx,available-32*s-ctx->style.window.spacing.x);passive_add(d,"modal-title","Änderungen erhalten",ACCESSKIT_ROLE_HEADING,nk_widget_bounds(ctx));nk_label(ctx,"Änderungen erhalten",NK_TEXT_LEFT);
+            nk_layout_row_push(ctx,available-32*s-ctx->style.window.spacing.x);native_heading(d,"modal-title","Änderungen erhalten");
             nk_layout_row_push(ctx,32*s);if(button(d,"cancel","Schließen"))command(d,SB_CMD_GUARD_CANCEL);nk_layout_row_end(ctx);
             nk_layout_row_dynamic(ctx,fmaxf(1,h-shell),1);
             if(!d->scrolling[3].measured)nk_group_set_scroll(ctx,"Guard contents",0,0);
@@ -1965,7 +2010,7 @@ static void popup(SBDesktop *d, int width, int height) {
     if (nk_begin(ctx,title,nk_rect((width-w)/2,(height-h)/2,w,h),NK_WINDOW_NO_SCROLLBAR)) {
         float available=ctx->current->layout->bounds.w;
         nk_layout_row_begin(ctx,NK_STATIC,32*s,2);
-        nk_layout_row_push(ctx,available-32*s-ctx->style.window.spacing.x); passive_add(d,"modal-title",title,ACCESSKIT_ROLE_HEADING,nk_widget_bounds(ctx)); nk_label(ctx,title,NK_TEXT_LEFT);
+        nk_layout_row_push(ctx,available-32*s-ctx->style.window.spacing.x);native_heading(d,"modal-title",title);
         nk_layout_row_push(ctx,32*s); if (button(d,"cancel","Schließen")) command(d,SB_CMD_CANCEL);
         nk_layout_row_end(ctx);
         bool form=!d->backup && (d->form==SB_FORM_PROJECT || d->form==SB_FORM_NOTE || d->form==SB_FORM_WORKSPACE || d->form==SB_FORM_BACKUP || d->form==SB_FORM_RESTORE);
@@ -2397,9 +2442,8 @@ static void welcome(SBDesktop *d,int width,int height,nk_flags flags) {
     glass(d,bounds,16); d->focus_group=0;
     if (nk_begin(ctx,"Welcome",bounds,flags|NK_WINDOW_NO_SCROLLBAR)) {
         nk_layout_row_dynamic(ctx,36*s,1);
-        passive_add(d,"welcome-title","Dein Projektgedächtnis",ACCESSKIT_ROLE_HEADING,nk_widget_bounds(ctx));
         nk_style_set_font(ctx,&d->ui.heading->handle);
-        nk_label(ctx,"Dein Projektgedächtnis",NK_TEXT_LEFT);
+        native_heading(d,"welcome-title","Dein Projektgedächtnis");
         nk_style_set_font(ctx,&d->ui.normal->handle);
         float remaining=ctx->current->layout->bounds.y+ctx->current->layout->bounds.h-
             (ctx->current->layout->at_y+ctx->current->layout->row.height)-ctx->style.window.spacing.y;
@@ -2434,6 +2478,7 @@ static void welcome(SBDesktop *d,int width,int height,nk_flags flags) {
 void sb_desktop_frame(SBDesktop *d) {
     d->reader_preparation_used=false;
     sb_native_text_free(&d->native_editor);
+    sb_native_text_free(&d->reader_title_native);d->reader_title_display[0]=0;d->reader_title_claimed=false;
     native_fields_clear(d);
     if (d->reveal_document[0] && (d->reveal_document_context!=accessible_context(d) ||
         (!modal_reader(d) && (!d->card || (d->editing && !d->model.source))))) d->reveal_document[0]=0;

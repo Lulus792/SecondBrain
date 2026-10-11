@@ -5,11 +5,11 @@
 typedef struct {SBShapedLine shape;size_t offset;float y;} SBPlainLine;
 typedef struct {
     char *text;size_t length,bytes,count;unsigned face;uint64_t hash,stamp;
-    SBPlainLine *lines;float advance,height;int ascent,descent;
+    SBPlainLine *lines;float advance,height;int ascent,descent;SBNativeText native;
 } SBPlainPlan;
 static void plain_free(SBPlainPlan *plan){
     for(size_t i=0;i<plan->count;++i)sb_shape_line_free(&plan->lines[i].shape);
-    free(plan->lines);free(plan->text);memset(plan,0,sizeof(*plan));
+    free(plan->lines);free(plan->text);sb_native_text_free(&plan->native);memset(plan,0,sizeof(*plan));
 }
 static bool plain_fonts(SBTextFace *face,const char *value,size_t length,SBShapeFontSpan **out,size_t *count){
     SBScriptPlan scripts={0};if(sb_script_plan(value,length,&scripts).code!=SB_OK)return false;

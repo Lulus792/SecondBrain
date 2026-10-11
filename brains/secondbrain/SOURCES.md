@@ -191,3 +191,8 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   Graphemflächen, gehaltene Metadaten/Worker-Budgets und Metal-Vergleich ab51.
 - [Readerprüfer](../../tests/test_reader_native.c): unabhängige Glyphen-/
   Ausrichtungs-/Ursprungsprüfung und produktive Absatz-/Code-/Tabellenquellen.
+
+- [Native Titel und Markierungen](../../docs/NATIVE_TITELGEOMETRIE.md):
+  tatsächliche Textbefehle, sichtbare Kürzung, eigene Geometrieausgaben und Cachebudget.
+- [Titelprüfer](../../tests/test_title_geometry.c): unabhängiger Glyphenvergleich,
+  Schriftgrößen, lange Namen, Marker, dekorative und modale Titel.

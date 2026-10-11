@@ -74,5 +74,6 @@ Die Referenz-App-/UI-Dateien stammen unverändert aus dem Quellcommit
 und derselbe Profilprüfer werden geteilt.
 
 Ausgeführte Gesamt-/Sanitizer-/Paketprüfungen stehen in [STATUS](STATUS.md).
-Weitere Titel-/Markierungsgeometrie, neue Zielplattformen und tatsächliche
-IME-/Screenreader-/Geräte-/Langzeitabnahmen bleiben Release-Arbeit.
+Titel und Listenmarkierungen sind ab 0.9.52 im
+[Titelvertrag](NATIVE_TITELGEOMETRIE.md) angebunden. Neue Zielplattformen und
+tatsächliche IME-/Screenreader-/Geräte-/Langzeitabnahmen bleiben Release-Arbeit.

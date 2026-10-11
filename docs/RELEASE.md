@@ -275,3 +275,12 @@ mit; Quelle, Zeilen, Bidi, Stile und Ausrichtung bleiben an der Zeichnung.
 [Vertrag/Messung](NATIVE_LESEGEOMETRIE.md). Separate Kartentitel, Listenmarkierungen,
 logische Kopfzellen ohne Widget, neue Zielplattformen und tatsächliche assistive/
 IME-/Geräte-/Langzeitabnahmen bleiben offen.
+
+## Native Titel und Markierungen vom 11. Oktober
+
+Ab 0.9.52 übernehmen Titel, vorhandene native Beschriftungen und Listenmarker
+ihre tatsächlich gezeichnete Geometrie. Gekürzter Text und vollständiger Name
+bleiben getrennt; dekorative Titel duplizieren keinen Dokumentinhalt.
+[Vertrag und Grenzen](NATIVE_TITELGEOMETRIE.md). Lokale Gesamt- und gezielte
+Sanitizerprüfungen bestehen. Neue Plattform-/Paketabnahmen, tatsächliche
+assistive Bedienung und die übrige Release-Liste bleiben offen.

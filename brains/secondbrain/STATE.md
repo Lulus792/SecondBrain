@@ -94,6 +94,17 @@ neuen Einbruch, aber weiterhin Ausreißer; keine allgemeine Flüssigkeitsaussage
 Mac-Paket und Installation bestehen; andere Zielplattformen bleiben offen.
 [Vertrag/Messung](../../docs/NATIVE_LESEGEOMETRIE.md).
 
+## Native Titel und Markierungen (0.9.52)
+
+Textbefehle verbinden sichtbare Titel, Beschriftungen und nummerierte Marker mit
+nativen Zeichenflächen; Aufzählungspunkte melden ihre tatsächliche Kreisfläche.
+Vollständige Namen bleiben erhalten, dekorative Titel stehen außerhalb des
+Dokumenttexts. 76/76 Release-Prüfungen bestehen (624,51 s); 354 Titel-, 590 Reader-
+und 621 Mac-Provider-Assertions auch unter ASan/UBSan im dokumentierten Umfang.
+39 eigene C-Dateien instrumentiert; 53 Quell-/Include-Hashes stimmen.
+Paket/Installation folgen, installiert bleibt 0.9.51.
+[Vertrag](../../docs/NATIVE_TITELGEOMETRIE.md).
+
 ## Nächste Arbeiten
 
 Quelllesen, Parser/Inline-Aufbereitung,
@@ -101,7 +112,7 @@ native Metadaten, Rasterung und Fälle über den Vorbereitungsbudgets profiliere
 Der Rückfall ist noch synchron; einzelne Bibliotheksaufrufe und Shutdown können
 warten. SBUI-074 bleibt für die vollständige Großdaten-/Geräteabnahme offen.
 
-Native Titel-/Markierungs-/logische Kopfzellgeometrie, echte IME und VoiceOver/NVDA/Orca,
+Aktuelle Plattform-/Paketabnahme, echte IME und VoiceOver/NVDA/Orca,
 Dialog-/Geräte-/Monitor-/Langzeitprüfungen, Windows-/Linux-Speicherfehler,
 Mindest-OS/frische Rechner, vollständige Runtime-/Lizenzprüfung, Sicherheitskanal,
 Signierung und abschließende natürliche Texte bleiben Release-Arbeit.

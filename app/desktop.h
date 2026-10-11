@@ -22,7 +22,7 @@ typedef enum {
 } SBCommand;
 typedef enum { SB_FOCUS_BUTTON, SB_FOCUS_TEXT, SB_FOCUS_MAP, SB_FOCUS_READER } SBFocusKind;
 typedef struct { char id[100], label[SB_NAME_CAP]; struct nk_rect bounds; SBFocusKind kind; int group; unsigned order; char parent[100]; } SBTarget;
-typedef struct { char id[100]; char *text; struct nk_rect bounds; accesskit_role role; unsigned order; int group; char parent[100]; unsigned level; float document_y; size_t row,column,rows,columns; SBTextSpan *styles; size_t style_count; float font_size;SBNativeText native; } SBPassiveText;
+typedef struct { char id[100]; char *text; struct nk_rect bounds; accesskit_role role; unsigned order; int group; char parent[100]; unsigned level; float document_y; size_t row,column,rows,columns; SBTextSpan *styles; size_t style_count; float font_size;SBNativeText native;char *display; } SBPassiveText;
 typedef struct {
     float position, destination, pending, maximum, elastic, fractional;
     nk_uint applied;
@@ -95,6 +95,9 @@ typedef struct {
     SBStatus graph_status;
     struct nk_text_edit text_edit;
     SBNativeText native_editor;
+    SBNativeText reader_title_native;
+    char reader_title_display[SB_NAME_CAP];
+    unsigned reader_title_order;bool reader_title_claimed;
     SBFieldText native_fields[SB_NATIVE_FIELDS];
     SBFieldSelection field_selections[SB_NATIVE_FIELDS];
     SBReaderPreparation *reader_preparation;
