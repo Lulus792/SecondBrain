@@ -58,7 +58,7 @@ Ein spezieller Windows-Test liest die tatsächlichen acht SDK-Farben und verglei
 die übertragenen RGB-Kanäle; seine native Ausführung steht noch aus.
 427 Bedingungen bestehen auch unter ASan/UBSan: 37 eigene C-Dateien und 61
 aktuelle Quell-/Includehashes; externe UI nicht instrumentiert, Leaks aus, kein TSan.
-Sauberes Paket und Installation folgen. Kein neuer vollständiger
+Paket und Installation sind nachfolgend dokumentiert. Kein neuer vollständiger
 lokaler 85er-Lauf. Originale: `build/contrast-palette-verification/`.
 
 ## Verbleibende Abnahme
@@ -69,3 +69,22 @@ live geänderte Systemeinstellungen benötigen weiterhin eine native und menschl
 Abnahme. Ungeeignete vom Nutzer gewählte Paare werden nicht durch erfundene Farben
 ersetzt. Allgemeine Kontrastmessung, Screenreader, weitere Geräte und die übrige
 Release-Liste bleiben offen; 1.0 nur nach Nutzerfreigabe.
+
+## Sauberes Intel/macOS-Paket
+
+0.9.69/8d74c8d72d6a, Release: Versionsprüfungen bestehen (0,79 s).
+Entpacktes Paket: 126 Desktop-, 167 Tastatur-, 75 Sicherungsbedingungen, zwei
+Einstellungsprozesse, CLI-/Runtime-/Lizenz-/Version und Wiederöffnung mit 20
+unveränderten Dateien. Echter 68→69→68-Wechsel erhält Dateien/Einstellungen;
+Sicherung/Wiederherstellung bestehen, drei App-Aufnahmen angesehen. 98 Dateien
+paketgleich installiert; 21 eigene Gedächtnisdateien beim Öffnen unverändert,
+installierte Aufnahme angesehen. Normaler Lumen-Look bleibt auf diesem Mac.
+Binärminimum macOS 14.0/SDK 15.2; tatsächlich ausgeführt auf Intel/macOS 14.6.1,
+keine ausgeführte 14.0-/ARM64-Abnahme.
+
+Archiv-SHA256: `a40be0d9012605df4570ef1e751a577b4c54ab7163f57fee4d9b06c1d6d139f1`.
+Rückfallkopie: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.68-20261012-014214`.
+Originale: `build/contrast-palette-package-check`, `build/contrast-palette-update`,
+`build/contrast-palette-verification/installed.json` und `installed-brain-check.json`.
+CI38184984352 zu 8d74c8d: vier Windows-/Linux-Desktopjobs in Arbeit, Mac queued.
+Echte SDK-/Windows-Themenabnahme bleibt offen.

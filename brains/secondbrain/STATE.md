@@ -1,7 +1,7 @@
 # SecondBrain: aktueller Stand
 
-Stand: 12. Oktober 2026. Installiert ist 0.9.68; der vollständige lokale
-Release-Lauf und alle vier Windows-/Linux-Desktopjobs sind erfolgreich.
+Stand: 12. Oktober 2026. Installiert ist 0.9.69. Der letzte vollständige lokale
+Release-Lauf und die bestätigte Windows-/Linux-CI gehören zur vorherigen 0.9.68.
 1.0 ist noch nicht freigegeben. Die maßgeblichen Quellen und die Historie
 stehen am Ende dieser Notiz.
 
@@ -15,11 +15,11 @@ Vorlagen und Updates überschreiben vorhandenes Wissen nicht automatisch.
 Ungespeicherte Entwürfe und erkannte externe Konflikte bleiben geschützt.
 Externe Bibliotheken nur für UI; eigener Code MIT.
 
-Installiert **0.9.68 / 0b0fdacda4fa**, sauberer Intel/macOS-Release auf
+Installiert **0.9.69 / 8d74c8d72d6a**, sauberer Intel/macOS-Release auf
 macOS 14.6.1/23G93. 98 Dateien paketgleich. Paketprüfungen: 126 Desktop-,
 167 Tastatur-, 75 Sicherungsbedingungen sowie Einstellungen, CLI, Lizenzen,
-Laufzeit und Versionsidentität. Echter 67→68→67-Wechsel erhält 20 Testdateien und
-Einstellungen; Sicherung/Wiederherstellung bestehen. [Nachweis](../../docs/UEBERGANG_BILD.md).
+Laufzeit und Versionsidentität. Echter 68→69→68-Wechsel erhält 20 Testdateien und
+Einstellungen; Sicherung/Wiederherstellung bestehen. [Nachweis](../../docs/SYSTEM_KONTRASTFARBEN.md).
 
 ## Neueste geprüfte Änderungen
 
@@ -57,8 +57,9 @@ Endprodukttexte erst abschließend beim vollständigen Produkt bereinigen.
 
 0.9.69 implementiert Windows-Farbrollen und ihre UI-Anwendung; 427 lokale
 Bedingungen mit synthetischen Paletten in Software/Metal und ASan/UBSan bestehen.
-Native Windows-SDK-/Themen-/Paketabnahme und saubere Installation folgen.
-[Vertrag](../../docs/SYSTEM_KONTRASTFARBEN.md). Noch installiert: 0.9.68.
+Sauberes Mac-Paket geprüft und installiert; native Windows-SDK-/Themen-/Paketabnahme
+folgt. Vier Desktopjobs der neuen CI38184984352 laufen, Mac queued.
+[Vertrag](../../docs/SYSTEM_KONTRASTFARBEN.md). Installiert ist 0.9.69.
 Weitere technische Abnahmen und benötigte reale Umgebungen anhand der
 Abnahmeübersicht klären.
 

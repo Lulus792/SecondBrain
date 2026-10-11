@@ -2,7 +2,7 @@
 
 Stand: 12. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.68/0b0fdacda4fa. Die Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.69/8d74c8d72d6a. Die Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -4459,3 +4459,15 @@ CPU-Rasterparität 1012 besteht. ASan/UBSan 427, 37 eigene C-Dateien / 61 aktuel
 Hashes; externe UI nicht instrumentiert, Leaks aus, kein TSan. Metal-Aufnahme
 angesehen. Kein neuer vollständiger lokaler 85er-Lauf. Paket/Installation folgen.
 [Vertrag, Microsoft-Grundlagen und Grenzen](SYSTEM_KONTRASTFARBEN.md).
+
+## Kontrastpalettenpaket 0.9.69 installiert
+
+Sauberer Intel/macOS-Release 8d74c8d72d6a; Versionsprüfungen bestehen (0,79 s).
+Paket: 126 Desktop-, 167 Tastatur-, 75 Sicherungsbedingungen, Einstellungen,
+CLI/Runtime/Lizenzen/Version und 20-Datei-Wiederöffnung. Echter 68→69→68-Wechsel
+mit Dateien/Einstellungen und Sicherung/Wiederherstellung erfolgreich; Aufnahmen
+angesehen. 98 Dateien paketgleich installiert; 21 eigene Dateien beim Öffnen
+unverändert, installierte Lumen-Aufnahme angesehen. Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.68-20261012-014214`.
+[Vertrag und Archivhash](SYSTEM_KONTRASTFARBEN.md). CI38184984352: Windows-/Linux-
+Desktopjobs in Arbeit, Mac queued. SDK-Abfrage und echte benutzerdefinierte Windows-
+Themen noch nicht als bestanden behauptet; weitere Release-Abnahmen bleiben offen.

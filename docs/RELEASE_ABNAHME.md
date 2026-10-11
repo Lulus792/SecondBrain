@@ -83,3 +83,11 @@ auf Windows abschließen; lokale Farben auf dem Mac ersetzen diese nicht.
 Den erfolgreichen Gesamt-/CI-Stand im Projektgedächtnis kurz halten. Offene technische
 Abnahmen bleiben Arbeitsumfang; erforderliche Geräte/Konten und Nutzerentscheidungen
 werden nicht durch weitere kleine Codeänderungen oder Statusnotizen ersetzt.
+
+## Neuerer begrenzter Prüfstand: 0.9.69
+
+Die oben genannten 84 lokalen Tests und bestätigten vier Plattformjobs gehören
+zur 0.9.68. Inzwischen ist [0.9.69 mit Kontrastfarben](SYSTEM_KONTRASTFARBEN.md)
+lokal gezielt geprüft und sauber installiert, einschließlich Paket und echtem
+68→69→68-Wechsel. Die neue CI läuft; tatsächliche Windows-Farbabfrage und
+benutzerdefinierte Themen bleiben separat offen. Kein neuer lokaler 85er-Gesamtlauf.
