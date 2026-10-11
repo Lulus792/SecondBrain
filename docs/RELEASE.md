@@ -446,3 +446,14 @@ SBUI-074, Geräte-/Trackpad-/assistive und weitere Plattformabnahmen bleiben off
 
 [Vertrag](MATERIAL_RUECKFALL.md). Gesamter Prozessspeichermangel/GPU-Geräteverlust,
 aktuelle weitere Plattformen, reale Geräte und assistive Abnahmen bleiben offen.
+
+## Übergangsbildprüfung vom 12. Oktober
+
+- [x] Native Ausgangsbild-/Übergangstextur-Pixelidentität auf Intel/Metal in den
+  geprüften Größen: 173 Interaktionsbedingungen, zwölf schnelle Wechsel und
+  reale Größenwechsel. [Vertrag](UEBERGANG_BILD.md).
+- [x] Alten Kartenzuschnitt bei Größenwechsel korrigieren: Aufnahmegröße halten,
+  alte Überblendung vor neuem Zeichnen beenden, Kamerafahrt erhalten.
+
+Echte Monitor-/Pixeldichtewechsel, weitere Geräte/Plattformen und menschliche
+Flüssigkeitsabnahme bleiben offen. Die lokale Prüfung schließt diese nicht ein.

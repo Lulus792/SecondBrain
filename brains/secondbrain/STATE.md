@@ -38,6 +38,15 @@ vollständiger lokaler 84er-Lauf. Sauberes Paket geprüft und installiert; echte
 66→67→66-Wechsel erhält 20 Dateien/Einstellungen und Sicherung/Wiederherstellung.
 [Vertrag](../../docs/MATERIAL_RUECKFALL.md). Übergangstextur-Pixelidentität bleibt offen.
 
+0.9.68 beendet alte Kartenüberblendung bei geänderter Fenster-/Pixelgröße;
+Kamerafahrt/Notiz erhalten, neue passende Ladeaufnahme erlaubt. 173 Bedingungen
+in Metal und Software, zwölf schnelle Wechsel und zwei reale Resize-Fälle.
+Sieben UI-/Versionsprüfungen bestehen; ASan/UBSan 173, 36 eigene C-Dateien / 58
+Hashes, externe UI nicht instrumentiert, Leaks aus. Kein neuer 84er-Gesamtlauf.
+Paket/Installation folgen; installiert bleibt 67. [Vertrag](../../docs/UEBERGANG_BILD.md).
+Früherer nativer Ausgangsbildfehler lag am Lesen nach Present; echter Resize-
+Zuschnittfehler unabhängig reproduziert und korrigiert. Reale Dichtewechsel offen.
+
 ## Aktueller Darstellungsschritt
 
 0.9.64 unterscheidet kompakte Erstellaktionen durch Dokument-/Ordnerplusse.

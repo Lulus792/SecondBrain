@@ -68,3 +68,10 @@ Grundlagen: Apple [Motion](https://developer.apple.com/design/human-interface-gu
 vor Umsetzung über offizielle DocC-Daten gelesen. Zahlen, Overlay-Technik und
 konkrete Layoutregeln sind eigene Übertragung. 1.0 bleibt bis zur Nutzerfreigabe
 gesperrt; weitere [Release-Arbeiten](RELEASE.md) bleiben bestehen.
+
+## Größenwechsel und aktuelle Bildprüfung
+
+Ab 0.9.68 beendet eine geänderte logische Fenstergröße oder Pixelauflösung die
+alte Kartenüberblendung vor dem Zeichnen. Die Kamerafahrt bleibt erhalten.
+Native Metal-Pixelidentität, zwölf schnelle Wechsel und reale Resize-Abläufe
+sind gezielt geprüft. [Vertrag und Grenzen](UEBERGANG_BILD.md).

@@ -544,8 +544,14 @@ void sb_ui_draw(SBUi *ui) {
     /* Keep the outgoing frame on the GPU. Reading the window back to the CPU
        forces a synchronous GPU wait on every note change. */
     SDL_Texture *snapshot=NULL;
-    int pixels_w=0,pixels_h=0;
-    if(ui->capture_pending && SDL_GetRenderOutputSize(ui->renderer,&pixels_w,&pixels_h)) {
+    int pixels_w=0,pixels_h=0;bool output_known=SDL_GetRenderOutputSize(ui->renderer,&pixels_w,&pixels_h);
+    /* The retained card belongs to its capture layout and backing resolution.
+       Reflow must never crop it using another window's dimensions. */
+    if(ui->outgoing_texture && (width!=ui->snapshot_logical_width || height!=ui->snapshot_logical_height ||
+       (output_known && (pixels_w!=ui->snapshot_width || pixels_h!=ui->snapshot_height)))){
+        SDL_DestroyTexture(ui->outgoing_texture);ui->outgoing_texture=NULL;ui->transitioning=false;
+    }
+    if(ui->capture_pending && output_known) {
         snapshot=SDL_CreateTexture(ui->renderer,SDL_PIXELFORMAT_RGBA32,SDL_TEXTUREACCESS_TARGET,pixels_w,pixels_h);
         if(snapshot && !SDL_SetRenderTarget(ui->renderer,snapshot)) {SDL_DestroyTexture(snapshot);snapshot=NULL;}
     }
@@ -570,7 +576,8 @@ void sb_ui_draw(SBUi *ui) {
             SDL_SetTextureBlendMode(snapshot,SDL_BLENDMODE_NONE);
             SDL_RenderTexture(ui->renderer,snapshot,NULL,NULL);
             SDL_DestroyTexture(ui->outgoing_texture);ui->outgoing_texture=snapshot;
-            ui->snapshot_width=pixels_w;ui->snapshot_height=pixels_h;ui->outgoing_bounds=ui->card_bounds;
+            ui->snapshot_width=pixels_w;ui->snapshot_height=pixels_h;
+            ui->snapshot_logical_width=width;ui->snapshot_logical_height=height;ui->outgoing_bounds=ui->card_bounds;
             SDL_SetTextureBlendMode(snapshot,SDL_BLENDMODE_BLEND);
         } else {
             /* Never blend a stale note if allocation or target setup failed. */

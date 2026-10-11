@@ -68,7 +68,7 @@ typedef struct {
     bool dark, testing,contrast;
     SBSpace space;
     SDL_Texture *outgoing_texture;
-    int snapshot_width,snapshot_height;
+    int snapshot_width,snapshot_height,snapshot_logical_width,snapshot_logical_height;
     SDL_FRect card_bounds,outgoing_bounds;
     float transition;
     bool transitioning,capture_pending;

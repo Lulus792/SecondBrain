@@ -4393,3 +4393,21 @@ beim Öffnen unverändert, Aufnahme angesehen. Rückfall: `/Users/lulus/Projects
 Binärminimum 14.0/SDK 15.2; tatsächlich ausgeführt auf Intel/macOS 14.6.1/23G93.
 [Vertrag und Archivhash](MATERIAL_RUECKFALL.md). CI38180524524: Kern/Python auf
 Windows/Linux erfolgreich, vier Desktopjobs in Arbeit, Mac queued.
+
+## Übergangsbild und Größenwechsel 0.9.68
+
+Der native Interaktionsprüfer hält vor Present gelesene Bildpixel. Die vorhandene
+Übergangstextur besteht dadurch den ursprünglichen Ausgangsbildvergleich mit
+Metal. Erweiterte Resize-Prüfung reproduziert einen Produktfehler: alte Karte
+mit neuen Fenstermaßen zugeschnitten. Die App hält nun logische/pixelbezogene
+Aufnahmegröße und verwirft bei Änderung die alte Überblendung vor dem Zeichnen;
+Kamerafahrt und Notiz erhalten, neue Ladeaufnahme bleibt erlaubt.
+173 Bedingungen bestehen in Metal und Software, einschließlich zwölf schneller
+Wechsel und zwei realer Größenwechsel. Drei Metal-Aufnahmen angesehen.
+Sieben relevante UI-/Versionsprüfungen bestehen (104,35 s). ASan/UBSan: 173
+Bedingungen, 36 eigene C-Dateien / 58 aktuelle Hashes; externe UI nicht instrumentiert,
+Leaks aus, kein TSan. Kein neuer vollständiger lokaler 84er-Lauf. Paket folgt.
+[Vertrag](UEBERGANG_BILD.md). Echter Monitor-/Dichtewechsel, weitere Geräte,
+Zielplattformen und menschliche Bedienabnahmen bleiben offen.
+Alle vier Windows-/Linux-Desktopjobs und Release-Pakete zu 28cdea3/CI38180524524
+bestehen inzwischen; sie belegen die vorherige 0.9.67-Materialfassung, nicht diese Änderung.

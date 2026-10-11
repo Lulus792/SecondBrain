@@ -8,9 +8,19 @@
 static unsigned checks;
 #define CHECK(x) do {++checks;if(!(x)){fprintf(stderr,"INTERACTION %d: %s\n",__LINE__,#x);return 1;}}while(0)
 #define OK(x) CHECK((x).code==SB_OK)
+static SDL_Surface *frame_pixels;
 static void frame(SBDesktop *d) {
     nk_input_begin(d->ui.ctx);SDL_Event e;while(SDL_PollEvent(&e))sb_desktop_event(d,&e);
-    sb_desktop_tick(d,1.0f/60);nk_input_end(d->ui.ctx);sb_desktop_frame(d);sb_ui_draw(&d->ui);SDL_RenderPresent(d->ui.renderer);sb_desktop_apply(d);
+    sb_desktop_tick(d,1.0f/60);nk_input_end(d->ui.ctx);sb_desktop_frame(d);sb_ui_draw(&d->ui);
+    SDL_DestroySurface(frame_pixels);SDL_Surface *raw=SDL_RenderReadPixels(d->ui.renderer,NULL);
+    frame_pixels=raw ? SDL_ConvertSurface(raw,SDL_PIXELFORMAT_RGBA32) : NULL;SDL_DestroySurface(raw);
+    SDL_RenderPresent(d->ui.renderer);sb_desktop_apply(d);
+}
+static bool wait_reader(SBDesktop *d){
+    Uint64 end=SDL_GetTicksNS()+UINT64_C(15000000000);bool pending;
+    do{pending=false;for(size_t i=0;i<d->passive_count;++i)if(!strcmp(d->passive[i].id,"reader:preparing"))pending=true;
+        if(!pending)return true;SDL_Delay(1);frame(d);
+    }while(SDL_GetTicksNS()<end);return false;
 }
 static uint64_t pixels(SBUi *ui,SDL_Texture *texture) {
     SDL_Texture *target=NULL;
@@ -21,24 +31,25 @@ static uint64_t pixels(SBUi *ui,SDL_Texture *texture) {
         SDL_SetRenderLogicalPresentation(ui->renderer,(int)w,(int)h,SDL_LOGICAL_PRESENTATION_DISABLED);
         SDL_RenderTexture(ui->renderer,texture,NULL,NULL);
     }
-    SDL_Surface *raw=SDL_RenderReadPixels(ui->renderer,NULL),*view=raw ? SDL_ConvertSurface(raw,SDL_PIXELFORMAT_RGBA32) : NULL;
+    SDL_Surface *raw=texture ? SDL_RenderReadPixels(ui->renderer,NULL) : NULL,*view=texture ? raw ? SDL_ConvertSurface(raw,SDL_PIXELFORMAT_RGBA32) : NULL : frame_pixels;
     uint64_t hash=0;if(view)for(int y=0;y<view->h;++y)hash=hash*1099511628211ULL^sb_hash((const char *)view->pixels+y*view->pitch,(size_t)view->w*4);
-    SDL_DestroySurface(view);SDL_DestroySurface(raw);SDL_SetRenderTarget(ui->renderer,NULL);SDL_DestroyTexture(target);return hash;
+    if(texture)SDL_DestroySurface(view);SDL_DestroySurface(raw);SDL_SetRenderTarget(ui->renderer,NULL);SDL_DestroyTexture(target);return hash;
 }
 
 static SBTarget *find(SBDesktop *d,const char *id) {for(size_t i=0;i<d->target_count;++i)if(!strcmp(d->targets[i].id,id))return &d->targets[i];return NULL;}
-static SBStatus capture(SBDesktop *d,const char *root,const char *name) {char path[SB_PATH_CAP];SBStatus s=sb_path_join(path,sizeof(path),root,name);return s.code==SB_OK ? sb_ui_capture(&d->ui,path) : s;}
+static SBStatus capture(SBDesktop *d,const char *root,const char *name) {char path[SB_PATH_CAP];SBStatus s=sb_path_join(path,sizeof(path),root,name);return s.code!=SB_OK ? s : frame_pixels && SDL_SaveBMP(frame_pixels,path) ? sb_ok() : sb_error(SB_IO,"Testbild konnte nicht gespeichert werden.");}
 int main(int argc,char **argv) {
-    CHECK(argc==3);char root[SB_PATH_CAP],name[64];snprintf(name,sizeof(name),"interaction-%lu-%lu",sb_process_id(),(unsigned long)time(NULL));OK(sb_path_join(root,sizeof(root),argv[2],name));
-    SBDesktop d;OK(sb_desktop_init(&d,root,argv[1],true));OK(sb_app_new_project(&d.model,"test","UI-Prüfung",NULL));
+    CHECK(argc==3 || (argc==4 && !strcmp(argv[3],"native")));char root[SB_PATH_CAP],name[64];snprintf(name,sizeof(name),"interaction-%lu-%lu",sb_process_id(),(unsigned long)time(NULL));OK(sb_path_join(root,sizeof(root),argv[2],name));
+    SBDesktop d;OK(sb_desktop_init(&d,root,argv[1],argc==3));printf("Renderer: %s; density %.2f\n",SDL_GetRendererName(d.ui.renderer),d.ui.density);OK(sb_app_new_project(&d.model,"test","UI-Prüfung",NULL));
     OK(sb_app_new_note(&d.model,"knowledge","a","Dokument A"));strcpy(d.model.editor,"# Dokument A\n\nAusgehender Inhalt.\n");OK(sb_app_save(&d.model));
     OK(sb_app_new_note(&d.model,"knowledge","b","Dokument B"));strcpy(d.model.editor,"# Dokument B\n\n");
     for(unsigned i=0;i<80;++i)strcat(d.model.editor,"Absatz zum flüssigen Scrollen mit sichtbarer Struktur.\n\n");OK(sb_app_save(&d.model));
     OK(sb_app_request(&d.model,SB_ACT_NOTE,"knowledge/a.md"));frame(&d);frame(&d);
-    uint64_t previous=pixels(&d.ui,NULL);CHECK(previous);OK(capture(&d,root,"transition-old.bmp"));
+    CHECK(wait_reader(&d));frame(&d);uint64_t previous=pixels(&d.ui,NULL);CHECK(previous);OK(capture(&d,root,"transition-old.bmp"));
     d.navigation.kind=SB_ACT_NOTE;strcpy(d.navigation.value,"knowledge/b.md");d.follow_star=true;CHECK(sb_desktop_animating(&d));
     d.ui.capture_pending=true;frame(&d);CHECK(!strcmp(d.model.path,"knowledge/b.md") && d.ui.transitioning && d.flight==0);
     CHECK(pixels(&d.ui,d.ui.outgoing_texture)==previous);
+    CHECK(pixels(&d.ui,d.ui.outgoing_texture)==pixels(&d.ui,NULL));
     float distance=sqrtf(powf(d.flight_to[0]-d.flight_from[0],2)+powf(d.flight_to[1]-d.flight_from[1],2));CHECK(distance>10);
     frame(&d);float moved=sqrtf(powf(d.focus_x-d.flight_from[0],2)+powf(d.focus_y-d.flight_from[1],2));CHECK(moved/distance>0.05f);
     OK(capture(&d,root,"transition-start.bmp"));for(unsigned i=0;i<4;++i)frame(&d);OK(capture(&d,root,"transition-middle.bmp"));
@@ -61,7 +72,7 @@ int main(int argc,char **argv) {
     target=find(&d,"edit");CHECK(target);e.motion.x=target->bounds.x+target->bounds.w/2;e.motion.y=target->bounds.y+target->bounds.h/2;
     nk_input_begin(d.ui.ctx);sb_desktop_event(&d,&e);nk_input_end(d.ui.ctx);frame(&d);CHECK(!strcmp(d.hover_label,"Bearbeiten"));d.hover_started=SDL_GetTicksNS()-400000000u;frame(&d);OK(capture(&d,root,"hover-shortcut.bmp"));
     CHECK(d.tooltip_bounds.x>=0 && d.tooltip_bounds.x+d.tooltip_bounds.w<=1336 && d.tooltip_bounds.y>=0 && d.tooltip_bounds.y+d.tooltip_bounds.h<=840);
-    SDL_Surface *hint_surface=SDL_RenderReadPixels(d.ui.renderer,NULL);CHECK(hint_surface);Uint8 red,green,blue,alpha;
+    SDL_Surface *hint_surface=frame_pixels ? SDL_ConvertSurface(frame_pixels,SDL_PIXELFORMAT_RGBA32) : NULL;CHECK(hint_surface);Uint8 red,green,blue,alpha;
     CHECK(SDL_ReadSurfacePixel(hint_surface,(int)((d.tooltip_bounds.x+5)*hint_surface->w/1336),(int)((d.tooltip_bounds.y+5)*hint_surface->h/840),&red,&green,&blue,&alpha));
     if(red!=22 || green!=34 || blue!=51)fprintf(stderr,"Hint margin RGB %u %u %u, expected 22 34 51\n",red,green,blue);CHECK(red==22 && green==34 && blue==51);SDL_DestroySurface(hint_surface);
     e.type=SDL_EVENT_MOUSE_BUTTON_DOWN;e.button.windowID=SDL_GetWindowID(d.ui.window);e.button.button=SDL_BUTTON_LEFT;e.button.down=true;e.button.x=target->bounds.x+target->bounds.w/2;e.button.y=target->bounds.y+target->bounds.h/2;
@@ -88,11 +99,26 @@ int main(int argc,char **argv) {
     for(unsigned repeat=0;repeat<12;++repeat) {
         const char *path=repeat%2 ? "knowledge/a.md" : "knowledge/b.md";
         d.navigation.kind=SB_ACT_NOTE;strcpy(d.navigation.value,path);d.follow_star=true;d.ui.capture_pending=true;frame(&d);
-        CHECK(!strcmp(d.model.path,path) && !sb_app_dirty(&d.model) && d.ui.transitioning);frame(&d);
+        CHECK(!strcmp(d.model.path,path) && !sb_app_dirty(&d.model) && d.ui.transitioning);
+        CHECK(d.ui.snapshot_width==frame_pixels->w && d.ui.snapshot_height==frame_pixels->h);
+        CHECK(pixels(&d.ui,d.ui.outgoing_texture)==pixels(&d.ui,NULL));frame(&d);
     }
+    /* A retained card uses the capture layout. Reflow must not sample that
+       image with the new window dimensions or overlay a displaced old card. */
+    CHECK(d.ui.transitioning && d.ui.outgoing_texture);
+    CHECK(SDL_SetWindowSize(d.ui.window,1000,700));CHECK(SDL_SyncWindow(d.ui.window));frame(&d);
+    CHECK(!d.ui.transitioning && !sb_app_dirty(&d.model) && d.flight>0 && d.flight<1);
+    CHECK(!d.ui.outgoing_texture || (d.ui.snapshot_logical_width==1000 && d.ui.snapshot_logical_height==700 && d.ui.snapshot_width==frame_pixels->w && d.ui.snapshot_height==frame_pixels->h));
+    d.navigation.kind=SB_ACT_NOTE;strcpy(d.navigation.value,"knowledge/b.md");d.follow_star=true;d.ui.capture_pending=true;frame(&d);
+    CHECK(d.ui.transitioning && d.ui.outgoing_texture && d.ui.snapshot_width==frame_pixels->w && d.ui.snapshot_height==frame_pixels->h);
+    CHECK(pixels(&d.ui,d.ui.outgoing_texture)==pixels(&d.ui,NULL));
+    CHECK(SDL_SetWindowSize(d.ui.window,1336,840));CHECK(SDL_SyncWindow(d.ui.window));frame(&d);
+    CHECK(!d.ui.transitioning && !sb_app_dirty(&d.model));
+    /* Reflow may already capture a fresh loading card for its next ready frame. */
+    CHECK(!d.ui.outgoing_texture || (d.ui.snapshot_logical_width==1336 && d.ui.snapshot_logical_height==840 && d.ui.snapshot_width==frame_pixels->w && d.ui.snapshot_height==frame_pixels->h));
     /* Time spent in a busy frame counts toward the short motion. */
     d.flight=0.4f;sb_desktop_tick(&d,0.2f);CHECK(d.flight>0.85f);
     e.type=SDL_EVENT_MOUSE_BUTTON_DOWN;e.button.windowID=SDL_GetWindowID(d.ui.window);e.button.button=SDL_BUTTON_LEFT;e.button.x=d.ui.card_bounds.x+30;e.button.y=d.ui.card_bounds.y+30;sb_desktop_event(&d,&e);CHECK(!d.ui.transitioning);
     sb_desktop_set_style(&d,(SBStyleChoice){.dark=true,.motion=true});frame(&d);CHECK(!d.ui.transitioning && d.flight==1 && !sb_app_dirty(&d.model));
-    sb_desktop_free(&d);printf("%u interaction assertions passed. Artifacts: %s\n",checks,root);return 0;
+    SDL_DestroySurface(frame_pixels);frame_pixels=NULL;sb_desktop_free(&d);printf("%u interaction assertions passed. Artifacts: %s\n",checks,root);return 0;
 }

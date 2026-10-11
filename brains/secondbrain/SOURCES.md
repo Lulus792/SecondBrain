@@ -242,3 +242,5 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Reader-Aktionen](../../docs/READER_AKTIONEN.md): gemessene Werkzeugbreiten, vollständige Aktionsnamen oder Icons und erhaltene Befehle.
 
 - [Materialrückfall](../../docs/MATERIAL_RUECKFALL.md): lesbare Ersatzflächen, sofortige Teilpufferfreigabe und Software-/Metal-Fehlerprovokationen.
+
+- [Übergangsbild](../../docs/UEBERGANG_BILD.md): vor Present geprüfte native Bildidentität, schnelle Wechsel und verworfene alte Aufnahme beim Resize.
