@@ -435,3 +435,14 @@ Glyphengeometrie bei Umbruchversuchen und gemeinsame identische Batchpläne.
 83 lokale Release-Tests und gezielte ASan/UBSan-Prüfungen bestehen; drei
 Metal-Messpaare zeigen einen begrenzten Gewinn für das lange Journal.
 SBUI-074, Geräte-/Trackpad-/assistive und weitere Plattformabnahmen bleiben offen.
+
+## Materialfehlerprüfung vom 12. Oktober
+
+- [x] Gezielte Raster-/Materialfehler lokal abnehmen: ab 0.9.67 bestehen sechs
+  Fehlerstellen in 108 Kombinationen, Software und Metal, einschließlich
+  lesbarem Vordergrund, bereinigten Teilpuffern und Rückkehr zur Glasdarstellung.
+- [x] Normale Vordergrund-Materialpixel mit Metal prüfen: vor Present gelesene
+  Kopie, 352 Bedingungen. Die produktive Übergangstextur ist weiter gesondert offen.
+
+[Vertrag](MATERIAL_RUECKFALL.md). Gesamter Prozessspeichermangel/GPU-Geräteverlust,
+aktuelle weitere Plattformen, reale Geräte und assistive Abnahmen bleiben offen.

@@ -29,6 +29,14 @@ Drei Metal-Paare: lange Notiz median 10,54 % früher vorbereitet, 6,64 % früher
 übergangsfrei. Keine allgemeine Geräte-/Bediengarantie. Sauberes Paket geprüft und 98 Dateien paketgleich installiert; echter
 65→66→65-Wechsel erhält 20 Dateien und Einstellungen. [Vertrag](../../docs/TEXT_VORBEREITUNG_OPTIMIERUNG.md).
 
+0.9.67 erhält bei Materialfehlern die gewählte Darstellung und deckende Karten;
+Teilpuffer sofort frei, erfolgreicher Versuch stellt Glas wieder her. 1122 Fehler-
+und 352 normale Pixelbedingungen in Software/Metal, CPU-Parität 1012. ASan/UBSan
+für beide Materialprüfer, 38 eigene C-Dateien / 60 Hashes, externe UI nicht
+instrumentiert, Leaks aus. Fünf weitere UI-/Versionsprüfungen bestehen. Kein neuer
+vollständiger lokaler 84er-Lauf. Paket/Installation folgen; installiert bleibt 66.
+[Vertrag](../../docs/MATERIAL_RUECKFALL.md). Übergangstextur-Pixelidentität bleibt offen.
+
 ## Aktueller Darstellungsschritt
 
 0.9.64 unterscheidet kompakte Erstellaktionen durch Dokument-/Ordnerplusse.

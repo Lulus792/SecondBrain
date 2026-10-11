@@ -19,5 +19,6 @@ typedef struct {
     float camera[8];
 } SBSpace;
 bool sb_space_draw(SBSpace *space, SDL_Renderer *renderer, int width, int height);
+void sb_space_fallback(const SBSpace *space,SDL_Renderer *renderer);
 void sb_space_free(SBSpace *space);
 #endif

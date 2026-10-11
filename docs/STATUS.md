@@ -4364,3 +4364,20 @@ macOS 14.6.1/23G93, x86_64; Binärminimum 14.0, SDK 15.2. Minimum nicht nativ ab
 [Vertrag und Archivhash](TEXT_VORBEREITUNG_OPTIMIERUNG.md).
 CI38179225359 zu b3b9370: Windows-/Linux-Kern und Python erfolgreich;
 vier Desktopjobs in Arbeit, Mac queued. Keine neue vollständige Plattformzusage.
+
+## Materialfehler und native Pixelabnahme 0.9.67
+
+Der Ersatzpfad erhält Hell-/Dunkel-/Kontrastfarben und zeichnet vorhandene
+Karten deckend ohne zusätzlichen CPU-Rasterpuffer oder neue Textur. Gescheiterte
+Teilzuweisungen werden sofort freigegeben; normale Glasdarstellung kehrt nach
+einem erfolgreichen Versuch zurück. Negative Altprüfungen bestätigen beide Fehler.
+108 Kombinationen / 1122 Bedingungen bestehen in Software und Metal; normale
+Materialfläche 352 Bedingungen in beiden Renderern, CPU-Rasterparität 1012.
+Der Prüfer hält jetzt eine vor Present gelesene Kopie. Dies ist keine Abnahme
+der produktiven Übergangstextur. Helle/dunkle Metal-Aufnahmen angesehen.
+ASan/UBSan: 1122/352 Bedingungen, 38 eigene C-Dateien / 60 aktuelle Hashes;
+externe UI nicht instrumentiert, Leaks aus, kein TSan. Fünf weitere UI-/Versions-
+prüfungen bestehen (51,95 s). Kein neuer vollständiger lokaler 84er-Lauf.
+Paket und Installation folgen. [Vertrag und Grenzen](MATERIAL_RUECKFALL.md).
+Alle vier Windows-/Linux-Desktopjobs und beide Pakete zu b3b9370/CI38179225359
+bestehen inzwischen. Sie belegen 0.9.66, nicht diese neue Materialänderung.

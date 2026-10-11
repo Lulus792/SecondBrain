@@ -36,20 +36,46 @@ static void line(SBSpace *s, SBPoint a, SBPoint b) {
         }
     }
 }
-static bool resize(SBSpace *s, SDL_Renderer *r, int width, int height) {
-    if (s->width == width && s->height == height && s->texture) return true;
-    SDL_DestroyTexture(s->texture); s->texture = NULL;
-    free(s->pixels); free(s->base); free(s->sky); s->pixels = s->base = s->sky = NULL;
-    s->sky_ready = false; s->cached = false;
-    s->width = s->height = 0;
-    if (width < 1 || height < 1 || width > 4096 || height > 4096) return false;
-    s->pixels = malloc((size_t)width * height * 4); s->base = malloc((size_t)width * height * 4);
-    s->sky = malloc((size_t)width * height * 4);
-    if (!s->pixels || !s->base || !s->sky) return false;
-    s->texture = SDL_CreateTexture(r, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, width, height);
-    if (!s->texture) return false;
-    s->width = width; s->height = height;
-    return true;
+static void raster_free(SBSpace *s){
+    SDL_DestroyTexture(s->texture);s->texture=NULL;
+    free(s->pixels);free(s->base);free(s->sky);s->pixels=s->base=s->sky=NULL;
+    s->width=s->height=0;s->sky_ready=false;s->cached=false;
+}
+static bool resize(SBSpace *s,SDL_Renderer *r,int width,int height){
+    if(s->width==width && s->height==height && s->texture)return true;
+    raster_free(s);
+    if(width<1 || height<1 || width>4096 || height>4096)return false;
+    size_t bytes=(size_t)width*height*4;
+    s->pixels=malloc(bytes);if(!s->pixels)goto fail;
+    s->base=malloc(bytes);if(!s->base)goto fail;
+    s->sky=malloc(bytes);if(!s->sky)goto fail;
+    s->texture=SDL_CreateTexture(r,SDL_PIXELFORMAT_RGBA32,SDL_TEXTUREACCESS_STREAMING,width,height);
+    if(!s->texture)goto fail;
+    s->width=width;s->height=height;return true;
+fail:
+    raster_free(s);return false;
+}
+/* A material failure must preserve theme contrast and panel boundaries without
+   allocating another CPU raster or texture. UI text is drawn afterwards. */
+void sb_space_fallback(const SBSpace *s,SDL_Renderer *renderer){
+    unsigned char sky[3]={s->dark ? 7 : 211,s->dark ? 14 : 224,s->dark ? 26 : 239};
+    if(s->contrast)memset(sky,s->dark ? 0 : 255,sizeof(sky));
+    SDL_SetRenderDrawColor(renderer,sky[0],sky[1],sky[2],255);SDL_RenderClear(renderer);
+    SDL_FColor color=s->contrast ? (SDL_FColor){s->dark ? 0 : 1,s->dark ? 0 : 1,s->dark ? 0 : 1,1} :
+        s->dark ? (SDL_FColor){17/255.0f,29/255.0f,47/255.0f,1} : (SDL_FColor){237/255.0f,245/255.0f,1,1};
+    SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_NONE);
+    for(unsigned i=0;i<s->glass_count && i<64;++i){SDL_FRect b=s->glass[i].rect;float radius=s->glass[i].radius;
+        if(!isfinite(b.x) || !isfinite(b.y) || !isfinite(b.w) || !isfinite(b.h) || !isfinite(radius) || b.w<=0 || b.h<=0)continue;
+        radius=clamp(radius,0,fminf(b.w,b.h)/2);
+        SDL_Vertex vertices[37];int indices[108];
+        vertices[0]=(SDL_Vertex){.position={b.x+b.w/2,b.y+b.h/2},.color=color};
+        const float centers[4][2]={{b.x+b.w-radius,b.y+radius},{b.x+b.w-radius,b.y+b.h-radius},{b.x+radius,b.y+b.h-radius},{b.x+radius,b.y+radius}};
+        for(unsigned corner=0;corner<4;++corner)for(unsigned step=0;step<9;++step){unsigned at=corner*9+step;
+            float angle=((float)corner-1+step/8.0f)*1.5707963267948966f;
+            vertices[at+1]=(SDL_Vertex){.position={centers[corner][0]+cosf(angle)*radius,centers[corner][1]+sinf(angle)*radius},.color=color};
+            indices[at*3]=0;indices[at*3+1]=(int)at+1;indices[at*3+2]=(int)((at+1)%36)+1;}
+        SDL_RenderGeometry(renderer,NULL,vertices,37,indices,108);
+    }
 }
 /* The flat interior has no edge light/bend. Sample columns are invariant for
    the whole pane; keep the exact old float expression when calculating them. */
@@ -216,6 +242,6 @@ bool sb_space_draw(SBSpace *s, SDL_Renderer *renderer, int width, int height) {
     return SDL_RenderTexture(renderer, s->texture, NULL, &rect);
 }
 void sb_space_free(SBSpace *s) {
-    SDL_DestroyTexture(s->texture); free(s->pixels); free(s->base); free(s->sky); free(s->points);
+    raster_free(s);free(s->points);
     memset(s, 0, sizeof(*s));
 }

@@ -240,3 +240,5 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Plattformvorschlag](../../docs/PLATTFORM_VORSCHLAG.md): vorgeschlagene Mindeststände, tatsächliche Binär-/CI-Belege und offene Abnahmen.
 - [Update-Nachweis](../../docs/UPDATE_NACHWEIS.md): tatsächlicher Intel/macOS-Paketwechsel, bytegleiche Projektdateien, gespeicherte Notiz und Wiederherstellung; getrennte Wiederöffnungsprüfung in CI.
 - [Reader-Aktionen](../../docs/READER_AKTIONEN.md): gemessene Werkzeugbreiten, vollständige Aktionsnamen oder Icons und erhaltene Befehle.
+
+- [Materialrückfall](../../docs/MATERIAL_RUECKFALL.md): lesbare Ersatzflächen, sofortige Teilpufferfreigabe und Software-/Metal-Fehlerprovokationen.

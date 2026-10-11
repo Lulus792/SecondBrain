@@ -25,8 +25,10 @@ Die Fläche besitzt eine deckende Innenseite und einen geglätteten Außenrand.
 Außerhalb der Rundungen bleibt die Hintergrunddarstellung erhalten. Die
 Texturkoordinaten folgen den tatsächlichen Fensterkoordinaten, auch nach Resize.
 Fehlt die Materialtextur, enthält der Code eine deckende Ersatzfläche mit
-passenden Hell-/Dunkel-/Kontrastfarben. Eine tatsächliche Speicherfehlerabnahme
-dieses Ersatzpfads steht noch aus.
+passenden Hell-/Dunkel-/Kontrastfarben. Ab 0.9.67 bestehen gezielt provozierte
+Raster-/Materialfehler und Wiederherstellung in Software und Metal;
+[Umfang und Grenzen](MATERIAL_RUECKFALL.md). Vollständiger Prozessspeichermangel
+und GPU-Geräteverlust sind damit nicht abgenommen.
 
 ## Begrenzte Dreiecke im Software-Renderer
 
@@ -73,3 +75,13 @@ an Snapshot-Pixelidentität; er wird nicht als bestandene Interaktionsprüfung
 geführt. Nach Present erfasste alte/leere Frames zählen nicht als aktuelle Bilder.
 78/78 lokale Release-Prüfungen bestehen (546,80 s). Das Intel/macOS-Paket ist
 geprüft und als 0.9.55 installiert; weitere Zielplattformabnahmen bleiben offen.
+
+## Native Materialpixel und Fehlerrückfall am 12. Oktober
+
+Der Materialprüfer hält jetzt eine vor Present gelesene Kopie des aktuellen
+Frames. 352 normale Pixelbedingungen bestehen dadurch auch mit Metal, ebenso
+1122 Bedingungen bei sechs gezielt fehlgeschlagenen Materialoperationen.
+Helle/dunkle Aufnahmen angesehen. ASan/UBSan für beide Softwareprüfungen bestehen;
+38 eigene C-Dateien / 60 aktuelle Hashes, externe UI nicht instrumentiert,
+Leaks aus. [Vertrag](MATERIAL_RUECKFALL.md).
+Dies ist keine Abnahme der Pixelidentität der produktiven Übergangstextur.

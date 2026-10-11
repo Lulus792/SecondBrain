@@ -555,7 +555,7 @@ void sb_ui_draw(SBUi *ui) {
     int material_pixels_w=width,material_pixels_h=height;SDL_GetCurrentRenderOutputSize(ui->renderer,&material_pixels_w,&material_pixels_h);
     ui->material_pixel_x=fmaxf(1,(float)material_pixels_w/fmaxf(1,width));ui->material_pixel_y=fmaxf(1,(float)material_pixels_h/fmaxf(1,height));
     ui->material_ready=sb_space_draw(&ui->space,ui->renderer,width,height);
-    if (!ui->material_ready) {SDL_SetRenderDrawColor(ui->renderer,7,14,26,255);SDL_RenderClear(ui->renderer);}
+    if(!ui->material_ready)sb_space_fallback(&ui->space,ui->renderer);
     nk_sdl_render(ui->ctx,NK_ANTI_ALIASING_ON);sb_ui_text_frame_end(ui);edit_cache_frame_end(ui);
     if (ui->transitioning && ui->outgoing_texture) {
         SDL_FRect dest=ui->outgoing_bounds,source={dest.x*ui->snapshot_width/width,dest.y*ui->snapshot_height/height,dest.w*ui->snapshot_width/width,dest.h*ui->snapshot_height/height};
