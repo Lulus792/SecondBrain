@@ -11,12 +11,12 @@ Lumen-Sternkarte, Glaskarten, Icons, direkte Pfeilnavigation, Kamerafahrt,
 Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert **0.9.49 / 5a4aee460031**, sauberer Intel/macOS-Release-Build.
+Installiert **0.9.50 / bd61ba99535d**, sauberer Intel/macOS-Release-Build.
 95 Dateien entsprechen dem geprüften Paket;18 Gedächtnisdateien beim Laden
 unverändert.126 Desktop-,161 Tastatur-,75 Sicherungs-Assertions, zwei Neustarts,
 produktive CLI und Runtime-/Lizenz-/Version bestehen.
-Rückfallversion0.9.48: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.48-20261011-124433`.
-CI38132768614 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
+Rückfallversion0.9.49: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.49-20261011-133009`.
+CI38135305464 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
 
 Frühere Build-/Paket-/Diagnoseverzeichnisse waren am11.Oktober nicht mehr
 vorhanden. Historische Abnahmen bleiben in STATUS/Journal; entfernte Dateien
@@ -73,14 +73,15 @@ gezielten Nachlauf decken alle73 aktuellen Prüfungen ab. Mac-Paket und Installa
 bestehen; andere Zielplattformen bleiben offen.
 [Vertrag/Prüfgrenzen](../../docs/NATIVE_TEXTGEOMETRIE.md).
 
-## Neue Feldaktionen (0.9.50, Paket noch ausstehend)
+## Neue Feldaktionen (0.9.50)
 
 Suche/Formulare bieten native Auswahl/Ersetzung mit Graphemgrenzen, atomischer
 Kapazitätsprüfung und erhaltener Fokusrückkehr. Der Mac-Anschluss ergänzt den
 fehlenden Setter auch im Notizeditor; readonly/NUL und getrennte Fensterqueues
 sind geprüft.74/74 Release-Prüfungen bestehen713,91s;190 Feldaktions-,503
 Geometrie- und608 Provider-Assertions auch unter ASan/UBSan im dokumentierten
-Umfang. Installiert bleibt49. [Vertrag](../../docs/NATIVE_FELDAKTIONEN.md).
+Umfang. Mac-Paket und Installation bestehen; andere Zielplattformen bleiben offen.
+[Vertrag](../../docs/NATIVE_FELDAKTIONEN.md).
 
 ## Nächste Arbeiten
 

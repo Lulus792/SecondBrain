@@ -2,7 +2,7 @@
 
 Stand: 11. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.49. Die Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.50. Die Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -3570,3 +3570,21 @@ Originale: `build/field-actions-verification/` und
 Paket/Installation folgen; installiert bleibt0.9.49. Neue Zielplattformen,
 native Leseblock-Geometrie, echte IME/Screenreader/Geräte und weitere Release-
 Arbeiten bleiben offen.1.0 nur nach ausdrücklicher Nutzerfreigabe.
+
+## Feldaktionspaket0.9.50 installiert
+
+Quellcommit `bd61ba99535d650045b6b0fb031e636e132889a7` ist gepusht. Sauberer
+Intel/macOS-Release-Build0.9.50/bd61ba99535d; drei Versions-/Release-Nachprüfungen
+bestehen. Entpacktes Paket:126 Desktop-,161 Tastatur-,75 Sicherungs-Assertions,
+zwei Einstellungs-Neustarts, produktive CLI und Runtime-/Lizenz-/Version bestehen.
+95 installierte Dateien stimmen einzeln mit dem Paket überein. Die installierte
+App lädt die eigene Instanz ohne Änderung ihrer18 Dateien; PNG der tatsächlichen
+C-App angesehen. Prüfgerät: macOS14.6.1/23G93,x86_64.
+
+Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.49-20261011-133009`.
+Archiv-SHA256: `8002fa0e43d81e573825fbb5080931fbb33c3f3f24cd9db81357ea2c546db681`.
+Originale: `build/field-actions-verification/` (Paketprotokoll, installierte
+Hashes/Version, Gedächtnisprüfung, Bild, Geräte-/Quellstand und CI-Snapshot).
+CI38135305464 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
+Native Leseblock-Geometrie, echte IME/Screenreader/Geräte und übrige Release-
+Arbeiten bleiben offen.1.0 nur nach Nutzerfreigabe.
