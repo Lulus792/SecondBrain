@@ -71,5 +71,5 @@ Vier vor Present aufgenommene Metalbilder (Dichte 2,00) wurden angesehen, aus
 48 erzeugten Aufnahmen. Der direkte Native-Versuch des Softwareprüfers scheiterte
 an Snapshot-Pixelidentität; er wird nicht als bestandene Interaktionsprüfung
 geführt. Nach Present erfasste alte/leere Frames zählen nicht als aktuelle Bilder.
-78/78 lokale Release-Prüfungen bestehen (546,80 s). Paket/Installation folgen;
-installiert bleibt 0.9.54.
+78/78 lokale Release-Prüfungen bestehen (546,80 s). Das Intel/macOS-Paket ist
+geprüft und als 0.9.55 installiert; weitere Zielplattformabnahmen bleiben offen.

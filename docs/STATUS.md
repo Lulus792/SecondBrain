@@ -2,7 +2,7 @@
 
 Stand: 11. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.54. Die Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.55. Die Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -3789,3 +3789,22 @@ Interaktionsversuch sind keine positiven Abnahmen. Originale:
 78/78 lokale Release-Prüfungen bestehen (546,80 s). Paket/Installation folgen; installiert bleibt
 0.9.54. Aktuelle Zielplattformen, reale Eingaben/Screenreader/Geräte, Leistung
 und übrige Release-Arbeit bleiben offen. 1.0 nur nach Nutzerfreigabe.
+
+## Dialogmaterialpaket 0.9.55 installiert
+
+Quellcommit `11c9cb4f1e990a2bc8c494920a653f2522e9b040` ist gepusht. Sauberer Intel/macOS-Release-Build
+0.9.55/11c9cb4f1e99; drei Versions-/Release-Nachprüfungen bestehen. Das entpackte
+Paket besteht 126 Desktop-, 161 Tastatur- und 75 Sicherungs-Assertions,
+zwei Einstellungs-Neustarts, produktive CLI und Runtime-/Lizenz-/Versionsprüfung.
+96 installierte Dateien entsprechen einzeln dem Paket. Die App öffnet die eigene
+Instanz ohne Änderung ihrer 18 Dateien; Aufnahme der tatsächlichen C-App angesehen.
+Prüfgerät: macOS 14.6.1/23G93, x86_64.
+
+Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.54-20261011-165023`.
+Archiv-SHA256: `d9f0976832787309cc89dfb49d0fd4d91175b56aefbd21c7a7c611917f3d955b`.
+Originale: `build/material-panel-verification/`. CI 38148508446 zum Quellcommit
+zuletzt queued; neue Gesamt-Plattformabnahme bleibt offen. SBUI-077 im
+beschriebenen lokalen Pixel-/Darstellungs-/Ereignisumfang nachgeprüft. Native
+Snapshot-Pixelidentität, Speicherfehlerabnahme der Ersatzfläche, reale Geräte/
+Eingaben/Screenreader, vollständige Leistung und übrige Release-Arbeit offen.
+1.0 nur nach ausdrücklicher Nutzerfreigabe.

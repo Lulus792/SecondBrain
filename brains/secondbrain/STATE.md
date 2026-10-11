@@ -11,12 +11,12 @@ Lumen-Sternkarte, Glaskarten, Icons, direkte Pfeilnavigation, Kamerafahrt,
 Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert **0.9.54 / 2ac5a67829d7**, sauberer Intel/macOS-Release-Build.
+Installiert **0.9.55 / 11c9cb4f1e99**, sauberer Intel/macOS-Release-Build.
 96 Dateien entsprechen dem geprüften Paket; 18 Gedächtnisdateien beim Laden
 unverändert. 126 Desktop-, 161 Tastatur-, 75 Sicherungs-Assertions, zwei Neustarts,
 produktive CLI und Runtime-/Lizenz-/Version bestehen.
-Rückfallversion 0.9.53: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.53-20261011-155340`.
-CI 38144771813 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
+Rückfallversion 0.9.54: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.54-20261011-165023`.
+CI 38148508446 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
 
 Frühere Build-/Paket-/Diagnoseverzeichnisse waren am11.Oktober nicht mehr
 vorhanden. Historische Abnahmen bleiben in STATUS/Journal; entfernte Dateien
@@ -132,7 +132,7 @@ SBUI-077 im lokalen Pixel-/Darstellungsumfang nachgeprüft: aktuelle Glasfläche
 vor eigenem Dialoginhalt, keine fremden Beschriftungen.352/136/621 Material-/
 Interaktions-/Provider-Assertions auch unter ASan/UBSan,39 C-Dateien,54 aktuelle
 Hashes. Vier gültige Metalbilder angesehen; Aufnahme-/Snapshot-Grenzen dokumentiert.
-78/78 lokale Release-Prüfungen bestehen (546,80 s). Paket/Installation folgen; installiert bleibt 0.9.54.
+78/78 lokale Release-Prüfungen bestehen (546,80 s). Mac-Paket/Installation bestehen; weitere Zielplattformen offen.
 [Vertrag](../../docs/DIALOGMATERIAL.md), [Bericht](/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-11_16-38-09/UI_REVIEW.md).
 
 ## Nächste Arbeiten
