@@ -31,6 +31,8 @@ static const Stroke motion[] = {{3.0000f,8.0000f,9.0000f,8.0000f},{3.0000f,12.00
 static const Stroke font[] = {{5.0000f,20.0000f,12.0000f,4.0000f},{12.0000f,4.0000f,19.0000f,20.0000f},{8.0000f,14.0000f,16.0000f,14.0000f}};
 static const Stroke glass[] = {{7.0000f,4.0000f,17.0000f,4.0000f},{17.0000f,4.0000f,20.0000f,10.0000f},{20.0000f,10.0000f,20.0000f,18.0000f},{20.0000f,18.0000f,4.0000f,18.0000f},{4.0000f,18.0000f,4.0000f,10.0000f},{4.0000f,10.0000f,7.0000f,4.0000f},{7.0000f,10.0000f,17.0000f,10.0000f}};
 static const Stroke backup[] = {{4.0000f,13.0000f,4.0000f,20.0000f},{4.0000f,20.0000f,20.0000f,20.0000f},{20.0000f,20.0000f,20.0000f,13.0000f},{4.0000f,13.0000f,8.0000f,13.0000f},{16.0000f,13.0000f,20.0000f,13.0000f},{12.0000f,3.0000f,12.0000f,14.0000f},{8.0000f,10.0000f,12.0000f,14.0000f},{12.0000f,14.0000f,16.0000f,10.0000f}};
+static const Stroke new_note[] = {{5.0000f,3.0000f,16.0000f,3.0000f},{16.0000f,3.0000f,20.0000f,7.0000f},{20.0000f,7.0000f,20.0000f,21.0000f},{20.0000f,21.0000f,5.0000f,21.0000f},{5.0000f,21.0000f,5.0000f,3.0000f},{16.0000f,3.0000f,16.0000f,7.0000f},{16.0000f,7.0000f,20.0000f,7.0000f},{12.0000f,10.0000f,12.0000f,18.0000f},{8.0000f,14.0000f,16.0000f,14.0000f}};
+static const Stroke new_project[] = {{3.0000f,7.0000f,10.0000f,7.0000f},{10.0000f,7.0000f,12.0000f,10.0000f},{12.0000f,10.0000f,21.0000f,10.0000f},{21.0000f,10.0000f,21.0000f,20.0000f},{21.0000f,20.0000f,3.0000f,20.0000f},{3.0000f,20.0000f,3.0000f,7.0000f},{3.0000f,5.0000f,11.0000f,5.0000f},{11.0000f,5.0000f,14.0000f,8.0000f},{14.0000f,8.0000f,21.0000f,8.0000f},{12.0000f,11.5000f,12.0000f,17.5000f},{9.0000f,14.5000f,15.0000f,14.5000f}};
 void sb_icon_draw(struct nk_command_buffer *canvas, SBIcon icon, struct nk_rect b, struct nk_color color) {
     const Stroke *lines=NULL; size_t count=0;
     switch(icon) {
@@ -63,6 +65,8 @@ void sb_icon_draw(struct nk_command_buffer *canvas, SBIcon icon, struct nk_rect 
     case SB_ICON_FONT: lines=font; count=sizeof(font)/sizeof(*font); break;
     case SB_ICON_GLASS: lines=glass; count=sizeof(glass)/sizeof(*glass); break;
     case SB_ICON_BACKUP: lines=backup; count=sizeof(backup)/sizeof(*backup); break;
+    case SB_ICON_NEW_NOTE: lines=new_note; count=sizeof(new_note)/sizeof(*new_note); break;
+    case SB_ICON_NEW_PROJECT: lines=new_project; count=sizeof(new_project)/sizeof(*new_project); break;
     default: return;
     }
     float scale=b.w/24, weight=1.7f*scale;
@@ -78,7 +82,9 @@ void sb_icon_draw(struct nk_command_buffer *canvas, SBIcon icon, struct nk_rect 
 }
 SBIcon sb_icon_for(const char *id) {
     if (!strcmp(id,"close-card") || !strcmp(id,"cancel") || !strcmp(id,"clear-search")) return SB_ICON_CLOSE;
-    if (!strcmp(id,"zoom-in") || !strcmp(id,"new-note") || !strcmp(id,"new-project") || !strcmp(id,"new-project-settings") || !strcmp(id,"new-project-detail")) return SB_ICON_ADD;
+    if (!strcmp(id,"zoom-in")) return SB_ICON_ADD;
+    if (!strcmp(id,"new-note")) return SB_ICON_NEW_NOTE;
+    if (!strcmp(id,"new-project") || !strcmp(id,"new-project-settings") || !strcmp(id,"new-project-detail")) return SB_ICON_NEW_PROJECT;
     if (!strcmp(id,"zoom-out")) return SB_ICON_MINUS;
     if (!strcmp(id,"rotate-left") || !strcmp(id,"source-back") || !strcmp(id,"page-prev") || !strcmp(id,"project-prev")) return SB_ICON_LEFT;
     if (!strcmp(id,"rotate-right") || !strcmp(id,"page-next") || !strcmp(id,"project-next")) return SB_ICON_RIGHT;

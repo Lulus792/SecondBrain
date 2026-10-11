@@ -31,6 +31,8 @@ icons={
 'font':[(5,20,12,4),(12,4,19,20),(8,14,16,14)],
 'glass':[(7,4,17,4),(17,4,20,10),(20,10,20,18),(20,18,4,18),(4,18,4,10),(4,10,7,4),(7,10,17,10)],
 'backup':[(4,13,4,20),(4,20,20,20),(20,20,20,13),(4,13,8,13),(16,13,20,13),(12,3,12,14),(8,10,12,14),(12,14,16,10)],
+'new_note':[(5,3,16,3),(16,3,20,7),(20,7,20,21),(20,21,5,21),(5,21,5,3),(16,3,16,7),(16,7,20,7),(12,10,12,18),(8,14,16,14)],
+'new_project':[(3,7,10,7),(10,7,12,10),(12,10,21,10),(21,10,21,20),(21,20,3,20),(3,20,3,7),(3,5,11,5),(11,5,14,8),(14,8,21,8),(12,11.5,12,17.5),(9,14.5,15,14.5)],
 }
 root=Path('assets/icons');root.mkdir(exist_ok=True)
 h='''#ifndef SB_ICONS_H\n#define SB_ICONS_H\n#include "ui.h"\ntypedef enum { SB_ICON_NONE, '''+', '.join('SB_ICON_'+n.upper() for n in icons)+''', SB_ICON_COUNT } SBIcon;\nSBIcon sb_icon_for(const char *id);\nvoid sb_icon_draw(struct nk_command_buffer *canvas, SBIcon icon, struct nk_rect bounds, struct nk_color color);\n#endif\n'''
@@ -59,6 +61,6 @@ c+='''    default: return;
 }
 SBIcon sb_icon_for(const char *id) {
 '''
-mapping={'close':['close-card','cancel','clear-search'],'add':['zoom-in','new-note','new-project','new-project-settings','new-project-detail'],'minus':['zoom-out'],'left':['rotate-left','source-back','page-prev','project-prev'],'right':['rotate-right','page-next','project-next'],'home':['camera-home'],'expand':['expand'],'list':['list'],'project':['project-picker','project-settings','workspace-settings','workspace-detail'],'edit':['edit'],'save':['save','guard-save'],'archive':['archive'],'copy':['save-copy','copy-context','guard-copy'],'filter':['filter','list-filter'],'reload':['reload','restore-project','refresh-projects'],'eye':['read'],'actions':['actions'],'settings':['settings','settings-actions'],'help':['help','help-actions'],'context':['context'],'palette':['theme','system-theme','contrast'],'motion':['motion'],'font':['font-minus','font-plus'],'glass':['transparency'],'backup':['backup-project']}
+mapping={'close':['close-card','cancel','clear-search'],'add':['zoom-in'],'new_note':['new-note'],'new_project':['new-project','new-project-settings','new-project-detail'],'minus':['zoom-out'],'left':['rotate-left','source-back','page-prev','project-prev'],'right':['rotate-right','page-next','project-next'],'home':['camera-home'],'expand':['expand'],'list':['list'],'project':['project-picker','project-settings','workspace-settings','workspace-detail'],'edit':['edit'],'save':['save','guard-save'],'archive':['archive'],'copy':['save-copy','copy-context','guard-copy'],'filter':['filter','list-filter'],'reload':['reload','restore-project','refresh-projects'],'eye':['read'],'actions':['actions'],'settings':['settings','settings-actions'],'help':['help','help-actions'],'context':['context'],'palette':['theme','system-theme','contrast'],'motion':['motion'],'font':['font-minus','font-plus'],'glass':['transparency'],'backup':['backup-project']}
 for n,ids in mapping.items():c+='    if ('+' || '.join(f'!strcmp(id,"{x}")' for x in ids)+f') return SB_ICON_{n.upper()};\n'
 c+='    if (!strncmp(id,"link:",5)) return SB_ICON_LINK;\n    return SB_ICON_NONE;\n}\n';Path('app/icons.c').write_text(c)

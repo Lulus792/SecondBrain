@@ -18,6 +18,16 @@ Installiert **0.9.63/92ab260e4203**, sauberer Intel/macOS-Release-Build.
 Lizenz-/Version bestehen. Tatsächliche App-Aufnahme angesehen. macOS14.6.1/23G93,x86_64.
 Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.62-20261011-215805`.
 
+## Aktueller Darstellungsschritt
+
+0.9.64 unterscheidet kompakte Erstellaktionen durch Dokument-/Ordnerplusse.
+Prioritäre Sternlabels werden zuerst reserviert, keine teilweise übermalten
+normalen Wörter. Neun Darstellungen und18 SDL-Aktions-/Escapeabläufe geprüft;
+9/9 passende Produktprüfungen bestehen (141,20s). Paket/neue Plattformen folgen,
+installiert bleibt0.9.63. [Vertrag](../../docs/ERSTELLEN_ICONS.md).
+[Mindestversionsvorschlag](../../docs/PLATTFORM_VORSCHLAG.md): technische Voraussetzungen,
+tatsächlich geprüfte CI-Umgebungen und offene Nutzerplattform-Abnahme getrennt.
+
 ## Geprüfter Fortschritt
 
 0.9.63 veröffentlicht während des Ladens den sichtbaren Status als Readerkind,
@@ -45,8 +55,8 @@ beide Release-Pakete tatsächlich geprüft. Windows-Debug114558512596 scheiterte
 bei der Hilfe-Kontextprüfung: zwei Bilder garantieren keinen fertigen Reader.
 Der Prüfer wartet jetzt begrenzt auf Bereitschaft und behält sämtliche Höhen-/
 Rückkehrassertionen. Hilfe/Reader lokal bestehen (17,26s),94 Hilfebedingungen auch
-unter ASan/UBSan mit bestätigten Bibliotheks-/Helperhashes. Neue Windows-Debug-
-Nachprüfung folgt. Installierter Produktcode entspricht weiter92ab260; nur Prüfer
+unter ASan/UBSan mit bestätigten Bibliotheks-/Helperhashes. Alle vier Windows-/Linux-Desktopjobs zu798b84e bestehen im
+Lauf38170374268 einschließlich Release-Paketen. Installierter Produktcode entspricht weiter92ab260; nur Prüfer
 geändert. Native Mac-CI zuletzt queued; lokale Intel-Prüfung separat. ARM64 und
 frische Nutzerrechner offen. Frühere Erfolge ersetzen keine neue Prüfung.
 
@@ -61,5 +71,6 @@ IME/VoiceOver/NVDA/Orca, native Dialoge, Monitore/Skalierungen/Langzeit, volle
 Windows-/Linux-Zielvolumes und physische Persistenz, Mindest-OS/frische Rechner,
 vollständige Runtime-/Lizenzprüfung, vertraulicher Sicherheitskanal, Signierung,
 dauerhafte aktuelle Release-Pakete und abschließende natürliche Texte bleiben
-Release-Arbeit. Mindest-OS-Präferenz erneut angefragt; weitere Arbeit unabhängig.
+Release-Arbeit. Mindest-OS-Vorschlag auf Nutzerantwort erarbeitet:14.0/Windows11 25H2/Ubuntu24.04;
+noch zu bestätigen und nativ auf Mindestständen abnehmen.
 Apple-Developer-Konto und Windows-Zertifikat fehlen. **1.0 nur nach Nutzerfreigabe.**

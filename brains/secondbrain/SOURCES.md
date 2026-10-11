@@ -234,3 +234,6 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 - [Modaler Fokus](../../docs/MODALER_FOKUS.md): geteilte Readerkennungen, aktive Gruppe, Pixelregression und Rückkehr.
 
 - [Nativer Ladezustand](../../docs/LADEZUSTAND_NATIVE.md): sichtbarer Status statt vorzeitigem Markdown-Textlauf, negative Regression und Metal-Paare.
+
+- [Erstellmotive](../../docs/ERSTELLEN_ICONS.md): eigene Vektoren, kompakte Leiste und Sternlabelpriorität.
+- [Plattformvorschlag](../../docs/PLATTFORM_VORSCHLAG.md): vorgeschlagene Mindeststände, tatsächliche Binär-/CI-Belege und offene Abnahmen.

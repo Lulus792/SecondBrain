@@ -2353,8 +2353,11 @@ static void galaxy_annotations(SBDesktop *d,struct nk_command_buffer *canvas,str
         nk_stroke_rect(canvas,focus,24,d->ui.contrast ? 2 : 1,d->ui.contrast ? ctx->style.text.color : nk_rgba(142,191,255,90));
     }
     struct nk_rect labels[80]; unsigned label_count = 0;
-    for (size_t i = 0; i < space->count; ++i) {
+    /* Reserve prominent labels before ordinary captions. Drawing a selected
+       label last could erase only part of an earlier caption in high contrast. */
+    for (unsigned priority=0;priority<2;++priority) for (size_t i = 0; i < space->count; ++i) {
         SBPoint p = space->points[i];
+        if((p.selected || p.focused)!=(priority==0))continue;
         if (!p.visible || (d->card && inside(p.x,p.y,card)) || (d->browser && inside(p.x,p.y,list))) continue;
         if (p.selected) nk_stroke_circle(canvas, nk_rect(p.x-8,p.y-8,16,16), d->ui.contrast ? 2 : 1, d->ui.contrast ? ctx->style.text.color : nk_rgba(142,191,255,145));
         if (p.focused) nk_stroke_circle(canvas, nk_rect(p.x-13,p.y-13,26,26), 2.5f, d->ui.contrast ? ctx->style.text.color : nk_rgb(190,223,255));

@@ -412,9 +412,15 @@ dem sichtbaren Ladezustand; gemessene erste Bilddauer in drei Metal-Paaren etwa
 20Prozent geringer. [Vertrag](LADEZUSTAND_NATIVE.md). Kein allgemeiner
 Flüssigkeits- oder menschlicher Eingabenachweis.
 
-- [ ] Windows-Debug-Hilfeprüfung erneut nativ abnehmen: Im Lauf38169362014 zu
+- [x] Windows-Debug-Hilfeprüfung erneut nativ abnehmen: Im Lauf38169362014 zu
   22a8504 war nach zwei Bildern der Kontextreader noch nicht bereit. Der Prüfer
   wartet jetzt begrenzt auf die tatsächliche Bereitschaft; Höhen- und Rückkehr-
   assertions bleiben erhalten. Lokal und unter ASan/UBSan nachgeprüft.
   Windows-Release und beide Linux-Jobs einschließlich Release-Paketen bestehen
   für22a8504; sie schließen diesen Debug-Nachweis nicht ein. Mac-CI queued.
+
+Hilfe-Nachprüfung zu798b84e: alle vier Windows-/Linux-Desktopjobs im
+[Lauf38170374268](https://github.com/Lulus792/SecondBrain/actions/runs/38170374268)
+erfolgreich, beide Release-Pakete geprüft; Mac-CI queued. Neue64-Fassung braucht
+eigene Nachweise. Der [Mindestversionsvorschlag](PLATTFORM_VORSCHLAG.md) ist auf
+Nutzerauftrag ausgearbeitet, noch keine endgültige Unterstützungszusage.
