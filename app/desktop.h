@@ -8,6 +8,7 @@
 #include "accessibility.h"
 #include "system_style.h"
 typedef struct SBReaderPreparation SBReaderPreparation;
+typedef struct SBReaderSource SBReaderSource;
 #define SB_NATIVE_FIELDS 7
 typedef struct {SBNativeText text;char *source;size_t anchor,caret;} SBFieldText;
 typedef struct {char *source;size_t anchor,caret;uint64_t context;bool pending;} SBFieldSelection;
@@ -101,6 +102,9 @@ typedef struct {
     SBFieldText native_fields[SB_NATIVE_FIELDS];
     SBFieldSelection field_selections[SB_NATIVE_FIELDS];
     SBReaderPreparation *reader_preparation;
+    SBReaderSource *reader_source;
+    bool reader_source_used;
+    size_t reader_source_builds,reader_source_hits,reader_source_bytes;
     bool reader_preparation_used;
     size_t reader_plan_hits,reader_plan_misses;
     char reader_pending_focus[100];

@@ -284,3 +284,13 @@ bleiben getrennt; dekorative Titel duplizieren keinen Dokumentinhalt.
 [Vertrag und Grenzen](NATIVE_TITELGEOMETRIE.md). Lokale Gesamt- und gezielte
 Sanitizerprüfungen bestehen. Neue Plattform-/Paketabnahmen, tatsächliche
 assistive Bedienung und die übrige Release-Liste bleiben offen.
+
+## Wiederverwendung des Dokumentbaums vom 11. Oktober
+
+Ab 0.9.53 hält der Vordergrundreader seinen Quellbaum und Referenzen bei
+unveränderten Textbytes mit einem eigenen 16-MiB-Budget. Größen-, Schrift- und
+Scrollwechsel benötigen keinen neuen Parserlauf. Lokale Gesamt- und gezielte
+Sanitizerprüfungen bestehen; der [Vertrag](READER_QUELLPLAN.md) benennt die
+Metal-Messung und den vollständigen synchronen Rückfall. Erste Aufbereitung,
+Inline-Parsing, Rasterung, reale Geräte und die aktuellen Zielplattformen bleiben
+weitere Leistungs- und Release-Arbeit.

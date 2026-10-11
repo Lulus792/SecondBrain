@@ -22,6 +22,7 @@ static void search_begin(SBDesktop *d);
 static void search_end(SBDesktop *d);
 static void focus_set(SBDesktop *d,const char *id);
 static void reader_preparation_free(SBDesktop *d);
+static void reader_source_free(SBDesktop *d);
 static void reader_preparation_retire(SBDesktop *d);
 static bool reader_preparing(const SBDesktop *d);
 static void composition_dispatch(void *user,const SDL_Event *event){sb_desktop_event(user,event);}
@@ -602,6 +603,7 @@ SBStatus sb_desktop_store_preferences(SBDesktop *d) {
 }
 void sb_desktop_free(SBDesktop *d) {
     reader_preparation_free(d);
+    reader_source_free(d);
     sb_system_style_free(d->style_monitor);
     sb_accessibility_free(d->accessibility);
     sb_backup_job_free(d->backup);
@@ -1790,6 +1792,7 @@ static bool document_tree(SBDesktop *d,const SBDocument *document,const SBRefere
 }
 
 #include "reader_prepare.inc"
+#include "reader_source.inc"
 static void document(SBDesktop *d, const char *text, float height) {
     d->reader_plan_hits=d->reader_plan_misses=0;
     struct nk_context *ctx = d->ui.ctx;
@@ -1807,10 +1810,10 @@ static void document(SBDesktop *d, const char *text, float height) {
     if (!nk_group_begin(ctx, "Reader", NK_WINDOW_NO_SCROLLBAR)) { ctx->style.window.group_padding=previous_padding; return; }
     scroll_gutter(d);
     unsigned slot=modal_reader(d) && (text==d->context || text==d->notice) ? 2 : 0;
-    SBDocument parsed={0}; SBReferences references={0};
+    SBDocument parsed={0}; SBReferences references={0};bool borrowed=false;
     if (!whole_code) {
-        SBStatus status=sb_document_init(&parsed,text,text_length);
-        if (status.code==SB_OK) status=sb_document_references(&parsed,&references);
+        bool foreground=d->form==SB_FORM_NONE || (modal_reader(d) && (text==d->context || text==d->notice));
+        SBStatus status=reader_source_get(d,text,text_length,foreground,&parsed,&references,&borrowed);
         if (status.code!=SB_OK) { d->message=status;whole_code=true; }
     }
     bool ready=reader_preparation_ready(d,text,whole_code,&parsed,&references,ctx->current->layout->bounds.w);
@@ -1827,7 +1830,7 @@ static void document(SBDesktop *d, const char *text, float height) {
     }
     d->ui.prepared_lookup=NULL;d->ui.prepared_data=NULL;
     nk_style_set_font(ctx, &d->ui.normal->handle);
-    sb_references_free(&references); sb_document_free(&parsed);
+    if(!borrowed){sb_references_free(&references); sb_document_free(&parsed);}
     if(ready)scroll_measure(d,slot);
     nk_group_end(ctx);
     if(!ready)nk_group_set_scroll(ctx,"Reader",0,d->scrolling[slot].applied);
@@ -2476,7 +2479,7 @@ static void welcome(SBDesktop *d,int width,int height,nk_flags flags) {
     nk_end(ctx);
 }
 void sb_desktop_frame(SBDesktop *d) {
-    d->reader_preparation_used=false;
+    d->reader_preparation_used=false;d->reader_source_used=false;
     sb_native_text_free(&d->native_editor);
     sb_native_text_free(&d->reader_title_native);d->reader_title_display[0]=0;d->reader_title_claimed=false;
     native_fields_clear(d);
@@ -2604,5 +2607,6 @@ void sb_desktop_frame(SBDesktop *d) {
     for(size_t i=0;i<d->target_count;++i)if(d->targets[i].kind==SB_FOCUS_TEXT && inside(pointer.x,pointer.y,d->targets[i].bounds)){text_pointer=true;break;}
     if(text_pointer!=d->ui.pointer_text){SDL_SetCursor(text_pointer && d->ui.text_cursor ? d->ui.text_cursor : SDL_GetDefaultCursor());d->ui.pointer_text=text_pointer;}
     reader_preparation_retire(d);
+    if(!d->reader_source_used)reader_source_free(d);
     accessible_publish(d);
 }

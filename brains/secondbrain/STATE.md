@@ -105,6 +105,18 @@ und 621 Mac-Provider-Assertions auch unter ASan/UBSan im dokumentierten Umfang.
 Mac-Paket und Installation bestehen; andere Zielplattformen bleiben offen.
 [Vertrag](../../docs/NATIVE_TITELGEOMETRIE.md).
 
+## Reader-Quellplan (0.9.53)
+
+Unveränderte Vordergrunddokumente behalten ihren eigenen Baum und Referenzen,
+gebunden an vollständige Textbytes. 16 MiB begrenzen gehaltene Kapazitäten;
+Editorwechsel gibt den Plan frei, übergroße Pläne bleiben im vollständigen
+synchronen Pfad. 22 Quell-, 48 produktive Reader-, 590 Geometrie- und 621
+Mac-Providerprüfungen bestehen; Quell-/Reader-/Provider auch unter ASan/UBSan.
+39 eigene C-Dateien instrumentiert, 54 Quell-/Include-Hashes passen.
+Drei Metal-Paare senken Wechsel-Layoutzeit; Bildausgabespitzen bleiben.
+77/77 lokale Release-Prüfungen bestehen (539,97 s). Paket/Installation folgen; installiert bleibt 0.9.52.
+[Vertrag und genaue Grenzen](../../docs/READER_QUELLPLAN.md).
+
 ## Nächste Arbeiten
 
 Quelllesen, Parser/Inline-Aufbereitung,

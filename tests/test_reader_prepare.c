@@ -24,18 +24,19 @@ int main(int argc,char **argv){
     first_pending=last_layout;CHECK(d.reader_preparation && loading(&d) && sb_desktop_animating(&d));
     CHECK(wait_reader(&d));frame(&d);CHECK(d.reader_plan_hits>40);if(d.reader_plan_misses)fprintf(stderr,"prepared misses: %zu hits: %zu\n",d.reader_plan_misses,d.reader_plan_hits);CHECK(!d.reader_plan_misses);
     float maximum=d.scrolling[0].maximum;CHECK(maximum>1000);uint64_t prepared_geometry=geometry(&d);
+    size_t source_builds=d.reader_source_builds;CHECK(d.reader_source && d.reader_source_bytes<=16u*1024u*1024u);frame(&d);CHECK(d.reader_source_builds==source_builds && geometry(&d)==prepared_geometry);
     d.ui.styled_cache_disabled=true;frame(&d);double reference_layout=last_layout;CHECK(geometry(&d)==prepared_geometry && d.scrolling[0].maximum==maximum);d.ui.styled_cache_disabled=false;frame(&d);
     printf("Fixture layout: initial pending %.2f ms; first ready %.2f ms; uncached synchronous reference %.2f ms.\n",first_pending,first_ready,reference_layout);
     d.scrolling[0].position=d.scrolling[0].destination=maximum/2;d.scrolling[0].active=true;frame(&d);float before=d.scrolling[0].position;
     /* A resized reader keeps its logical position while the new plan runs. */
-    SDL_SetWindowSize(d.ui.window,750,900);frame(&d);CHECK(loading(&d));CHECK(fabsf(d.scrolling[0].position-before)<1);CHECK(wait_reader(&d));frame(&d);CHECK(d.reader_plan_hits>40 && !d.reader_plan_misses);
+    SDL_SetWindowSize(d.ui.window,750,900);frame(&d);CHECK(loading(&d));CHECK(fabsf(d.scrolling[0].position-before)<1);CHECK(wait_reader(&d));frame(&d);CHECK(d.reader_plan_hits>40 && !d.reader_plan_misses);CHECK(d.reader_source_builds==source_builds);
     /* A short replacement remains immediately usable; stale output is retired. */
     OK(sb_app_new_note(&d.model,"knowledge","short","Short"));frame(&d);CHECK(!loading(&d));
     OK(sb_app_request(&d.model,SB_ACT_NOTE,"knowledge/long.md"));frame(&d);CHECK(loading(&d));
     OK(sb_app_request(&d.model,SB_ACT_NOTE,"knowledge/short.md"));frame(&d);CHECK(!loading(&d));
     for(unsigned i=0;i<30 && d.reader_preparation;++i){SDL_Delay(1);frame(&d);}CHECK(!d.reader_preparation);
     OK(sb_app_request(&d.model,SB_ACT_NOTE,"knowledge/long.md"));frame(&d);CHECK(loading(&d));OK(sb_ui_fonts(&d.ui,1.5f));frame(&d);CHECK(wait_reader(&d));frame(&d);CHECK(d.reader_plan_hits>40 && !d.reader_plan_misses);
-    d.editing=true;frame(&d);for(unsigned i=0;i<30 && d.reader_preparation;++i){SDL_Delay(1);frame(&d);}CHECK(!d.reader_preparation && !d.ui.prepared_lookup);
+    d.editing=true;frame(&d);for(unsigned i=0;i<30 && d.reader_preparation;++i){SDL_Delay(1);frame(&d);}CHECK(!d.reader_preparation && !d.ui.prepared_lookup);CHECK(!d.reader_source && !d.reader_source_bytes);
     d.editing=false;char raw_path[SB_PATH_CAP];OK(sb_path_join(raw_path,sizeof(raw_path),d.model.project.root,"literal.txt"));
     char raw[16000]={0};for(unsigned i=0;i<120;++i)strcat(raw,"literal AV ffi אבג ببب text with words and code\r\n");
     OK(sb_fs_write_new(raw_path,raw,strlen(raw)));OK(sb_app_source(&d.model,raw_path));frame(&d);CHECK(loading(&d));CHECK(wait_reader(&d));frame(&d);CHECK(d.reader_plan_hits>100 && !d.reader_plan_misses);

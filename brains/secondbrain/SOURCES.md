@@ -196,3 +196,8 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   tatsächliche Textbefehle, sichtbare Kürzung, eigene Geometrieausgaben und Cachebudget.
 - [Titelprüfer](../../tests/test_title_geometry.c): unabhängiger Glyphenvergleich,
   Schriftgrößen, lange Namen, Marker, dekorative und modale Titel.
+
+- [Reader-Quellplan](../../docs/READER_QUELLPLAN.md): eigener Dokumentbaum,
+  exakte Quellbindung, Referenzen, Speicherbudget und serialisierte Metal-Messung.
+- [Quellprüfer](../../tests/test_reader_source.c): Quellenbesitz, Änderungen
+  gleicher Länge, Referenzumgebung und vollständiger Budget-Rückfall.
