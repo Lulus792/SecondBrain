@@ -112,3 +112,4 @@ SBStatus sb_prepare_layout_take(SBPrepareLayout *j,SBUi *ui,const SBStyledText *
     *out=j->plan;j->plan=(SBStyledPlan){0};j->taken=true;return sb_ok();
 }
 void sb_prepare_layout_free(SBPrepareLayout *j){if(!j)return;sb_prepare_layout_cancel(j);SDL_WaitThread(j->thread,NULL);if(j->tokens){for(size_t i=0;i<j->token_count;++i)free(j->tokens[i]);free(j->tokens);}sb_ui_styled_plan_free(&j->plan);sb_styled_free(&j->text);sb_text_snapshot_free(j->fonts);free(j);}
+#include "prepare_batch.inc"

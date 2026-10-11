@@ -1,82 +1,51 @@
 # SecondBrain: aktueller Stand
 
-Stand: 8. Oktober 2026. Maßgebliche Originale: [STATUS](../../docs/STATUS.md),
+Stand: 11. Oktober 2026. Originale: [STATUS](../../docs/STATUS.md),
 [Release-Liste](../../docs/RELEASE.md), [Quellen](SOURCES.md).
-Frühere Fortschritte und Abnahmen: [Journal](journal/2026-10-08.md).
 
 ## Produkt und installierte App
 
 Eigene C17-App für Mensch und KI: Projekte/Notizen anlegen, lesen, bearbeiten,
-suchen, archivieren und sichern; Quellen und gespeicherten Kontext kopieren.
-Lumen-Sternkarte, Glaskarten/Icons, direkte Pfeilnavigation, Kamerafahrt,
-weiches Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
+suchen, archivieren, sichern; Quellen und gespeicherten Kontext kopieren.
+Lumen-Sternkarte, Glaskarten, Icons, direkte Pfeilnavigation, Kamerafahrt,
+Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert: **0.9.44 / 0455e5a276f8**, sauberer Intel/macOS-Release-Build.
-95 Dateien entsprechen dem geprüften Paket, Gedächtnis beim Laden unverändert.
-Vorige 0.9.43: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.43-20261008-202002`.
-Paketprüfung: 126 Desktop-, 158 Tastatur-, 75 Sicherungs-Assertions, zwei
-Neustarts, produktive CLI sowie Runtime-/Lizenz-/Version.
-CI37822760493 zu0455e5a zuletzt queued; kein neuer Gesamt-Plattformnachweis.
+Installiert weiterhin **0.9.44 / 0455e5a276f8**; Versionsaufruf am 11. Oktober
+bestätigt. Die früheren lokalen Build-/Paket-/Diagnoseverzeichnisse sind nicht
+mehr vorhanden. Historische Abnahmen bleiben in STATUS und im Journal erhalten;
+ihre entfernten Dateien sind keine aktuell zugänglichen Prüfbelege.
+Ein frischer Release-Build liegt unter `build/current-ui`.
 
-## Aktueller geprüfter Fortschritt (0.9.43)
+## Aktuelle Arbeit (0.9.46)
 
-Native Editor-Metadaten werden bei exakt unverändertem Quellen-/Schrift-/
-Zeilenplan mit eigenem 32-MiB-Budget wiederverwendet. Ausgaben besitzen ihre
-Laufarrays und übernehmen die aktuelle Scrollposition. Über dem Budget bleiben
-Quellen und Geometrie vollständig. [Vertrag](../../docs/NATIVE_TEXTGEOMETRIE.md).
+Die Vorbereitung formatierter Texte aus 0.9.44/45 ist jetzt an den Reader
+angeschlossen: ein privater Fontkontext/Thread pro Dokument, genaue Block-/
+Tabellenbreiten und gehaltene Pläne außerhalb des allgemeinen Memo-Caches.
+Navigation bricht ohne laufenden Join ab; übernommen wird die letzte passende
+Auswahl. Resize erhält währenddessen die logische Scrollposition. Modale Reader
+besitzen den Auftrag gegenüber ihrem verdeckten Dokument. Ein aus einer Quelle
+zurückkehrender Linkfokus wird nach der Vorbereitung wiederhergestellt.
+Aktuelle Hover-/Tastaturhinweise unterbrechen eine überlagernde Überblendung.
+[Vertrag und Grenzen](../../docs/READER_VORBEREITUNG.md).
 
-68/68 lokale Release-Prüfungen (684,64s), 13.708 Editor-/Cache-, 405 native
-Text- und 590 Providerprüfungen bestehen, dieselben drei Prüfer auch unter
-haltendem ASan/UBSan. Scope/Hashnachweise in STATUS. Build ohne Tests besteht.
-Vier abwechselnde lokale Profilpaare: nativer Export des vorbereiteten
-67-KB-Editors 34,53→6,71ms; keine allgemeine Bildraten-/Kaltlayout-Abnahme.
-Sauberes Intel/macOS-Paket und Installation bestehen; neue Zielplattformprüfungen
-bleiben offen. Die oben genannten Paketprüfungen gehören zu0.9.44.
-
-## Neue Diagnose des langen Wechsels
-
-Ein reiner Breitenmessversuch erhielt Geometrie, zeigte im alternierenden
-Vergleich keinen Gewinn (75,32→85,14ms Layoutmedian) und wurde vollständig
-entfernt. Der experimentelle Breitenmessweg ist weiterhin entfernt. Der
-[Vorbereitungsvertrag](../../docs/READER_VORBEREITUNG.md) folgt neu gelesenen
-Apple Loading/Motion und dem festgelegten SDL_ttf-Fontthreadvertrag.
-Neue UI-Diagnose SBUI-074; die Vorbereitung ist noch nicht integriert.
-
-## Geprüfter Vorbereitungsunterbau (0.9.44)
-
-Unveränderliche Fontdaten, private Worker-Fonts und eigener Quelltext sind
-umgesetzt. Vor einmaliger Übernahme werden Source/Kontext/Fontbindung geprüft.
-69/69 lokale Release-Prüfungen (596,74s),393 neue Job-/Fontprüfungen bestehen.
-Dieselben393 plus405 native Text-,13.708 Editor- und590 Providerprüfungen auch
-unter haltendemASan/UBSan; Scope/Hashes in STATUS. Build ohne Tests besteht.
-[Vertrag](../../docs/FONT_SNAPSHOTS.md). Intel/macOS-Paket/Installation bestehen;
-weitere Zielplattformen bleiben offen.
-Der produktive Wechsel ist noch nicht angebunden; das Ergebnis ist bislang
-eine ungebrochene Zeile. SBUI-074 bleibt offen.
-
-## Formatierter Umbruch im Worker (0.9.45)
-
-Privater CPU-Textkontext teilt Absatz-/Graphem-/Bidi-/Font-/Umbruchalgorithmus
-mit der UI. Fertige Pläne tragen gleiche Glyphen, Zeilen, Offsets und Höhen.
-981 neue Parameter-/Stil-/Abbruch-/Epochprüfungen,69/69 lokale Release-Prüfungen
-(530,96s) und981/405/13.708/590 unter ASan/UBSan bestehen. Scope/Hashes in STATUS.
-Build ohne Tests besteht. [Vertrag](../../docs/FONT_SNAPSHOTS.md).
-Paket/Zielplattformen folgen; der sichtbare Dokumentwechsel ist nicht angebunden.
+3250 Schrift-/Job-/Batchprüfungen und 44 produktive Readerprüfungen bestehen
+auch unter haltendem ASan/UBSan im dokumentierten Teilumfang. Native
+Blockgeometrie/Scrollmaximum stimmen mit dem synchronen Referenzpfad überein.
+Interaktions- und Tastaturprüfung bestehen nach den Anschlusskorrekturen.
+70/70 lokale Release-Prüfungen bestehen (488,53s). Paket/Installation und
+Zielplattformen folgen.
 
 ## Nächste Arbeiten
 
-Vorbereitung auf Dokumentblöcke/Tabellen erweitern, Job-/Output-/
-Speichergrenzen und nichtblockierende Retireverwaltung prüfen und in den langen
-Wechsel integrieren. Native Zeichenrechtecke für weitere
-Felder und Leseblöcke integrieren.
-Das erste Layout langer Dokumente und große Exporte über der Cachegrenze
-weiter optimieren. Reale Eingabemethoden, VoiceOver/NVDA/Orca, Dialoge,
-Geräte/mehrere Monitore/lange Sitzungen und X11-/Wayland-HiDPI prüfen.
-Weitere Release-Abnahmen: volle Windows-/Linux-Zielvolumes und physische
-Persistenz, frische Rechner/OS-Mindestversionen, komplette SDK-/Systemruntime-
-Zuordnung. Die Release-Liste hält Umfang und Nachweise fest.
+Die aktuelle Gesamt-/Paketprüfung abschließen, geprüften Schritt veröffentlichen
+und die Mac-App aktualisieren. Danach Quelllesen, Parser/Inline-Aufbereitung,
+native Metadaten, Rasterung und Fälle über den Vorbereitungsbudgets profilieren.
+Der Rückfall ist noch synchron; einzelne Bibliotheksaufrufe und Shutdown können
+warten. SBUI-074 bleibt für die vollständige Großdaten-/Geräteabnahme offen.
 
-Eigener Code MIT. Signaturkonten fehlen; vertraulicher Sicherheitskanal ist
-angefragt. Vollständiger Auftrag aktiv. **1.0 erst nach ausdrücklicher Freigabe**;
-abschließende Produkttext-Bereinigung erst nach Vollständigkeit.
+Weitere native Textfelder/Leseblöcke, echte IME und VoiceOver/NVDA/Orca,
+Dialog-/Geräte-/Monitor-/Langzeitprüfungen, Windows-/Linux-Speicherfehler,
+Mindest-OS/frische Rechner, vollständige Runtime-/Lizenzprüfung, Sicherheitskanal,
+Signierung und abschließende natürliche Texte bleiben Release-Arbeit.
+**1.0 nur nach ausdrücklicher Nutzerfreigabe.**

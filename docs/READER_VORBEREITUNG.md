@@ -1,7 +1,7 @@
 # Lange Dokumente vorbereiten, ohne die Bewegung anzuhalten
 
-Stand: 8. Oktober 2026. Dies ist der recherchierte Umsetzungs-/Abnahmevertrag,
-**noch keine integrierte Produktfunktion**. Installiert bleibt0.9.43. Der
+Stand: 11. Oktober 2026. Dies ist der recherchierte Umsetzungs-/Abnahmevertrag.
+Der neue Framepfad ist angebunden; installiert ist weiterhin 0.9.44. Der
 [Reviewbericht](/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-08_19-28-45/UI_REVIEW.md) bestätigt SBUI-074 für die kalte Layoutarbeit.
 
 ## Belegter Ausgangszustand
@@ -105,5 +105,51 @@ Ab 0.9.45 bereitet ein CPU-Kontext zusätzlich formatierte Texte mit Umbruch,
 Graphemen, Bidi, Absätzen und Abschlusszeilen vor. Er teilt den Layoutalgorithmus
 mit der Leseansicht. Rolle/Breite/Abstände, exakte Stile und Fontzustand werden
 vor der Übernahme geprüft. Der produktive Dokumentwechsel ruft auch diesen
-erweiterten Prototyp noch nicht auf; Block-/Tabellenbreiten, Jobverwaltung,
-Speichergrenzen und sichtbare Integration bleiben offen.
+erweiterten Prototyp zu diesem Stand noch nicht auf; Block-/Tabellenbreiten,
+Jobverwaltung, Speichergrenzen und sichtbare Integration waren offen.
+
+## Dokumentanbindung vom 11. Oktober
+
+Der Reader sammelt bei Texten ab 4096 Bytes die tatsächlich benötigten
+Absatz-/Überschrift-/Code-/Tabellenpläne. Listen- und Zitateinrückung sowie
+gestapelte Tabellenköpfe werden berücksichtigt. Nuklear misst mit der
+Panelbreite, kürzt die Zeichenfläche aber auf ganze Punkte; beide exakten
+Breiten werden vorbereitet. Der sichtbare Inhalt übernimmt keine Teilhöhe.
+
+Ein Hintergrundauftrag öffnet einen privaten CPU-Fontkontext für alle Blöcke.
+Fertige Pläne bleiben außerhalb des allgemeinen Memo-Caches erhalten und
+werden bei Höhenmessung, Zeichengeometrie und Rasterung direkt benutzt.
+Die UI besitzt höchstens einen Auftrag. Bei neuer Auswahl wird er abgebrochen;
+erst nach bestätigtem Threadabschluss wird er ohne laufenden Join freigegeben
+und die aktuellste Auswahl vorbereitet. Große Schrift, Breite, Schrift-Epoche,
+Quellbytes und Dokumentkontext gehören zur Identität.
+
+Währenddessen nennt die vorhandene Karte das aktuelle Dokument und zeigt
+„Dokument wird vorbereitet …“ als sichtbaren und nativen Status. Andere
+Navigation bleibt bedienbar; Links des vorherigen Dokuments bleiben nicht aktiv.
+Der fertige Inhalt wird vollständig eingesetzt. Bei normaler Bewegung blendet
+die vorher aufgenommene Statuskarte kurz aus; reduzierte Bewegung überspringt
+die Überblendung. Die Kamera wartet nicht auf das Textlayout. Eine neue Breite
+erhält die bisherige logische Scrollposition während der Vorbereitung.
+
+Die Integration ist ausdrücklich ein begrenzter erster Produktpfad:
+
+- Unter 4096 Bytes erfolgt weiterhin direkte Darstellung.
+- Über 4096 Requests oder dem eigenen Eingabebudget bleibt der bisherige
+  synchrone Reader erreichbar. Fehler beim Worker/Fontbinden verwenden ebenfalls
+  den bisherigen Pfad; dieser Rückfall erfüllt keine flüssige Bewegungsgarantie.
+- Quelllesen, Parser, Inline-Aufbereitung, native Metadaten, Fontbindung und
+  Rasterung sind weiterhin UI-Arbeit. Deren große Fälle benötigen eigene Profile.
+- Das Retentionsbudget begrenzt nicht sämtliche temporären Bibliotheksdaten
+  eines einzelnen riesigen Absatzes. Weitere Spitzenverbrauchsprüfungen fehlen.
+- Ein Bibliotheksaufruf bleibt bis zur Rückkehr ununterbrechbar. Das reguläre
+  Beenden wartet nach Abbruch auf den Worker; die Navigation tut das nicht.
+
+Der neue Desktopprüfer benutzt den produktiven Framepfad mit langen gemischten
+Absätzen, Listen, Zitaten, Tabellen und Code. Er prüft vollständige Treffer der
+Vorbereitung, native Blockgeometrie/Scrollmaximum gegen den synchronen Pfad,
+Resize, schnelle Ersetzung, Schriftwechsel, Bearbeiten und CRLF-Textquellen.
+Zeitwerte aus diesem lokalen Softwareprüfer sind ein gezieltes Profil, kein
+GPU-/Geräte-/Screenreader- oder allgemeiner Bildratennachweis. SBUI-074 bleibt
+für die vollständige Großdaten-/Geräteabnahme offen. Ausführungsnachweise:
+[STATUS](STATUS.md).

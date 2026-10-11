@@ -3307,3 +3307,62 @@ breiten, begrenzte Job-/Output-/Spitzen-Speicherverwaltung, nichtblockierendes
 Retire/Shutdown und sichtbare Integration bleiben offen. SBUI-074 bleibt offen.
 Paket/neue Zielplattformen folgen, installiert bleibt zunächst0.9.44.
 Vollständiger Auftrag aktiv;1.0 weiterhin nur nach ausdrücklicher Freigabe.
+
+## Produktiver Reader mit Hintergrundvorbereitung (0.9.46, 11. Oktober)
+
+Der dokumentierte Font-/Umbruchunterbau ist an den sichtbaren Reader angeschlossen.
+Texte ab4096Bytes erhalten einen Batch mit privatem CPU-Fontkontext/Thread;
+Absätze, Überschriften, Code, Listen-/Zitateinrückungen und Tabellenbreiten werden
+vorbereitet. Fertige Pläne bleiben außerhalb des allgemeinen Memo-Caches gehalten.
+Messung und Nuklears auf ganze Punkte gekürzte Zeichenfläche erhalten jeweils
+ihren exakten Plan, ohne den bestehenden Umbruch zu ändern.
+
+Die UI besitzt höchstens einen Auftrag; Navigation cancelt und prüft den echten
+SDL-Threadabschluss vor der Freigabe. Nur das letzte passende Dokument wird
+übernommen. Die vorhandene Karte zeigt seinen Titel und einen sichtbaren und nativen
+Status; die Kamera wartet nicht auf das Layout. Resize erhält währenddessen die
+logische Scrollposition. Modale Reader besitzen die Vorbereitung gegenüber dem
+verdeckten Dokument. Bei Quellenrückkehr bleibt Linkfokus bis zur Verfügbarkeit
+vorgemerkt; andere Auswahl/Fokus/Kontext verwirft ihn. Aktuelle Hover-/Tastatur-
+hinweise unterbrechen überlagernde Überblendungen. [Vertrag](READER_VORBEREITUNG.md).
+
+**70/70 lokale Intel/macOS-Release-Prüfungen bestehen (488,53s, CTest-j4).**
+3250 Font-/Job-/Batchprüfungen: genaue Glyphen-/Fontbindung,2200 gleichzeitig
+gehaltene Blöcke, eigene Eingabekopie, exakte Parameterabweisung, Budgetablehnung,
+Abbruch und Schriftwechsel.44 produktive Readerprüfungen: gemischte Schrift/
+Styles, Listen/Zitate/Tabellen/Code, vollständige Plan-Treffer, native Block-
+geometrie/Scrollmaximum gegen den synchronen Pfad, Resize, Retarget, Schrift,
+Bearbeiten, CRLF-Quellen und modaler Kontext. Die erste Gesamtprüfung fand zwei
+Anschlussfehler: überblendete Hinweise und noch nicht verfügbare Readerziele.
+Hinweise und verschobene Quellen-Fokusrückkehr sind korrigiert; die Tastatur-
+prüfung wartet gezielt auf die verfügbare Struktur. Neue Gesamtprüfung besteht.
+
+**3250+44 Prüfungen bestehen unter haltendemASan/UBSan ohne Befund.**
+Instrumentiert: eigene UI/Text/Space/Icons/NativeText/Prepare samt Includes,
+Desktop, Shape/Carets/Scripts/Bidi und beide Prüfer. Übrige Objekte in Desktop,
+Core/Modell, native Provider sowie externe SDL/TTF/HarfBuzz/FreeType/Bidi-
+Bibliotheken bleiben uninstrumentiert. Mac-Leakprüfung aus; kein ThreadSanitizer-
+Nachweis.20 Quell-/Include-Hashes stimmen mit der aktuellen instrumentierten
+Fassung. Protokolle: `build/reader-verification/`, `build/reader-sanitizers/`.
+
+Gezieltes Softwareprofil der gemischten Prüffassung: initiale Vorbereitung16,00ms,
+erste fertige Layoutphase16,08ms, synchroner Referenzplan ohne Layoutcache40,84ms.
+Das ist ein einzelner lokaler Prüflauf, keine allgemeine Framegarantie.
+Eine isolierte Kopie der17 Projektdateien blieb beim Softwareprofil unverändert.
+Wechsel über Eingang/STATE/62-KiB-Übergabe: durchschnittlich6,04ms Layout,
+39,79ms Zeichnen und92,31ms Present. Der langsamste Gesamtframe341,90ms betrifft
+1,09ms Layout/67,09ms Zeichnen/273,71ms Present. Software-Bildausgabe bleibt damit
+ein eigener offener Leistungsfall; kein universeller Flüssigkeitsnachweis.
+Derselbe isolierte Ablauf ist zusätzlich mit dem tatsächlichen Metal-Renderer
+automatisch ausgeführt: Wechsel durchschnittlich3,29ms Layout/18,44ms Zeichnen/
+0,40ms Present; Gesamtmedian19,94ms,p9542,83ms,Maximum46,37ms. Der langsamste
+Frame enthält27,34ms Layout. Kamerazeichnen benötigt durchschnittlich16,79ms.
+Diese verbleibende UI-/Zeichenarbeit ist der nächste Leistungsansatz; keine
+menschliche Bedien-/GPU-Matrixabnahme. Auch diese Fixture blieb unverändert.
+Protokolle: `build/reader-profile/`.
+
+Paket/Installation und neue Windows-/Linux-/ARM64-Abnahmen folgen. Installiert
+weiterhin0.9.44. Parser/Inline, native Metadaten, Rasterung, Spitzenverbrauch,
+synchrone Budget-Rückfälle, Shutdown und echte Geräte/assistive Bedienung bleiben
+offen. SBUI-074 ist für die vollständige Abnahme nicht geschlossen.1.0 bleibt
+an ausdrückliche Nutzerfreigabe gebunden.

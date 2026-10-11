@@ -28,12 +28,18 @@ typedef struct SBStyledCache SBStyledCache;
 typedef struct SBComposition SBComposition;
 typedef struct SBEditCache SBEditCache;
 typedef struct SBEditNativeCache SBEditNativeCache;
+typedef struct SBStyledPlan SBStyledPlan;
+typedef const SBStyledPlan *(*SBPreparedLookup)(void *data,const struct nk_user_font *font,
+    const SBStyledText *text,float width,struct nk_vec2 padding,float gap,bool terminal_line);
 typedef struct {
     SBTextSystem *text;
     uint64_t font_epoch;
     SDL_AtomicInt *layout_cancel; /* CPU preparation contexts only. */
+    size_t *layout_budget; /* Remaining retained-plan bytes in CPU contexts. */
     SBStyledCache *styled_cache;
     bool styled_cache_disabled;
+    SBPreparedLookup prepared_lookup;
+    void *prepared_data; /* Borrowed, scoped by the reader that owns the batch. */
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Cursor *text_cursor;
@@ -90,7 +96,7 @@ float sb_ui_wrap_height(struct nk_context *ctx,const struct nk_user_font *font,c
 /* Returned spans are owned by the caller; text remains borrowed. */
 bool sb_ui_styled_spans(const SBStyledText *text,SBTextSpan **spans,size_t *count);
 typedef struct {SBShapedLine shape;float y;size_t source_offset;} SBStyledLine;
-typedef struct {SBStyledLine *lines;size_t count,capacity;float height;} SBStyledPlan;
+struct SBStyledPlan {SBStyledLine *lines;size_t count,capacity;float height;};
 /* Same CPU layout as rendering; no context/window/renderer is needed. */
 bool sb_ui_styled_plan(SBUi *ui,const struct nk_user_font *font,const SBStyledText *text,
     float width,struct nk_vec2 padding,float gap,bool terminal_line,SBStyledPlan *out);

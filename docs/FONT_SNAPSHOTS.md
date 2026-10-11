@@ -1,9 +1,8 @@
 # Schriftbesitz für die Textvorbereitung
 
-Stand: 8. Oktober 2026, Unterbau ab 0.9.44, formatierter Umbruch ab 0.9.45.
-Der Prototyp wird noch nicht vom Dokumentwechsel aufgerufen. Er bereitet nun
-auch formatierte Texte mit Absätzen und Umbruch vor; vollständige
-Dokumentstruktur und sichtbare Ladezustände bleiben weitere Integration.
+Stand: 11. Oktober 2026, Unterbau ab 0.9.44, formatierter Umbruch ab 0.9.45.
+Die neue Dokumentanbindung bündelt Reader-Blöcke in einem Hintergrundauftrag.
+Ihre Prüfungen und Grenzen stehen im [Reader-Vertrag](READER_VORBEREITUNG.md).
 [Gesamtvertrag](READER_VORBEREITUNG.md).
 
 ## Unveränderliche Ressourcen
@@ -77,10 +76,21 @@ leerer Text, unabhängige Eingabekopie, doppelte Übernahme, veränderter Kontex
 Abbruch, ungültiges UTF-8, Snapshotfreigabe und Schriftneuladen sind erfasst.
 Fremdthread-Erfassung/Bindung wird abgewiesen.
 
-Dieser Unterbau ist kein Nachweis eines flüssigen langen Dokumentwechsels.
-Es fehlen insbesondere eine begrenzte Jobverwaltung, Dokumentblöcke/Tabellen
-mit ihren jeweiligen Breiten, Output-/Spitzen-Speicherabnahme großer Texte, nicht-
-blockierende Erholung/Shutdown und Integration in den sichtbaren Framepfad.
+Die einzelnen Zeilen-/Layoutjobs bleiben separat prüfbare APIs. Die Reader-
+Anbindung verwendet stattdessen einen Batch mit einem privaten Fontkontext und
+Thread. Sie bindet alle Glyphen erst nach vollständiger Kontext-/Fontprüfung und
+hält die Pläne unabhängig vom allgemeinen Memo-Cache fest. Eine exakte Suche
+prüft Textbytes, Stile, Rolle, Breite, Innen-/Zeilenabstände und Abschlussregel.
+Die Lookup-Tabelle verwendet Hashes nur zur Vorauswahl, nie als Identitätsbeweis.
+
+Ein Batch nimmt höchstens 4096 Requests, 32 MiB eigene Eingabedaten und 64 MiB
+gehaltene Pläne samt Fontkennungen an. Vor dem Hinzufügen einer weiteren Zeile
+wird deren Speicherbedarf geprüft; die aktuelle einzelne Shape-/Bidi-Operation
+und Bibliotheksallokationen gehören nicht zu diesem Retentionsbudget.
+Ein Gesamtnachweis des Spitzenverbrauchs großer Texte bleibt deshalb offen.
+Die UI besitzt höchstens einen Batch. Navigation bricht ab und prüft zur Freigabe
+`SDL_GetThreadState == SDL_THREAD_COMPLETE`, bevor sie joint; der letzte
+ausgewählte Inhalt beginnt danach. Shutdown cancelt und joint weiterhin bewusst.
 Der Job akzeptiert höchstens die vorhandene Textgrenze; die Fontdaten-Grenze
 ist kein allgemeines 64-MiB-Limit aller Bibliotheks-/Glyphenallokationen.
 Ausgeführte Tests, Sanitizer-Scope und neue Plattformnachweise stehen in

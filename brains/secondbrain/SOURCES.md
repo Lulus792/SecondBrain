@@ -1,6 +1,6 @@
 # SecondBrain Quellen
 
-Zuletzt eingesehen: 8. Oktober 2026. Relative Verweise erwarten diese Instanz
+Zuletzt eingesehen: 11. Oktober 2026. Relative Verweise erwarten diese Instanz
 unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 
 ## Auftrag und Arbeitsweise
@@ -159,3 +159,10 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
 
 - [Font-Snapshots](../../docs/FONT_SNAPSHOTS.md): unveränderliche Ressourcen,
   private Worker-Fonts, geprüfte Quell-/Fontbindung und Grenzen des Prototyps.
+
+## Reader-Anbindung vom 11. Oktober
+
+- [Vorbereitungsvertrag](../../docs/READER_VORBEREITUNG.md): Zustände, produktive Anbindung und offene Leistungsgrenzen.
+- [Schriftbesitz](../../docs/FONT_SNAPSHOTS.md): private CPU-Kontexte, Batch-Budgets und Freigabe.
+- [Produktiver Prüfer](../../tests/test_reader_prepare.c): Umbruch-/Tabellen-/Scrollvergleich, Resize, Retarget, Schriftwechsel, modaler Reader und CRLF-Quellen.
+- [Batch-Prüfer](../../tests/test_prepare.c): genaue Glyphenbindung, über 2048 gehaltene Pläne, Budgetabweisung und Abbruch.

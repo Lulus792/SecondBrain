@@ -5,6 +5,11 @@ typedef SBStyledLine StyledLine;
 typedef SBStyledPlan StyledPlan;
 static void styled_plan_free(StyledPlan *plan){for(size_t i=0;i<plan->count;++i)sb_shape_line_free(&plan->lines[i].shape);free(plan->lines);memset(plan,0,sizeof(*plan));}
 static bool styled_line_add(StyledPlan *plan,SBShapedLine *line,SBUi *ui,const struct nk_user_font *base,float gap) {
+    if(ui->layout_budget){
+        size_t bytes=line->capacity*sizeof(*line->glyphs)+line->run_capacity*sizeof(*line->runs)+line->count+sizeof(uint8_t *);
+        if(plan->count==plan->capacity)bytes+=(plan->capacity ? plan->capacity : 16)*sizeof(*plan->lines);
+        if(bytes>*ui->layout_budget)return false;*ui->layout_budget-=bytes;
+    }
     if(plan->count==plan->capacity){size_t next=plan->capacity ? plan->capacity*2 : 16;StyledLine *grown=realloc(plan->lines,next*sizeof(*grown));if(!grown)return false;plan->lines=grown;plan->capacity=next;}
     plan->lines[plan->count++]=(StyledLine){*line,plan->height};memset(line,0,sizeof(*line));
     const SBShapedLine *last=&plan->lines[plan->count-1].shape;
@@ -162,20 +167,24 @@ static StyledMemo *styled_memo(SBUi *ui,const struct nk_user_font *base,const SB
     if(cache->bytes+next.bytes>SB_STYLED_BYTES){sb_ui_styled_cache_clear(ui);ui->styled_cache=calloc(1,sizeof(*ui->styled_cache));if(!ui->styled_cache){styled_memo_free(&next);return NULL;}cache=ui->styled_cache;slot=&cache->entries[hash%SB_STYLED_SETS][0];}
     cache->bytes-=slot->bytes;styled_memo_free(slot);next.stamp=++cache->stamp;*slot=next;cache->bytes+=next.bytes;return slot;
 }
-float sb_ui_styled_height(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,float width){StyledMemo *memo=styled_memo(ui,base,text,width,ui->ctx->style.text.padding,4*ui->scale,false);if(memo)return memo->plan.height;StyledPlan plan={0};if(!styled_build(ui,base,text,width,ui->ctx->style.text.padding,4*ui->scale,false,&plan))return 0;float height=plan.height;styled_plan_free(&plan);return height;}
+static const StyledPlan *styled_lookup(SBUi *ui,const struct nk_user_font *font,const SBStyledText *text,float width,struct nk_vec2 padding,float gap,bool terminal_line){
+    if(!ui->styled_cache_disabled && ui->prepared_lookup){const StyledPlan *plan=ui->prepared_lookup(ui->prepared_data,font,text,width,padding,gap,terminal_line);if(plan)return plan;}
+    StyledMemo *memo=styled_memo(ui,font,text,width,padding,gap,terminal_line);return memo ? &memo->plan : NULL;
+}
+float sb_ui_styled_height(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,float width){const StyledPlan *memo=styled_lookup(ui,base,text,width,ui->ctx->style.text.padding,4*ui->scale,false);if(memo)return memo->height;StyledPlan plan={0};if(!styled_build(ui,base,text,width,ui->ctx->style.text.padding,4*ui->scale,false,&plan))return 0;float height=plan.height;styled_plan_free(&plan);return height;}
 void sb_ui_styled_draw(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text){sb_ui_styled_aligned(ui,base,text,NK_TEXT_LEFT);}
 bool sb_ui_styled_geometry(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,float width,SBStyledGeometryVisitor visitor,void *user) {
-    if(!visitor)return false;StyledMemo *memo=styled_memo(ui,base,text,width,ui->ctx->style.text.padding,4*ui->scale,false);StyledPlan fresh={0};
+    if(!visitor)return false;const StyledPlan *memo=styled_lookup(ui,base,text,width,ui->ctx->style.text.padding,4*ui->scale,false);StyledPlan fresh={0};
     if(!memo && !styled_build(ui,base,text,width,ui->ctx->style.text.padding,4*ui->scale,false,&fresh))return false;
-    const StyledPlan *plan=memo ? &memo->plan : &fresh;bool ok=true;
+    const StyledPlan *plan=memo ? memo : &fresh;bool ok=true;
     for(size_t i=0;i<plan->count && ok;++i)ok=visitor(user,&plan->lines[i].shape,plan->lines[i].source_offset,plan->lines[i].y);
     styled_plan_free(&fresh);return ok;
 }
 void sb_ui_styled_aligned(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,nk_flags alignment) {
     struct nk_rect bounds;if(nk_widget(&bounds,ui->ctx)==NK_WIDGET_INVALID)return;
-    StyledMemo *memo=styled_memo(ui,base,text,bounds.w,ui->ctx->style.text.padding,4*ui->scale,false);StyledPlan fresh={0};
+    const StyledPlan *memo=styled_lookup(ui,base,text,bounds.w,ui->ctx->style.text.padding,4*ui->scale,false);StyledPlan fresh={0};
     if(!memo && !styled_build(ui,base,text,bounds.w,ui->ctx->style.text.padding,4*ui->scale,false,&fresh))return;
-    const StyledPlan *plan=memo ? &memo->plan : &fresh;struct nk_vec2 padding=ui->ctx->style.text.padding;float available=fmaxf(1,bounds.w-2*padding.x);
+    const StyledPlan *plan=memo ? memo : &fresh;struct nk_vec2 padding=ui->ctx->style.text.padding;float available=fmaxf(1,bounds.w-2*padding.x);
     for(size_t i=0;i<plan->count;++i){const StyledLine *line=&plan->lines[i];float measured=line->shape.advance/ui->density,shift=0;
         if(alignment&NK_TEXT_ALIGN_RIGHT)shift=fmaxf(0,available-measured);else if(alignment&NK_TEXT_ALIGN_CENTERED)shift=fmaxf(0,(available-measured)/2);
         sb_ui_shaped_draw(ui,&line->shape,bounds.x+padding.x+shift,bounds.y+padding.y+line->y+line->shape.ascent/ui->density,ui->ctx->style.text.color);

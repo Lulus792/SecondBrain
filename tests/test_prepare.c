@@ -73,6 +73,57 @@ static int layout_invalidation(SBUi *ui){
     SBTextSpan invalid_span={1,strlen(source)-1,0};SBStyledText invalid={.text=(char *)source,.spans=&invalid_span,.count=1};snapshot=sb_ui_text_snapshot(ui);CHECK(snapshot);job=sb_prepare_layout_start(snapshot,&invalid,1,120,padding,gap,false,6);CHECK(job);CHECK(wait_layout(job)==SB_PREPARE_FAILED);sb_prepare_layout_free(job);
     return 0;
 }
+static SBPrepareState wait_batch(SBPrepareBatch *batch){Uint64 end=SDL_GetTicksNS()+UINT64_C(15000000000);SBPrepareState state;while((state=sb_prepare_batch_state(batch,NULL))==SB_PREPARE_PENDING && SDL_GetTicksNS()<end)SDL_Delay(1);return state;}
+static bool retire_batch(SBPrepareBatch *batch){Uint64 end=SDL_GetTicksNS()+UINT64_C(15000000000);while(!sb_prepare_batch_try_free(batch)){if(SDL_GetTicksNS()>=end)return false;SDL_Delay(1);}return true;}
+typedef struct {SBPrepareBatch *batch;SBUi *ui;unsigned hits;} BatchLookup;
+static const SBStyledPlan *batch_lookup(void *data,const struct nk_user_font *font,const SBStyledText *text,float width,struct nk_vec2 padding,float gap,bool terminal){
+    BatchLookup *p=data;unsigned role=font==&p->ui->normal->handle ? 0 : font==&p->ui->body->handle ? 1 : font==&p->ui->heading->handle ? 2 : 3;
+    SBPrepareRequest r={.text=*text,.role=role,.width=width,.padding=padding,.gap=gap,.terminal_line=terminal};
+    const SBStyledPlan *plan=sb_prepare_batch_lookup(p->batch,p->ui,&r);if(plan)++p->hits;return plan;
+}
+static int batch_cases(SBUi *ui){
+    OK(sb_ui_fonts(ui,1));
+    const char *source="**AV ffi** אבג *ببب* 👩‍💻 words words\nlast";
+    SBInline reader;SBStyledText styled={0};OK(sb_inline_init(&reader,source,strlen(source)));OK(sb_inline_styled(&reader,0,strlen(source),&styled));
+    SBPrepareRequest requests[4];struct nk_vec2 padding=ui->ctx->style.text.padding;
+    size_t remaining=1;SBStyledPlan rejected={0};ui->layout_budget=&remaining;
+    CHECK(!sb_ui_styled_plan(ui,&ui->body->handle,&styled,100,padding,4,false,&rejected));
+    CHECK(!rejected.lines && !rejected.count && remaining==1);ui->layout_budget=NULL;
+    for(unsigned i=0;i<4;++i)requests[i]=(SBPrepareRequest){.text=styled,.role=i,.width=173+i*31,.padding=padding,.gap=4*ui->scale};
+    SBTextSnapshot *fonts=sb_ui_text_snapshot(ui);CHECK(fonts);SBPrepareBatch *b=sb_prepare_batch_start(fonts,requests,4,23);CHECK(b);
+    CHECK(wait_batch(b)==SB_PREPARE_READY);CHECK(!sb_prepare_batch_lookup(b,ui,&requests[0]));
+    CHECK(sb_prepare_batch_bind(b,ui,24).code==SB_CONFLICT);OK(sb_prepare_batch_bind(b,ui,23));
+    CHECK(sb_prepare_batch_bytes(b)>strlen(source)*4 && sb_prepare_batch_bytes(b)<SB_PREPARE_INPUT_BYTES+SB_PREPARE_OUTPUT_BYTES);
+    for(unsigned i=0;i<4;++i){const SBStyledPlan *plan=sb_prepare_batch_lookup(b,ui,&requests[i]);CHECK(plan);
+        const struct nk_user_font *font=i==0 ? &ui->normal->handle : i==1 ? &ui->body->handle : i==2 ? &ui->heading->handle : &ui->code->handle;
+        SBStyledPlan reference={0};CHECK(sb_ui_styled_plan(ui,font,&styled,requests[i].width,padding,4,false,&reference));CHECK(reference.count==plan->count && reference.height==plan->height);
+        for(size_t l=0;l<reference.count;++l){Compare c={.result=&plan->lines[l].shape,.valid=true};CHECK(compare_line(&c,&reference.lines[l].shape,0,0));CHECK(plan->lines[l].source_offset==reference.lines[l].source_offset && plan->lines[l].y==reference.lines[l].y);}
+        sb_ui_styled_plan_free(&reference);
+    }
+    SBPrepareRequest changed=requests[0];changed.width+=1;CHECK(!sb_prepare_batch_lookup(b,ui,&changed));changed=requests[0];changed.terminal_line=true;CHECK(!sb_prepare_batch_lookup(b,ui,&changed));
+    BatchLookup lookup={b,ui,0};ui->prepared_lookup=batch_lookup;ui->prepared_data=&lookup;sb_ui_styled_cache_clear(ui);
+    const SBStyledPlan *plan=sb_prepare_batch_lookup(b,ui,&requests[1]);LayoutCompare compare={.plan=plan,.valid=true};
+    CHECK(sb_ui_styled_height(ui,&ui->body->handle,&styled,requests[1].width)==plan->height);
+    CHECK(sb_ui_styled_geometry(ui,&ui->body->handle,&styled,requests[1].width,compare_layout,&compare));CHECK(compare.valid && compare.at==plan->count && lookup.hits==2 && !ui->styled_cache);
+    ui->prepared_lookup=NULL;ui->prepared_data=NULL;
+    OK(sb_ui_fonts(ui,1.25f));CHECK(!sb_prepare_batch_lookup(b,ui,&requests[0]));CHECK(sb_prepare_batch_bind(b,ui,23).code==SB_CONFLICT);CHECK(retire_batch(b));
+    fonts=sb_ui_text_snapshot(ui);CHECK(fonts);b=sb_prepare_batch_start(fonts,requests,4,25);CHECK(b);sb_prepare_batch_cancel(b);CHECK(wait_batch(b)==SB_PREPARE_CANCELLED);CHECK(sb_prepare_batch_bind(b,ui,25).code==SB_INVALID);CHECK(retire_batch(b));
+    fonts=sb_ui_text_snapshot(ui);CHECK(fonts);CHECK(!sb_prepare_batch_start(fonts,requests,0,0));CHECK(!sb_prepare_batch_start(fonts,requests,SB_PREPARE_REQUEST_LIMIT+1,0));
+    changed=requests[0];changed.role=4;CHECK(!sb_prepare_batch_start(fonts,&changed,1,0));sb_text_snapshot_free(fonts);
+    /* More plans than the general memo cache can retain, all pinned together. */
+    OK(sb_ui_fonts(ui,1));size_t count=2200;SBPrepareRequest *many=calloc(count,sizeof(*many));char (*labels)[40]=calloc(count,sizeof(*labels));SBTextSpan *spans=calloc(count,sizeof(*spans));CHECK(many && labels && spans);
+    for(size_t i=0;i<count;++i){snprintf(labels[i],40,"block %zu AV ffi",i);spans[i]=(SBTextSpan){0,strlen(labels[i]),0};many[i]=(SBPrepareRequest){.text={.text=labels[i],.spans=&spans[i],.count=1},.role=1,.width=200,.padding=padding,.gap=4};}
+    fonts=sb_ui_text_snapshot(ui);CHECK(fonts);b=sb_prepare_batch_start(fonts,many,count,9);CHECK(b);CHECK(wait_batch(b)==SB_PREPARE_READY);OK(sb_prepare_batch_bind(b,ui,9));
+    for(size_t i=0;i<count;++i){plan=sb_prepare_batch_lookup(b,ui,&many[i]);CHECK(plan && plan->count==1 && plan->height>0);}
+    /* Requests are copied; changes to caller memory cannot change a bound plan. */
+    const SBStyledPlan *first=sb_prepare_batch_lookup(b,ui,&many[0]);labels[0][0]='X';CHECK(!sb_prepare_batch_lookup(b,ui,&many[0]));labels[0][0]='b';CHECK(sb_prepare_batch_lookup(b,ui,&many[0])==first);
+    CHECK(retire_batch(b));free(many);free(labels);free(spans);
+    /* Reject oversized aggregate input before starting a worker. */
+    char *large=malloc(SB_TEXT_LIMIT+1);CHECK(large);memset(large,'a',SB_TEXT_LIMIT);large[SB_TEXT_LIMIT]=0;SBTextSpan large_span={0,SB_TEXT_LIMIT,0};
+    for(size_t i=0;i<3;++i)requests[i]=(SBPrepareRequest){.text={.text=large,.spans=&large_span,.count=1},.role=1,.width=200,.padding=padding};
+    fonts=sb_ui_text_snapshot(ui);CHECK(fonts);CHECK(!sb_prepare_batch_start(fonts,requests,3,0));sb_text_snapshot_free(fonts);free(large);
+    sb_styled_free(&styled);sb_inline_free(&reader);return 0;
+}
 int main(int argc,char **argv){CHECK(argc==2);SBUi ui;OK(sb_ui_init(&ui,argv[1],900,600,true));
     for(unsigned scale=0;scale<3;++scale){OK(sb_ui_fonts(&ui,1+0.5f*scale));const struct nk_user_font *base=&ui.body->handle;
         CHECK(!shape_case(&ui,base,"AB é ffi AV אב12גד ببب سلام 👩‍💻",0));CHECK(!shape_case(&ui,base,"אבג AB 12 (דה)",0));
@@ -82,5 +133,5 @@ int main(int argc,char **argv){CHECK(argc==2);SBUi ui;OK(sb_ui_init(&ui,argv[1],
     TTF_Font *font=sb_ui_cluster_font(&ui.body->handle,"п",2,NULL);CHECK(font && TTF_SetFontLanguage(font,"bg"));sb_ui_styled_cache_clear(&ui);CHECK(!shape_case(&ui,&ui.body->handle,"птб AV ffi",0));
     CHECK(!immutable_assets(&ui));CHECK(!thread_ownership(&ui));CHECK(!cancelled(&ui));CHECK(!stale_fonts(&ui));
     for(unsigned scale=0;scale<3;++scale){OK(sb_ui_fonts(&ui,1+0.5f*scale));for(unsigned role=0;role<4;++role){CHECK(!layout_case(&ui,role,125,false));CHECK(!layout_case(&ui,role,430,true));}}
-    CHECK(!layout_invalidation(&ui));sb_ui_shutdown(&ui);printf("%u private-worker-font/source/glyph/wrap/style/cancellation/epoch assertions passed.\n",checks);return 0;
+    CHECK(!layout_invalidation(&ui));CHECK(!batch_cases(&ui));sb_ui_shutdown(&ui);printf("%u private-worker-font/source/glyph/wrap/style/batch/cancellation/epoch assertions passed.\n",checks);return 0;
 }

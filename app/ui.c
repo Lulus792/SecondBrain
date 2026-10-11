@@ -211,8 +211,8 @@ static bool wrapped_source(const char *value,size_t length,SBWrappedSource *sour
     source->span=(SBTextSpan){0,length,0};source->text.spans=length ? &source->span : NULL;source->text.count=length ? 1 : 0;return true;
 }
 static const StyledPlan *wrapped_plan(SBUi *ui,const struct nk_user_font *font,const SBWrappedSource *source,float width,struct nk_vec2 padding,StyledPlan *fresh){
-    StyledMemo *memo=styled_memo(ui,font,&source->text,width,padding,2*padding.y,true);
-    if(memo)return &memo->plan;
+    const StyledPlan *memo=styled_lookup(ui,font,&source->text,width,padding,2*padding.y,true);
+    if(memo)return memo;
     return styled_build(ui,font,&source->text,width,padding,2*padding.y,true,fresh) ? fresh : NULL;
 }
 static bool wrapped_paint(SBUi *ui,struct nk_command_buffer *canvas,struct nk_rect bounds,const char *value,size_t length,const struct nk_user_font *font,struct nk_vec2 padding,struct nk_color color,nk_flags alignment){

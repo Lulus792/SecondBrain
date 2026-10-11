@@ -33,6 +33,13 @@ static void frame_run(SBDesktop *d,bool draw) {
     sb_desktop_apply(d);
 }
 static void frame(SBDesktop *d) { frame_run(d,true); }
+static bool reader_ready(SBDesktop *d) {
+    Uint64 deadline=SDL_GetTicksNS()+UINT64_C(15000000000);
+    for(;;){bool pending=false;for(size_t i=0;i<d->passive_count;++i)if(!strcmp(d->passive[i].id,"reader:preparing")){pending=true;break;}
+        if(!pending)return true;if(SDL_GetTicksNS()>=deadline)return false;
+        SDL_Delay(1);frame(d);
+    }
+}
 static void key(SBDesktop *d, SDL_Keycode code, SDL_Keymod mod) {
     SDL_Event e = {0}; e.type = SDL_EVENT_KEY_DOWN; e.key.key = code; e.key.mod = mod;
     e.key.windowID = SDL_GetWindowID(d->ui.window); e.key.down = true;
@@ -189,6 +196,7 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
     key(d,SDLK_UP,0); CHECK(!strcmp(d->focus,"context"));
     key(d,SDLK_UP,0); CHECK(!strcmp(d->focus,"help-actions"));
     key(d,SDLK_ESCAPE,0); CHECK(d->form==SB_FORM_NONE);
+    CHECK(reader_ready(d));
     CHECK(d->target_count > 300);
     CHECK(reach(d,"reader"));
     key(d,SDLK_PAGEDOWN,0);
@@ -207,7 +215,7 @@ int sb_desktop_keyboard_test(SBDesktop *d, const char *directory) {
     key(d,SDLK_F6,0); CHECK(!strcmp(d->focus,"project-picker"));
     key(d,SDLK_TAB,SDL_KMOD_SHIFT); CHECK(!strcmp(d->focus,"link:299"));
     key(d,SDLK_RETURN,0); CHECK(d->model.source && strstr(d->model.source,"Quelle ü"));
-    key(d,SDLK_ESCAPE,0); CHECK(!d->model.source && !strcmp(d->focus,"link:299"));
+    key(d,SDLK_ESCAPE,0); CHECK(!d->model.source);CHECK(reader_ready(d));CHECK(!strcmp(d->focus,"link:299"));
     key(d,SDLK_PAGEDOWN,0);
     key(d,SDLK_C,MOD|SDL_KMOD_SHIFT); CHECK(d->form == SB_FORM_CONTEXT);
     CHECK(activate(d,"copy-context"));

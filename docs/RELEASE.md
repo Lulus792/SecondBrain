@@ -1,6 +1,6 @@
 # Auf dem Weg zu 1.0
 
-Stand: 8. Oktober 2026. Diese Liste bewertet den vorhandenen Code und die
+Stand: 11. Oktober 2026. Diese Liste bewertet den vorhandenen Code und die
 [Distribution](DISTRIBUTION.md). Der Nutzer hat die offenen Arbeiten als Umsetzungsauftrag bestätigt. Die
 Versionsnummer 1.0 darf erst nach seiner ausdrücklichen Freigabe gesetzt werden.
 Die unterstützten Umgebungen und konkreten Abnahmen werden dabei festgelegt.
@@ -234,3 +234,19 @@ behalten eigenes Eigentum; übergroße Exporte bleiben vollständig ohne
 zusätzliche dauerhafte Kopie. [Vertrag](NATIVE_TEXTGEOMETRIE.md).
 Dies schließt weder das erste lange Layout noch die Integration weiterer
 Felder/Leseblöcke oder reale Geräte-/Eingabe-/Screenreader-Abnahmen ab.
+
+## Reader-Vorbereitung vom 11. Oktober
+
+Ab 0.9.46 bereitet der produktive Reader lange Dokumente blockweise in einem
+privaten CPU-Fontkontext vor. Die UI verwendet fertige, gehaltene Pläne für
+Umbruch, Höhen, Geometrie und Zeichnung; der allgemeine Memo-Cache verdrängt
+sie nicht. Retargeting wartet nicht auf einen laufenden Worker. Resize erhält
+die logische Scrollposition; Quellenrückkehr erhält den früheren Linkfokus nach
+der Vorbereitung. Aktuelle Hinweise unterbrechen überlagernde Überblendungen.
+[Vertrag und tatsächliche Grenzen](READER_VORBEREITUNG.md).
+
+Die vollständige Leistungsaufgabe bleibt offen: Quelllesen, Parser/Inline-
+Aufbereitung, native Metadaten und Rasterung bleiben UI-Arbeit. Budget-Rückfälle
+sind synchron; Spitzenverbrauch einzelner riesiger Absätze, Shutdown und echte
+Geräte/GPU/Monitore brauchen weitere Abnahmen. Die vorhandene Quellen-/Kontext-
+und Blockgeometrieprüfung ersetzt keine Windows-/Linux- oder menschliche Prüfung.

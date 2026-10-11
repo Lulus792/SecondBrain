@@ -7,6 +7,7 @@
 #include "backup_job.h"
 #include "accessibility.h"
 #include "system_style.h"
+typedef struct SBReaderPreparation SBReaderPreparation;
 
 typedef enum { SB_FORM_NONE, SB_FORM_PROJECT, SB_FORM_NOTE, SB_FORM_WORKSPACE, SB_FORM_SETTINGS, SB_FORM_CONTEXT, SB_FORM_HELP, SB_FORM_ACTIONS, SB_FORM_PROJECTS, SB_FORM_FILTER,SB_FORM_BACKUP,SB_FORM_RESTORE,SB_FORM_ABOUT,SB_FORM_NOTICE_LIST,SB_FORM_NOTICE_TEXT } SBForm;
 typedef enum {
@@ -91,6 +92,11 @@ typedef struct {
     SBStatus graph_status;
     struct nk_text_edit text_edit;
     SBNativeText native_editor;
+    SBReaderPreparation *reader_preparation;
+    bool reader_preparation_used;
+    size_t reader_plan_hits,reader_plan_misses;
+    char reader_pending_focus[100];
+    uint64_t reader_pending_context;
     bool text_edit_ready;
     char graph_project[SB_PATH_CAP];
     bool graph_dirty, card, browser, solid, reduced_motion, focus_changed, keyboard, dragging, moved;

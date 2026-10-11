@@ -9,6 +9,7 @@
 #include "document.h"
 #include "inline.h"
 #include "table.h"
+#include "prepare.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,6 +21,9 @@ static void accessible_publish(SBDesktop *d);
 static void search_begin(SBDesktop *d);
 static void search_end(SBDesktop *d);
 static void focus_set(SBDesktop *d,const char *id);
+static void reader_preparation_free(SBDesktop *d);
+static void reader_preparation_retire(SBDesktop *d);
+static bool reader_preparing(const SBDesktop *d);
 static void composition_dispatch(void *user,const SDL_Event *event){sb_desktop_event(user,event);}
 static void style_update(SBDesktop *d,bool force) {
     d->system_style=sb_system_style_snapshot(d->style_monitor,force);
@@ -79,6 +83,7 @@ void sb_desktop_tick(SBDesktop *d, float seconds) {
 
 }
 bool sb_desktop_animating(const SBDesktop *d) {
+    if(reader_preparing(d))return true;
     if(sb_ui_composition_working(&d->ui))return true;
     if (d->ui.transitioning || d->modal_sizing) return true;
     if (d->hover_label[0] && SDL_GetTicksNS()-d->hover_started<350000000u) return true;
@@ -562,6 +567,7 @@ SBStatus sb_desktop_store_preferences(SBDesktop *d) {
     return status;
 }
 void sb_desktop_free(SBDesktop *d) {
+    reader_preparation_free(d);
     sb_system_style_free(d->style_monitor);
     sb_accessibility_free(d->accessibility);
     sb_backup_job_free(d->backup);
@@ -1723,7 +1729,9 @@ static bool document_tree(SBDesktop *d,const SBDocument *document,const SBRefere
     free(layout);return true;
 }
 
+#include "reader_prepare.inc"
 static void document(SBDesktop *d, const char *text, float height) {
+    d->reader_plan_hits=d->reader_plan_misses=0;
     struct nk_context *ctx = d->ui.ctx;
     size_t text_length=strlen(text);
     const char *extension = d->model.source ? strrchr(d->model.source_path, '.') : NULL;
@@ -1739,22 +1747,30 @@ static void document(SBDesktop *d, const char *text, float height) {
     if (!nk_group_begin(ctx, "Reader", NK_WINDOW_NO_SCROLLBAR)) { ctx->style.window.group_padding=previous_padding; return; }
     scroll_gutter(d);
     unsigned slot=modal_reader(d) && (text==d->context || text==d->notice) ? 2 : 0;
-    smooth_scroll(d,slot,ctx->current->layout->offset_y);
     SBDocument parsed={0}; SBReferences references={0};
     if (!whole_code) {
         SBStatus status=sb_document_init(&parsed,text,text_length);
         if (status.code==SB_OK) status=sb_document_references(&parsed,&references);
         if (status.code!=SB_OK) { d->message=status;whole_code=true; }
     }
-    if (!whole_code && !document_tree(d,&parsed,&references,slot,&link_number,&first_heading)) whole_code=true;
-    if (whole_code) {
+    bool ready=reader_preparation_ready(d,text,whole_code,&parsed,&references,ctx->current->layout->bounds.w);
+    if(ready)smooth_scroll(d,slot,ctx->current->layout->offset_y);
+    if(!ready){
+        nk_layout_row_dynamic(ctx,32*d->ui.scale,1);
+        passive_add(d,"reader:preparing","Dokument wird vorbereitet …",ACCESSKIT_ROLE_STATUS,nk_widget_bounds(ctx));
+        nk_label(ctx,"Dokument wird vorbereitet …",NK_TEXT_LEFT);
+    }
+    if (ready && !whole_code && !document_tree(d,&parsed,&references,slot,&link_number,&first_heading)) whole_code=true;
+    if (ready && whole_code) {
         SBMarkdown reader; SBMarkdownBlock block; sb_markdown_init(&reader,text,text_length,true);
         while (sb_markdown_next(&reader,&block)) document_block(d,text,text_length,block,slot,&link_number,&references,NULL,"reader",&first_heading);
     }
+    d->ui.prepared_lookup=NULL;d->ui.prepared_data=NULL;
     nk_style_set_font(ctx, &d->ui.normal->handle);
     sb_references_free(&references); sb_document_free(&parsed);
-    scroll_measure(d,slot);
+    if(ready)scroll_measure(d,slot);
     nk_group_end(ctx);
+    if(!ready)nk_group_set_scroll(ctx,"Reader",0,d->scrolling[slot].applied);
     ctx->style.window.group_padding=previous_padding;
 }
 
@@ -2346,6 +2362,7 @@ static void welcome(SBDesktop *d,int width,int height,nk_flags flags) {
     nk_end(ctx);
 }
 void sb_desktop_frame(SBDesktop *d) {
+    d->reader_preparation_used=false;
     sb_native_text_free(&d->native_editor);
     if (d->reveal_document[0] && (d->reveal_document_context!=accessible_context(d) ||
         (!modal_reader(d) && (!d->card || (d->editing && !d->model.source))))) d->reveal_document[0]=0;
@@ -2424,7 +2441,18 @@ void sb_desktop_frame(SBDesktop *d) {
             d->keyboard = true; d->focus_changed = true; d->focus_scroll_frames = 3;
         } else focus_set(d,d->targets[first].id);
     }
-    if (!focus_target(d) && d->target_count) focus_set(d,d->targets[0].id);
+    if(d->reader_pending_focus[0]){
+        if(d->reader_pending_context!=accessible_context(d) || d->editing || modal || strcmp(d->focus,"reader"))d->reader_pending_focus[0]=0;
+        else for(size_t i=0;i<d->target_count;++i)if(!strcmp(d->targets[i].id,d->reader_pending_focus)){
+            focus_set(d,d->reader_pending_focus);d->reader_pending_focus[0]=0;break;
+        }
+    }
+    if (!focus_target(d) && d->target_count) {
+        if(reader_preparing(d) && !strncmp(d->focus,"link:",5)){
+            snprintf(d->reader_pending_focus,sizeof(d->reader_pending_focus),"%s",d->focus);
+            d->reader_pending_context=accessible_context(d);focus_set(d,"reader");
+        }else focus_set(d,d->targets[0].id);
+    }
     d->activate[0] = 0;
     for (unsigned i=0;i<4;++i) if (!d->scrolling[i].used) {
         d->scrolling[i].active=false; d->scrolling[i].pending=0; d->scrolling[i].elastic=0; d->scrolling[i].ready=false;
@@ -2436,9 +2464,15 @@ void sb_desktop_frame(SBDesktop *d) {
     if(input_focus && input_focus->kind==SB_FOCUS_TEXT)sb_ui_focus_input(&d->ui);
     nk_sdl_update_TextInput(d->ui.ctx);
     if (!d->hover_claimed) d->hover_label[0]=0;
-    if (d->hint_visible && ((d->form==SB_FORM_NONE && !d->model.guard) || d->hint_group==3)) draw_hint(d);
+    if (d->hint_visible && ((d->form==SB_FORM_NONE && !d->model.guard) || d->hint_group==3)) {
+        /* A snapshot must not cover current hover/focus guidance. The short
+           content transition is interruptible when another interaction wins. */
+        sb_ui_transition_tick(&d->ui,1,true);
+        draw_hint(d);
+    }
     bool text_pointer=false;struct nk_vec2 pointer=d->ui.ctx->input.mouse.pos;
     for(size_t i=0;i<d->target_count;++i)if(d->targets[i].kind==SB_FOCUS_TEXT && inside(pointer.x,pointer.y,d->targets[i].bounds)){text_pointer=true;break;}
     if(text_pointer!=d->ui.pointer_text){SDL_SetCursor(text_pointer && d->ui.text_cursor ? d->ui.text_cursor : SDL_GetDefaultCursor());d->ui.pointer_text=text_pointer;}
+    reader_preparation_retire(d);
     accessible_publish(d);
 }
