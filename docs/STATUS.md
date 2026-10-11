@@ -2,7 +2,7 @@
 
 Stand: 11. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.53. Die Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.54. Die Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -3750,3 +3750,21 @@ Originaldaten gelesen. SBUI-077 bleibt offen: konkurrierende Texte hinter
 Dialogflächen beruhigen und den gewählten Glascharakter erhalten. SBUI-074,
 reale assistive/Geräteprüfungen und übrige Release-Arbeit ebenfalls offen.
 Paket und Installation folgen; installiert bleibt 0.9.53. 1.0 nur nach Freigabe.
+
+## Iconpaket 0.9.54 installiert
+
+Quellcommit `2ac5a67829d7d2bb16ce69df6496178537d13c9c` ist gepusht. Sauberer Intel/macOS-Release-Build
+0.9.54/2ac5a67829d7; drei Versions-/Release-Nachprüfungen bestehen. Das entpackte
+Paket besteht 126 Desktop-, 161 Tastatur- und 75 Sicherungs-Assertions,
+zwei Einstellungs-Neustarts, produktive CLI und Runtime-/Lizenz-/Versionsprüfung.
+96 installierte Dateien entsprechen einzeln dem Paket. Die App öffnet die eigene
+Instanz ohne Änderung ihrer 18 Dateien; Aufnahme der tatsächlichen C-App angesehen.
+Prüfgerät: macOS 14.6.1/23G93, x86_64.
+
+Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.53-20261011-155340`.
+Archiv-SHA256: `cded0592486ea6712cf3c2eee80fd1c7bd8d25fa3f702fb49c3319856f1c8286`.
+Originale: `build/icon-polish-verification/`. CI 38144771813 zum Quellcommit
+zuletzt queued; neue Gesamt-Plattformabnahme bleibt offen. SBUI-076/078
+im beschriebenen lokalen Bild-/Export-/Ereignisumfang nachgeprüft. SBUI-077,
+Leistungs-, reale Geräte-/Eingabe-/Screenreader- und übrige Release-Abnahmen offen.
+1.0 nur nach ausdrücklicher Nutzerfreigabe.

@@ -11,12 +11,12 @@ Lumen-Sternkarte, Glaskarten, Icons, direkte Pfeilnavigation, Kamerafahrt,
 Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert **0.9.53 / 1c5f73161469**, sauberer Intel/macOS-Release-Build.
-95 Dateien entsprechen dem geprüften Paket; 18 Gedächtnisdateien beim Laden
+Installiert **0.9.54 / 2ac5a67829d7**, sauberer Intel/macOS-Release-Build.
+96 Dateien entsprechen dem geprüften Paket; 18 Gedächtnisdateien beim Laden
 unverändert. 126 Desktop-, 161 Tastatur-, 75 Sicherungs-Assertions, zwei Neustarts,
 produktive CLI und Runtime-/Lizenz-/Version bestehen.
-Rückfallversion 0.9.52: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.52-20261011-153352`.
-CI 38143419075 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
+Rückfallversion 0.9.53: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.53-20261011-155340`.
+CI 38144771813 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
 
 Frühere Build-/Paket-/Diagnoseverzeichnisse waren am11.Oktober nicht mehr
 vorhanden. Historische Abnahmen bleiben in STATUS/Journal; entfernte Dateien
@@ -122,7 +122,7 @@ Drei Metal-Paare senken Wechsel-Layoutzeit; Bildausgabespitzen bleiben.
 SBUI-076/078: Reloadbögen, Sicherungsicon und regenerativer Export erhalten
 vorhandene Zuordnungen/Punktflächen. 136 Interaktions-Assertions vorher/nachher,
 100/200%-Aufnahmen, fünf gezielte Prüfungen und Python unittest bestehen;
-31 Exportdateien reproduzierbar. Paket/Installation folgen, installiert bleibt53.
+31 Exportdateien reproduzierbar. Mac-Paket/Installation bestehen; weitere Zielplattformen offen.
 SBUI-077 bleibt offen: konkurrierende Dialog-Hintergrundtexte beruhigen und
 Glascharakter erhalten. [Bericht](/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-11_15-36-09/UI_REVIEW.md).
 
