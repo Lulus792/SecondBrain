@@ -1,7 +1,8 @@
 # Zur langen Notiz zurückkehren
 
 Stand: 11. Oktober 2026, Umsetzung ab 0.9.58. UI-Befund SBUI-079.
-78/78 lokale Release-Prüfungen bestehen (651,31 s); Paketabnahme folgt.
+78/78 lokale Release-Prüfungen bestehen (651,31 s); Intel/macOS-Paket geprüft
+und als 0.9.58 installiert. Weitere Zielplattformabnahmen bleiben offen.
 [UI-Nachprüfung](/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-11_18-36-07/UI_REVIEW.md).
 
 ## Reproduzierter Fehler

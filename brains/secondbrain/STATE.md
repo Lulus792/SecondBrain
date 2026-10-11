@@ -13,13 +13,13 @@ Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt. Externe
 Bibliotheken bleiben auf UI beschränkt; eigene Lizenz MIT.
 
-Installiert **0.9.57 / 1c827fd0e46d**, sauberer Intel/macOS-Release-Build.
+Installiert **0.9.58 / 4d984a6330c2**, sauberer Intel/macOS-Release-Build.
 96 Dateien entsprechen dem geprüften Paket; 18 Gedächtnisdateien beim Öffnen
 unverändert. 126 Desktop-, 161 Tastatur-, 75 Sicherungs-Assertions, zwei Neustarts,
 produktive CLI und Runtime-/Lizenz-/Version bestehen. Tatsächliche App-Aufnahme
 angesehen. Prüfgerät: macOS 14.6.1/23G93, x86_64.
-Rückfallversion 0.9.56: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.56-20261011-182004`.
-CI 38154566935 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
+Rückfallversion 0.9.57: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.57-20261011-191238`.
+CI 38158192485 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
 Frühere Plattformnachweise ersetzen keine Prüfung dieser neuen Fassung.
 
 ## Geprüfte aktuelle Änderung
@@ -30,16 +30,11 @@ Reader-/Editorposition und Inhaltshöhe. Die native Modalabschirmung bleibt.
 39 eigene C-Dateien, 55 aktuelle Hashes. 78/78 Release-Prüfungen bestehen
 (651,31 s). Finale Vorher/Menü/Nachher-Bilder angesehen; SBUI-079 lokal geprüft.
 SBUI-080 bleibt offen: F1 verliert die Ursprungsaufgabe eines begonnenen Formulars.
-[Vertrag](../../docs/READER_RUECKKEHR.md). Paket/Installation folgen; installiert 0.9.57.
+[Vertrag](../../docs/READER_RUECKKEHR.md). Intel/macOS-Paket/Installation geprüft;
+weitere aktuelle Zielplattformabnahmen offen.
 
-0.9.57 hält zusätzlich graphemgebundene Stilgrenzen im Quellenbudget; Schrift-
-und Zeichenpositionen bleiben aktuell. 177 Quell-/Stil-, 50 Reader- und 621
-Mac-Assertions auch unter ASan/UBSan bestehen; 39 eigene C-Dateien, 55 aktuelle
-Hashes. 78/78 Release-Prüfungen (685,84 s) plus erweiterte Budgetprüfung bestehen.
-Metal-Paare senken Ruhe-/Scroll-/Kamera-Layout im Median um 38,62/26,54/32,55%;
-erste Bilder und Frame-Spitzen verbessern sich nicht durchgängig.
-[Stilplan](../../docs/READER_STILPLAN.md). Intel/macOS-Paket/Installation geprüft;
-aktuelle Windows-/Linux-/ARM64-Abnahmen fehlen.
+Zusätzlich bleiben graphemgebundene Stilgrenzen im Quellenbudget gehalten;
+Schrift- und Zeichenpositionen bleiben aktuell. [Stilplan](../../docs/READER_STILPLAN.md).
 
 0.9.56 hält Inline-Analysen von Absätzen/Überschriften mit Text und Referenzen
 im vorhandenen 16-MiB-Quellbudget. Iteratoren erhalten eigene Cursor; Änderungen
@@ -64,6 +59,9 @@ Die [Frame-Messung](../../docs/FRAME_MESSUNG.md) erfasst Eingabe, erste Bilder u
 reale Animationsabstände; Einzelausgaben ersetzen keine menschliche Bedienabnahme.
 
 ## Nächste Arbeiten und verbleibende Abnahmen
+
+SBUI-080 korrigieren: Hilfe/vergleichbare Befehlswechsel aus begonnenen Formularen
+erhalten Ursprungsaufgabe, Eingaben, Fokus/Auswahl und Scrollposition.
 
 Native Blockausgaben/-veröffentlichung, erste Quell-/Parser-/Worker-Aufbereitung,
 Tabellenzellen, Rasterung und Fälle über den Vorbereitungsbudgets getrennt

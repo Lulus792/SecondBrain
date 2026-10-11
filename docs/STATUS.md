@@ -2,7 +2,7 @@
 
 Stand: 11. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.57. Die Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.58. Die Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -3945,3 +3945,23 @@ Hilfe; Escape stellt die Formularaufgabe nicht wieder her, erneutes Anlegen leer
 den Titel. Keine vorhandene Datei wurde verloren. Weitere Zielplattformen,
 reale Geräte/IME/Screenreader, SBUI-074 und übrige Release-Arbeit bleiben offen.
 Paket/Installation folgen; installiert weiterhin 0.9.57. 1.0 nur nach Freigabe.
+
+
+## Reader-Rückkehrpaket 0.9.58 installiert
+
+Quellcommit `4d984a6330c2aa15f1990b7ea85b1dd4791d192c` gepusht. Sauberer
+Intel/macOS-Release-Build 0.9.58/4d984a6330c2; drei Versions-/Release-Nachprüfungen
+bestehen. Das entpackte Paket besteht 126 Desktop-, 161 Tastatur- und 75
+Sicherungs-Assertions, zwei Einstellungs-Neustarts, produktive CLI sowie
+Runtime-/Lizenz-/Version beider Programme. Alle 96 installierten Dateien
+entsprechen einzeln dem Paket. Die App öffnet das eigene Gedächtnis ohne
+Änderung seiner 18 Dateien; tatsächliche C-App-Aufnahme angesehen.
+Prüfgerät: macOS 14.6.1/23G93, x86_64.
+
+Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.57-20261011-191238`.
+Archiv-SHA256: `7fb84bc50137e5a178c67a4a586dd5417b3c75af3d574fcc27396693039517d9`.
+Originale: `build/reader-overlay-verification/`. CI 38158192485 zum Quellcommit
+zuletzt queued; weitere aktuelle Zielplattformabnahmen offen. SBUI-079 im lokalen
+Quellen-/SDL-/Bild-/Providerumfang geprüft. SBUI-080 (Hilfe aus begonnenem
+Formular), erste Vorbereitung/Bildspitzen, reale Geräte/IME/Screenreader und
+übrige Release-Arbeit bleiben offen. 1.0 nur nach ausdrücklicher Nutzerfreigabe.
