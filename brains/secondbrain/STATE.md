@@ -71,7 +71,9 @@ Inhaltshöhe vor Anwendung und begrenzt große Eingaben. 45 Scroll-, 117 Reader-
 und 622 Mac-Prüfbedingungen auch unter ASan/UBSan: 39 C-Dateien/56 Hashes.
 Vier gezielte Release-Läufe bestehen (36,05 s), tatsächliche Reader-/Kontext-
 Bilder betrachtet. [Vertrag](../../docs/SCROLLEN_BEIM_LADEN.md).
-Gesamt-/Paket-/Plattformprüfung folgen; installiert weiter 0.9.60.
+81/81 lokale Release-Prüfungen bestehen (437,82 s). Paket-/Plattformprüfung
+folgen; installiert weiter 0.9.60. Doppelter visueller Reader-Fokusrahmen
+im modalen Hintergrund ist als nächste UI-Nachprüfung festgehalten.
 
 0.9.60 korrigiert Cache-Indexierung an `void *`; GCC/Clang weisen sie künftig
 als Fehler ab. Fensterprüfer synchronisieren und bestätigen 780×900 bzw.

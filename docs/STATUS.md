@@ -4059,3 +4059,10 @@ auf Windows und Linux in Debug/Release, einschließlich beider Release-Pakete
 separat. Diese Abnahme gilt für 0.9.60, nicht automatisch für 0.9.61.
 Leistung, reale Geräte/IME/Screenreader und übrige Release-Aufgaben bleiben.
 1.0 weiterhin nur nach ausdrücklicher Nutzerfreigabe.
+
+
+81/81 lokale Release-Prüfungen zu dc5af86/0.9.61 bestehen (437,82 s).
+Original: `build/reader-scroll-verification/ctest-release.log`. Paket und neue
+native Zielplattformabnahme folgen. Der sichtbare zweite Reader-Fokusrahmen
+im modalen Hintergrund ist in RELEASE als eigene UI-Nachprüfung aufgenommen;
+native Zielabschirmung bleibt bestehen. Gesamtziel/1.0 weiterhin offen.

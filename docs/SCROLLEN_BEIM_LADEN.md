@@ -53,7 +53,9 @@ vor/nach dem Lauf geprüft. Externe UI nicht instrumentiert, kein Leak-/
 ThreadSanitizer-Nachweis. Originale: `build/reader-scroll-verification/`,
 `build/reader-scroll-sanitizers/` und `build/current-ui/reader-scroll-69864/`.
 
-Gesamt-, Paket- und neue native Zielplattformabnahme folgen. Installiert bleibt
+Alle 81 lokalen Release-Prüfungen bestehen (437,82 s); Original:
+`build/reader-scroll-verification/ctest-release.log`.
+Paket- und neue native Zielplattformabnahme folgen. Installiert bleibt
 zunächst 0.9.60. Dies behebt den bestätigten Eingabeverlust, nicht die gesamte
 Leistungsaufgabe: erste Quell-/Parser-/Rasterarbeit, große echte Wissensbasen,
 reale Geräte/Monitore/Trackpads, IME und Screenreader bleiben offene Abnahmen.

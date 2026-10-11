@@ -110,6 +110,12 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   Nutzerwunsch erst, wenn das Produkt vollständig ist. Entwicklungsunterlagen
   behalten ihren Zweck und ihre Nachweise.
 
+- [ ] **Fokus nur in der aktiven Modalaufgabe zeichnen:** Die Kontextaufnahme
+  zur Scrollkorrektur zeigt denselben Reader-Fokusrahmen im abgeschirmten
+  Formularhintergrund. Native Ziele sind dort gesperrt; die visuelle
+  Ringzeichnung benötigt eine eigene Nachprüfung. Original:
+  `build/reader-scroll-verification/context-ready.png`.
+
 ## Mögliche spätere Erweiterungen
 
 Chat-Anbieter, automatische KI-Pflege, Synchronisation, mobile Apps, Wiki-Links,
