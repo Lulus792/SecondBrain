@@ -63,6 +63,15 @@ Die tatsächlichen Frames haben weiterhin Layout-/Presentspitzen.
 bestehen (395,24s). Intel/macOS-Paket und Installation geprüft; andere
 Zielplattformen bleiben offen.
 
+## Neue Feldgeometrie (0.9.49, Paket noch ausstehend)
+
+Suche und alle Formulartexte kopieren ihre tatsächliche gezeichnete Geometrie
+mit eigenen Quellen; IME und der gehaltene Notizeditorcache bleiben geschützt.
+503 Feld- und 592 Mac-Providerprüfungen bestehen auch unter ASan/UBSan.
+72/73 Release-Prüfungen plus korrigierter zeitabhängiger Cursor-Test im
+gezielten Nachlauf decken alle73 aktuellen Prüfungen ab. Installiert bleibt48.
+[Vertrag/Prüfgrenzen](../../docs/NATIVE_TEXTGEOMETRIE.md).
+
 ## Nächste Arbeiten
 
 Quelllesen, Parser/Inline-Aufbereitung,
@@ -70,7 +79,7 @@ native Metadaten, Rasterung und Fälle über den Vorbereitungsbudgets profiliere
 Der Rückfall ist noch synchron; einzelne Bibliotheksaufrufe und Shutdown können
 warten. SBUI-074 bleibt für die vollständige Großdaten-/Geräteabnahme offen.
 
-Weitere native Textfelder/Leseblöcke, echte IME und VoiceOver/NVDA/Orca,
+Native Leseblock-Geometrie und einzeilige Auswahl-/Ersetzungsaktionen, echte IME und VoiceOver/NVDA/Orca,
 Dialog-/Geräte-/Monitor-/Langzeitprüfungen, Windows-/Linux-Speicherfehler,
 Mindest-OS/frische Rechner, vollständige Runtime-/Lizenzprüfung, Sicherheitskanal,
 Signierung und abschließende natürliche Texte bleiben Release-Arbeit.

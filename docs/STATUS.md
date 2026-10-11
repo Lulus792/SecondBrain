@@ -1,8 +1,8 @@
 # Umsetzungsstand von SecondBrain
 
-Stand: 8. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
+Stand: 11. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.41. Die neue Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.48. Die Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -3485,3 +3485,38 @@ Protokolle/Hashmanifest: `build/space-raster-verification/`.
 zuletzt queued; keine neue Windows-/Linux-/ARM64-Gesamtabnahme behauptet.
 Layout-/Present-/Geräte-/assistive Abnahme, SBUI-074 und übrige Release-Liste
 bleiben offen.1.0 nur nach ausdrücklicher Nutzerfreigabe.
+
+## Native Suche-/Formulargeometrie (0.9.49, 11. Oktober)
+
+Alle sieben einzeiligen Eingabefeldtypen kopieren ihren gezeichneten Quellplan
+unmittelbar nach dem jeweiligen Nuklear-Widget. Quellen, Glyphenrechtecke und
+Scrollversatz bleiben pro Feld unabhängig; vollständig abgeschnittene Widgets
+übernehmen keinen alten Plan. IME-Komposition behält die Originalquelle ohne
+unpassende Kompositionsrechtecke. Vor Veröffentlichung werden die vollständigen
+Quellenbytes abgeglichen. Kleine Felder verdrängen den gehaltenen Editorplan nicht.
+[Vertrag](NATIVE_TEXTGEOMETRIE.md).
+
+503 produktive Feldprüfungen bestehen: Quellen/Geometrie, Bidi/Grapheme/Emoji,
+leere Texte, 100/150/200 Prozent Schrift, horizontaler Scrollversatz, IME und
+Editorcache. Der echte Mac-Provider ergänzt einen UTF-16-Bereich nach Akzent
+und Familien-Emoji im Notiztitel mit Breite, Höhe und Bildschirmposition.
+503 Feld- und 592 Providerprüfungen bestehen unter haltendem ASan/UBSan.
+38 eigene C-Dateien aus Kern/Modell/UI/Desktop/Text-/Glyphenlayout sind neu
+instrumentiert; 50 Quell-/Include-Hashes entsprechen der geprüften Fassung.
+Externe Bibliotheken/Bidi-Engine sind uninstrumentiert, Leakerkennung auf dem Mac
+ausgeschaltet; dies ist kein TSan- oder vollständiger Bibliotheksnachweis.
+Originale: `build/field-geometry-sanitizers/{build.log,field-test.log,native-test.log,sources.json}`.
+
+Der Release-Lauf besteht 72/73 Prüfungen (788,47s). Die einzige Fehlprüfung
+kontrollierte Cursor-Sichtbarkeit nach zwei gerenderten Frames und konnte damit
+bereits die nächste ausgeblendete Blinkphase treffen. Die Testkorrektur prüft
+Blinkphase und Eingaberücksetzung beim berechnenden Tick, vor Raster-/Present-
+Verzögerung, sowie den übernommenen Text. Produktives Cursorverhalten unverändert.
+Der gezielte Nachlauf besteht 145 Navigation-Assertions und 48 Cache-/Rasterfälle
+(19,66s); alle 73 aktuellen Prüfungen sind damit abgedeckt. Die übrigen 72 benötigen
+nach dieser reinen Teständerung keinen erneuten Lauf. Originale:
+`build/field-geometry-verification/{ctest-release.log,navigation-final.log,checks.json}`.
+
+Paket und Installation folgen; installiert bleibt 0.9.48. Leseansicht,
+einzeilige native Auswahl-/Ersetzungsaktionen, neue Zielplattformen und tatsächliche
+IME-/Screenreader-/Geräteabnahmen bleiben offen. 1.0 nur nach Nutzerfreigabe.

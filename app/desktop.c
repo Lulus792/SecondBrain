@@ -465,6 +465,7 @@ static void backup_poll(SBDesktop *d) {
         if (status.code!=SB_OK) d->message=status;
     }
 }
+#include "native_fields.inc"
 static void field(SBDesktop *d, const char *tag, const char *label, char *text, int capacity, int focus) {
     struct nk_context *ctx = d->ui.ctx;
     int length = (int)strlen(text);
@@ -477,7 +478,7 @@ static void field(SBDesktop *d, const char *tag, const char *label, char *text, 
         nk_window_set_focus(ctx,ctx->current->name_string);
         nk_edit_focus(ctx, NK_EDIT_ALWAYS_INSERT_MODE); d->form_focus = 0;
     }
-    nk_flags state = nk_edit_string(ctx, NK_EDIT_FIELD, text, &length, capacity, nk_filter_default);
+    nk_flags state = native_field_edit(d,tag,text,&length,capacity);
     if (state & NK_EDIT_ACTIVE) d->active_form_field = focus;
     text[length] = 0;
     ring(d, tag);
@@ -574,6 +575,7 @@ void sb_desktop_free(SBDesktop *d) {
     sb_dialogs_free(d->dialogs);
     if (d->text_edit_ready) nk_textedit_free(&d->text_edit);
     sb_native_text_free(&d->native_editor);
+    native_fields_clear(d);
     free(d->targets); passive_clear(d); free(d->passive);
     sb_graph_free(&d->graph); sb_notes_free(&d->graph_notes); free(d->graph_ids);
     sb_notes_free(&d->hits); free(d->context); free(d->notice); sb_app_free(&d->model);
@@ -846,6 +848,11 @@ static void accessible_publish(SBDesktop *d) {
             size_t capacity=0; v->value=!strcmp(t->id,"editor") ? d->model.editor : accessible_field(d,t->id,&capacity); v->editable=true;
             if (!strcmp(t->id,"editor") && d->text_edit_ready) { v->anchor=(size_t)d->text_edit.select_start; v->caret=(size_t)d->text_edit.select_end; }
             if(!strcmp(t->id,"editor") && d->native_editor.count)v->native_text=&d->native_editor;
+            SBFieldText *field=native_field(d,t->id);
+            if(field && field->source && v->value && !strcmp(field->source,v->value)){
+                v->anchor=field->anchor;v->caret=field->caret;
+                if(field->text.count)v->native_text=&field->text;
+            }
         } else if (t->kind==SB_FOCUS_READER) v->value=d->form==SB_FORM_NOTICE_TEXT ? d->notice : d->form==SB_FORM_CONTEXT ? d->context : d->model.source ? d->model.source : d->model.editor;
         if (!strcmp(t->id,"galaxy")) v->label="Dokumente in der Sternkarte";
         v->order=((uint64_t)t->group<<32)|t->order;
@@ -1233,7 +1240,7 @@ static void search_box(SBDesktop *d) {
         sb_icon_draw(nk_window_get_canvas(ctx),SB_ICON_SEARCH,nk_rect(icon.x+(icon.w-16*s)/2,icon.y+(icon.h-16*s)/2,16*s,16*s),ctx->style.text.color);
         nk_layout_row_push(ctx,fmaxf(24,available-24*s-24*s));
         text_target(d,"search");target_label(d,"Suche im Projekt");int length=(int)strlen(d->search);
-        nk_edit_string(ctx,NK_EDIT_FIELD,d->search,&length,sizeof(d->search),nk_filter_default);d->search[length]=0;
+        native_field_edit(d,"search",d->search,&length,sizeof(d->search));
         if (!length && !focused(d,"search")) {
             struct nk_rect hint=d->targets[d->target_count-1].bounds;hint.y+=(hint.h-d->ui.normal->handle.height)/2;hint.h=d->ui.normal->handle.height;
             nk_draw_text(nk_window_get_canvas(ctx),hint,"Suche im Projekt",16,&d->ui.normal->handle,nk_rgba(0,0,0,0),d->ui.dark ? nk_rgb(168,186,210) : nk_rgb(80,100,124));
@@ -2412,6 +2419,7 @@ static void welcome(SBDesktop *d,int width,int height,nk_flags flags) {
 void sb_desktop_frame(SBDesktop *d) {
     d->reader_preparation_used=false;
     sb_native_text_free(&d->native_editor);
+    native_fields_clear(d);
     if (d->reveal_document[0] && (d->reveal_document_context!=accessible_context(d) ||
         (!modal_reader(d) && (!d->card || (d->editing && !d->model.source))))) d->reveal_document[0]=0;
     int width, height; SDL_GetWindowSize(d->ui.window,&width,&height);

@@ -160,7 +160,7 @@ static bool edit_native_copy(const SBNativeText *source,SBNativeText *out){
     SBNativeText copy=*source;copy.capacity=copy.count;copy.runs=malloc(copy.count*sizeof(*copy.runs));if(!copy.runs)return false;
     memcpy(copy.runs,source->runs,copy.count*sizeof(*copy.runs));*out=copy;return true;
 }
-bool sb_ui_edit_native(SBUi *ui,struct nk_text_edit *edit,SBNativeText *out){
+static bool edit_native_export(SBUi *ui,struct nk_text_edit *edit,SBNativeText *out,bool retain){
     if(!ui || !edit || !out || ui->edit_paint.edit!=edit)return false;
     SBEditPlan *p=edit_plan(edit,ui->edit_paint.font,ui->edit_paint.row);if(!p || p->hash!=ui->edit_paint.hash)return false;
     SBEditNativeCache *memo=ui->edit_native_cache;
@@ -170,7 +170,7 @@ bool sb_ui_edit_native(SBUi *ui,struct nk_text_edit *edit,SBNativeText *out){
         if(!edit_native_build(ui,p,out))return false;
         /* The source and actual retained run capacity both count toward the
            budget. Cache allocation failure never rejects a complete export. */
-        if(p->length+1+sizeof(SBEditNativeCache)<SB_EDIT_NATIVE_BUDGET && out->count<=(SB_EDIT_NATIVE_BUDGET-p->length-1-sizeof(SBEditNativeCache))/sizeof(*out->runs)){
+        if(retain && p->length+1+sizeof(SBEditNativeCache)<SB_EDIT_NATIVE_BUDGET && out->count<=(SB_EDIT_NATIVE_BUDGET-p->length-1-sizeof(SBEditNativeCache))/sizeof(*out->runs)){
             SBEditNativeCache *next=calloc(1,sizeof(*next));
             if(next){next->source=malloc(p->length+1);
                 if(next->source && edit_native_copy(out,&next->text)){
@@ -183,6 +183,8 @@ bool sb_ui_edit_native(SBUi *ui,struct nk_text_edit *edit,SBNativeText *out){
     for(size_t i=0;i<out->count;++i)if(out->runs[i].geometry){out->runs[i].x+=x;out->runs[i].y=ui->edit_paint.area.y+out->runs[i].y-ui->edit_paint.scroll.y;}
     return true;
 }
+bool sb_ui_edit_native(SBUi *ui,struct nk_text_edit *edit,SBNativeText *out){return edit_native_export(ui,edit,out,true);}
+bool sb_ui_field_native(SBUi *ui,struct nk_text_edit *edit,SBNativeText *out){return edit_native_export(ui,edit,out,false);}
 
 
 /* Fit actual shaped advances and never split a displayed grapheme. The

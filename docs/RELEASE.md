@@ -250,3 +250,10 @@ Aufbereitung, native Metadaten und Rasterung bleiben UI-Arbeit. Budget-Rückfäl
 sind synchron; Spitzenverbrauch einzelner riesiger Absätze, Shutdown und echte
 Geräte/GPU/Monitore brauchen weitere Abnahmen. Die vorhandene Quellen-/Kontext-
 und Blockgeometrieprüfung ersetzt keine Windows-/Linux- oder menschliche Prüfung.
+
+## Native Feldgeometrie vom 11. Oktober
+
+Ab 0.9.49 übernehmen Suche und alle Formulartexte den gezeichneten Quellplan.
+Die Ausgaben bleiben pro Feld getrennt und verdrängen den Notizeditorcache nicht.
+[Vertrag](NATIVE_TEXTGEOMETRIE.md). Leseansicht, native Auswahl-/Ersetzungsaktionen
+einzeiliger Felder und reale assistive/IME-/Geräteabnahmen bleiben offen.

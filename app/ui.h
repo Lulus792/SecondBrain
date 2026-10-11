@@ -126,5 +126,7 @@ bool sb_ui_edit_geometry(SBUi *ui,struct nk_text_edit *edit,const struct nk_user
     float row,bool display,SBEditGeometryVisitor visitor,void *user);
 /* Original-source native units of the most recently painted matching edit. */
 bool sb_ui_edit_native(SBUi *ui,struct nk_text_edit *edit,SBNativeText *out);
+/* Small transient fields must not evict the retained document metadata. */
+bool sb_ui_field_native(SBUi *ui,struct nk_text_edit *edit,SBNativeText *out);
 
 #endif

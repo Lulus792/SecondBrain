@@ -130,6 +130,17 @@ int main(int argc,char **argv) {
     void *field=native_find(view,"Titel",0); CHECK(field!=NULL);
     ((void(*)(void *,SEL,void *))objc_msgSend)(field,sel_registerName("setAccessibilityValue:"),string("Native Notiz ü")); frame(&d); frame(&d);
     CHECK(!strcmp(d.name,"Native Notiz ü"));
+    /* String fields publish the painted source geometry too. UTF-16 native
+       ranges cross an accent and family emoji before the tested Latin glyph. */
+    ((void(*)(void *,SEL,void *))objc_msgSend)(field,sel_registerName("setAccessibilityValue:"),string("e\xcc\x81 👩‍👩‍👧‍👦 end"));frame(&d);frame(&d);
+    TextRect title_box=native_text_rect(field,(TextRange){15,1}),title_frame=native_frame(field);
+    float title_width=0,title_height=0,title_x=0,title_y=0;
+    for(size_t i=0;i<d.native_fields[1].text.count;++i){SBNativeTextRun *r=&d.native_fields[1].text.runs[i];for(size_t j=0;j<r->characters;++j)if(r->scalars[j]==11){title_width=r->widths[j];title_height=r->height;title_x=r->x+r->positions[j];title_y=r->y;}}
+    struct nk_rect title_field_bounds={0};for(size_t i=0;i<d.target_count;++i)if(!strcmp(d.targets[i].id,"form-name"))title_field_bounds=d.targets[i].bounds;
+    CHECK(title_width>0 && fabs(title_box.size.width-title_width)<0.1 && fabs(title_box.size.height-title_height)<0.1);
+    CHECK(fabs(title_box.origin.x-(title_frame.origin.x+title_x-title_field_bounds.x))<0.1);
+    CHECK(fabs(title_box.origin.y-(title_frame.origin.y+title_field_bounds.h-(title_y-title_field_bounds.y)-title_height))<0.1);
+    ((void(*)(void *,SEL,void *))objc_msgSend)(field,sel_registerName("setAccessibilityValue:"),string("Native Notiz ü"));frame(&d);frame(&d);
     void *submit=native_find(view,"Anlegen",0); CHECK(submit!=NULL);
     ((void(*)(void *,SEL))objc_msgSend)(submit,sel_registerName("accessibilityPerformPress")); frame(&d); frame(&d);
     CHECK(d.form==SB_FORM_NONE && !strcmp(d.model.path,"knowledge/native-notiz-ue.md"));

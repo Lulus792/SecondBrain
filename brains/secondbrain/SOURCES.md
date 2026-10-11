@@ -176,3 +176,8 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   eingefrorene Versionsreferenz und alternierende produktive Metal-Messung.
 - [Rasterprüfer](../../tests/test_space_raster.c): vollständige RGBA-Daten,
   Modi, Cache/Resize, Randfälle und64 Flächen gegen die0.9.47-Referenz.
+
+- [Native Eingabefeldgeometrie](../../docs/NATIVE_TEXTGEOMETRIE.md): sofortige
+  Quell-/Planübernahme, IME, Scrollversatz, Eigentum und erhaltener Editorcache ab49.
+- [Produktiver Feldprüfer](../../tests/test_field_geometry.c): alle sieben
+  Feldtypen, Bidi/Grapheme, große Schrift, Scrollen und IME.

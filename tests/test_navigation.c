@@ -73,7 +73,12 @@ int main(int argc,char **argv){
     key(&d,SDLK_F,MOD);type(&d,"Alpha");CHECK(click(&d,"clear-search"));if(d.browser || d.search_session || d.search[0])fprintf(stderr,"CLEAR state browser=%d session=%d query=%s focus=%s\n",d.browser,d.search_session,d.search,d.focus);CHECK(!d.browser && !d.search_session && !d.search[0]);
     key(&d,SDLK_E,MOD);CHECK(d.editing);SBTarget *edit=target(&d,"editor");CHECK(edit);SDL_Event motion={0};motion.type=SDL_EVENT_MOUSE_MOTION;motion.motion.windowID=SDL_GetWindowID(d.ui.window);motion.motion.x=edit->bounds.x+20;motion.motion.y=edit->bounds.y+20;SDL_PushEvent(&motion);frame(&d);
     CHECK(d.ui.pointer_text && d.ui.text_cursor && SDL_GetCursor()==d.ui.text_cursor && d.ui.ctx->style.edit.cursor_size<3);
-    d.ui.caret_epoch=SDL_GetTicksNS();SDL_Delay(600);frame(&d);CHECK(d.ui.ctx->style.edit.cursor_normal.a==0);type(&d,"Text");CHECK(d.ui.ctx->style.edit.cursor_normal.a>0);
+    /* Observe the blink phase when it is computed, before raster/present
+       latency can cross another half-second boundary. Input must reset it. */
+    d.ui.caret_epoch=SDL_GetTicksNS()-UINT64_C(600000000);sb_desktop_tick(&d,1.0f/60);CHECK(d.ui.ctx->style.edit.cursor_normal.a==0);
+    SDL_Event reset={0};reset.type=SDL_EVENT_TEXT_INPUT;reset.text.windowID=SDL_GetWindowID(d.ui.window);reset.text.text="Text";
+    nk_input_begin(d.ui.ctx);sb_desktop_event(&d,&reset);sb_desktop_tick(&d,1.0f/60);CHECK(d.ui.ctx->style.edit.cursor_normal.a>0);nk_input_end(d.ui.ctx);
+    sb_desktop_frame(&d);sb_ui_draw(&d.ui);SDL_RenderPresent(d.ui.renderer);sb_desktop_apply(&d);frame(&d);CHECK(strstr(d.model.editor,"Text"));
     key(&d,SDLK_S,MOD);CHECK(!sb_app_dirty(&d.model));
     d.expanded=true;d.browser=false;key(&d,SDLK_F,MOD);type(&d,"Alpha");
     OK(sb_app_new_project(&d.model,"two","Second project",NULL));frame(&d);CHECK(!d.search_session && !d.browser && !d.expanded);
