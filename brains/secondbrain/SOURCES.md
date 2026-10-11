@@ -221,6 +221,8 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   gewöhnlichen Modalaufgaben, Scrollkörper-/Titelregeln und offener Formularbefund.
 - [Hilfe-Rückkehr](../../docs/HILFE_RUECKKEHR.md): Ursprungsaufgabe, Feldauswahl,
   Scrollposition und modale Befehlsgrenzen ab 0.9.59; lokale Prüfgrenzen.
+- [Scrollen beim Laden](../../docs/SCROLLEN_BEIM_LADEN.md): erhaltene Eingaben,
+  Messung vor Anwendung, Richtungswechsel, Kontextgrenzen und Prüfungen ab 0.9.61.
 - [UI-Plattformkorrekturen](../../docs/UI_PLATTFORMKORREKTUREN.md): typisierte
   Cache-Adressen, bestätigte Fenstergrößen und AT-SPI-Textbereichsauswahl ab
   0.9.60; Originalbefunde, offizielle API-Quellen und verbleibende Nachweise.

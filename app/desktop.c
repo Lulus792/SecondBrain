@@ -1832,8 +1832,18 @@ static void document(SBDesktop *d, const char *text, float height) {
         if (status.code!=SB_OK) { d->message=status;whole_code=true; }
     }
     bool ready=reader_preparation_ready(d,text,whole_code,&parsed,&references,ctx->current->layout->bounds.w);
-    if(ready)smooth_scroll(d,slot,ctx->current->layout->offset_y);
+    if(ready){
+        /* Measure the first complete extent before consuming queued gestures;
+           a large impulse must not paint a frame beyond the document end. */
+        float deferred=d->scrolling[slot].measured ? 0 : d->scrolling[slot].pending;
+        if(deferred)d->scrolling[slot].pending=0;
+        smooth_scroll(d,slot,ctx->current->layout->offset_y);
+        d->scrolling[slot].pending+=deferred;
+    }
     if(!ready){
+        /* A loading row has no document extent yet. Keep input for this reader
+           until its real layout can consume and clamp it. */
+        d->scrolling[slot].used=true;d->scrolling[slot].measured=false;
         nk_layout_row_dynamic(ctx,32*d->ui.scale,1);
         passive_add(d,"reader:preparing","Dokument wird vorbereitet …",ACCESSKIT_ROLE_STATUS,nk_widget_bounds(ctx));
         nk_label(ctx,"Dokument wird vorbereitet …",NK_TEXT_LEFT);

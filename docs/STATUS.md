@@ -4039,3 +4039,23 @@ und Linux behalten eingegrenzte Prüferbefunde; neue Rolle-/Bereitschafts-
 Nachprüfung folgt. Native Mac-Jobs zuletzt queued; keine vollständige neue
 Plattformabnahme. Frühe Scrollbefehle, vollständige Leistung, tatsächliche
 Geräte/IME/Screenreader und übrige Release-Arbeit offen. 1.0 nur nach Freigabe.
+
+
+## Frühe Reader-Scrollbefehle (0.9.61)
+
+Der produktive Ereignistest bestätigt vor der Korrektur verlorenes Bild ab
+während des Ladens. Der Reader hält Eingaben, misst die erste vollständige
+Inhaltshöhe und begrenzt die Anwendung vor Zeichnung. Haupt-/Kontextreader,
+Richtungswechsel, Notizwechsel, extreme Eingabe und normale Animation geprüft.
+45 Scroll-, 117 Reader- und 622 Mac-Prüfbedingungen unter ASan/UBSan:
+39 eigene C-Dateien, 56 aktuelle Hashes, externe UI nicht instrumentiert,
+kein Leak-/ThreadSanitizer. Vier gezielte Release-Läufe bestehen (36,05 s),
+Reader-/Kontextbilder betrachtet. [Vertrag](SCROLLEN_BEIM_LADEN.md).
+Gesamt-/Paket-/neue Zielplattformprüfung folgen, installiert weiterhin 0.9.60.
+
+Die Plattformkorrekturen zu b6490bd/0.9.60 bestehen inzwischen tatsächlich
+auf Windows und Linux in Debug/Release, einschließlich beider Release-Pakete
+(CI 38164624696). Native Mac-Jobs zuletzt queued; lokaler Intel-Nachweis
+separat. Diese Abnahme gilt für 0.9.60, nicht automatisch für 0.9.61.
+Leistung, reale Geräte/IME/Screenreader und übrige Release-Aufgaben bleiben.
+1.0 weiterhin nur nach ausdrücklicher Nutzerfreigabe.

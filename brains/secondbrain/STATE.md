@@ -19,9 +19,9 @@ unverändert. 126 Desktop-, 166 Tastatur-, 75 Sicherungs-Assertions, zwei Neusta
 produktive CLI und Runtime-/Lizenz-/Version bestehen. Tatsächliche App-Aufnahme
 angesehen. Prüfgerät: macOS 14.6.1/23G93, x86_64.
 Rückfallversion 0.9.59: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.59-20261011-202739`.
-CI 38163682947 zu a6d6f09: Windows Release inklusive UI/Paket vollständig
-erfolgreich. Windows Debug/ Linux haben weiter UI-Prüferbefunde; native Mac-Jobs
-zuletzt queued. Keine vollständige aktuelle Plattformabnahme.
+CI 38164624696 zu b6490bd: alle vier Windows-/Linux-UI-Jobs vollständig
+erfolgreich, beide Release-Pakete geprüft. Native Mac-Jobs zuletzt queued;
+lokale Intel/macOS-Abnahme separat. Neue 0.9.61-Zielplattformprüfung folgt.
 Frühere Plattformnachweise ersetzen keine Prüfung dieser neuen Fassung.
 
 ## Geprüfte aktuelle Änderung
@@ -66,6 +66,13 @@ reale Animationsabstände; Einzelausgaben ersetzen keine menschliche Bedienabnah
 
 ## Nächste Arbeiten und verbleibende Abnahmen
 
+0.9.61 hält frühe Scrollbefehle im ladenden Reader, misst die erste echte
+Inhaltshöhe vor Anwendung und begrenzt große Eingaben. 45 Scroll-, 117 Reader-
+und 622 Mac-Prüfbedingungen auch unter ASan/UBSan: 39 C-Dateien/56 Hashes.
+Vier gezielte Release-Läufe bestehen (36,05 s), tatsächliche Reader-/Kontext-
+Bilder betrachtet. [Vertrag](../../docs/SCROLLEN_BEIM_LADEN.md).
+Gesamt-/Paket-/Plattformprüfung folgen; installiert weiter 0.9.60.
+
 0.9.60 korrigiert Cache-Indexierung an `void *`; GCC/Clang weisen sie künftig
 als Fehler ab. Fensterprüfer synchronisieren und bestätigen 780×900 bzw.
 780×520; der AT-SPI-Prüfer sucht den Inhalt im passenden Textbereich.
@@ -79,8 +86,8 @@ Windows C2036 und Linux-Resize sind nativ nachgeprüft. Die verbleibenden
 Prüferbefunde sind eingegrenzt: Linux-Stilabfrage erreicht einen namensgleichen
 Textlauf des Kartenkopfs; sie erlaubt jetzt nur Dokument-/Eingabebereiche.
 Windows-Debug erwartet Struktur/letzten Link vor fertigem Reader; beide
-Prüfer warten jetzt begrenzt. Lokale gezielte Nachprüfung besteht, neuer
-nativer Lauf folgt. [Originalbefunde](../../docs/UI_PLATTFORMKORREKTUREN.md).
+Prüfer warten jetzt begrenzt. Lokale und native Windows-/Linux-Nachprüfung
+zu b6490bd bestehen. [Originalbefunde](../../docs/UI_PLATTFORMKORREKTUREN.md).
 Die erste 0.9.59-Paketprüfung fand einen frühen Scrollbefehl während der
 Lizenzreader-Vorbereitung. Der Tastaturprüfer wartet für seine fertige Ansicht
 jetzt begrenzt; sein gezielter Durchlauf besteht. Frühe Scrollbefehle bleiben

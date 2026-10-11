@@ -79,10 +79,11 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   GPU-Treiber auf allen Zielsystemen. Die bisherigen Tests verwenden versteckte
   Fenster und den SDL-Softwarerenderer. Große Dateien und Graphgrenzen sind benannt,
   aber noch kein belastbarer Leistungsnachweis auf schwächerer Hardware.
-  Die 0.9.59-Paketprüfung bestätigt außerdem eine Timing-Grenze: Ein Scrollbefehl
+  Die 0.9.59-Paketprüfung bestätigte außerdem eine Timing-Grenze: Ein Scrollbefehl
   während der Lizenzreader-Vorbereitung kann vor der fertigen Ansicht verpuffen.
   Der Tastaturtest wartet für seine Prüfung der fertigen Leseansicht begrenzt
-  auf deren Bereitschaft. Der Umgang mit frühen Scrollbefehlen bleibt Produktarbeit.
+  auf deren Bereitschaft. Ab 0.9.61 bleiben diese Eingaben bis zur gemessenen
+  fertigen Ansicht erhalten; [lokale Korrektur und Prüfgrenzen](SCROLLEN_BEIM_LADEN.md).
 - [ ] **Dauerhafte Release-Pakete veröffentlichen:** versionierte GitHub Releases,
   Prüfsummen, Änderungsübersicht und reproduzierbare Paketabnahme. Actions-Artefakte
   verfallen nach 30 Tagen. Signierung, macOS-Notarisierung und einfache Installation
@@ -159,23 +160,30 @@ Ein zuvor beobachteter Wartestatus ist kein aktueller Erfolgsnachweis.
   Belastung/Sanitizern geprüft. Im Lauf 38162552488 zu fe7d18e bestehen die
   tatsächlichen MSVC-UI-Builds in Debug (114538327441) und Release
   (114538327369). UI-/Paketprüfungen liefen bei dieser Abfrage noch.
-- [ ] Linux-Resize-Prüfung untersuchen: `prepared-document-reader` scheitert
+- [x] Linux-Resize-Prüfung untersuchen: `prepared-document-reader` scheiterte
   an `tests/test_reader_prepare.c:54`, unmittelbar nach Fenstergrößenänderung
   bei `loading(&d)`. Ein bestandener Build ersetzt diese Laufzeitprüfung nicht.
   Ab 0.9.60 synchronisiert der Prüfer die zulässige tatsächliche Größe;
   die lokale Nachprüfung besteht, native Linux-Nachprüfung folgt.
   Im neuen Release-Lauf 38162552488 besteht der Reader-Resize-Test tatsächlich;
   der Linux-Debug-/Release-Gesamtlauf scheitert noch an der getrennten Stilprüfung.
-- [ ] Linux-native Textstilabfrage untersuchen: `native-accessibility` scheitert
+- [x] Linux-native Textstilabfrage untersuchen: `native-accessibility` scheiterte
   bei AT-SPI-Operation 11 auf „Stilprüfung“ (`object/pattern not found`).
   Release-Job 114525404659 und Debug-Job 114525404463 haben fehlgeschlagene
   UI-Prüfungen; die Paketprüfungen wurden dadurch nicht ausgeführt.
-  Der Prüfer sucht ab 0.9.60 für Textstile einen namensgleichen Textbereich mit
-  angefordertem Inhalt. Native Linux-Nachprüfung bleibt erforderlich.
+  Der Prüfer sucht ab 0.9.60 für Textstile einen namensgleichen Dokument-/
+  Eingabebereich mit angefordertem Inhalt. Die native Linux-Nachprüfung besteht
+  zu b6490bd in Debug und Release; erwartete Stilwerte bleiben unverändert.
 
 Windows-/Linux-Kernprüfungen bestehen in diesem Lauf; die macOS-Jobs wurden
 zuletzt weiterhin als queued beobachtet. Die UI-Befunde benötigen Korrekturen
 und neue native Nachweise. Logauszüge: `build/help-return-verification/prior-*-failure.log`.
+
+Zu b6490bd/0.9.60 sind alle vier Windows-/Linux-UI-Jobs einschließlich nativer
+Prüfungen erfolgreich; beide Release-Jobs bestehen auch die entpackten Pakete.
+[Lauf 38164624696](https://github.com/Lulus792/SecondBrain/actions/runs/38164624696).
+Der Absatz davor beschreibt den früheren 0.9.58-Lauf. Native macOS-Jobs zuletzt
+queued; lokale Intel/macOS-Abnahme separat. Keine menschliche Screenreader-Abnahme.
 
 ## Textfortschritt vom 8. Oktober
 
