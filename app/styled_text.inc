@@ -82,6 +82,11 @@ static bool styled_boxes(SBUi *ui,const struct nk_user_font *base,const SBShapeP
     if(!at)boxes[at++]=(SBNativeCharBox){end,0,edge,0,0,height,line->base_level};
     sb_caret_plan_free(&carets);*out=boxes;*count=at;return true;
 }
+static SBStatus styled_trial(SBUi *ui,const SBShapeParagraph *paragraph,size_t byte,size_t length,float *advance){
+    if(!ui->styled_full_geometry_trials)return sb_shape_paragraph_advance(paragraph,byte,length,advance);
+    SBShapedLine line={0};SBStatus status=sb_shape_paragraph_line(paragraph,byte,length,&line);
+    if(status.code==SB_OK)*advance=line.advance;sb_shape_line_free(&line);return status;
+}
 static bool styled_paragraph(SBUi *ui,const struct nk_user_font *base,const SBStyledText *text,size_t start,size_t length,float available,float gap,StyledPlan *plan) {
     SBTextParagraph *bidi=NULL;SBShapeParagraph *prepared=NULL;SBShapeFontSpan *fonts=NULL;size_t font_count=0;
     if(sb_bidi_paragraph_create(text->text+start,length,SB_BIDI_AUTO_LTR,&bidi).code!=SB_OK)return false;
@@ -110,26 +115,26 @@ static bool styled_paragraph(SBUi *ui,const struct nk_user_font *base,const SBSt
     size_t begin=0;
     while(success && begin<terminal) {
         if(ui->layout_cancel && SDL_GetAtomicInt(ui->layout_cancel)){success=false;break;}
-        size_t low=begin+1,high=low;SBShapedLine trial={0};
+        size_t low=begin+1,high=low;SBShapedLine trial={0};float advance=0;
         if(prefix){size_t lo=begin+1,hi=terminal+1;
             while(lo<hi){size_t mid=lo+(hi-lo)/2;if(prefix[mid]-prefix[begin]<=available)lo=mid+1;else hi=mid;}
             low=high=lo>begin+1 ? lo-1 : begin+1;}
-        success=sb_shape_paragraph_line(prepared,boundaries[begin],boundaries[high]-boundaries[begin],&trial).code==SB_OK;
+        success=styled_trial(ui,prepared,boundaries[begin],boundaries[high]-boundaries[begin],&advance).code==SB_OK;
         if(!success)break;
-        bool fits=trial.advance/ui->density<=available;sb_shape_line_free(&trial);
+        bool fits=advance/ui->density<=available;
         if(prefix){
             while(success && !fits && low>begin+1){--low;
-                success=sb_shape_paragraph_line(prepared,boundaries[begin],boundaries[low]-boundaries[begin],&trial).code==SB_OK;
-                fits=success && trial.advance/ui->density<=available;sb_shape_line_free(&trial);}
+                success=styled_trial(ui,prepared,boundaries[begin],boundaries[low]-boundaries[begin],&advance).code==SB_OK;
+                fits=success && advance/ui->density<=available;}
             while(success && fits && low<terminal){
-                success=sb_shape_paragraph_line(prepared,boundaries[begin],boundaries[low+1]-boundaries[begin],&trial).code==SB_OK;
-                fits=success && trial.advance/ui->density<=available;sb_shape_line_free(&trial);if(fits)++low;}
+                success=styled_trial(ui,prepared,boundaries[begin],boundaries[low+1]-boundaries[begin],&advance).code==SB_OK;
+                fits=success && advance/ui->density<=available;if(fits)++low;}
         }else if(fits){
             for(;;){if(high==terminal){low=high;break;}size_t next=begin+2*(high-begin);if(next>terminal)next=terminal;
-                success=sb_shape_paragraph_line(prepared,boundaries[begin],boundaries[next]-boundaries[begin],&trial).code==SB_OK;
-                if(!success)break;fits=trial.advance/ui->density<=available;sb_shape_line_free(&trial);if(!fits){low=high;high=next;break;}high=next;}
-            while(success && high>low+1){size_t mid=low+(high-low)/2;success=sb_shape_paragraph_line(prepared,boundaries[begin],boundaries[mid]-boundaries[begin],&trial).code==SB_OK;
-                if(!success)break;fits=trial.advance/ui->density<=available;sb_shape_line_free(&trial);if(fits)low=mid;else high=mid;}
+                success=styled_trial(ui,prepared,boundaries[begin],boundaries[next]-boundaries[begin],&advance).code==SB_OK;
+                if(!success)break;fits=advance/ui->density<=available;if(!fits){low=high;high=next;break;}high=next;}
+            while(success && high>low+1){size_t mid=low+(high-low)/2;success=styled_trial(ui,prepared,boundaries[begin],boundaries[mid]-boundaries[begin],&advance).code==SB_OK;
+                if(!success)break;fits=advance/ui->density<=available;if(fits)low=mid;else high=mid;}
         }
         size_t end=low;
         if(end<terminal && end>begin+1){size_t space=end;while(space>begin && !styled_blank(text->text+start,boundaries[space-1],boundaries[space]))--space;if(space>begin)end=space;}

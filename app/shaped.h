@@ -39,6 +39,8 @@ SBStatus sb_shape_line(const SBTextParagraph *paragraph,size_t byte,size_t lengt
 SBStatus sb_shape_paragraph_create(const SBTextParagraph *paragraph,
     const SBShapeFontSpan *spans,size_t count,SBShapeParagraph **out);
 SBStatus sb_shape_paragraph_line(const SBShapeParagraph *paragraph,size_t byte,size_t length,SBShapedLine *out);
+/* Exact advance using the same context; no glyph/caret geometry is retained. */
+SBStatus sb_shape_paragraph_advance(const SBShapeParagraph *paragraph,size_t byte,size_t length,float *advance);
 void sb_shape_paragraph_free(SBShapeParagraph *paragraph);
 /* Immutable source/boundaries borrowed for geometry consumers. */
 const SBTextParagraph *sb_shape_paragraph_bidi(const SBShapeParagraph *paragraph);

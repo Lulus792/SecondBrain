@@ -20,8 +20,8 @@ const char *sb_ttf_font_language(TTF_Font *font){
     return NULL;
 #endif
 }
-bool sb_ttf_shape_range(TTF_Font *font,const char *context,size_t length,
-    size_t byte,size_t range,bool rtl,Uint32 script,SBTTFMirror mirror,SBTTFShape *out) {
+static bool sb_ttf_shape_range_mode(TTF_Font *font,const char *context,size_t length,
+    size_t byte,size_t range,bool rtl,Uint32 script,SBTTFMirror mirror,SBTTFShape *out,bool geometry) {
     TTF_CHECK_FONT(font,false);
     if(!context || !out || out->glyphs || out->count || !range || length>INT_MAX ||
        byte>length || range>length-byte ||
@@ -51,17 +51,17 @@ bool sb_ttf_shape_range(TTF_Font *font,const char *context,size_t length,
     unsigned count=0;
     const hb_glyph_info_t *info=hb_buffer_get_glyph_infos(buffer,&count);
     const hb_glyph_position_t *positions=hb_buffer_get_glyph_positions(buffer,NULL);
-    SBTTFGlyph *glyphs=count ? SDL_calloc(count,sizeof(*glyphs)) : NULL;
-    if(count && !glyphs){hb_buffer_destroy(buffer);return SDL_OutOfMemory();}
+    SBTTFGlyph *glyphs=geometry && count ? SDL_calloc(count,sizeof(*glyphs)) : NULL;
+    if(geometry && count && !glyphs){hb_buffer_destroy(buffer);return SDL_OutOfMemory();}
     Sint64 x=0,y=0;
     int bold=TTF_HANDLE_STYLE_BOLD(font) ? F26Dot6(font->glyph_overhang) : 0;
     for(unsigned i=0;i<count;++i) {
         c_glyph *metrics=NULL;
         if(info[i].cluster<byte || info[i].cluster>=byte+range ||
-           !Find_GlyphByIndex(font,info[i].codepoint,0,0,0,0,0,0,&metrics,NULL)) {
+           (geometry && !Find_GlyphByIndex(font,info[i].codepoint,0,0,0,0,0,0,&metrics,NULL))) {
             SDL_free(glyphs);hb_buffer_destroy(buffer);return SDL_SetError("Invalid shaped glyph or cluster");
         }
-        glyphs[i]=(SBTTFGlyph){info[i].codepoint,info[i].cluster,
+        if(geometry)glyphs[i]=(SBTTFGlyph){info[i].codepoint,info[i].cluster,
             (float)((double)x+positions[i].x_offset)/64.0f,
             -(float)((double)y+positions[i].y_offset)/64.0f,
             (float)((double)positions[i].x_advance+bold)/64.0f,
@@ -69,12 +69,23 @@ bool sb_ttf_shape_range(TTF_Font *font,const char *context,size_t length,
         x+=(Sint64)positions[i].x_advance+bold;y+=positions[i].y_advance;
     }
     hb_buffer_destroy(buffer);
-    *out=(SBTTFShape){glyphs,count,(float)((double)x/64.0),font->ascent,-font->descent};
+    *out=(SBTTFShape){glyphs,geometry ? count : 0,(float)((double)x/64.0),font->ascent,-font->descent};
     return true;
 #else
-    (void)rtl;(void)script;(void)mirror;
+    (void)rtl;(void)script;(void)mirror;(void)geometry;
     return SDL_SetError("Contextual shaping requires HarfBuzz");
 #endif
+}
+
+bool sb_ttf_shape_range(TTF_Font *font,const char *context,size_t length,
+    size_t byte,size_t range,bool rtl,Uint32 script,SBTTFMirror mirror,SBTTFShape *out){
+    return sb_ttf_shape_range_mode(font,context,length,byte,range,rtl,script,mirror,out,true);
+}
+bool sb_ttf_shape_advance(TTF_Font *font,const char *context,size_t length,
+    size_t byte,size_t range,bool rtl,Uint32 script,SBTTFMirror mirror,float *advance){
+    if(!advance)return SDL_SetError("Missing contextual advance output");
+    SBTTFShape shape={0};bool ok=sb_ttf_shape_range_mode(font,context,length,byte,range,rtl,script,mirror,&shape,false);
+    if(ok)*advance=shape.advance;sb_ttf_shape_free(&shape);return ok;
 }
 
 bool sb_ttf_ligature_carets(TTF_Font *font,Uint32 glyph,bool rtl,float *positions,

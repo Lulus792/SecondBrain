@@ -40,7 +40,12 @@ static void *reserve(void *old,size_t wanted,size_t *capacity,size_t element) {
 }
 static Uint32 shape_mirror(Uint32 cp){return (Uint32)sb_bidi_mirror(cp);}
 static SBStatus append_range(SBShapedLine *line,const SBTextParagraph *p,size_t context_byte,size_t context_length,
-    size_t begin,size_t length,const SBShapeFontSpan *span,unsigned char level) {
+    size_t begin,size_t length,const SBShapeFontSpan *span,unsigned char level,bool geometry) {
+    if(!geometry){float advance=0;
+        if(!sb_ttf_shape_advance(span->font,sb_bidi_paragraph_text(p)+context_byte,context_length,
+                                begin-context_byte,length,(level&1)!=0,span->script,shape_mirror,&advance) || !isfinite(advance) || advance<0)
+            return sb_error(SB_IO,"Schriftbreite konnte nicht geformt werden: %s",SDL_GetError());
+        line->advance+=advance;return sb_ok();}
     SBTTFShape shaped={0};
     if(!sb_ttf_shape_range(span->font,sb_bidi_paragraph_text(p)+context_byte,context_length,
                           begin-context_byte,length,(level&1)!=0,span->script,shape_mirror,&shaped))
@@ -88,7 +93,7 @@ SBStatus sb_shape_paragraph_create(const SBTextParagraph *p,const SBShapeFontSpa
     if(status.code!=SB_OK){sb_shape_paragraph_free(prepared);return status;}
     *out=prepared;return sb_ok();
 }
-SBStatus sb_shape_paragraph_line(const SBShapeParagraph *prepared,size_t byte,size_t length,SBShapedLine *out) {
+static SBStatus paragraph_line(const SBShapeParagraph *prepared,size_t byte,size_t length,SBShapedLine *out,bool geometry) {
     if(!prepared || !out || out->glyphs || out->runs || out->count || out->run_count || out->capacity || out->run_capacity)
         return sb_error(SB_INVALID,"Ungültige Zeilenausgabe.");
     const SBTextParagraph *p=prepared->bidi;size_t total=sb_bidi_paragraph_length(p);
@@ -107,19 +112,24 @@ SBStatus sb_shape_paragraph_line(const SBShapeParagraph *prepared,size_t byte,si
             for(size_t i=last;i>first && status.code==SB_OK;--i) {
                 const SBShapeFontSpan *span=&spans[i-1];size_t begin=span->byte>run.byte ? span->byte : run.byte;
                 size_t end=span->byte+span->length<run_end ? span->byte+span->length : run_end;
-                if(begin<end)status=append_range(&line,p,byte,length,begin,end-begin,span,run.level);
+                if(begin<end)status=append_range(&line,p,byte,length,begin,end-begin,span,run.level,geometry);
             }
         } else {
             for(size_t i=first;i<last && status.code==SB_OK;++i) {
                 const SBShapeFontSpan *span=&spans[i];size_t begin=span->byte>run.byte ? span->byte : run.byte;
                 size_t end=span->byte+span->length<run_end ? span->byte+span->length : run_end;
-                if(begin<end)status=append_range(&line,p,byte,length,begin,end-begin,span,run.level);
+                if(begin<end)status=append_range(&line,p,byte,length,begin,end-begin,span,run.level,geometry);
             }
         }
     }
     sb_bidi_line_free(&visual);
     if(status.code!=SB_OK){sb_shape_line_free(&line);return status;}
     *out=line;return sb_ok();
+}
+SBStatus sb_shape_paragraph_line(const SBShapeParagraph *prepared,size_t byte,size_t length,SBShapedLine *out){return paragraph_line(prepared,byte,length,out,true);}
+SBStatus sb_shape_paragraph_advance(const SBShapeParagraph *prepared,size_t byte,size_t length,float *advance){
+    if(!advance)return sb_error(SB_INVALID,"Breitenausgabe fehlt.");SBShapedLine line={0};SBStatus status=paragraph_line(prepared,byte,length,&line,false);
+    if(status.code==SB_OK)*advance=line.advance;sb_shape_line_free(&line);return status;
 }
 SBStatus sb_shape_line(const SBTextParagraph *p,size_t byte,size_t length,const SBShapeFontSpan *spans,size_t count,SBShapedLine *out) {
     SBShapeParagraph *prepared=NULL;SBStatus status=sb_shape_paragraph_create(p,spans,count,&prepared);

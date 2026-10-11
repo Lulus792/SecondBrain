@@ -38,6 +38,7 @@ typedef struct {
     size_t *layout_budget; /* Remaining retained-plan bytes in CPU contexts. */
     SBStyledCache *styled_cache;
     bool styled_cache_disabled;
+    bool styled_full_geometry_trials; /* Diagnostic comparison with old wrap trials. */
     SBPreparedLookup prepared_lookup;
     void *prepared_data; /* Borrowed, scoped by the reader that owns the batch. */
     SDL_Window *window;

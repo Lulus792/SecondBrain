@@ -4330,3 +4330,22 @@ bleibt ausdrücklich ohne Meilenstein. Fünf serielle Messläufe mit272 Bildern,
 CLI-/Ausgabeschutz und50 Python-Prüfungen bestehen; eine Windows-Prüfung
 übersprungen.19 Kopie-/18 Originaldateien unverändert. App0.9.65 unverändert.
 [Originale, Meilensteine und nächste Untersuchung](FRAME_MESSUNG.md).
+
+## Textvorbereitung 0.9.66 vom 12. Oktober
+
+Genau geformte Vorschubbreiten ersetzen vollständige Glyphengeometrie bei
+Umbruchversuchen. Gewählte Zeilen und native Rechtecke bleiben identisch zum
+Referenzpfad. Identische Batchaufträge teilen einen Plan; Eingabegrenzen und
+vollständiger Text-/Layout-/Stilvergleich bleiben erhalten. Das lange Journal
+hat 149 unterschiedliche Aufträge: Deduplizierung bringt dort keinen belegten
+Zeitgewinn, reduziert im Wiederholungsfixture aber den Speicher um rund 94,2 %.
+
+Drei abwechselnde Metal-Messpaare: lange Notiz vorbereitet median 10,54 % früher,
+übergangsfrei 6,64 % früher. 18 Original-/Kopiedateien unverändert. Kleine Notizen
+nicht durchgehend schneller; keine menschliche Bedien-/Scanoutmessung.
+Alle 83 lokalen Release-CTest-Prüfungen bestehen (summiert 504,86 s).
+ASan/UBSan: 5385 Vorbereitungs-, 120 Reader-, 1019 Glyphenbedingungen; 38 eigene
+C-Dateien und 58 aktuelle Quell-/Includehashes, externe UI nicht instrumentiert,
+Leaks aus, kein TSan. Reader-Aufnahme angesehen. Sauberes Paket und Installation
+folgen. [Vertrag und Originale](TEXT_VORBEREITUNG_OPTIMIERUNG.md).
+Neue Windows-/Linux-/ARM64- und reale Geräteabnahme bleiben offen; SBUI-074 ebenfalls.

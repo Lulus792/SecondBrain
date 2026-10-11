@@ -186,3 +186,12 @@ Originale: `build/text-presentation-verification/`, insbesondere `results.json`,
 bleibt separat. Nächste Untersuchung: Worker-Vorbereitung und UI-Veröffentlichung/
 Rasterung des ersten fertigen Textbilds getrennt begrenzen. SBUI-074 und reale
 Geräte-/Trackpad-/assistive sowie Windows-/Linux-/ARM64-Leistungsabnahmen bleiben offen.
+
+## Optimierung vom 12. Oktober
+
+Die [Textvorbereitung](TEXT_VORBEREITUNG_OPTIMIERUNG.md) verwendet genaue
+Vorschubbreiten für Umbruchversuche und vollständige Geometrie erst für die
+gewählten Zeilen. Drei abwechselnde Metal-Messpaare zeigen für die lange Notiz
+median 10,54 % frühere vorbereitete Kommandos und 6,64 % früheres Übergangsende.
+Kleine Notizen sind nicht durchgehend schneller; Systemlast und Caches bleiben
+Einflussgrößen. Das neue Dokument enthält Einzelwerte, Referenzprüfung und Grenzen.

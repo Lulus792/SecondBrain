@@ -427,3 +427,11 @@ Hilfe-Nachprüfung zu798b84e: alle vier Windows-/Linux-Desktopjobs im
 erfolgreich, beide Release-Pakete geprüft; Mac-CI queued. Neue64-Fassung braucht
 eigene Nachweise. Der [Mindestversionsvorschlag](PLATTFORM_VORSCHLAG.md) ist auf
 Nutzerauftrag ausgearbeitet, noch keine endgültige Unterstützungszusage.
+
+## Textvorbereitung vom 12. Oktober
+
+Die [Optimierung 0.9.66](TEXT_VORBEREITUNG_OPTIMIERUNG.md) spart vollständige
+Glyphengeometrie bei Umbruchversuchen und gemeinsame identische Batchpläne.
+83 lokale Release-Tests und gezielte ASan/UBSan-Prüfungen bestehen; drei
+Metal-Messpaare zeigen einen begrenzten Gewinn für das lange Journal.
+SBUI-074, Geräte-/Trackpad-/assistive und weitere Plattformabnahmen bleiben offen.

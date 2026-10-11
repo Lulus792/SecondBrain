@@ -213,6 +213,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   von Hintergrundtext, Vordergrundtext und Außenrand in sechs Darstellungsmodi.
 - [Frame-Messung](../../docs/FRAME_MESSUNG.md): Eingabe, erste Bilder, reale
   Tickabstände und CSV-Einzelwerte; serielle Metal-/Software-Nachweise und Grenzen.
+- [Optimierte Textvorbereitung](../../docs/TEXT_VORBEREITUNG_OPTIMIERUNG.md): genaue Umbruchbreiten, gemeinsame identische Aufträge und paarweise Messgrenzen.
 - [Reader-Inline-Plan](../../docs/READER_INLINE_PLAN.md): gehaltene Hervorhebungen,
   Referenzen und Linkiteratoren im Quellbudget, Fehlerbereinigung und Metal-Vergleich.
 - [Reader-Stilplan](../../docs/READER_STILPLAN.md): gehaltene Graphem-Stilgrenzen,

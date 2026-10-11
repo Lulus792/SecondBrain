@@ -12,6 +12,14 @@ static TTF_Font *open_font(const char *root,const char *name,float size){char pa
 static const SBTTFGlyph *cluster(const SBTTFShape *shape,Uint32 byte){for(size_t i=0;i<shape->count;++i)if(shape->glyphs[i].byte==byte)return &shape->glyphs[i];return NULL;}
 static Uint32 observed_mirror;
 static Uint32 mirror_probe(Uint32 cp){if(cp==0x221d)observed_mirror=sb_bidi_mirror(cp);return cp=='(' ? ']' : sb_bidi_mirror(cp);}
+static int advances(const SBShapeParagraph *paragraph){
+    size_t count=0;const uint32_t *boundaries=sb_shape_paragraph_boundaries(paragraph,&count);
+    for(size_t a=0;a+1<count;++a)for(size_t b=a+1;b<count;++b){SBShapedLine full={0};float measured=-1;
+        OK(sb_shape_paragraph_line(paragraph,boundaries[a],boundaries[b]-boundaries[a],&full));
+        OK(sb_shape_paragraph_advance(paragraph,boundaries[a],boundaries[b]-boundaries[a],&measured));CHECK(measured==full.advance);sb_shape_line_free(&full);}
+    float unchanged=123;CHECK(sb_shape_paragraph_advance(paragraph,SIZE_MAX,1,&unchanged).code==SB_INVALID && unchanged==123);
+    CHECK(sb_shape_paragraph_advance(paragraph,0,1,NULL).code==SB_INVALID);return 0;
+}
 static int mirroring(TTF_Font *font) {
     SBTTFShape overridden={0},reference={0},supplementary={0};
     CHECK(sb_ttf_shape_range(font,"(",1,0,1,true,0,mirror_probe,&overridden));
@@ -20,6 +28,7 @@ static int mirroring(TTF_Font *font) {
     observed_mirror=0;
     CHECK(sb_ttf_shape_range(font,"∝",3,0,3,true,0,mirror_probe,&supplementary));
     CHECK(observed_mirror==0x1db10);
+    float measured=0;CHECK(sb_ttf_shape_advance(font,"(",1,0,1,true,0,mirror_probe,&measured) && measured==overridden.advance);
     sb_ttf_shape_free(&overridden);sb_ttf_shape_free(&reference);sb_ttf_shape_free(&supplementary);return 0;
 }
 static int contextual(TTF_Font *arabic) {
@@ -52,6 +61,7 @@ static int line_cases(TTF_Font *latin,TTF_Font *arabic,TTF_Font *hebrew,TTF_Font
     const size_t order[]={0,7,5,3,9};
     for(size_t i=0;i<5;++i){CHECK(line.runs[i].byte==order[i]);CHECK(line.runs[i].glyph_count>0);}
     CHECK(line.glyphs[4].font==bold && line.glyphs[4].level==1);
+    SBShapeParagraph *prepared=NULL;OK(sb_shape_paragraph_create(p,spans,5,&prepared));CHECK(!advances(prepared));sb_shape_paragraph_free(prepared);
     CHECK(!memcmp(sb_bidi_paragraph_text(p),text,length));
     SBTTFShape joined={0};CHECK(sb_ttf_shape_range(arabic,text,length,3,6,true,TAG('A','r','a','b'),NULL,&joined));
     for(size_t i=0;i<line.count;++i)if(line.glyphs[i].byte>=3 && line.glyphs[i].byte<9) {
@@ -63,6 +73,7 @@ static int line_cases(TTF_Font *latin,TTF_Font *arabic,TTF_Font *hebrew,TTF_Font
     sb_shape_line_free(&line);sb_bidi_paragraph_free(p);
     text="אבג AB";length=strlen(text);OK(sb_bidi_paragraph_create(text,length,SB_BIDI_AUTO_LTR,&p));
     SBShapeFontSpan rtl_spans[]={{0,6,hebrew,TAG('H','e','b','r')},{6,3,latin,TAG('L','a','t','n')}};
+    OK(sb_shape_paragraph_create(p,rtl_spans,2,&prepared));CHECK(!advances(prepared));sb_shape_paragraph_free(prepared);
     OK(sb_shape_line(p,7,2,rtl_spans,2,&line));CHECK(line.base_level==1 && line.run_count==1 && line.runs[0].level==2);
     sb_shape_line_free(&line);sb_bidi_paragraph_free(p);
     text="é";length=strlen(text);OK(sb_bidi_paragraph_create(text,length,SB_BIDI_LTR,&p));
@@ -77,6 +88,7 @@ static int raster_metrics(TTF_Font *font,const char *text,bool rtl,uint32_t scri
     SBTTFShape shape={0};
     CHECK(sb_ttf_shape_range(font,text,strlen(text),0,strlen(text),rtl,script,NULL,&shape));
     CHECK(shape.advance>0 && shape.count>0);
+    float measured=0;CHECK(sb_ttf_shape_advance(font,text,strlen(text),0,strlen(text),rtl,script,NULL,&measured));CHECK(measured==shape.advance);
     for(size_t i=0;i<shape.count;++i) {
         SBTTFGlyph *g=&shape.glyphs[i];TTF_ImageType type;SDL_Surface *image=TTF_GetGlyphImageForIndex(font,g->index,&type);
         CHECK(image);CHECK(g->width>=0 && g->height>=0);

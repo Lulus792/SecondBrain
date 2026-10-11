@@ -67,7 +67,8 @@ static int layout_case(SBUi *ui,unsigned role,float width,bool terminal){
     CHECK(sb_prepare_layout_take(job,ui,&styled,role,width,padding,gap,terminal,78,&result).code==SB_CONFLICT && !result.lines);
     unsigned old_style=styled.spans[0].style;styled.spans[0].style^=SB_TEXT_BOLD;CHECK(sb_prepare_layout_take(job,ui,&styled,role,width,padding,gap,terminal,77,&result).code==SB_CONFLICT && !result.lines);styled.spans[0].style=old_style;
     OK(sb_prepare_layout_take(job,ui,&styled,role,width,padding,gap,terminal,77,&result));CHECK(sb_prepare_layout_take(job,ui,&styled,role,width,padding,gap,terminal,77,&result).code==SB_INVALID);sb_prepare_layout_free(job);
-    SBStyledPlan reference={0};CHECK(sb_ui_styled_plan(ui,font,&styled,width,padding,gap,terminal,&reference));CHECK(reference.count==result.count && reference.height==result.height);
+    SBStyledPlan reference={0};ui->styled_full_geometry_trials=true;
+    CHECK(sb_ui_styled_plan(ui,font,&styled,width,padding,gap,terminal,&reference));ui->styled_full_geometry_trials=false;CHECK(reference.count==result.count && reference.height==result.height);
     CHECK(!compare_native(&reference.native,&result.native));
     for(size_t i=0;i<result.count;++i){CHECK(result.lines[i].y==reference.lines[i].y && result.lines[i].source_offset==reference.lines[i].source_offset);Compare compare={.result=&result.lines[i].shape,.valid=true};CHECK(compare_line(&compare,&reference.lines[i].shape,0,0));}
     if(!terminal){LayoutCompare compare={.plan=&result,.valid=true};CHECK(sb_ui_styled_geometry(ui,font,&styled,width,compare_layout,&compare));CHECK(compare.valid && compare.at==result.count);CHECK(sb_ui_styled_height(ui,font,&styled,width)==result.height);}
@@ -129,7 +130,26 @@ static int batch_cases(SBUi *ui){
     for(size_t i=0;i<count;++i){plan=sb_prepare_batch_lookup(b,ui,&many[i]);CHECK(plan && plan->count==1 && plan->height>0);}
     /* Requests are copied; changes to caller memory cannot change a bound plan. */
     const SBStyledPlan *first=sb_prepare_batch_lookup(b,ui,&many[0]);labels[0][0]='X';CHECK(!sb_prepare_batch_lookup(b,ui,&many[0]));labels[0][0]='b';CHECK(sb_prepare_batch_lookup(b,ui,&many[0])==first);
-    CHECK(retire_batch(b));free(many);free(labels);free(spans);
+    CHECK(retire_batch(b));
+    /* Repeated identical requests must retain one owned plan, not 128 copies.
+       Compare against the same-size set of different, same-length paragraphs. */
+    size_t repeated_count=128;SBPrepareRequest repeated[128];
+    for(size_t i=0;i<repeated_count;++i)repeated[i]=many[0];
+    fonts=sb_ui_text_snapshot(ui);CHECK(fonts);b=sb_prepare_batch_start(fonts,many,repeated_count,41);CHECK(b);CHECK(wait_batch(b)==SB_PREPARE_READY);size_t unique_bytes=sb_prepare_batch_bytes(b);CHECK(retire_batch(b));
+    fonts=sb_ui_text_snapshot(ui);CHECK(fonts);b=sb_prepare_batch_start(fonts,repeated,repeated_count,42);CHECK(b);CHECK(wait_batch(b)==SB_PREPARE_READY);OK(sb_prepare_batch_bind(b,ui,42));
+    first=sb_prepare_batch_lookup(b,ui,&repeated[0]);CHECK(first);
+    for(size_t i=0;i<repeated_count;++i)CHECK(sb_prepare_batch_lookup(b,ui,&repeated[i])==first);
+    printf("Repeated batch bytes: %zu; distinct batch bytes: %zu.\n",sb_prepare_batch_bytes(b),unique_bytes);
+    CHECK(sb_prepare_batch_bytes(b)<unique_bytes/2);CHECK(retire_batch(b));
+    /* Equality includes every layout/style field, not only source text. */
+    SBPrepareRequest variants[8];for(unsigned i=0;i<8;++i)variants[i]=requests[0];
+    variants[1].width+=1;variants[2].role=1;variants[3].gap+=1;variants[4].padding.x+=1;variants[5].padding.y+=1;variants[6].terminal_line=true;
+    CHECK(styled.count);SBTextSpan *different=malloc(styled.count*sizeof(*different));CHECK(different);memcpy(different,styled.spans,styled.count*sizeof(*different));different[0].style^=SB_TEXT_BOLD;variants[7].text.spans=different;
+    fonts=sb_ui_text_snapshot(ui);CHECK(fonts);b=sb_prepare_batch_start(fonts,variants,8,43);CHECK(b);CHECK(wait_batch(b)==SB_PREPARE_READY);OK(sb_prepare_batch_bind(b,ui,43));
+    first=sb_prepare_batch_lookup(b,ui,&variants[0]);CHECK(first);
+    for(unsigned i=1;i<8;++i){plan=sb_prepare_batch_lookup(b,ui,&variants[i]);CHECK(plan && plan!=first);}
+    CHECK(retire_batch(b));free(different);
+    free(many);free(labels);free(spans);
     /* Reject oversized aggregate input before starting a worker. */
     char *large=malloc(SB_TEXT_LIMIT+1);CHECK(large);memset(large,'a',SB_TEXT_LIMIT);large[SB_TEXT_LIMIT]=0;SBTextSpan large_span={0,SB_TEXT_LIMIT,0};
     for(size_t i=0;i<3;++i)requests[i]=(SBPrepareRequest){.text={.text=large,.spans=&large_span,.count=1},.role=1,.width=200,.padding=padding};

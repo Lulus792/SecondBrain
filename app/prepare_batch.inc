@@ -87,20 +87,27 @@ SBPrepareBatch *sb_prepare_batch_start(SBTextSnapshot *fonts,const SBPrepareRequ
     if(!fonts || !requests || !count || count>SB_PREPARE_REQUEST_LIMIT)return NULL;
     SBPrepareBatch *b=calloc(1,sizeof(*b));if(!b)return NULL;
     b->blocks=calloc(count,sizeof(*b->blocks));if(!b->blocks){free(b);return NULL;}
-    b->count=count;b->input_bytes=sizeof(*b)+count*sizeof(*b->blocks);b->context=context;b->fonts=fonts;
+    b->input_bytes=sizeof(*b)+count*sizeof(*b->blocks);b->context=context;b->fonts=fonts;
+    size_t offered=b->input_bytes;
     for(size_t i=0;i<count;++i){const SBPrepareRequest *r=&requests[i];
         if(!batch_request_valid(r))goto fail;
         size_t length=strlen(r->text.text);if(length>SB_TEXT_LIMIT ||
+           !batch_charge(&offered,length+1,1,SB_PREPARE_INPUT_BYTES) ||
+           !batch_charge(&offered,r->text.count,sizeof(*r->text.spans),SB_PREPARE_INPUT_BYTES))goto fail;
+        uint64_t hash=sb_hash(r->text.text,length);size_t bucket=hash%4096;bool duplicate=false;
+        for(size_t at=b->buckets[bucket];at;at=b->blocks[at-1].next){SBPreparedBlock *held=&b->blocks[at-1];
+            if(held->hash==hash && batch_request_equal(r,&held->request)){duplicate=true;break;}}
+        if(duplicate)continue;
+        if(
            !batch_charge(&b->input_bytes,length+1,1,SB_PREPARE_INPUT_BYTES) ||
            !batch_charge(&b->input_bytes,r->text.count,sizeof(*r->text.spans),SB_PREPARE_INPUT_BYTES))goto fail;
-        SBPreparedBlock *p=&b->blocks[i];p->request=*r;p->request.text=(SBStyledText){0};
+        SBPreparedBlock *p=&b->blocks[b->count++];p->request=*r;p->request.text=(SBStyledText){0};
         p->request.text.text=malloc(length+1);
         p->request.text.spans=r->text.count ? malloc(r->text.count*sizeof(*r->text.spans)) : NULL;
         if(!p->request.text.text || (r->text.count && !p->request.text.spans))goto fail;
         memcpy(p->request.text.text,r->text.text,length+1);p->request.text.count=r->text.count;
         if(r->text.count)memcpy(p->request.text.spans,r->text.spans,r->text.count*sizeof(*r->text.spans));
-        p->hash=sb_hash(r->text.text,length);
-        size_t bucket=p->hash%4096;p->next=b->buckets[bucket];b->buckets[bucket]=i+1;
+        p->hash=hash;p->next=b->buckets[bucket];b->buckets[bucket]=b->count;
     }
     b->thread=SDL_CreateThread(batch_worker,"SecondBrain document",b);
     if(b->thread)return b;

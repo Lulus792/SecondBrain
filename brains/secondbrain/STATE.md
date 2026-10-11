@@ -1,6 +1,6 @@
 # SecondBrain: aktueller Stand
 
-Stand:11.Oktober2026. Originale: [STATUS](../../docs/STATUS.md),
+Stand: 12. Oktober 2026. Originale: [STATUS](../../docs/STATUS.md),
 [Release-Liste](../../docs/RELEASE.md), [Quellen](SOURCES.md).
 Historische Schritte und Messungen stehen in STATUS und im [Journal](journal/2026-10-11.md).
 
@@ -17,6 +17,17 @@ Installiert **0.9.65/1a19bee557ca**, sauberer Intel/macOS-Release-Build.
 167 Tastatur-,75 Sicherungsbedingungen, zwei Einstellungs-Neustarts, CLI-/Runtime-/
 Lizenz-/Version bestehen. Tatsächliche App-Aufnahme angesehen. macOS14.6.1/23G93,x86_64.
 Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.64-20261011-230732`.
+
+## Neuester geprüfter Fortschritt
+
+0.9.66 berechnet bei Umbruchversuchen nur genaue kontextuelle Vorschubbreiten;
+gewählte Zeilen behalten die vollständige Geometrie. Identische Batchaufträge
+teilen einen Plan bei erhaltenen Eingabegrenzen. 83/83 lokale Release-Tests
+bestehen (summiert 504,86 s), ASan/UBSan: 5385 Vorbereitungs-, 120 Reader- und
+1019 Glyphenbedingungen. Externe UI nicht instrumentiert, Leaks aus, kein TSan.
+Drei Metal-Paare: lange Notiz median 10,54 % früher vorbereitet, 6,64 % früher
+übergangsfrei. Keine allgemeine Geräte-/Bediengarantie. Paket/Installation folgen;
+installiert bleibt bis dahin 0.9.65. [Vertrag](../../docs/TEXT_VORBEREITUNG_OPTIMIERUNG.md).
 
 ## Aktueller Darstellungsschritt
 
