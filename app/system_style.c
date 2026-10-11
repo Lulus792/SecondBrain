@@ -121,7 +121,10 @@ SBSystemStyle sb_system_style_read_native(void) {
     if (SystemParametersInfoW(SPI_GETCLIENTAREAANIMATION,0,&value,0)) { s.known|=SB_SYS_MOTION; s.motion=!value; }
     if (SystemParametersInfoW(SPI_GETDISABLEOVERLAPPEDCONTENT,0,&value,0)) { s.known|=SB_SYS_TRANSPARENCY; s.solid=value!=0; }
     HIGHCONTRASTW contrast={0}; contrast.cbSize=sizeof(contrast);
-    if (SystemParametersInfoW(SPI_GETHIGHCONTRAST,sizeof(contrast),&contrast,0)) { s.known|=SB_SYS_CONTRAST; s.contrast=(contrast.dwFlags&HCF_HIGHCONTRASTON)!=0; }
+    if (SystemParametersInfoW(SPI_GETHIGHCONTRAST,sizeof(contrast),&contrast,0)) {
+        s.known|=SB_SYS_CONTRAST;s.contrast=(contrast.dwFlags&HCF_HIGHCONTRASTON)!=0;
+        if(contrast.lpszDefaultScheme)LocalFree(contrast.lpszDefaultScheme);
+    }
     if(s.contrast){s.palette=sb_system_palette_read_native();if(s.palette.valid)s.known|=SB_SYS_PALETTE;}
 
 #elif defined(__linux__)

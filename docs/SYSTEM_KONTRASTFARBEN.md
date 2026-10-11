@@ -86,5 +86,25 @@ Archiv-SHA256: `a40be0d9012605df4570ef1e751a577b4c54ab7163f57fee4d9b06c1d6d139f1
 Rückfallkopie: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.68-20261012-014214`.
 Originale: `build/contrast-palette-package-check`, `build/contrast-palette-update`,
 `build/contrast-palette-verification/installed.json` und `installed-brain-check.json`.
-CI38184984352 zu 8d74c8d: vier Windows-/Linux-Desktopjobs in Arbeit, Mac queued.
-Echte SDK-/Windows-Themenabnahme bleibt offen.
+CI38184984352 zu 8d74c8d: Windows Debug/Release und Linux Release bestehen.
+Die Release-Paketprüfschritte bestehen. Linux Debug scheitert mit SegFault in
+`background-text-preparation`; der Palettentest selbst besteht. Mac weiterhin queued.
+Echte benutzerdefinierte Windows-Themen und menschliche Abnahme bleiben offen.
+
+## Schemanamen freigeben ab 0.9.70
+
+Microsofts [HIGHCONTRASTW-Vertrag](https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-highcontrastw),
+am 12. Oktober erneut gelesen, beschreibt `lpszDefaultScheme` als vom System
+angelegten Puffer, der mit `LocalFree` freigegeben werden muss. Die bisherige
+Sekundenabfrage las die Flags, ließ diesen Puffer aber unfreigegeben. Der Adapter
+gibt einen vorhandenen Schemanamen jetzt nach erfolgreicher Abfrage frei.
+Eine konkrete Produktions-Leakrate wurde nicht gemessen.
+
+Die neue Windows-Prüfung kompiliert den tatsächlichen Adapter und beantwortet
+die drei Systemabfragen kontrolliert. 1024 Schemanamen werden mit echten Win32-
+Allokatoren angelegt und auf ihre Freigabe geprüft; Systemeinstellungen werden
+nicht geändert. Dieser Test ist Windows-only, seine native Ausführung steht noch aus.
+Lokal auf Intel/macOS bestehen vier Paletten-/Darstellungs-/Versionsprüfungen
+(18,71 s) und zwei Textvorbereitungsprüfungen (8,17 s). Das belegt weder die neue
+Windows-Allokatorprüfung noch die Behebung des Linux-Debug-Absturzes.
+Originale: `build/contrast-lifetime-verification/local.log` und `prepare-local.log`.
