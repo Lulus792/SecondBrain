@@ -24,6 +24,7 @@ static void focus_set(SBDesktop *d,const char *id);
 static void reader_preparation_free(SBDesktop *d);
 static void reader_source_free(SBDesktop *d);
 static SBStatus reader_inline_get(SBDesktop *d,size_t node,const char *text,size_t length,const SBReferences *references,SBInline *reader,SBStyledText *styled,bool *borrowed);
+static bool reader_inline_styles_get(SBDesktop *d,size_t node,const SBStyledText *styled,SBTextSpan **out,size_t *count);
 static void reader_preparation_retire(SBDesktop *d);
 static bool reader_preparing(const SBDesktop *d);
 static void composition_dispatch(void *user,const SDL_Event *event){sb_desktop_event(user,event);}
@@ -227,11 +228,12 @@ static void passive_span(SBDesktop *d,const char *id,const char *text,size_t len
 static void passive_add(SBDesktop *d,const char *id,const char *text,accesskit_role role,struct nk_rect bounds) {
     passive_span(d,id,text,text ? strlen(text) : 0,role,bounds);
 }
-static void passive_styles(SBDesktop *d,size_t before,const SBStyledText *styled,float font_size) {
+static void passive_styles_for_node(SBDesktop *d,size_t before,const SBStyledText *styled,float font_size,size_t node) {
     if (d->passive_count!=before+1 || !styled || strcmp(d->passive[before].text,styled->text)) return;
     SBPassiveText *p=&d->passive[before];
-    if (sb_ui_styled_spans(styled,&p->styles,&p->style_count)) p->font_size=font_size;
+    if (reader_inline_styles_get(d,node,styled,&p->styles,&p->style_count)) p->font_size=font_size;
 }
+static void passive_styles(SBDesktop *d,size_t before,const SBStyledText *styled,float font_size){passive_styles_for_node(d,before,styled,font_size,SIZE_MAX);}
 static void passive_geometry(SBDesktop *d,size_t before,const struct nk_user_font *font,const SBStyledText *styled,struct nk_rect bounds,nk_flags alignment){
     if(d->passive_count!=before+1)return;SBPassiveText *p=&d->passive[before];
     if(styled && !strcmp(p->text,styled->text))sb_ui_styled_native(&d->ui,font,styled,bounds,alignment,&p->native);
@@ -1649,7 +1651,7 @@ static void document_block(SBDesktop *d,const char *text,size_t length_total,SBM
             nk_layout_row_dynamic(ctx,text_height+(heading ? 10 : 0),1);
             size_t before=d->passive_count;
             document_span(d,shown,shown_length,block.offset,heading ? ACCESSKIT_ROLE_HEADING : code ? ACCESSKIT_ROLE_CODE : ACCESSKIT_ROLE_PARAGRAPH,heading,nk_widget_bounds(ctx),slot,false);
-            if (plain) passive_styles(d,before,&styled,font->height);
+            if (plain) passive_styles_for_node(d,before,&styled,font->height,source_node);
             else if (code && shown_length) {
                 SBTextSpan code_span={0,shown_length,SB_TEXT_CODE};
                 SBStyledText literal={.text=d->passive_count==before+1 ? d->passive[before].text : "",.spans=&code_span,.count=1};

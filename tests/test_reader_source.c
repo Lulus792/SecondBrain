@@ -92,6 +92,44 @@ int main(void){
     bool bold=false,italic=false,code=false;for(size_t i=0;i<styled.count;++i){bold|=(styled.spans[i].style&SB_TEXT_BOLD)!=0;italic|=(styled.spans[i].style&SB_TEXT_ITALIC)!=0;code|=(styled.spans[i].style&SB_TEXT_CODE)!=0;}
     CHECK(bold && italic && code && strstr(styled.text,"& label אבג"));
     sb_inline_free(&reference);sb_styled_free(&fresh);
+    SBTextSpan *native_styles=NULL,*expected_styles=NULL;size_t native_count=0,expected_count=0;
+    CHECK(reader_inline_styles_get(&d,paragraph,&styled,&native_styles,&native_count));
+    CHECK(sb_ui_styled_spans(&styled,&expected_styles,&expected_count));
+    SBStyledText normalized={.text=styled.text,.spans=native_styles,.count=native_count},expected={.text=styled.text,.spans=expected_styles,.count=expected_count};
+    CHECK(same_styles(&normalized,&expected));free(expected_styles);
+    size_t style_builds=d.reader_style_builds;const SBTextSpan *held_native=d.reader_source->inline_nodes[paragraph]->native_styles;
+    CHECK(native_count && native_styles!=held_native);native_styles[0].style=12345;free(native_styles);
+    CHECK(reader_inline_styles_get(&d,paragraph,&styled,&native_styles,&native_count));
+    CHECK(d.reader_style_builds==style_builds && d.reader_style_hits==1 && native_styles!=held_native && native_styles[0].style!=12345);free(native_styles);
+    /* The first scalar decides a combining/ZWJ grapheme's style. Borrowing a
+       cache must preserve this rule, including cross-span boundaries. */
+    const char *clusters="# Clusters\n\ne*́* 👩*‍🔬* and [r]\n\n[r]: original.md\n";
+    CHECK(reader_source_get(&d,clusters,strlen(clusters),true,&doc,&refs,&borrowed).code==SB_OK && borrowed);
+    paragraph=SIZE_MAX;for(size_t i=0;i<doc.count;++i)if(doc.nodes[i].kind==SB_DOC_PARAGRAPH && sb_document_content(&doc.nodes[i],&inline_text,&inline_length).code==SB_OK && inline_length){paragraph=i;break;}
+    CHECK(paragraph!=SIZE_MAX && reader_inline_get(&d,paragraph,inline_text,inline_length,&refs,&in,&styled,&inline_borrowed).code==SB_OK && inline_borrowed);
+    CHECK(reader_inline_styles_get(&d,paragraph,&styled,&native_styles,&native_count));
+    CHECK(native_count==1 && !native_styles[0].style && native_styles[0].length==strlen(styled.text) && strstr(styled.text,"é 👩‍🔬"));free(native_styles);
+    /* Complete styled output when no retained inline entry is eligible. */
+    style_builds=d.reader_style_builds;SBTextSpan manual_spans[]={{0,1,0},{1,2,SB_TEXT_BOLD}};SBStyledText manual={.text="á",.spans=manual_spans,.count=2};
+    CHECK(reader_inline_styles_get(&d,SIZE_MAX,&manual,&native_styles,&native_count));
+    CHECK(native_count==1 && native_styles[0].length==3 && !native_styles[0].style && d.reader_style_builds==style_builds+1);free(native_styles);
+    /* Fill the shared budget with real inline entries before asking for the
+       rich paragraph's additional native styles. Its output must stay whole. */
+    char *crowded=calloc(1,10000);CHECK(crowded);strcpy(crowded,"# Budget\n\n");
+    for(unsigned i=0;i<60;++i)strcat(crowded,"*a* b ");strcat(crowded,"\n\n");
+    for(unsigned i=0;i<50;++i)strcat(crowded,"filler words\n\n");
+    CHECK(reader_source_get(&d,crowded,strlen(crowded),true,&doc,&refs,&borrowed).code==SB_OK && borrowed);
+    size_t rich_node=SIZE_MAX;SBStyledText rich_styles={0};
+    for(size_t i=0;i<doc.count;++i){if(doc.nodes[i].kind!=SB_DOC_PARAGRAPH)continue;
+        CHECK(sb_document_content(&doc.nodes[i],&inline_text,&inline_length).code==SB_OK);
+        CHECK(reader_inline_get(&d,i,inline_text,inline_length,&refs,&in,&styled,&inline_borrowed).code==SB_OK);
+        if(rich_node==SIZE_MAX){CHECK(inline_borrowed);rich_node=i;rich_styles=styled;}
+        if(!inline_borrowed){sb_inline_free(&in);sb_styled_free(&styled);}}
+    CHECK(reader_inline_styles_get(&d,rich_node,&rich_styles,&native_styles,&native_count));
+    CHECK(native_count==120 && !d.reader_source->inline_nodes[rich_node]->native_styles_ready && d.reader_source_bytes<=SB_READER_SOURCE_BYTES);
+    CHECK(sb_ui_styled_spans(&rich_styles,&expected_styles,&expected_count));
+    normalized=(SBStyledText){.text=rich_styles.text,.spans=native_styles,.count=native_count};expected=(SBStyledText){.text=rich_styles.text,.spans=expected_styles,.count=expected_count};
+    CHECK(same_styles(&normalized,&expected));free(native_styles);free(expected_styles);free(crowded);
     const char invalid[]={ (char)0xff,0 };
     CHECK(reader_source_get(&d,invalid,1,true,&doc,&refs,&borrowed).code!=SB_OK);
     CHECK(!borrowed && !d.reader_source && !refs.items);release(&doc,&refs,borrowed);

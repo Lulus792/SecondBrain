@@ -11,7 +11,7 @@ static double last_layout,first_pending,first_ready;
 static void frame(SBDesktop *d){nk_input_begin(d->ui.ctx);SDL_Event e;while(SDL_PollEvent(&e))sb_desktop_event(d,&e);nk_input_end(d->ui.ctx);sb_desktop_tick(d,1.0f/60);Uint64 start=SDL_GetTicksNS();sb_desktop_frame(d);last_layout=(double)(SDL_GetTicksNS()-start)/1e6;sb_ui_draw(&d->ui);SDL_RenderPresent(d->ui.renderer);sb_desktop_apply(d);}
 static bool loading(SBDesktop *d){for(size_t i=0;i<d->passive_count;++i)if(!strcmp(d->passive[i].id,"reader:preparing"))return true;return false;}
 static bool wait_reader(SBDesktop *d){Uint64 end=SDL_GetTicksNS()+UINT64_C(15000000000);while(loading(d) && SDL_GetTicksNS()<end){SDL_Delay(1);frame(d);}first_ready=last_layout;return !loading(d);}
-static uint64_t geometry(SBDesktop *d){uint64_t hash=0;for(size_t i=0;i<d->passive_count;++i){SBPassiveText *p=&d->passive[i];if(strncmp(p->id,"reader:",7))continue;hash=hash*1099511628211ULL^sb_hash(p->id,strlen(p->id));hash=hash*1099511628211ULL^sb_hash(p->text,strlen(p->text));hash=hash*1099511628211ULL^sb_hash((const char *)&p->bounds,sizeof(p->bounds));hash=hash*1099511628211ULL^sb_hash((const char *)&p->document_y,sizeof(p->document_y));}return hash;}
+static uint64_t geometry(SBDesktop *d){uint64_t hash=0;for(size_t i=0;i<d->passive_count;++i){SBPassiveText *p=&d->passive[i];if(strncmp(p->id,"reader:",7))continue;hash=hash*1099511628211ULL^sb_hash(p->id,strlen(p->id));hash=hash*1099511628211ULL^sb_hash(p->text,strlen(p->text));hash=hash*1099511628211ULL^sb_hash((const char *)&p->bounds,sizeof(p->bounds));hash=hash*1099511628211ULL^sb_hash((const char *)&p->document_y,sizeof(p->document_y));hash=hash*1099511628211ULL^sb_hash((const char *)&p->font_size,sizeof(p->font_size));for(size_t j=0;j<p->style_count;++j){SBTextSpan s=p->styles[j];hash=hash*1099511628211ULL^s.offset^s.length^s.style;}}return hash;}
 static char *fixture(void){
     char *text=calloc(1,100000);if(!text)return NULL;strcpy(text,"# Long document\n\n");
     const char *block="A paragraph with **bold ffi**, *italic*, אבג and ببب with emoji 👩‍💻. More words for a wrapped line.\n\n> Quoted text with **style**.\n>\n> - Nested list with *words* and אבג.\n\n123. Numbered list words words words.\n124. Second item with **style**.\n\n| Name | Value |\n| --- | ---: |\n| **First** | אבג ببب |\n| Second | Text words words words |\n\n```c\nint value = 42; /* a long line with more words for wrapping */\n```\n\n";
@@ -25,9 +25,11 @@ int main(int argc,char **argv){
     CHECK(wait_reader(&d));frame(&d);CHECK(d.reader_plan_hits>40);if(d.reader_plan_misses)fprintf(stderr,"prepared misses: %zu hits: %zu\n",d.reader_plan_misses,d.reader_plan_hits);CHECK(!d.reader_plan_misses);
     float maximum=d.scrolling[0].maximum;CHECK(maximum>1000);uint64_t prepared_geometry=geometry(&d);
     size_t source_builds=d.reader_source_builds;CHECK(d.reader_source && d.reader_source_bytes<=16u*1024u*1024u);
-    size_t inline_builds=d.reader_inline_builds,inline_hits=d.reader_inline_hits;frame(&d);
+    size_t inline_builds=d.reader_inline_builds,inline_hits=d.reader_inline_hits;
+    size_t style_hits=d.reader_style_hits;frame(&d);
     CHECK(d.reader_source_builds==source_builds && geometry(&d)==prepared_geometry);
     CHECK(d.reader_inline_builds==inline_builds && d.reader_inline_hits>inline_hits);
+    CHECK(d.reader_style_hits-style_hits>=200);
     d.ui.styled_cache_disabled=true;frame(&d);double reference_layout=last_layout;CHECK(geometry(&d)==prepared_geometry && d.scrolling[0].maximum==maximum);d.ui.styled_cache_disabled=false;frame(&d);
     printf("Fixture layout: initial pending %.2f ms; first ready %.2f ms; uncached synchronous reference %.2f ms.\n",first_pending,first_ready,reference_layout);
     d.scrolling[0].position=d.scrolling[0].destination=maximum/2;d.scrolling[0].active=true;frame(&d);float before=d.scrolling[0].position;

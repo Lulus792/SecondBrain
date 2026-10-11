@@ -3874,3 +3874,30 @@ Originale: `build/reader-inline-verification/`. CI 38151902742 zum Quellcommit
 zuletzt queued; keine neue Windows-/Linux-/ARM64-Abnahme. Erste Vorbereitung,
 Tabellenzellen, native Ausgaben/Bildausgabe, reale Geräte/Eingaben/Screenreader
 und weitere Release-Arbeit bleiben offen. 1.0 nur nach Nutzerfreigabe.
+
+## Graphemgebundener Reader-Stilplan (0.9.57)
+
+Zwei Metal-Diagnoseproben lokalisieren rund 2,2 ms pro Bewegungsbild in der
+wiederholten Graphem-Normalisierung nativer Stile. Gehaltene Inline-Einträge
+besitzen jetzt bei Bedarf diese Stilspannen im vorhandenen 16-MiB-Quellbudget.
+Jeder Aufrufer erhält eine eigene Ausgabe; geänderte Textquellen ersetzen alle
+Einträge. Zeichenrechtecke, Umbruch, Schriftgröße und Positionen folgen weiter
+der aktuellen Darstellung. [Vertrag und Grenzen](READER_STILPLAN.md).
+
+177 Quell-/Stil-, 50 Reader- und 621 native Mac-Assertions bestehen auch unter
+haltendem ASan/UBSan: 39 eigene C-Dateien, 55 aktuelle Quell-/Include-Hashes.
+Die erweiterte Prüfung füllt das kleine Budget mit echten Einträgen; der Absatz
+behält alle 120 Ausgabestilspannen, obwohl seine zusätzliche Cache-Kopie nicht
+mehr hineinpasst. Externe UI-Bibliotheken sind nicht instrumentiert; keine
+Leak-/ThreadSanitizer-Abnahme. 78/78 lokale Release-Prüfungen bestehen (685,84 s),
+anschließend die erweiterte Budgetprüfung in Release und mit Sanitizern.
+Produktcode dazwischen unverändert. Originale: `build/native-stage-verification/`,
+`build/reader-style-verification/`, `build/reader-style-sanitizers/`.
+
+Drei alternierende Produktionspaare mit eingefrorenem Desktop aus 4a87e9f und
+unveränderten 18 Profilkopiedateien zeigen median 38,62% weniger Ruhe-Layout,
+26,54% weniger Scroll-Layout und 32,55% weniger Kamera-Layout. Erste Bilder und
+Frame-p95 verbessern sich nicht durchgängig; kein fester Bildratennachweis.
+Erste Vorbereitung, andere Textarten/native Ausgaben/Bildausgabe, aktuelle
+Zielplattformen und reale Eingabe-/Screenreader-/Geräteabnahmen bleiben offen.
+Paket/Installation folgen; installiert weiterhin 0.9.56. 1.0 nur nach Freigabe.

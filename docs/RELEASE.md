@@ -328,3 +328,11 @@ Verweise in seinem Quellenbudget. Lokale Gesamt-/Sanitizerprüfungen bestehen;
 serielle Metal-Paare zeigen weniger Layoutarbeit. Die erste Vorbereitung,
 Tabellenzellen, native Metadaten/Bildausgabe und vollständige Geräte-/Plattform-
 und Bedienabnahmen bleiben offen. Dieser Schritt schließt SBUI-074 nicht ab.
+
+## Wiederverwendung der Stilgrenzen vom 11. Oktober
+
+Ab 0.9.57 hält der [Reader-Stilplan](READER_STILPLAN.md) graphemgebundene
+Stilspannen unter dem gemeinsamen Quellenbudget. Lokale Gesamt-/Sanitizer-
+prüfungen und zusätzliche Budgetausgabe bestehen. Serielle Metal-Paare zeigen
+weniger Layoutarbeit; erste Vorbereitung, andere Textarten, native Ausgaben/
+Bildausgabe und vollständige Geräte-/Plattform-/Bedienabnahme bleiben offen.

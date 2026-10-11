@@ -106,6 +106,7 @@ typedef struct {
     bool reader_source_used;
     size_t reader_source_builds,reader_source_hits,reader_source_bytes;
     size_t reader_inline_builds,reader_inline_hits;
+    size_t reader_style_builds,reader_style_hits;
     bool reader_preparation_used;
     size_t reader_plan_hits,reader_plan_misses;
     char reader_pending_focus[100];

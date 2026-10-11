@@ -2,7 +2,7 @@
 #ifndef SB_READER_SOURCE_BYTES
 #define SB_READER_SOURCE_BYTES (16u*1024u*1024u)
 #endif
-typedef struct { SBInline reader; SBStyledText styled; } SBReaderInline;
+typedef struct { SBInline reader; SBStyledText styled; SBTextSpan *native_styles;size_t native_style_count;bool native_styles_ready; } SBReaderInline;
 struct SBReaderSource {
     char *source;
     size_t length,bytes;
@@ -13,7 +13,7 @@ struct SBReaderSource {
 static void reader_source_free(SBDesktop *d){
     SBReaderSource *p=d->reader_source;if(!p)return;
     if(p->inline_nodes){for(size_t i=0;i<p->document.count;++i){SBReaderInline *entry=p->inline_nodes[i];
-        if(entry){sb_inline_free(&entry->reader);sb_styled_free(&entry->styled);free(entry);}}
+        if(entry){sb_inline_free(&entry->reader);sb_styled_free(&entry->styled);free(entry->native_styles);free(entry);}}
         free(p->inline_nodes);}
     sb_references_free(&p->references);sb_document_free(&p->document);free(p->source);free(p);
     d->reader_source=NULL;d->reader_source_bytes=0;
@@ -51,6 +51,25 @@ static SBStatus reader_source_get(SBDesktop *d,const char *text,size_t length,bo
         }
     }
     return status;
+}
+static bool reader_inline_styles_get(SBDesktop *d,size_t node,const SBStyledText *styled,SBTextSpan **out,size_t *count){
+    *out=NULL;*count=0;SBReaderSource *p=d->reader_source;
+    SBReaderInline *entry=p && d->reader_source_used && node<p->document.count && p->inline_nodes ? p->inline_nodes[node] : NULL;
+    bool owned=entry && styled->text==entry->styled.text && styled->spans==entry->styled.spans && styled->count==entry->styled.count;
+    if(owned && entry->native_styles_ready){
+        if(entry->native_style_count){*out=malloc(entry->native_style_count*sizeof(**out));if(!*out)return false;memcpy(*out,entry->native_styles,entry->native_style_count*sizeof(**out));}
+        *count=entry->native_style_count;++d->reader_style_hits;return true;
+    }
+    ++d->reader_style_builds;
+    if(!sb_ui_styled_spans(styled,out,count))return false;
+    if(!owned)return true;
+    /* The caller keeps its own result. Retaining an exact separate copy avoids
+       shared output lifetime and accounts for the actual held allocation. */
+    if(*count>(SB_READER_SOURCE_BYTES-p->bytes)/sizeof(**out))return true;
+    SBTextSpan *copy=*count ? malloc(*count*sizeof(*copy)) : NULL;if(*count && !copy)return true;
+    if(*count)memcpy(copy,*out,*count*sizeof(*copy));entry->native_styles=copy;entry->native_style_count=*count;entry->native_styles_ready=true;
+    p->bytes+=*count*sizeof(*copy);d->reader_source_bytes=p->bytes;
+    return true;
 }
 static SBStatus reader_inline_get(SBDesktop *d,size_t node,const char *text,size_t length,const SBReferences *references,SBInline *reader,SBStyledText *styled,bool *borrowed){
     *borrowed=false;SBReaderSource *p=d->reader_source;

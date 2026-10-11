@@ -24,6 +24,14 @@ Frühere Plattformnachweise ersetzen keine Prüfung dieser neuen Fassung.
 
 ## Geprüfte aktuelle Änderung
 
+0.9.57 hält zusätzlich graphemgebundene Stilgrenzen im Quellenbudget; Schrift-
+und Zeichenpositionen bleiben aktuell. 177 Quell-/Stil-, 50 Reader- und 621
+Mac-Assertions auch unter ASan/UBSan bestehen; 39 eigene C-Dateien, 55 aktuelle
+Hashes. 78/78 Release-Prüfungen (685,84 s) plus erweiterte Budgetprüfung bestehen.
+Metal-Paare senken Ruhe-/Scroll-/Kamera-Layout im Median um 38,62/26,54/32,55%;
+erste Bilder und Frame-Spitzen verbessern sich nicht durchgängig.
+[Stilplan](../../docs/READER_STILPLAN.md). Paket/Installation folgen; installiert 0.9.56.
+
 0.9.56 hält Inline-Analysen von Absätzen/Überschriften mit Text und Referenzen
 im vorhandenen 16-MiB-Quellbudget. Iteratoren erhalten eigene Cursor; Änderungen
 ersetzen den gesamten Plan. Speicher-/Budgetrückfälle bleiben vollständig.
