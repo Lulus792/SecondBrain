@@ -50,9 +50,10 @@ bleiben abgeschirmt. [Hilfe](../../docs/HILFE_RUECKKEHR.md),
 
 ## Nächste Arbeiten und verbleibende Abnahmen
 
-Visuellen Fokus auf die aktive Modalaufgabe begrenzen: Kontextaufnahme zeigt
-noch denselben Reader-Rahmen im abgeschirmten Hintergrund. Native Ziele dort
-sind gesperrt. [Release-Befund](../../docs/RELEASE.md).
+0.9.62 begrenzt den visuellen Fokus lokal auf die aktive Modalgruppe.
+310 Bedingungen, fünf gezielte Tests und ASan/UBSan bestehen; beide Bilder
+angesehen. Gesamtprüfung läuft, Paket/Installation und neue Zielplattformen
+folgen. Installiert bleibt vorerst0.9.61. [Vertrag](../../docs/MODALER_FOKUS.md).
 
 Erste Quell-/Parser-/Worker-Aufbereitung, native Veröffentlichung, Tabellen,
 Rasterung, Budgetrückfälle, riesige Absätze und Shutdown weiter profilieren.

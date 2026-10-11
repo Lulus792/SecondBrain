@@ -110,11 +110,13 @@ hinaus einen verlässlichen Alltag und einen dauerhaften Veröffentlichungsweg.
   Nutzerwunsch erst, wenn das Produkt vollständig ist. Entwicklungsunterlagen
   behalten ihren Zweck und ihre Nachweise.
 
-- [ ] **Fokus nur in der aktiven Modalaufgabe zeichnen:** Die Kontextaufnahme
+- [x] **Fokus nur in der aktiven Modalaufgabe zeichnen (lokal):** Die Kontextaufnahme
   zur Scrollkorrektur zeigt denselben Reader-Fokusrahmen im abgeschirmten
   Formularhintergrund. Native Ziele sind dort gesperrt; die visuelle
   Ringzeichnung benötigt eine eigene Nachprüfung. Original:
-  `build/reader-scroll-verification/context-ready.png`.
+  `build/reader-scroll-verification/context-ready.png`. Ab 0.9.62 bindet die
+  Ringzeichnung den Fokus an die aktive Modalgruppe; 310 gezielte Bedingungen
+  prüfen Vordergrund, Hintergrund und Escape-Rückkehr. [Nachweis und Grenzen](MODALER_FOKUS.md).
 
 ## Mögliche spätere Erweiterungen
 

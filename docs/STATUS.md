@@ -4089,3 +4089,15 @@ Native macOS-Jobs zuletzt queued; lokaler Intel-Nachweis separat, neue ARM64-
 Abnahme offen. Menschliche Geräte/IME/Screenreader, vollständige Leistung und
 übrige Release-Arbeit einschließlich visuellem Modal-Fokusrahmen bleiben offen.
 1.0 nur nach ausdrücklicher Nutzerfreigabe.
+
+## Modal-Fokus 0.9.62 lokal korrigiert
+
+Der gemeinsame Readername zeichnet hinter Kontext-/Lizenzkarten keinen zweiten
+Fokusrahmen mehr. Vordergrund und Escape-Rückkehr bleiben sichtbar. 310 gezielte
+Pixel-/Ziel-/Rückkehrbedingungen, fünf CTest-Fälle (71,10s) sowie 310 Fokus-,
+135 Vordergrund- und622 Mac-Providerbedingungen unter ASan/UBSan bestehen.
+39 eigene C-Dateien/56 Hashes geprüft; externe UI nicht instrumentiert,
+Leaks deaktiviert, kein ThreadSanitizer. Vorher-/Nachherbilder angesehen.
+[Vertrag](MODALER_FOKUS.md); Originale `build/modal-focus-verification/` und
+`build/modal-focus-sanitizers/`. Gesamtprüfung läuft; neue Paket-/Installation-/
+Plattformabnahme folgt. Installierte App bleibt vorerst0.9.61. 1.0 bleibt offen.

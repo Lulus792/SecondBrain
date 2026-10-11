@@ -230,3 +230,5 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   native Auswahl/Ersetzung, gescrollte Einstellungen, Kontextreader und Hilfe-Schaltfläche.
 - [SBUI-077-Nachprüfung](/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-11_16-38-09/UI_REVIEW.md): Software-/Metalbilder und offene native
   Snapshot-, Plattform-, Geräte- und assistive Abnahmen.
+
+- [Modaler Fokus](../../docs/MODALER_FOKUS.md): geteilte Readerkennungen, aktive Gruppe, Pixelregression und Rückkehr.

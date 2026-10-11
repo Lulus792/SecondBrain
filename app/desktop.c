@@ -390,6 +390,8 @@ static void tooltip(SBDesktop *d,const char *text) {
 static bool focused(SBDesktop *d, const char *id) { return d->keyboard && !strcmp(d->focus, id); }
 static void ring(SBDesktop *d, const char *id) {
     if (focused(d, id) && d->target_count && !strcmp(d->targets[d->target_count-1].id,id)) {
+        /* Shared control names do not give an obscured panel the modal focus. */
+        if((d->form!=SB_FORM_NONE || d->model.guard) && d->targets[d->target_count-1].group!=3)return;
         struct nk_rect bounds=d->targets[d->target_count-1].bounds;
         if (d->ui.contrast) {
             /* A separate inner ring remains distinct from the normal border. */
