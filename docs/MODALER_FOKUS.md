@@ -22,7 +22,10 @@ isolieren; dies ist keine menschliche Desktopbedienung.
 310 Bedingungen bestehen über Kontext und Lizenztext, 100/200 Prozent Schrift
 sowie dunkle/helle, reguläre/solide und kontrastreiche Darstellung. Die gleiche
 Regression scheitert mit dem bisherigen Produktcode am Hintergrundstreifen.
-Fünf gezielte Tests bestehen zusätzlich (71,10 Sekunden). Vorher-/Nachherbilder
+Fünf gezielte Tests bestehen zusätzlich (71,10 Sekunden);82/82 lokale
+Release-Prüfungen bestehen (413,41 Sekunden). ASan/UBSan bestehen für310 Fokus-,
+135 Vordergrund- und622 Mac-Providerbedingungen,39 eigene C-Dateien/56 Hashes.
+Externe UI nicht instrumentiert, Leaks aus, kein ThreadSanitizer. Vorher-/Nachherbilder
 wurden angesehen. Originale: `build/modal-focus-verification/`.
 
 Geprüfte Umgebung: macOS 14.6.1, Intel, Retina. Neue Windows-/Linux-/ARM64-,
