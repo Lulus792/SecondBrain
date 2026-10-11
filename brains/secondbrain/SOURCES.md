@@ -217,5 +217,7 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   Referenzen und Linkiteratoren im Quellbudget, Fehlerbereinigung und Metal-Vergleich.
 - [Reader-Stilplan](../../docs/READER_STILPLAN.md): gehaltene Graphem-Stilgrenzen,
   eigene Ausgabekopien, zusätzliches Budgetlimit und serielle Metal-Messung.
+- [Reader-Rückkehr](../../docs/READER_RUECKKEHR.md): stabile Inhaltsidentität unter
+  gewöhnlichen Modalaufgaben, Scrollkörper-/Titelregeln und offener Formularbefund.
 - [SBUI-077-Nachprüfung](/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-11_16-38-09/UI_REVIEW.md): Software-/Metalbilder und offene native
   Snapshot-, Plattform-, Geräte- und assistive Abnahmen.

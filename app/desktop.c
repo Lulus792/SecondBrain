@@ -45,6 +45,12 @@ static uint64_t accessible_context(const SBDesktop *d) {
     return sb_hash(d->model.project.root,strlen(d->model.project.root))^sb_hash(d->model.source_path,strlen(d->model.source_path))^
         ((uint64_t)d->model.generation<<24)^((uint64_t)d->form<<8)^((d->form==SB_FORM_NOTICE_TEXT ? (uint64_t)d->notice_index : 0)<<56)^(uint64_t)d->model.guard;
 }
+static uint64_t reader_content_context(const SBDesktop *d) {
+    /* Ordinary controls do not replace the document or its glyph plans.
+       Native action contexts still distinguish every form and save guard. */
+    return sb_hash(d->model.project.root,strlen(d->model.project.root))^sb_hash(d->model.source_path,strlen(d->model.source_path))^
+        ((uint64_t)d->model.generation<<24)^(modal_reader(d) ? ((uint64_t)d->form<<8)^((d->form==SB_FORM_NOTICE_TEXT ? (uint64_t)d->notice_index : 0)<<56) : 0);
+}
 
 static const char *sections[] = {"all", "overview", "knowledge", "inbox", "journal", "archive"};
 static const char *section_names[] = {"Alle Dokumente", "Orientierung", "Wissen", "Eingang", "Übergaben", "Archiv"};
@@ -1635,7 +1641,7 @@ static void document_block(SBDesktop *d,const char *text,size_t length_total,SBM
                 if (inline_status.code!=SB_OK) d->message=inline_status;
             }
             const char *caption=d->model.source ? d->model.source_title : d->model.title;
-            bool fixed_title=*first_heading && heading==1 && d->form==SB_FORM_NONE && plain &&
+            bool fixed_title=*first_heading && heading==1 && !modal_reader(d) && plain &&
                 styled.count==1 && !styled.spans[0].style && !strcmp(plain,caption);
             if (fixed_title){size_t before=d->passive_count;document_span(d,plain,strlen(plain),block.offset,ACCESSKIT_ROLE_HEADING,1,d->reader_title_bounds,slot,true);
                 passive_title(d,before);
@@ -1815,7 +1821,7 @@ static void document(SBDesktop *d, const char *text, float height) {
     unsigned slot=modal_reader(d) && (text==d->context || text==d->notice) ? 2 : 0;
     SBDocument parsed={0}; SBReferences references={0};bool borrowed=false;
     if (!whole_code) {
-        bool foreground=d->form==SB_FORM_NONE || (modal_reader(d) && (text==d->context || text==d->notice));
+        bool foreground=!modal_reader(d) || text==d->context || text==d->notice;
         SBStatus status=reader_source_get(d,text,text_length,foreground,&parsed,&references,&borrowed);
         if (status.code!=SB_OK) { d->message=status;whole_code=true; }
     }
@@ -2510,7 +2516,10 @@ void sb_desktop_frame(SBDesktop *d) {
     if (modal || !d->card || d->editing || d->model.source) sb_ui_transition_tick(&d->ui,1,true);
     bool before = d->focus_form != SB_FORM_NONE || d->focus_guard;
     bool enter = modal && (!before || d->form != d->focus_form || d->model.guard != d->focus_guard);
-    if (enter) memset(d->scrolling,0,sizeof(d->scrolling));
+    if (enter) {
+        memset(&d->scrolling[3],0,sizeof(d->scrolling[3]));
+        if(modal_reader(d) && d->form!=d->focus_form)memset(&d->scrolling[2],0,sizeof(d->scrolling[2]));
+    }
     if (modal && !before) snprintf(d->saved_focus,sizeof(d->saved_focus),"%s",d->focus);
     if (!modal && before) {
         /* A cancelled map navigation can leave the old editor card open.
@@ -2547,7 +2556,8 @@ void sb_desktop_frame(SBDesktop *d) {
     if (!modal && (d->form!=SB_FORM_NONE || d->model.guard)) {
         /* A button can open its form while this frame is being constructed. */
         snprintf(d->saved_focus,sizeof(d->saved_focus),"%s",d->focus);
-        memset(d->scrolling,0,sizeof(d->scrolling));
+        memset(&d->scrolling[3],0,sizeof(d->scrolling[3]));
+        if(modal_reader(d))memset(&d->scrolling[2],0,sizeof(d->scrolling[2]));
         enter=true; d->focus_form=d->form; d->focus_guard=d->model.guard;
     }
     if (d->form!=SB_FORM_NONE || d->model.guard) { d->target_count = 0; passive_clear(d); d->focus_group = 3; }

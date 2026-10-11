@@ -336,3 +336,16 @@ Stilspannen unter dem gemeinsamen Quellenbudget. Lokale Gesamt-/Sanitizer-
 prüfungen und zusätzliche Budgetausgabe bestehen. Serielle Metal-Paare zeigen
 weniger Layoutarbeit; erste Vorbereitung, andere Textarten, native Ausgaben/
 Bildausgabe und vollständige Geräte-/Plattform-/Bedienabnahme bleiben offen.
+
+## Reader-Rückkehr und offener Formularbefund vom 11. Oktober
+
+0.9.58 erhält die lange Notiz und ihre Leseposition bei gewöhnlichen Menü-/
+Formwechseln; Quelle/Worker bleiben gültig und der feste Titel bleibt einmalig.
+[Reader-Rückkehr](READER_RUECKKEHR.md) dokumentiert lokale Gesamt-/Sanitizer-/
+Bildnachweise und die Grenzen. SBUI-079 lokal nachgeprüft, keine Geräte-/
+Plattform-/assistive Gesamtabnahme.
+
+- [ ] SBUI-080: F1/Hilfe und vergleichbare Befehlswechsel aus begonnenen Formularen
+  erhalten Ursprungsaufgabe, Felder, Auswahl, Fokus und Scrollposition. Die
+  bestätigte Ereignisprobe verliert die Aufgabe und leert den Titel bei erneutem
+  Anlegen. Gespeicherte Dateien bleiben außerhalb dieses Befunds.

@@ -95,9 +95,9 @@ static bool reader_preparation_ready(SBDesktop *d,const char *text,bool code,con
     if(strlen(text)<4096)return true;
     /* A modal reader and its obscured document must not continually replace
        each other's single worker. Only the foreground reader owns preparation. */
-    if(d->form!=SB_FORM_NONE && (!modal_reader(d) || (text!=d->context && text!=d->notice)))return false;
+    if(modal_reader(d) && text!=d->context && text!=d->notice)return false;
     d->reader_preparation_used=true;SBReaderPreparation *p=d->reader_preparation;
-    uint64_t context=accessible_context(d);
+    uint64_t context=reader_content_context(d);
     bool same=p && p->context==context && p->epoch==d->ui.font_epoch && p->scale==d->ui.scale && p->density==d->ui.density && p->width==width && p->code==code && !strcmp(p->source,text);
     if(p && sb_prepare_batch_state(p->batch,NULL)==SB_PREPARE_CANCELLED)same=false;
     if(p && !same){sb_prepare_batch_cancel(p->batch);

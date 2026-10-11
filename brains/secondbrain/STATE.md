@@ -24,6 +24,14 @@ Frühere Plattformnachweise ersetzen keine Prüfung dieser neuen Fassung.
 
 ## Geprüfte aktuelle Änderung
 
+0.9.58 erhält Reader-/Quellpläne beim Öffnen/Schließen gewöhnlicher Menüs,
+Reader-/Editorposition und Inhaltshöhe. Die native Modalabschirmung bleibt.
+115 Reader-, 177 Quell-/Stil- und 621 Mac-Assertions auch unter ASan/UBSan;
+39 eigene C-Dateien, 55 aktuelle Hashes. 78/78 Release-Prüfungen bestehen
+(651,31 s). Finale Vorher/Menü/Nachher-Bilder angesehen; SBUI-079 lokal geprüft.
+SBUI-080 bleibt offen: F1 verliert die Ursprungsaufgabe eines begonnenen Formulars.
+[Vertrag](../../docs/READER_RUECKKEHR.md). Paket/Installation folgen; installiert 0.9.57.
+
 0.9.57 hält zusätzlich graphemgebundene Stilgrenzen im Quellenbudget; Schrift-
 und Zeichenpositionen bleiben aktuell. 177 Quell-/Stil-, 50 Reader- und 621
 Mac-Assertions auch unter ASan/UBSan bestehen; 39 eigene C-Dateien, 55 aktuelle

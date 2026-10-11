@@ -33,6 +33,23 @@ int main(int argc,char **argv){
     d.ui.styled_cache_disabled=true;frame(&d);double reference_layout=last_layout;CHECK(geometry(&d)==prepared_geometry && d.scrolling[0].maximum==maximum);d.ui.styled_cache_disabled=false;frame(&d);
     printf("Fixture layout: initial pending %.2f ms; first ready %.2f ms; uncached synchronous reference %.2f ms.\n",first_pending,first_ready,reference_layout);
     d.scrolling[0].position=d.scrolling[0].destination=maximum/2;d.scrolling[0].active=true;frame(&d);float before=d.scrolling[0].position;
+    /* Ordinary overlays keep the document and its scroll bookmark. Their
+       native action context remains modal even though glyph work is retained. */
+    strcpy(d.focus,"reader");d.keyboard=true;
+    SBReaderPreparation *held_preparation=d.reader_preparation;SBReaderSource *held_source=d.reader_source;
+    SBForm overlays[]={SB_FORM_ACTIONS,SB_FORM_SETTINGS,SB_FORM_HELP,SB_FORM_FILTER,SB_FORM_PROJECTS,SB_FORM_NOTE,SB_FORM_PROJECT,SB_FORM_WORKSPACE,SB_FORM_BACKUP,SB_FORM_RESTORE,SB_FORM_ABOUT,SB_FORM_NOTICE_LIST};
+    for(size_t menu=0;menu<sizeof(overlays)/sizeof(*overlays);++menu){
+        d.form=overlays[menu];frame(&d);frame(&d);
+        CHECK(d.reader_preparation==held_preparation && d.reader_source==held_source && d.reader_source_builds==source_builds);
+        CHECK(fabsf(d.scrolling[0].position-before)<1 && d.reader_plan_hits>40 && !d.reader_plan_misses);
+        CHECK(fabsf(d.scrolling[0].maximum-maximum)<1);
+        d.form=SB_FORM_NONE;frame(&d);
+        CHECK(!loading(&d) && d.reader_preparation==held_preparation && d.reader_source==held_source && d.reader_source_builds==source_builds);
+        CHECK(fabsf(d.scrolling[0].position-before)<1);
+    }
+    d.model.guard=true;frame(&d);frame(&d);
+    CHECK(d.reader_preparation==held_preparation && d.reader_source==held_source && fabsf(d.scrolling[0].position-before)<1);
+    d.model.guard=false;frame(&d);CHECK(!loading(&d) && d.reader_source_builds==source_builds && fabsf(d.scrolling[0].position-before)<1);
     /* A resized reader keeps its logical position while the new plan runs. */
     SDL_SetWindowSize(d.ui.window,750,900);frame(&d);CHECK(loading(&d));CHECK(fabsf(d.scrolling[0].position-before)<1);CHECK(wait_reader(&d));frame(&d);CHECK(d.reader_plan_hits>40 && !d.reader_plan_misses);CHECK(d.reader_source_builds==source_builds);
     /* A short replacement remains immediately usable; stale output is retired. */
@@ -42,6 +59,11 @@ int main(int argc,char **argv){
     for(unsigned i=0;i<30 && d.reader_preparation;++i){SDL_Delay(1);frame(&d);}CHECK(!d.reader_preparation);
     OK(sb_app_request(&d.model,SB_ACT_NOTE,"knowledge/long.md"));frame(&d);CHECK(loading(&d));OK(sb_ui_fonts(&d.ui,1.5f));frame(&d);CHECK(wait_reader(&d));frame(&d);CHECK(d.reader_plan_hits>40 && !d.reader_plan_misses);
     d.editing=true;frame(&d);for(unsigned i=0;i<30 && d.reader_preparation;++i){SDL_Delay(1);frame(&d);}CHECK(!d.reader_preparation && !d.ui.prepared_lookup);CHECK(!d.reader_source && !d.reader_source_bytes);
+    strcpy(d.focus,"editor");d.keyboard=true;d.focus_scroll_frames=0;frame(&d);
+    d.reduced_motion=true;d.scrolling[1].pending=300;frame(&d);frame(&d);float editor_position=d.scrolling[1].position;CHECK(editor_position>100);
+    d.form=SB_FORM_SETTINGS;frame(&d);CHECK(fabsf(d.scrolling[1].position-editor_position)<1);
+    d.form=SB_FORM_NONE;frame(&d);CHECK(fabsf(d.scrolling[1].position-editor_position)<1);
+    d.reduced_motion=false;
     d.editing=false;char raw_path[SB_PATH_CAP];OK(sb_path_join(raw_path,sizeof(raw_path),d.model.project.root,"literal.txt"));
     char raw[16000]={0};for(unsigned i=0;i<120;++i)strcat(raw,"literal AV ffi אבג ببب text with words and code\r\n");
     OK(sb_fs_write_new(raw_path,raw,strlen(raw)));OK(sb_app_source(&d.model,raw_path));frame(&d);CHECK(loading(&d));CHECK(wait_reader(&d));frame(&d);CHECK(d.reader_plan_hits>100 && !d.reader_plan_misses);

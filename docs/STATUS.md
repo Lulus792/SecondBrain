@@ -3920,3 +3920,28 @@ Originale: `build/reader-style-verification/`. CI 38154566935 zum Quellcommit
 zuletzt queued; neue Gesamt-Plattformabnahme offen. Erste Vorbereitung, weitere
 Textarten/native Ausgaben/Bildausgabe, reale Geräte/Eingaben/Screenreader und
 übrige Release-Arbeit bleiben offen. 1.0 nur nach ausdrücklicher Nutzerfreigabe.
+
+## Reader-Rückkehr unter gewöhnlichen Modalaufgaben (0.9.58)
+
+SBUI-079: Aktionen/Settings/Formulare erhalten die unveränderte Reader-
+Inhaltsidentität. Native Aktionskontexte bleiben modal getrennt. Quelle, Worker,
+Inline-/Stilpläne und Reader-/Editorposition werden nicht beim Dialogeintritt
+verworfen. Ein tatsächlich anderer modaler Reader übernimmt seine eigene Aufgabe;
+Quellen-/Font-/Breitenwechsel bleiben echte Neubindungen. Der feste Notiztitel
+bleibt auch im Formularhintergrund fest, statt eine zusätzliche H1 einzufügen.
+[Vertrag und UI-Nachprüfung](READER_RUECKKEHR.md).
+
+177 Quell-/Stil-, 115 produktive Reader- und 621 native Mac-Assertions bestehen
+auch unter haltendem ASan/UBSan: 39 eigene C-Dateien, 55 aktuelle Hashes; externe
+UI-Bibliotheken nicht instrumentiert, kein Leak-/ThreadSanitizer-Nachweis.
+Gezielte Reader-/Titel-/Feld-/Guard-/Interaktions-/Einstiegsprüfungen und alle
+78 Release-Prüfungen bestehen (651,31 s). Finale Softwarebilder vor/Aktionen/nach
+Rückkehr betrachtet. Vorfassungen mit laufendem Übergang oder zusätzlicher H1
+sind keine Abschlussbilder. Originale: `build/reader-overlay-verification/`,
+`build/reader-overlay-sanitizers/`; Bilder/Apple-Quellen im UI-Bericht.
+
+SBUI-080 ist neu bestätigt/offen: F1 ersetzt ein begonnenes Notizformular durch
+Hilfe; Escape stellt die Formularaufgabe nicht wieder her, erneutes Anlegen leert
+den Titel. Keine vorhandene Datei wurde verloren. Weitere Zielplattformen,
+reale Geräte/IME/Screenreader, SBUI-074 und übrige Release-Arbeit bleiben offen.
+Paket/Installation folgen; installiert weiterhin 0.9.57. 1.0 nur nach Freigabe.
