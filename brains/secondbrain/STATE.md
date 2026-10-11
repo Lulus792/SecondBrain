@@ -11,12 +11,12 @@ Lumen-Sternkarte, Glaskarten, Icons, direkte Pfeilnavigation, Kamerafahrt,
 Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert **0.9.47 / 7df7dd2f63b9**, sauberer Intel/macOS-Release-Build.
+Installiert **0.9.48 / 42c42f71aafb**, sauberer Intel/macOS-Release-Build.
 95 Dateien entsprechen dem geprüften Paket;18 Gedächtnisdateien beim Laden
 unverändert.126 Desktop-,161 Tastatur-,75 Sicherungs-Assertions, zwei Neustarts,
 produktive CLI und Runtime-/Lizenz-/Version bestehen.
-Rückfallversion0.9.46: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.46-20261011-114425`.
-CI38129123502 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
+Rückfallversion0.9.47: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.47-20261011-120953`.
+CI38130627969 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
 
 Frühere Build-/Paket-/Diagnoseverzeichnisse waren am11.Oktober nicht mehr
 vorhanden. Historische Abnahmen bleiben in STATUS/Journal; entfernte Dateien
@@ -60,7 +60,8 @@ vergleiche gegen0.9.47 auch unter ASan/UBSan bestehen. Drei alternierende Metal-
 Paare verbessern Kamera-Zeichenzeit im Median um19,36%; Profilkopie unverändert.
 Die tatsächlichen Frames haben weiterhin Layout-/Presentspitzen.
 [Vertrag/Messung](../../docs/RASTER_LEISTUNG.md).72/72 lokale Release-Prüfungen
-bestehen (395,24s). Paket/Installation folgen.
+bestehen (395,24s). Intel/macOS-Paket und Installation geprüft; andere
+Zielplattformen bleiben offen.
 
 ## Nächste Arbeiten
 
