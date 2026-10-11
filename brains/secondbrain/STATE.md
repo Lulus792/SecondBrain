@@ -34,8 +34,8 @@ Einstellungen; Sicherung/Wiederherstellung bestehen. [Nachweis](../../docs/SYSTE
   Kamerafahrt und neue passende Ladeaufnahme erhalten. ASan/UBSan im dokumentierten
   Umfang; externe UI nicht instrumentiert, Leaks aus, kein TSan.
 
-84/84 lokale Release-Tests bestehen (707,14 s); die geprüfte Binärdatei ist
-bytegleich zur installierten App. Alle vier Windows-/Linux-Desktopjobs zu
+Für 0.9.68 bestehen 84/84 lokale Release-Tests (707,14 s); die damalige
+Build- und installierte Binärdatei waren bytegleich. Alle vier Windows-/Linux-Desktopjobs zu
 0b0fdac/CI38181757771 einschließlich beider Release-Pakete bestehen. Mac-CI queued;
 lokale Intel-Abnahme separat. Server 2025/Xvfb sind keine menschlichen
 Windows-11-/Wayland-/Screenreaderabnahmen.

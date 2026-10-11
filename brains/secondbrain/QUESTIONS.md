@@ -22,7 +22,11 @@ Beleg: [Designrecherche](../../docs/UI_GALAXIE.md) und [Umsetzung](../../docs/UI
 
 ## Vollständiger Release
 
-Welche Betriebssystemversionen werden für 1.0 zugesagt? Die eigene Lizenz ist
+Der Nutzer hat einen begründeten Mindestversionsvorschlag beauftragt. Stand
+12. Oktober 2026: macOS 14.0 (Intel/ARM64), Windows 11 25H2 x64 und Ubuntu
+24.04 LTS x86_64 sind vorgeschlagene Abnahmeziele. Die tatsächliche Abnahme und
+verbindliche Zusage stehen noch aus; [Begründung und Quellen](../../docs/PLATTFORM_VORSCHLAG.md).
+Die eigene Lizenz ist
 auf Nutzerentscheidung MIT. Die Arbeiten der Release-Liste sind beauftragt;
 1.0 wird erst auf ausdrückliche Freigabe gesetzt. Signierte Pakete benötigen
 noch Apple-Developer-Konto beziehungsweise Windows-Signaturzertifikat. Die [Release-Liste](../../docs/RELEASE.md)
