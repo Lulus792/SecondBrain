@@ -12,11 +12,11 @@ Glaskarten, eigene Icons, direkte Pfeilnavigation, Kamerafahrt, Startfokus, Text
 und große Leseansicht sind implementiert. Originalbytes, Entwürfe und erkannte
 Konflikte bleiben geschützt. Externe Bibliotheken nur UI; MIT.
 
-Installiert **0.9.64/bef4816d3e40**, sauberer Intel/macOS-Release-Build.
+Installiert **0.9.65/1a19bee557ca**, sauberer Intel/macOS-Release-Build.
 98 Dateien paketgleich;18 Gedächtnisdateien beim Öffnen unverändert.126 Desktop-,
 167 Tastatur-,75 Sicherungsbedingungen, zwei Einstellungs-Neustarts, CLI-/Runtime-/
 Lizenz-/Version bestehen. Tatsächliche App-Aufnahme angesehen. macOS14.6.1/23G93,x86_64.
-Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.63-20261011-222221`.
+Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.64-20261011-230732`.
 
 ## Aktueller Darstellungsschritt
 
@@ -62,7 +62,15 @@ oder vorhandene Icons. Bearbeiten/Speichern priorisiert, Namen/Reihenfolge/
 Befehle erhalten.800 Bedingungen über36 Größen-/Schrift-/Zustandsszenarien
 und10 passende Produktprüfungen bestehen (185,15s), Aufnahmen angesehen.
 Kein neuer83er-Gesamtlauf. [Vertrag](../../docs/READER_AKTIONEN.md).
-Sauberes65-Paket und Installation folgen; installiert bleibt vorerst64.
+Sauberes65-Paket und Installation geprüft:98 Dateien paketgleich,18 eigene
+Gedächtnisdateien beim Öffnen unverändert; tatsächliche Aufnahme angesehen.
+126 Desktop-,167 Tastatur-,75 Sicherungsbedingungen,20-Datei-Wiederöffnung,
+zwei Einstellungsprozesse, CLI-/Runtime-/Version bestehen. Echter Wechsel
+64→65→64 erhält20 Testdateien und Einstellungen. Drei saubere Versions-/
+Reader-Nachprüfungen bestehen (8,32s),47 Python-Prüfungen bestehen, eine native
+Windows-Prüfung übersprungen. CI38174603923 zu1a19bee: Linux-Release samt Paket
+erfolgreich; Windows/Linux-Debug in Arbeit, Mac queued. Die neue Windows-
+Fixtureabnahme bleibt bis zum erfolgreichen Paket offen.
 
 Alle vier Windows-/Linux-Desktopjobs zu d575caf/CI38172915154 bestehen
 einschließlich Release-Paketen und neuer Compiler-/Lizenzquellengrenze.

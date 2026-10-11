@@ -4294,3 +4294,22 @@ scheitert nach bestandener Produktprüfung im Prüfer an CRLF-Einstellungen.
 Der Fixtureproduzent schreibt nun native LF-Bytes; Windows-Textübersetzung
 gezielt geprüft und echter Mac-Versionswechsel erneut bestanden. Neue native
 Windows-Paketabnahme offen. [Originale](UPDATE_NACHWEIS.md). Mac-CI queued.
+
+## Reader-Aktionspaket0.9.65 installiert
+
+Sauberer Intel/macOS-Release0.9.65/1a19bee557ca: drei abschließende Reader-/
+Versionsprüfungen bestehen (8,32s). Paket besteht126 Desktop-,167 Tastatur-,75
+Sicherungsbedingungen,20-Datei-Wiederöffnung, zwei Einstellungsprozesse,
+CLI-/Runtime-/Versionsprüfung. Echter64→65→64-Wechsel besteht mit20 erhaltenen
+Testdateien, Einstellungen und Sicherung/Wiederherstellung.98 installierte
+Dateien paketgleich;18 eigene Gedächtnisdateien beim Öffnen unverändert.
+Installierte Aufnahme angesehen.47 Python-Prüfungen bestehen, eine native
+Windows-Prüfung auf dem Mac übersprungen (48 entdeckt,4,582s).
+Archiv-SHA256: `b40958a6e001a8525efe85e6fdc6f440a14116c44f31eaa8cad2f44658d2bc74`.
+Rückfall: `build/previous-dist-0.9.64-20261011-230732`; Originale:
+`build/reader-actions-verification/` und `build/reader-actions-package-check/`.
+
+Neue CI38174603923 zu1a19bee: Linux-Release samt Paket erfolgreich;
+Windows/Linux-Debug in Arbeit, Mac-Jobs queued. Neue Windows-Fixtureabnahme,
+andere Darstellungen und menschliche Geräte-/assistive Abnahme bleiben offen.
+1.0 wird weiterhin erst auf ausdrückliche Nutzerfreigabe gesetzt.

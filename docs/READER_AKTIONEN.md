@@ -48,3 +48,21 @@ Desktop-/Tastaturabläufen, zwei Versions- und Releaseprüfungen. Kein neuer
 Freigabe. Native Windows-/Linux-/ARM64-, weitere Darstellungs- und menschliche
 assistive Abnahmen bleiben offen. SBUI-074 und die übrige [Release-Liste](RELEASE.md)
 werden durch diesen Aktionsschritt nicht abgeschlossen.
+
+## Geprüftes Paket installiert
+
+Sauberer Intel/macOS-Release0.9.65/1a19bee557ca: drei abschließende Reader-/
+Versionsprüfungen bestehen (8,32s). Entpacktes Paket besteht126 Desktop-,167
+Tastatur-,75 Sicherungsbedingungen,20-Datei-Wiederöffnung, zwei Einstellungs-
+prozesse und CLI-/Runtime-/Versionsprüfung. Echter Wechsel64→65→64 erhält die
+Testdateien, gewählte Notiz und Darstellung; Sicherung/Wiederherstellung bestehen.
+98 installierte Dateien paketgleich,18 echte Projektgedächtnisdateien beim
+Öffnen unverändert. Installierte App-Aufnahme angesehen. Archiv-SHA256:
+`b40958a6e001a8525efe85e6fdc6f440a14116c44f31eaa8cad2f44658d2bc74`.
+Rückfall: `build/previous-dist-0.9.64-20261011-230732`.
+Originale: `build/reader-actions-verification/`, `build/reader-actions-package-check/`.
+
+CI38174603923 zu1a19bee: Linux-Release einschließlich Paket erfolgreich;
+Windows/Linux-Debug noch in Arbeit, Mac-Jobs queued. Das ist keine menschliche
+Screenreader-/Geräte-/allgemeine Stilabnahme.47 ausführbare Python-Prüfungen
+bestehen, eine native Windows-Prüfung lokal übersprungen.
