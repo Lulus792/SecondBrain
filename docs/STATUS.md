@@ -2,7 +2,7 @@
 
 Stand: 11. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.48. Die Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.49. Die Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -3520,3 +3520,21 @@ nach dieser reinen Teständerung keinen erneuten Lauf. Originale:
 Paket und Installation folgen; installiert bleibt 0.9.48. Leseansicht,
 einzeilige native Auswahl-/Ersetzungsaktionen, neue Zielplattformen und tatsächliche
 IME-/Screenreader-/Geräteabnahmen bleiben offen. 1.0 nur nach Nutzerfreigabe.
+
+## Feldgeometriepaket0.9.49 installiert
+
+Quellcommit `5a4aee460031279a54120a88eefa6df40f5857d8` ist gepusht. Der saubere
+Intel/macOS-Release-Build identifiziert0.9.49/5a4aee460031; drei Versions-/Release-
+Nachprüfungen bestehen. Entpacktes Paket:126 Desktop-,161 Tastatur-,75 Sicherungs-
+Assertions, zwei Einstellungs-Neustarts, produktive CLI und Runtime-/Lizenz-/Version
+bestehen.95 installierte Dateien stimmen einzeln mit dem geprüften Paket überein.
+Die installierte App lädt die eigene Instanz, ohne deren18 Dateien zu verändern;
+PNG der tatsächlichen C-App angesehen. Prüfgerät: macOS14.6.1/23G93, x86_64.
+
+Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.48-20261011-124433`.
+Archiv-SHA256: `0f121fe486af59c34567dbf175a7b8e686c1e1bfc1cd861109e810a113e5a075`.
+Originale: `build/field-geometry-verification/` (Paketprotokoll, installierte
+Hashes/Version, Gedächtnisprüfung, Bild, Geräte-/Quellstand und CI-Snapshot).
+CI38132768614 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
+Leseansicht, native einzeilige Auswahl/Ersetzung, reale IME/Screenreader/Geräte und
+alle übrigen Release-Arbeiten bleiben offen.1.0 nur nach Nutzerfreigabe.

@@ -11,12 +11,12 @@ Lumen-Sternkarte, Glaskarten, Icons, direkte Pfeilnavigation, Kamerafahrt,
 Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert **0.9.48 / 42c42f71aafb**, sauberer Intel/macOS-Release-Build.
+Installiert **0.9.49 / 5a4aee460031**, sauberer Intel/macOS-Release-Build.
 95 Dateien entsprechen dem geprüften Paket;18 Gedächtnisdateien beim Laden
 unverändert.126 Desktop-,161 Tastatur-,75 Sicherungs-Assertions, zwei Neustarts,
 produktive CLI und Runtime-/Lizenz-/Version bestehen.
-Rückfallversion0.9.47: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.47-20261011-120953`.
-CI38130627969 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
+Rückfallversion0.9.48: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.48-20261011-124433`.
+CI38132768614 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
 
 Frühere Build-/Paket-/Diagnoseverzeichnisse waren am11.Oktober nicht mehr
 vorhanden. Historische Abnahmen bleiben in STATUS/Journal; entfernte Dateien
@@ -63,13 +63,14 @@ Die tatsächlichen Frames haben weiterhin Layout-/Presentspitzen.
 bestehen (395,24s). Intel/macOS-Paket und Installation geprüft; andere
 Zielplattformen bleiben offen.
 
-## Neue Feldgeometrie (0.9.49, Paket noch ausstehend)
+## Neue Feldgeometrie (0.9.49)
 
 Suche und alle Formulartexte kopieren ihre tatsächliche gezeichnete Geometrie
 mit eigenen Quellen; IME und der gehaltene Notizeditorcache bleiben geschützt.
 503 Feld- und 592 Mac-Providerprüfungen bestehen auch unter ASan/UBSan.
 72/73 Release-Prüfungen plus korrigierter zeitabhängiger Cursor-Test im
-gezielten Nachlauf decken alle73 aktuellen Prüfungen ab. Installiert bleibt48.
+gezielten Nachlauf decken alle73 aktuellen Prüfungen ab. Mac-Paket und Installation
+bestehen; andere Zielplattformen bleiben offen.
 [Vertrag/Prüfgrenzen](../../docs/NATIVE_TEXTGEOMETRIE.md).
 
 ## Nächste Arbeiten
