@@ -1,6 +1,6 @@
 # Stilgrenzen mit dem Text halten
 
-Stand: 11. Oktober 2026. Umsetzung ab 0.9.57; Paketabnahme folgt.
+Stand: 11. Oktober 2026. Umsetzung ab 0.9.57; Intel/macOS-Paket geprüft.
 Die Änderung ergänzt den [Reader-Inline-Plan](READER_INLINE_PLAN.md).
 
 ## Befund
@@ -69,9 +69,8 @@ kein Leak-/ThreadSanitizer- oder menschlicher Screenreader-Nachweis.
 Originale: `build/reader-style-verification/` und
 `build/reader-style-sanitizers/`. 78/78 lokale Release-Prüfungen bestehen
 (685,84 s); die danach erweiterte Budgetprüfung besteht zusätzlich im Release-
-und Sanitizer-Prüfer. Der Produktcode blieb dabei unverändert. Paket- und
-Installationsnachweise folgen im [Umsetzungsstand](STATUS.md); installiert ist
-noch 0.9.56.
+und Sanitizer-Prüfer. Der Produktcode blieb dabei unverändert. Das Intel/macOS-Paket ist geprüft und als 0.9.57 installiert.
+Weitere Zielplattformabnahmen bleiben offen; Details im [Umsetzungsstand](STATUS.md).
 
 ## Alternierender Leistungsvergleich
 

@@ -13,13 +13,13 @@ Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt. Externe
 Bibliotheken bleiben auf UI beschränkt; eigene Lizenz MIT.
 
-Installiert **0.9.56 / bb2fe497dd74**, sauberer Intel/macOS-Release-Build.
+Installiert **0.9.57 / 1c827fd0e46d**, sauberer Intel/macOS-Release-Build.
 96 Dateien entsprechen dem geprüften Paket; 18 Gedächtnisdateien beim Öffnen
 unverändert. 126 Desktop-, 161 Tastatur-, 75 Sicherungs-Assertions, zwei Neustarts,
 produktive CLI und Runtime-/Lizenz-/Version bestehen. Tatsächliche App-Aufnahme
 angesehen. Prüfgerät: macOS 14.6.1/23G93, x86_64.
-Rückfallversion 0.9.55: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.55-20261011-173958`.
-CI 38151902742 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
+Rückfallversion 0.9.56: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.56-20261011-182004`.
+CI 38154566935 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
 Frühere Plattformnachweise ersetzen keine Prüfung dieser neuen Fassung.
 
 ## Geprüfte aktuelle Änderung
@@ -30,21 +30,14 @@ Mac-Assertions auch unter ASan/UBSan bestehen; 39 eigene C-Dateien, 55 aktuelle
 Hashes. 78/78 Release-Prüfungen (685,84 s) plus erweiterte Budgetprüfung bestehen.
 Metal-Paare senken Ruhe-/Scroll-/Kamera-Layout im Median um 38,62/26,54/32,55%;
 erste Bilder und Frame-Spitzen verbessern sich nicht durchgängig.
-[Stilplan](../../docs/READER_STILPLAN.md). Paket/Installation folgen; installiert 0.9.56.
+[Stilplan](../../docs/READER_STILPLAN.md). Intel/macOS-Paket/Installation geprüft;
+aktuelle Windows-/Linux-/ARM64-Abnahmen fehlen.
 
 0.9.56 hält Inline-Analysen von Absätzen/Überschriften mit Text und Referenzen
 im vorhandenen 16-MiB-Quellbudget. Iteratoren erhalten eigene Cursor; Änderungen
 ersetzen den gesamten Plan. Speicher-/Budgetrückfälle bleiben vollständig.
 Vor einem fehlgeschlagenen Quellenersatz werden frühere geliehene Ausgaben
 zurückgesetzt. [Vertrag](../../docs/READER_INLINE_PLAN.md).
-
-56 Quell-, 49 produktive Reader- und 621 Mac-Assertions auch unter haltendem
-ASan/UBSan bestehen: 39 eigene C-Dateien, 55 aktuelle Quell-/Include-Hashes.
-UI-Abhängigkeiten nicht instrumentiert; keine Leak-/ThreadSanitizer-Abnahme.
-78/78 lokale Release-Prüfungen bestehen (552,41 s).
-Drei alternierende Metal-Paare senken Scroll-/Kamera-/Wechsel-Layout im Median
-um 31,20/35,54/22,63%; die 18 Profilkopiedateien bleiben unverändert.
-Frame-p95 und erste Vorbereitung verbessern sich nicht durchgängig.
 
 ## Weitere implementierte Grundlagen
 

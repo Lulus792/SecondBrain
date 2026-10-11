@@ -2,7 +2,7 @@
 
 Stand: 11. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.56. Die Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.57. Die Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -3901,3 +3901,22 @@ Frame-p95 verbessern sich nicht durchgängig; kein fester Bildratennachweis.
 Erste Vorbereitung, andere Textarten/native Ausgaben/Bildausgabe, aktuelle
 Zielplattformen und reale Eingabe-/Screenreader-/Geräteabnahmen bleiben offen.
 Paket/Installation folgen; installiert weiterhin 0.9.56. 1.0 nur nach Freigabe.
+
+
+## Reader-Stilpaket 0.9.57 installiert
+
+Quellcommit `1c827fd0e46d9adfd13c8c51e5e5eeb26f495558` ist gepusht. Sauberer
+Intel/macOS-Release-Build 0.9.57/1c827fd0e46d; drei Versions-/Release-Nachprüfungen
+bestehen. Das entpackte Paket besteht 126 Desktop-, 161 Tastatur- und 75
+Sicherungs-Assertions, zwei Einstellungs-Neustarts, produktive CLI sowie
+Runtime-/Lizenz-/Version beider ausgelieferter Programme. Alle 96 installierten
+Dateien entsprechen einzeln dem Paket. Die App öffnet das eigene Gedächtnis
+ohne Änderung seiner 18 Dateien; tatsächliche C-App-Aufnahme angesehen.
+Prüfgerät: macOS 14.6.1/23G93, x86_64.
+
+Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.56-20261011-182004`.
+Archiv-SHA256: `fe2ff0874bfe9e4974a28fea2ee5333b7a21e069cf56829b0d1ff4678ae82579`.
+Originale: `build/reader-style-verification/`. CI 38154566935 zum Quellcommit
+zuletzt queued; neue Gesamt-Plattformabnahme offen. Erste Vorbereitung, weitere
+Textarten/native Ausgaben/Bildausgabe, reale Geräte/Eingaben/Screenreader und
+übrige Release-Arbeit bleiben offen. 1.0 nur nach ausdrücklicher Nutzerfreigabe.
