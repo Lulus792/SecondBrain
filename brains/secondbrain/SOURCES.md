@@ -181,3 +181,8 @@ unter brains/secondbrain im Repository. Quellen haben unterschiedliche Aufgaben.
   Quell-/Planübernahme, IME, Scrollversatz, Eigentum und erhaltener Editorcache ab49.
 - [Produktiver Feldprüfer](../../tests/test_field_geometry.c): alle sieben
   Feldtypen, Bidi/Grapheme, große Schrift, Scrollen und IME.
+
+- [Native Feldaktionen](../../docs/NATIVE_FELDAKTIONEN.md): Auswahl-/Ersetzungs-
+  Vertrag, Quellen-/Kontextschutz und eigene Mac-Setter-/Besitzeranbindung ab50.
+- [Aktionsprüfer](../../tests/test_field_actions.c): produktive Queue und Widgets,
+  Graphemgrenzen, Kapazität, Fokusrückkehr und geschlossene/geänderte Felder.

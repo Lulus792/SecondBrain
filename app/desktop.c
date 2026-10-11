@@ -576,6 +576,7 @@ void sb_desktop_free(SBDesktop *d) {
     if (d->text_edit_ready) nk_textedit_free(&d->text_edit);
     sb_native_text_free(&d->native_editor);
     native_fields_clear(d);
+    field_selections_free(d);
     free(d->targets); passive_clear(d); free(d->passive);
     sb_graph_free(&d->graph); sb_notes_free(&d->graph_notes); free(d->graph_ids);
     sb_notes_free(&d->hits); free(d->context); free(d->notice); sb_app_free(&d->model);
@@ -791,7 +792,11 @@ static void accessible_actions(SBDesktop *d) {
                 d->card=true; d->star=index; d->follow_star=true; focus_set(d,"galaxy"); request(d,SB_ACT_NOTE,d->graph_notes.items[index].path);
             }
         } else if (target) {
-            if (action.action==ACCESSKIT_ACTION_FOCUS || action.action==ACCESSKIT_ACTION_SCROLL_INTO_VIEW) focus_set(d,action.id);
+            if (action.action==ACCESSKIT_ACTION_FOCUS || action.action==ACCESSKIT_ACTION_SCROLL_INTO_VIEW){
+                size_t capacity=0;char *source=accessible_field(d,action.id,&capacity);SBFieldSelection *selection=field_selection(d,action.id);
+                if(source && field_selection_matches(d,selection,source))selection->pending=true;
+                focus_set(d,action.id);
+            }
             else if (action.action==ACCESSKIT_ACTION_CLICK && target->kind==SB_FOCUS_BUTTON) { focus_set(d,action.id); snprintf(d->activate,sizeof(d->activate),"%s",action.id); }
             else if (action.action==ACCESSKIT_ACTION_SCROLL_UP || action.action==ACCESSKIT_ACTION_SCROLL_DOWN) {
                 unsigned slot=modal_reader(d) ? 2 : d->form!=SB_FORM_NONE ? 3 : !strcmp(action.id,"editor") ? 1 : 0;
@@ -811,13 +816,13 @@ static void accessible_actions(SBDesktop *d) {
                         else { edit->select_start=start; edit->select_end=end; d->message=sb_error(SB_LIMIT,"Text konnte nicht eingefügt werden."); }
                     } else d->message=sb_error(SB_LIMIT,"Text überschreitet die Editorgrenze.");
                 }
-            } else if (target->kind==SB_FOCUS_TEXT && action.action==ACCESSKIT_ACTION_SET_VALUE && action.value) {
-                size_t capacity=0; char *field=accessible_field(d,action.id,&capacity); size_t n=strlen(action.value);
-                if (field && n<capacity && sb_utf8_valid(action.value,n) && !strchr(action.value,'\n') && !strchr(action.value,'\r')) {
-                    strcpy(field,action.value); if (!strcmp(action.id,"form-id")) d->id_manual=true;
-                    if (!strcmp(action.id,"backup-path")) d->restore_checked=false;
+            } else if (target->kind==SB_FOCUS_TEXT && (action.action==ACCESSKIT_ACTION_SET_VALUE || action.action==ACCESSKIT_ACTION_SET_TEXT_SELECTION || action.action==ACCESSKIT_ACTION_REPLACE_SELECTED_TEXT)) {
+                size_t capacity=0;char *field=accessible_field(d,action.id,&capacity);SBStatus status=native_field_action(d,&action,field,capacity);
+                if(status.code==SB_OK){
+                    if(action.action!=ACCESSKIT_ACTION_SET_TEXT_SELECTION && !strcmp(action.id,"form-id"))d->id_manual=true;
+                    if(action.action!=ACCESSKIT_ACTION_SET_TEXT_SELECTION && !strcmp(action.id,"backup-path"))d->restore_checked=false;
                     focus_set(d,action.id);
-                } else d->message=sb_error(SB_INVALID,"Eingabe ist ungültig oder zu lang.");
+                }else d->message=status;
             }
         }
         sb_accessibility_action_free(&action);
@@ -853,6 +858,8 @@ static void accessible_publish(SBDesktop *d) {
                 v->anchor=field->anchor;v->caret=field->caret;
                 if(field->text.count)v->native_text=&field->text;
             }
+            SBFieldSelection *selection=field_selection(d,t->id);
+            if(v->value && field_selection_matches(d,selection,v->value)){v->anchor=selection->anchor;v->caret=selection->caret;}
         } else if (t->kind==SB_FOCUS_READER) v->value=d->form==SB_FORM_NOTICE_TEXT ? d->notice : d->form==SB_FORM_CONTEXT ? d->context : d->model.source ? d->model.source : d->model.editor;
         if (!strcmp(t->id,"galaxy")) v->label="Dokumente in der Sternkarte";
         v->order=((uint64_t)t->group<<32)|t->order;

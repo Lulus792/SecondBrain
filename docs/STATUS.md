@@ -3538,3 +3538,35 @@ Hashes/Version, Gedächtnisprüfung, Bild, Geräte-/Quellstand und CI-Snapshot).
 CI38132768614 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
 Leseansicht, native einzeilige Auswahl/Ersetzung, reale IME/Screenreader/Geräte und
 alle übrigen Release-Arbeiten bleiben offen.1.0 nur nach Nutzerfreigabe.
+
+## Native Feldaktionen (0.9.50, 11. Oktober)
+
+Suche und alle Formulartexte bieten native Auswahl/Ersetzung mit eigenem
+Quellen-/Auswahlzustand. Ganze Grapheme, umgekehrte Auswahl, leeres Einfügen/
+Löschen, Kapazitätsgrenzen und Fokusrückkehr sind angebunden. Die neue Quelle
+wird vor Änderung vollständig vorbereitet; veraltete Quellen/Kontexte werden
+abgewiesen. Wenn eine Einfügung mit dem nächsten Zeichen ein Emoji bildet,
+landet der Cursor hinter dem ganzen Graphem. [Vertrag](NATIVE_FELDAKTIONEN.md).
+
+Der lokale festgelegte Mac-Provider0.27.1 hat keinen Setter für ausgewählten
+Text. Die eigene C-Anbindung ergänzt ihn über Fenster und Autor-ID, die gesperrte
+Besitzerzuordnung und die bestehende begrenzte Queue. Schreibgeschützte Elemente
+und eingebettete NUL-Zeichen werden abgewiesen; Freigabe entfernt den Besitzer
+vor dem Adapter. Der Anschluss gilt auch für den vorhandenen Notizeditor.
+Primärquelle/Hash: `build/field-actions-verification/provider-source.json`.
+
+74/74 lokale Release-Prüfungen bestehen (713,91s).190 produktive Feldaktions-,
+503 Feldgeometrie- und608 echte Mac-Provider-Assertions bestehen auch unter
+haltendem ASan/UBSan. Letztere prüfen Auswahl/Ersetzung, readonly, NUL und zwei
+native Fenster mit derselben Autor-ID und getrennten Warteschlangen.
+39 eigene C-Dateien aus Kern/Modell/UI/Desktop/Text-/Glyphenlayout sind neu
+instrumentiert;51 Quell-/Include-Hashes entsprechen der geprüften Fassung.
+Externe Bibliotheken/Bidi-Engine bleiben uninstrumentiert; Mac-Leakerkennung ist
+abgeschaltet, kein TSan-Nachweis. Der erste Gesamtlauf wurde nach der ergänzten
+Emoji-Einfügekorrektur kontrolliert abgebrochen und nicht als Abnahme gezählt.
+Originale: `build/field-actions-verification/` und
+`build/field-actions-sanitizers/{build.log,actions-test.log,geometry-test.log,native-test.log,sources.json}`.
+
+Paket/Installation folgen; installiert bleibt0.9.49. Neue Zielplattformen,
+native Leseblock-Geometrie, echte IME/Screenreader/Geräte und weitere Release-
+Arbeiten bleiben offen.1.0 nur nach ausdrücklicher Nutzerfreigabe.

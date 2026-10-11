@@ -257,3 +257,12 @@ Ab 0.9.49 übernehmen Suche und alle Formulartexte den gezeichneten Quellplan.
 Die Ausgaben bleiben pro Feld getrennt und verdrängen den Notizeditorcache nicht.
 [Vertrag](NATIVE_TEXTGEOMETRIE.md). Leseansicht, native Auswahl-/Ersetzungsaktionen
 einzeiliger Felder und reale assistive/IME-/Geräteabnahmen bleiben offen.
+
+## Native Feldaktionen vom 11. Oktober
+
+Ab0.9.50 sind Auswahl und Ersetzung an alle einzeiligen Felder angeschlossen,
+mit graphemgebundenen Grenzen, atomischer Kapazitätsprüfung und geschützter
+Fokusrückkehr. Die eigene Mac-Anbindung ergänzt den im festgelegten Provider
+fehlenden Setter für ausgewählten Text, auch im Notizeditor. [Vertrag](NATIVE_FELDAKTIONEN.md).
+Neue Zielplattform-, IME-/Screenreader-/Geräteabnahmen und native Leseblock-Geometrie
+bleiben offen.

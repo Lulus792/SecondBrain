@@ -88,7 +88,7 @@ Widgets. Vorläufige IME-Komposition meldet weiterhin die Originalquelle ohne
 unpassende Kompositionsrechtecke. Die Veröffentlichung vergleicht die vollständigen
 Quellenbytes erneut: nach einer zwischenzeitlichen Änderung werden alte Rechtecke
 nicht mit dem neuen Text kombiniert. Die kleinen Felder verdrängen den gehaltenen
-32-MiB-Notizeditorplan nicht und behalten keine zusätzlichen dauerhaften Caches.
+32-MiB-Notizeditorplan nicht und behalten keine zusätzlichen dauerhaften Geometrie-Caches.
 
 Der produktive Feldprüfer kontrolliert alle sieben Feldtypen, getrennte Quellen,
 gemischte Schreibrichtungen, Grapheme/Emoji, leere Texte, 100/150/200 Prozent
@@ -97,8 +97,9 @@ Der macOS-Providerprüfer ergänzt einen UTF-16-Zeichenbereich nach Akzent und
 Familien-Emoji im Notiztitel mit Breite, Höhe und Bildschirmposition.
 
 Die genaue Geometrie gilt für die Eingabefelder. Die Leseansicht benötigt weitere
-Integration. Native Auswahl-/Ersetzungsaktionen der einzeiligen Felder sind noch
-nicht angebunden; die bisherige native Set-Value-Aktion bleibt erhalten.
+Integration. Ab0.9.50 ergänzt der [Aktionsvertrag](NATIVE_FELDAKTIONEN.md) native
+Auswahl und Ersetzung in den einzeiligen Feldern; der ursprüngliche Set-Value-Weg
+bleibt erhalten.
 Die Leistung großer realer
 Editorinhalte, Exporte über der Cachegrenze und das erste lange Dokumentlayout
 sind weitere Aufgaben. Vollständige Plattform-, IME- und

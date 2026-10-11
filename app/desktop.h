@@ -10,6 +10,7 @@
 typedef struct SBReaderPreparation SBReaderPreparation;
 #define SB_NATIVE_FIELDS 7
 typedef struct {SBNativeText text;char *source;size_t anchor,caret;} SBFieldText;
+typedef struct {char *source;size_t anchor,caret;uint64_t context;bool pending;} SBFieldSelection;
 
 typedef enum { SB_FORM_NONE, SB_FORM_PROJECT, SB_FORM_NOTE, SB_FORM_WORKSPACE, SB_FORM_SETTINGS, SB_FORM_CONTEXT, SB_FORM_HELP, SB_FORM_ACTIONS, SB_FORM_PROJECTS, SB_FORM_FILTER,SB_FORM_BACKUP,SB_FORM_RESTORE,SB_FORM_ABOUT,SB_FORM_NOTICE_LIST,SB_FORM_NOTICE_TEXT } SBForm;
 typedef enum {
@@ -95,6 +96,7 @@ typedef struct {
     struct nk_text_edit text_edit;
     SBNativeText native_editor;
     SBFieldText native_fields[SB_NATIVE_FIELDS];
+    SBFieldSelection field_selections[SB_NATIVE_FIELDS];
     SBReaderPreparation *reader_preparation;
     bool reader_preparation_used;
     size_t reader_plan_hits,reader_plan_misses;

@@ -73,6 +73,15 @@ gezielten Nachlauf decken alle73 aktuellen Prüfungen ab. Mac-Paket und Installa
 bestehen; andere Zielplattformen bleiben offen.
 [Vertrag/Prüfgrenzen](../../docs/NATIVE_TEXTGEOMETRIE.md).
 
+## Neue Feldaktionen (0.9.50, Paket noch ausstehend)
+
+Suche/Formulare bieten native Auswahl/Ersetzung mit Graphemgrenzen, atomischer
+Kapazitätsprüfung und erhaltener Fokusrückkehr. Der Mac-Anschluss ergänzt den
+fehlenden Setter auch im Notizeditor; readonly/NUL und getrennte Fensterqueues
+sind geprüft.74/74 Release-Prüfungen bestehen713,91s;190 Feldaktions-,503
+Geometrie- und608 Provider-Assertions auch unter ASan/UBSan im dokumentierten
+Umfang. Installiert bleibt49. [Vertrag](../../docs/NATIVE_FELDAKTIONEN.md).
+
 ## Nächste Arbeiten
 
 Quelllesen, Parser/Inline-Aufbereitung,
@@ -80,7 +89,7 @@ native Metadaten, Rasterung und Fälle über den Vorbereitungsbudgets profiliere
 Der Rückfall ist noch synchron; einzelne Bibliotheksaufrufe und Shutdown können
 warten. SBUI-074 bleibt für die vollständige Großdaten-/Geräteabnahme offen.
 
-Native Leseblock-Geometrie und einzeilige Auswahl-/Ersetzungsaktionen, echte IME und VoiceOver/NVDA/Orca,
+Native Leseblock-Geometrie, echte IME und VoiceOver/NVDA/Orca,
 Dialog-/Geräte-/Monitor-/Langzeitprüfungen, Windows-/Linux-Speicherfehler,
 Mindest-OS/frische Rechner, vollständige Runtime-/Lizenzprüfung, Sicherheitskanal,
 Signierung und abschließende natürliche Texte bleiben Release-Arbeit.

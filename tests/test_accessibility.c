@@ -140,6 +140,13 @@ int main(int argc,char **argv) {
     CHECK(title_width>0 && fabs(title_box.size.width-title_width)<0.1 && fabs(title_box.size.height-title_height)<0.1);
     CHECK(fabs(title_box.origin.x-(title_frame.origin.x+title_x-title_field_bounds.x))<0.1);
     CHECK(fabs(title_box.origin.y-(title_frame.origin.y+title_field_bounds.h-(title_y-title_field_bounds.y)-title_height))<0.1);
+    ((void(*)(void *,SEL,TextRange))objc_msgSend)(field,sel_registerName("setAccessibilitySelectedTextRange:"),(TextRange){1,1});frame(&d);frame(&d);
+    CHECK(d.field_selections[1].anchor==0 && d.field_selections[1].caret==2);
+    const char *title_selected=utf8(send(field,"accessibilitySelectedText"));CHECK(title_selected && !strcmp(title_selected,"e\xcc\x81"));
+    ((void(*)(void *,SEL,void *))objc_msgSend)(field,sel_registerName("setAccessibilitySelectedText:"),string("Ä"));frame(&d);frame(&d);
+    CHECK(!strcmp(d.name,"Ä 👩‍👩‍👧‍👦 end") && d.field_selections[1].caret==1);
+    unsigned short nul_text[]={65,0,66};void *native_nul=((void *(*)(void *,SEL,const unsigned short *,unsigned long))objc_msgSend)(objc_getClass("NSString"),sel_registerName("stringWithCharacters:length:"),nul_text,3UL);
+    ((void(*)(void *,SEL,void *))objc_msgSend)(field,sel_registerName("setAccessibilitySelectedText:"),native_nul);frame(&d);CHECK(!strcmp(d.name,"Ä 👩‍👩‍👧‍👦 end"));
     ((void(*)(void *,SEL,void *))objc_msgSend)(field,sel_registerName("setAccessibilityValue:"),string("Native Notiz ü"));frame(&d);frame(&d);
     void *submit=native_find(view,"Anlegen",0); CHECK(submit!=NULL);
     ((void(*)(void *,SEL))objc_msgSend)(submit,sel_registerName("accessibilityPerformPress")); frame(&d); frame(&d);
@@ -157,6 +164,7 @@ int main(int argc,char **argv) {
     ((void(*)(void *,SEL,NativeRange))objc_msgSend)(editor,sel_registerName("setAccessibilitySelectedTextRange:"),(NativeRange){1,1}); frame(&d); frame(&d);
     CHECK(d.text_edit.select_start==0 && d.text_edit.select_end==2);
     selected=utf8(send(editor,"accessibilitySelectedText")); CHECK(selected && !strcmp(selected,"e\xcc\x81"));
+    ((void(*)(void *,SEL,void *))objc_msgSend)(editor,sel_registerName("setAccessibilitySelectedText:"),string("Ä"));frame(&d);frame(&d);CHECK(!strcmp(d.model.editor,"Ä") && d.text_edit.cursor==1);
     char native_long[600];memset(native_long,'a',300);strcpy(native_long+300," e\xcc\x81 👩‍👩‍👧‍👦 end");
     ((void(*)(void *,SEL,void *))objc_msgSend)(editor,sel_registerName("setAccessibilityValue:"),string(native_long));frame(&d);frame(&d);
     ((void(*)(void *,SEL,NativeRange))objc_msgSend)(editor,sel_registerName("setAccessibilitySelectedTextRange:"),(NativeRange){250,65});frame(&d);frame(&d);
@@ -178,6 +186,8 @@ int main(int argc,char **argv) {
     /* A value action is never applied to the read-only document surface. */
     d.editing=false; d.card=true; frame(&d);
     void *reader=native_find(view,d.model.title,0); CHECK(reader!=NULL);
+    CHECK(!((BOOL(*)(void *,SEL,SEL))objc_msgSend)(reader,sel_registerName("isAccessibilitySelectorAllowed:"),sel_registerName("setAccessibilitySelectedText:")));
+    ((void(*)(void *,SEL,void *))objc_msgSend)(reader,sel_registerName("setAccessibilitySelectedText:"),string("Must stay read-only"));frame(&d);CHECK(!strstr(d.model.editor,"Must stay read-only"));
     const char *read_value=utf8(send(reader,"accessibilityValue")); CHECK(read_value && strstr(read_value,"Projekt"));
     printf("Native macOS accessibility provider queried and used: button press, text value, project note creation, editor and save.\n");
 #endif
@@ -790,6 +800,21 @@ int main(int argc,char **argv) {
     accesskit_tree_update *large_tree=sb_accessibility_tree(a); text=accesskit_tree_update_debug(large_tree); CHECK(strstr(text,"paragraph:1999") && strstr(text,"Geänderter Absatz"));
     accesskit_string_free(text); accesskit_tree_update_free(large_tree);
     free(blocks); free(block_ids);
+#ifdef __APPLE__
+    /* Identical author IDs in separate native windows must use their own queue. */
+    item=(SBAccessibleItem){.id="text",.label="Editor",.value="AüB",.bounds={0,0,200,100},.role=ACCESSKIT_ROLE_TEXT_INPUT,.editable=true};sb_accessibility_update(a,"Test","text",&item,1,"",false,3);
+    SDL_Window *other_window=SDL_CreateWindow("Other accessibility owner",400,300,SDL_WINDOW_HIDDEN);CHECK(other_window);
+    SBAccessibility *other=sb_accessibility_new(other_window);CHECK(other);sb_accessibility_update(other,"Other","text",&item,1,"",false,3);
+    void *other_native=SDL_GetPointerProperty(SDL_GetWindowProperties(other_window),SDL_PROP_WINDOW_COCOA_WINDOW_POINTER,NULL);
+    void *other_field=native_find(send(other_native,"contentView"),"Editor",0);CHECK(other_field);
+    ((void(*)(void *,SEL,void *))objc_msgSend)(other_field,sel_registerName("setAccessibilitySelectedText:"),string("Other only"));
+    CHECK(!sb_accessibility_next_action(a,&pending));CHECK(sb_accessibility_next_action(other,&pending));CHECK(pending.action==ACCESSKIT_ACTION_REPLACE_SELECTED_TEXT && !strcmp(pending.value,"Other only"));sb_accessibility_action_free(&pending);
+    sb_accessibility_free(other);SDL_DestroyWindow(other_window);
+    void *own_native=SDL_GetPointerProperty(SDL_GetWindowProperties(test_window),SDL_PROP_WINDOW_COCOA_WINDOW_POINTER,NULL);
+    void *own_field=native_find(send(own_native,"contentView"),"Editor",0);CHECK(own_field);
+    ((void(*)(void *,SEL,void *))objc_msgSend)(own_field,sel_registerName("setAccessibilitySelectedText:"),string("Owner remains"));
+    CHECK(sb_accessibility_next_action(a,&pending));CHECK(!strcmp(pending.value,"Owner remains"));sb_accessibility_action_free(&pending);
+#endif
     sb_accessibility_free(a); SDL_DestroyWindow(test_window); SDL_Quit();
     printf("%u accessibility assertions passed.\n",checks); return 0;
 }

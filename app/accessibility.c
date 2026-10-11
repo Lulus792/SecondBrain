@@ -14,6 +14,8 @@ static SDL_SpinLock mac_role_lock;
 static IMP mac_children_original,mac_role_original,mac_rows_original,mac_allowed_original;
 static IMP mac_row_count_original,mac_column_count_original,mac_cell_original;
 static void *mac_heading_role;
+static BOOL mac_text_can_replace(void *self);
+static void mac_selected_text(void *self,SEL selector,void *value);
 static void *mac_role(void *self,SEL selector) {
     SDL_LockSpinlock(&mac_role_lock); IMP original=mac_role_original; SDL_UnlockSpinlock(&mac_role_lock);
     void *role=((void *(*)(void *,SEL))original)(self,selector);
@@ -64,6 +66,7 @@ static void mac_replace(Class node,const char *name,IMP replacement,const char *
     else class_addMethod(node,selector,replacement,encoding);
 }
 static BOOL mac_allowed(void *self,SEL selector,SEL requested) {
+    if(requested==sel_registerName("setAccessibilitySelectedText:"))return mac_text_can_replace(self);
     if (mac_table(self) && (requested==sel_registerName("accessibilityRows") ||
         requested==sel_registerName("accessibilityRowCount") || requested==sel_registerName("accessibilityColumnCount") ||
         requested==sel_registerName("accessibilityCellForColumn:row:"))) return YES;
@@ -85,6 +88,7 @@ static void *mac_children(void *self,SEL selector) {
             mac_replace(node,"accessibilityRowCount",(IMP)mac_row_count,"q@:",&mac_row_count_original);
             mac_replace(node,"accessibilityColumnCount",(IMP)mac_column_count,"q@:",&mac_column_count_original);
             mac_replace(node,"accessibilityCellForColumn:row:",(IMP)mac_cell,"@@:qq",&mac_cell_original);
+            class_addMethod(node,sel_registerName("setAccessibilitySelectedText:"),(IMP)mac_selected_text,"v@:@");
         }
     }
     SDL_UnlockSpinlock(&mac_role_lock); return children;
@@ -124,12 +128,17 @@ struct SBAccessibility {
     Pending *head,*tail; size_t queued,queued_bytes;
 #if defined(__APPLE__)
     accesskit_macos_subclassing_adapter *adapter;
+    void *native_window;struct SBAccessibility *mac_next;
 #elif defined(_WIN32)
     accesskit_windows_subclassing_adapter *adapter;
 #else
     accesskit_unix_adapter *adapter;
 #endif
 };
+#if defined(__APPLE__)
+static SDL_SpinLock mac_owner_lock;
+static SBAccessibility *mac_owners;
+#endif
 static char *copy(const char *s) { if (!s) return NULL; size_t n=strlen(s)+1; char *p=malloc(n); if (p) memcpy(p,s,n); return p; }
 static uint64_t identity_hash(const char *id,uint64_t context) {
     return sb_hash(id,strlen(id))^context;
@@ -176,7 +185,7 @@ static bool permits(const Item *v,accesskit_action action) {
     case ACCESSKIT_ACTION_CLICK: return v->role==ACCESSKIT_ROLE_BUTTON || v->role==ACCESSKIT_ROLE_LINK || v->role==ACCESSKIT_ROLE_LIST_BOX_OPTION;
     case ACCESSKIT_ACTION_SET_VALUE: return v->editable;
     case ACCESSKIT_ACTION_REPLACE_SELECTED_TEXT: case ACCESSKIT_ACTION_SET_TEXT_SELECTION:
-        return v->editable && v->role==ACCESSKIT_ROLE_MULTILINE_TEXT_INPUT;
+        return v->editable && (v->role==ACCESSKIT_ROLE_MULTILINE_TEXT_INPUT || v->role==ACCESSKIT_ROLE_TEXT_INPUT || v->role==ACCESSKIT_ROLE_SEARCH_INPUT);
     case ACCESSKIT_ACTION_SCROLL_UP: case ACCESSKIT_ACTION_SCROLL_DOWN:
         return v->role==ACCESSKIT_ROLE_DOCUMENT || v->role==ACCESSKIT_ROLE_MULTILINE_TEXT_INPUT;
     default: return false;
@@ -273,7 +282,7 @@ static accesskit_tree_update *build_locked(SBAccessibility *a) {
             if (!v->editable) accesskit_node_set_read_only(node);
             else {
                 accesskit_node_add_action(node,ACCESSKIT_ACTION_SET_VALUE);
-                if (v->role==ACCESSKIT_ROLE_MULTILINE_TEXT_INPUT) {
+                if (permits(v,ACCESSKIT_ACTION_SET_TEXT_SELECTION)) {
                     accesskit_node_add_action(node,ACCESSKIT_ACTION_REPLACE_SELECTED_TEXT);
                     accesskit_node_add_action(node,ACCESSKIT_ACTION_SET_TEXT_SELECTION);
                 }
@@ -291,7 +300,7 @@ static accesskit_tree_update *build_locked(SBAccessibility *a) {
                     text_run(tree,node,run.node,v->value+run.text.span.offset,&run.text,rect,v->font_size);
                 }
             }
-            if (v->run_count && v->editable && v->role==ACCESSKIT_ROLE_MULTILINE_TEXT_INPUT) {
+            if (v->run_count && permits(v,ACCESSKIT_ACTION_SET_TEXT_SELECTION)) {
                 accesskit_text_selection selection={native_position(v,v->anchor),native_position(v,v->caret)};
                 accesskit_node_set_text_selection(node,selection);
             }
@@ -338,6 +347,31 @@ static bool submit_locked(SBAccessibility *a,Item *item,accesskit_action kind,co
     }
     return accepted;
 }
+#if defined(__APPLE__)
+/* The pinned macOS provider exposes ranges but has no selected-text setter.
+   Resolve its author ID inside its owning window, then use the same locked
+   production queue. Registry removal precedes adapter/mutex destruction. */
+static bool mac_text_bridge(void *self,const char *value,bool submit){
+    void *window=((void *(*)(void *,SEL))objc_msgSend)(self,sel_registerName("accessibilityWindow"));
+    void *identifier=((void *(*)(void *,SEL))objc_msgSend)(self,sel_registerName("accessibilityIdentifier"));
+    const char *id=identifier ? ((const char *(*)(void *,SEL))objc_msgSend)(identifier,sel_registerName("UTF8String")) : NULL;
+    if(!window || !id)return false;
+    bool accepted=false;SDL_LockSpinlock(&mac_owner_lock);
+    for(SBAccessibility *a=mac_owners;a;a=a->mac_next)if(a->native_window==window){
+        SDL_LockMutex(a->mutex);Item *item=NULL;for(size_t i=0;i<a->count;++i)if(!strcmp(a->items[i].id,id)){item=&a->items[i];break;}
+        accepted=a->alive && item && (submit ? submit_locked(a,item,ACCESSKIT_ACTION_REPLACE_SELECTED_TEXT,value,0,0) : permits(item,ACCESSKIT_ACTION_REPLACE_SELECTED_TEXT));
+        SDL_UnlockMutex(a->mutex);break;
+    }
+    SDL_UnlockSpinlock(&mac_owner_lock);return accepted;
+}
+static BOOL mac_text_can_replace(void *self){return mac_text_bridge(self,NULL,false) ? YES : NO;}
+static void mac_selected_text(void *self,SEL selector,void *value){
+    (void)selector;if(!value || !((BOOL(*)(void *,SEL,Class))objc_msgSend)(value,sel_registerName("isKindOfClass:"),objc_getClass("NSString")))return;
+    const char *text=((const char *(*)(void *,SEL))objc_msgSend)(value,sel_registerName("UTF8String"));
+    unsigned long bytes=((unsigned long(*)(void *,SEL,unsigned long))objc_msgSend)(value,sel_registerName("lengthOfBytesUsingEncoding:"),4UL);
+    if(text && bytes<SB_TEXT_LIMIT && strlen(text)==bytes)mac_text_bridge(self,text,true);
+}
+#endif
 bool sb_accessibility_submit(SBAccessibility *a,accesskit_node_id node,accesskit_action kind,const char *value,size_t anchor,size_t caret) {
     SDL_LockMutex(a->mutex);Item *item=NULL;
     for(size_t i=0;i<a->count;++i)if(a->items[i].node==node || run_id(a->items[i].node)==node){item=&a->items[i];break;}
@@ -383,6 +417,7 @@ SBAccessibility *sb_accessibility_new(SDL_Window *window) {
         static bool forwarded=false;
         if (!forwarded) { accesskit_macos_add_focus_forwarder_to_window_class(class_getName(object_getClass(native))); forwarded=true; }
         a->adapter=accesskit_macos_subclassing_adapter_for_window(native,factory,a,action,a);
+        a->native_window=native;SDL_LockSpinlock(&mac_owner_lock);a->mac_next=mac_owners;mac_owners=a;SDL_UnlockSpinlock(&mac_owner_lock);
         mac_native_roles(native);
     }
 #elif defined(_WIN32)
@@ -487,6 +522,9 @@ bool sb_accessibility_current(SBAccessibility *a,const SBAccessibleAction *actio
 void sb_accessibility_action_free(SBAccessibleAction *action) { free(action->value); memset(action,0,sizeof(*action)); }
 void sb_accessibility_free(SBAccessibility *a) {
     if (!a) return;
+#if defined(__APPLE__)
+    SDL_LockSpinlock(&mac_owner_lock);SBAccessibility **owner=&mac_owners;while(*owner && *owner!=a)owner=&(*owner)->mac_next;if(*owner)*owner=a->mac_next;SDL_UnlockSpinlock(&mac_owner_lock);
+#endif
     SDL_LockMutex(a->mutex); a->alive=false; SDL_UnlockMutex(a->mutex);
 #if defined(__APPLE__)
     if (a->adapter) accesskit_macos_subclassing_adapter_free(a->adapter);
