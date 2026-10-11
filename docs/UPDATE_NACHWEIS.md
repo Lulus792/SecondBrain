@@ -72,3 +72,23 @@ oder Stromausfallprüfung. Der genaue historische Versionswechsel ist lokal
 Intel/macOS geprüft; daraus folgt keine allgemeine Rückwärtskompatibilitätszusage
 für künftige Datenformate. Die eigene [Migrationspolitik](DATENVERTRAG.md) und
 die offenen [Release-Abnahmen](RELEASE.md) bleiben maßgeblich.
+
+## Windows-Fixture nachgeprüft
+
+CI38173351172 zu a5a5127 besteht in Linux-Debug/Release einschließlich Paket
+sowie Windows-Debug. Windows-Release114570435578 besteht die Produktprüfung,
+scheitert aber im neuen Paket-Prüfer: Die manuell geschriebene Einstellungsdatei
+wurde im Python-Textmodus auf Windows mit CRLF erzeugt. Das native Format
+verlangt LF. Die tatsächliche `before.bmp` zeigt deshalb korrekt „Einstellungsdatei
+ist beschädigt oder hat eine unbekannte Version.“. Das ist ein Prüferfehler,
+kein belegter Verlust gespeicherter Nutzerdateien.
+
+Die Fixture schreibt jetzt explizite UTF-8-Bytes. Eine kontrollierte Windows-
+Textmodus-Übersetzung im Python-Test bestätigt sowohl die vorherige CRLF-Ursache
+als auch LF und erhaltene Unicode-/Prozentpfade des korrigierten Produzenten.
+Der tatsächliche Mac-Wechsel63→64→63 besteht erneut mit20 erhaltenen Dateien.
+Originale: `build/package-update-verification/windows-release-failure.log`,
+SHA256-geprüftes Windows-Artefakt11714972949 (`windows-evidence.zip`), dessen
+betrachtete `windows-update-before.png`, sowie `lf-regression/`.
+Die neue native Windows-Paketprüfung folgt nach dem Push; ihre Aussage bleibt
+bis zum tatsächlich ausgeführten Ergebnis offen.

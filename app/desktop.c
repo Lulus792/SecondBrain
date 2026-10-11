@@ -1875,6 +1875,27 @@ static void actions(SBDesktop *d, float width) {
     (void)width;
     if (button(d, "actions", "Aktionen")) d->form = SB_FORM_ACTIONS;
 }
+static void detail_action_row(SBDesktop *d,float content,float height,unsigned count,const char **labels,unsigned primary,float *widths){
+    struct nk_context *ctx=d->ui.ctx;float s=d->ui.scale;
+    const struct nk_user_font *font=&d->ui.normal->handle;
+    float available=fmaxf(1,content-(count-1)*ctx->style.window.spacing.x),total=0,preferred[4];
+    for(unsigned i=0;i<count;++i){
+        preferred[i]=ceilf(fmaxf(70*s+1,40*s+12+font->width(font->userdata,font->height,labels[i],(int)strlen(labels[i]))));
+        widths[i]=preferred[i];total+=preferred[i];
+    }
+    if(total>available){
+        float icon=fminf(36*s,available/count),spare=available-count*icon;
+        for(unsigned i=0;i<count;++i)widths[i]=icon;
+        /* Keep the main task named; remaining commands retain their own icons,
+           full target names and hover guidance rather than partial words. */
+        for(unsigned step=0;step<count;++step){
+            unsigned i=step ? (step<=primary ? step-1 : step) : primary;
+            float extra=preferred[i]-icon;
+            if(extra<=spare){widths[i]=preferred[i];spare-=extra;}
+        }
+    }
+    nk_layout_row(ctx,NK_STATIC,height,(int)count,widths);
+}
 static void detail(SBDesktop *d, float x, float y, float width, float height, nk_flags flags) {
     struct nk_context *ctx=d->ui.ctx; float s=d->ui.scale;
     bool compact=height<340*s; struct nk_vec2 spacing=ctx->style.window.spacing;
@@ -1899,12 +1920,16 @@ static void detail(SBDesktop *d, float x, float y, float width, float height, nk
         nk_layout_row_dynamic(ctx,22*s,1);
         muted(d,d->model.source ? "Quelle · schreibgeschützt" : d->model.editor ? sb_app_dirty(&d->model) ? "Ungespeicherte Änderungen" : "Gespeichert" : "Ein Ort für Ziele, Notizen und Quellen.");
         }
+        float action_widths[4];
         if (d->model.source) {
-            nk_layout_row_dynamic(ctx,(compact ? 28 : 36)*s,2);
+            const char *labels[]={"Zum Dokument",d->expanded ? "Kleine Ansicht" : "Groß lesen"};
+            detail_action_row(d,content,(compact ? 28 : 36)*s,2,labels,0,action_widths);
             if (button(d,"source-back","Zum Dokument")) { sb_app_source_close(&d->model); d->reset_reader=true; if (d->keyboard) focus_set(d,d->source_focus[0] ? d->source_focus : "reader"); }
             if (button(d,"expand",d->expanded ? "Kleine Ansicht" : "Groß lesen")) { d->expanded=!d->expanded; d->reset_reader=true; }
         } else if (d->model.editor) {
-            nk_layout_row_dynamic(ctx,(compact ? 28 : 36)*s,d->editing || sb_app_dirty(&d->model) ? 4 : 3);
+            bool four=d->editing || sb_app_dirty(&d->model);
+            const char *labels[4]={d->editing ? "Lesen" : "Bearbeiten",four ? "Speichern" : d->expanded ? "Klein" : "Groß lesen",four ? d->expanded ? "Klein" : "Groß lesen" : "Aktionen","Aktionen"};
+            detail_action_row(d,content,(compact ? 28 : 36)*s,four ? 4 : 3,labels,d->editing ? 1 : 0,action_widths);
             if (d->editing) {
                 if (button(d,"read","Lesen")) { d->editing=false; d->expanded=true; }
                 if (button(d,"save","Speichern")) command(d,SB_CMD_SAVE);

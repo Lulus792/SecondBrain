@@ -4276,3 +4276,21 @@ Wiederöffnung,126 Desktop-,167 Tastatur-,75 Sicherungsbedingungen, zwei
 Einstellungsprozessen, CLI-Sicherung, Runtime- und Versionsidentität. Originale:
 `build/package-update-verification/package-check/`. Kein neuer Produkt-CTest-
 Gesamtlauf; neue native Paketprüfung folgt nach Veröffentlichung des Prüfers.
+
+## Readeraktionen0.9.65 und Windows-Prüferkorrektur
+
+Gemessene Reader-Aktionsbreiten erhalten vollständige Namen oder zeigen die
+vorhandenen Icons; Hauptaufgabe priorisiert, Zielnamen/Befehle erhalten.
+Negative Regression mit bisherigem Renderer bestätigt Wortreste.800 neue
+Caption-/Geometrie-/Aktivierungsbedingungen über36 Szenarien und zehn weitere
+passende Produktprüfungen bestehen (185,15s). Reader-/Editorbilder angesehen.
+Kein neuer83er-Gesamtlauf; sauberes Paket und Installation folgen.
+[Vertrag und UI-Review](READER_AKTIONEN.md).
+
+CI38172915154 zu d575caf: alle vier Windows-/Linux-Desktopjobs und beide
+Release-Pakete erfolgreich. Neuer Update-Lauf38173351172 zu a5a5127: Linux-
+Debug/Release und Paket sowie Windows-Debug erfolgreich; Windows-Release
+scheitert nach bestandener Produktprüfung im Prüfer an CRLF-Einstellungen.
+Der Fixtureproduzent schreibt nun native LF-Bytes; Windows-Textübersetzung
+gezielt geprüft und echter Mac-Versionswechsel erneut bestanden. Neue native
+Windows-Paketabnahme offen. [Originale](UPDATE_NACHWEIS.md). Mac-CI queued.

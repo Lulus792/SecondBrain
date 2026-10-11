@@ -55,6 +55,22 @@ Erweiterte lokale0.9.64-Paketprüfung besteht:20 unveränderte Dateien,126 Deskt
 Runtime und Versionsidentität. Kein neuer Gesamtlauf der Produkt-CTest-Suite.
 [Vertrag](../../docs/UPDATE_NACHWEIS.md).
 
+## Neuer UI-Schritt0.9.65
+
+Readeraktionen verwenden gemessene Inhaltsbreiten und zeigen ganze Wörter
+oder vorhandene Icons. Bearbeiten/Speichern priorisiert, Namen/Reihenfolge/
+Befehle erhalten.800 Bedingungen über36 Größen-/Schrift-/Zustandsszenarien
+und10 passende Produktprüfungen bestehen (185,15s), Aufnahmen angesehen.
+Kein neuer83er-Gesamtlauf. [Vertrag](../../docs/READER_AKTIONEN.md).
+Sauberes65-Paket und Installation folgen; installiert bleibt vorerst64.
+
+Alle vier Windows-/Linux-Desktopjobs zu d575caf/CI38172915154 bestehen
+einschließlich Release-Paketen und neuer Compiler-/Lizenzquellengrenze.
+Neuer Update-Prüfer zu a5a5127: Linux-Debug/Release und Paket sowie Windows-Debug
+erfolgreich; Windows-Release-Paket scheitert am Prüfer-Textmodus (CRLF statt LF).
+Fixture schreibt jetzt UTF-8-Bytes; Windows-Übersetzungsregression und erneuter
+echter Mac-Wechsel bestehen. Neue native Paketabnahme folgt; Mac-CI queued.
+
 ## Geprüfter Fortschritt
 
 0.9.63 veröffentlicht während des Ladens den sichtbaren Status als Readerkind,

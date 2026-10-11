@@ -30,6 +30,14 @@ def invoke(program, *args, expected=0):
     return result
 
 
+def write_fixture_settings(settings, workspace):
+    # The native settings format uses LF bytes on every platform. Text-mode
+    # output would translate them to CRLF on Windows and invalidate the fixture.
+    settings.write_bytes(('SecondBrain settings 2\nworkspace=' + quote(str(workspace), safe='/:-._~')
+                         + '\nproject=projekt\nnote=' + quote('knowledge/Handschrift ü.md', safe='/:-._~')
+                         + '\nfont=150\nwidth=1000\nheight=700\ndark=1\nsolid=1\nmotion=1\nfollow-theme=0\ncontrast=0\n').encode('utf-8'))
+
+
 def verify(before_root, after_root, evidence):
     old_app, old_cli = programs(before_root)
     new_app, new_cli = programs(after_root)
@@ -82,9 +90,7 @@ def verify(before_root, after_root, evidence):
 
     old_read = read_project(old_cli)
     settings = evidence / 'settings.conf'
-    settings.write_text('SecondBrain settings 2\nworkspace=' + quote(str(workspace), safe='/:-._~')
-                        + '\nproject=projekt\nnote=' + quote('knowledge/Handschrift ü.md', safe='/:-._~')
-                        + '\nfont=150\nwidth=1000\nheight=700\ndark=1\nsolid=1\nmotion=1\nfollow-theme=0\ncontrast=0\n', encoding='utf-8')
+    write_fixture_settings(settings, workspace)
     invoke(old_app, '--settings', settings, '--snapshot', evidence / 'before.bmp')
     unchanged('old app opening')
     saved_settings = settings.read_bytes()
