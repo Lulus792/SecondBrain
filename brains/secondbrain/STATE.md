@@ -12,14 +12,14 @@ Lumen-Sternkarte, Glaskarten, eigene Icons, direkte Pfeilnavigation, Kamerafahrt
 Startfokus, Textcursor und große Leseansicht sind implementiert. Originalbytes,
 Entwürfe und erkannte Konflikte bleiben geschützt. Externe Bibliotheken nur UI; MIT.
 
-Installiert **0.9.61 / e219bf47cbdb**, sauberer Intel/macOS-Release-Build.
+Installiert **0.9.62 /5b72cf4c13f0**, sauberer Intel/macOS-Release-Build.
 96 Dateien entsprechen dem geprüften Paket; 18 Gedächtnisdateien beim Öffnen
 unverändert. 126 Desktop-, 167 Tastatur-, 75 Sicherungs-Prüfbedingungen, zwei
 Neustarts, CLI-/Runtime-/Lizenz-/Version bestehen. Tatsächliche App-Aufnahme
 betrachtet. Gerät: macOS 14.6.1/23G93, x86_64.
-Rückfall 0.9.60: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.60-20261011-210850`.
+Rückfall0.9.61: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.61-20261011-213259`.
 
-CI 38165889862 zu dc5af86/0.9.61: alle vier Windows-/Linux-UI-Jobs erfolgreich,
+CI38167793413 zu427a18c/0.9.62: alle vier Windows-/Linux-UI-Jobs erfolgreich,
 Debug/Release und beide Release-Pakete tatsächlich geprüft. Native Mac-Jobs
 zuletzt queued; lokaler Intel-Nachweis separat. ARM64 und frische Rechner offen.
 Frühere Nachweise ersetzen keine Prüfung neuer Änderungen.
@@ -52,11 +52,14 @@ bleiben abgeschirmt. [Hilfe](../../docs/HILFE_RUECKKEHR.md),
 
 0.9.62 begrenzt den visuellen Fokus lokal auf die aktive Modalgruppe.
 310 Bedingungen, fünf gezielte Tests und ASan/UBSan bestehen; beide Bilder
-angesehen. 82/82 Release-Prüfungen bestehen (413,41s); Paket/Installation und neue Zielplattformen
-folgen. Installiert bleibt vorerst0.9.61. [Vertrag](../../docs/MODALER_FOKUS.md).
+angesehen.82/82 Release-Prüfungen bestehen (413,41s); Paket/Installation
+und Windows-/Linux-Debug/Release geprüft. Menschliche Bedienung und neue ARM64-
+Abnahme bleiben offen. [Vertrag](../../docs/MODALER_FOKUS.md).
 
 Erste Quell-/Parser-/Worker-Aufbereitung, native Veröffentlichung, Tabellen,
 Rasterung, Budgetrückfälle, riesige Absätze und Shutdown weiter profilieren.
+Drei aktuelle serielle Metal-Läufe: erstes Bild74,53–81,11ms,
+Wechselspitzen25,90–26,09ms. Keine menschliche Eingabe-/Trackpadmessung.
 SBUI-074 bleibt für vollständige Leistungs-/Geräte-/Großdatenabnahme offen.
 Native Snapshot-Pixelidentität und Material-Ersatzfläche bei Speicherfehler offen.
 

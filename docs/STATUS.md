@@ -4107,3 +4107,28 @@ Tastatur, Sicherungen und Prozessfehler. Quellkorrektur427a18c nach origin/main
 gepusht und Remote bestätigt. CI38167793413: Windows-/Linux-Desktopjobs
 bei der ersten Abfrage in Arbeit, native Mac-Jobs queued; noch kein Erfolgsnachweis
 für diese neue Fassung. Sauberer Paketbuild folgt.
+
+## Modal-Fokuspaket0.9.62 installiert
+
+Sauberer Intel/macOS-Release-Build0.9.62/5b72cf4c13f0; CLI-/Desktopversion und
+Release-Vertrag bestehen. Entpacktes Paket besteht126 Desktop-,167 Tastatur-
+und75 Sicherungsbedingungen, zwei Einstellungs-Neustarts sowie produktive CLI,
+Runtime-/Lizenzprüfung. Alle96 installierten Dateien paketgleich;18 Gedächtnis-
+dateien beim Öffnen unverändert. Tatsächliche App-Aufnahme angesehen.
+Rückfall: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.61-20261011-213259`.
+Archiv-SHA256: `a9be6f467a7574668ea883417a877c9997fc66d02f2655b947ceb18f6f64eb4a`.
+Originale: `build/modal-focus-verification/` und `build/modal-focus-package/`.
+
+CI38167793413 zum Quellcommit427a18c70d533c6d47cb3a036bfe27ef6d77d9dd:
+alle vier Windows-/Linux-Desktopjobs erfolgreich, Debug/Release und beide
+Release-Pakete tatsächlich geprüft. Joboriginal: `ci-jobs-3.json`. Native
+Mac-Jobs zuletzt queued; lokale Intel-Prüfung separat, neue ARM64-Abnahme offen.
+
+Drei serielle Metal-Läufe der aktuellen Fassung, je272 Bilder, verwenden die
+unveränderte Kopie des Gedächtnisses und wechseln Übergabe7.Oktober, Eingang,
+START. Erste Bilddauer81,11/74,53/76,78ms, größter Wechsel26,09/25,90/25,94ms.
+Zeitabschnitte, Bildfolge und sieben Anforderungen je Lauf geprüft; alle18
+Original-/Kopiedateien unverändert. Dies ist kein paarweiser Verbesserungsnachweis
+und keine menschliche Trackpadmessung. Erste Layout-/Rasterarbeit bleibt
+Leistungsaufgabe; SBUI-074 offen. Originale: `performance/` im Prüfverzeichnis.
+1.0 nur nach ausdrücklicher Nutzerfreigabe.
