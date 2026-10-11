@@ -11,12 +11,12 @@ Lumen-Sternkarte, Glaskarten, Icons, direkte Pfeilnavigation, Kamerafahrt,
 Scrollen, Startfokus, Textcursor und große Leseansicht sind implementiert.
 Originalbytes, Entwürfe und erkannte Konflikte bleiben geschützt.
 
-Installiert **0.9.52 / 4df171b5ae09**, sauberer Intel/macOS-Release-Build.
+Installiert **0.9.53 / 1c5f73161469**, sauberer Intel/macOS-Release-Build.
 95 Dateien entsprechen dem geprüften Paket; 18 Gedächtnisdateien beim Laden
 unverändert. 126 Desktop-, 161 Tastatur-, 75 Sicherungs-Assertions, zwei Neustarts,
 produktive CLI und Runtime-/Lizenz-/Version bestehen.
-Rückfallversion 0.9.51: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.51-20261011-150738`.
-CI 38141637193 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
+Rückfallversion 0.9.52: `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.52-20261011-153352`.
+CI 38143419075 zum Quellcommit zuletzt queued; neue Gesamt-Plattformabnahme offen.
 
 Frühere Build-/Paket-/Diagnoseverzeichnisse waren am11.Oktober nicht mehr
 vorhanden. Historische Abnahmen bleiben in STATUS/Journal; entfernte Dateien
@@ -114,7 +114,7 @@ synchronen Pfad. 22 Quell-, 48 produktive Reader-, 590 Geometrie- und 621
 Mac-Providerprüfungen bestehen; Quell-/Reader-/Provider auch unter ASan/UBSan.
 39 eigene C-Dateien instrumentiert, 54 Quell-/Include-Hashes passen.
 Drei Metal-Paare senken Wechsel-Layoutzeit; Bildausgabespitzen bleiben.
-77/77 lokale Release-Prüfungen bestehen (539,97 s). Paket/Installation folgen; installiert bleibt 0.9.52.
+77/77 lokale Release-Prüfungen bestehen (539,97 s). Mac-Paket und Installation bestehen; andere Zielplattformen bleiben offen.
 [Vertrag und genaue Grenzen](../../docs/READER_QUELLPLAN.md).
 
 ## Nächste Arbeiten

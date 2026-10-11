@@ -64,7 +64,6 @@ Diese Änderung wurde entfernt. Die vorhandene Glasdarstellung bleibt erhalten.
 Originale: `build/reader-source-verification/` mit eingefrorener Referenz,
 Pixelprüfung, erster Messreihe und `source-cache-serial/paired-profiles.json`.
 Speicherprüfungen: `build/reader-source-sanitizers/`.
-77/77 lokale Release-Prüfungen bestehen (539,97 s); Paket, Installation und neue
-Zielplattformabnahmen folgen.
-Die installierte App bleibt 0.9.52. Tatsächliche Geräte-, Screenreader-, Eingabe-
+77/77 lokale Release-Prüfungen bestehen (539,97 s). Das Intel/macOS-Paket ist
+geprüft und als 0.9.53 installiert; neue Zielplattformabnahmen bleiben offen. Tatsächliche Geräte-, Screenreader-, Eingabe-
 und Langzeitabnahmen sowie der vollständige 1.0-Auftrag bleiben offen.
