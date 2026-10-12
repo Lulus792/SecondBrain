@@ -57,7 +57,10 @@ Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
 - Innere Windows-AccessKit-DLL: optionaler abschließender Cargo-Linkeraufruf
   erzeugt jetzt ebenfalls eine Karte mit DLL-/Kartenhashes. Cargo--lib-Vertrag
   lokal mit cdylib/staticlib, Pfad mit Leerzeichen/Umlaut und Hashbindung geprüft;
- 72 Python-Tests (eine übersprungen) bestehen. Native Windows-Karte noch offen.
+ 72 Python-Tests (eine übersprungen) bestehen. CI38204329310 Windows/Linux
+  Debug/Release erfolgreich; Windows-DLL-Karte SHA-geprüft und Release-DLL-Hash
+  passt exakt zur Paketdatei. Benannt:29 libcmt-,21 libvcruntime-,99 libucrt-
+  Mitglieder. Eigene DLL-SDK-Pfade und vollständige Rust-Quellzerlegung offen.
 - [Startdiagnose](../../docs/LAUFZEIT_START.md): tatsächliche normale Rendererwahl,
   vier Frames, sichtbares Fenster und beobachtete Module. Dadurch echter Windows-
   Startfehler gefunden: Accessibility muss vor dem ersten sichtbaren Fenster

@@ -281,5 +281,30 @@ AccessKit-Ausführung. Originale: `build/accesskit-map-check/`.
 Auch die tatsächliche lokale CMake-ExternalProject-Kette mit Cargo und
 anschließendem Identitätsprüfer besteht, einschließlich Leerzeichen/Umlaut
 in allen beteiligten Pfaden. Quelle: `build/accesskit-map-check/Orchestrierung ü/`.
-Die neue native Windows-DLL-Prüfung folgt; die inneren Beiträge werden erst
-nach ihrer tatsächlichen Karte und dem Paketvergleich als zugeordnet behandelt.
+Die anschließende native Windows-DLL-Prüfung ist im unten beschriebenen Umfang
+abgeschlossen.
+
+### Native DLL-Karte und Paketvergleich
+
+[CI38204329310](https://github.com/Lulus792/SecondBrain/actions/runs/38204329310)
+zu420f42c besteht unter Windows/Linux in Debug/Release, einschließlich beider
+Release-Pakete. Die rohe Windows-CTest-Datei bestätigt jeweils92 bestandene
+Prüfblöcke. Die Mac-Jobs warten weiterhin auf Runner.
+
+Windows-Debug-Nachweis11726841419, Release-Nachweis11726483760 und
+Release-Paket11726344057 wurden heruntergeladen und gegen ihre GitHub-SHA256-
+Digests geprüft. Die Kartenhashes passen zu den jeweiligen Identitätsdateien.
+Der Release-DLL-Hash passt zusätzlich exakt zur AccessKit-DLL im tatsächlichen
+Anwendungsarchiv:
+
+- DLL: `63e295847700376a39664d495702572c2bcfcbe96dfa67e79cb7a56317534392`.
+- Karte: `b0f7889efeb097be4af88f2e1fc2647699436a1b196e06fdbc9603f3594783b7`.
+
+Beide DLL-Karten benennen29 unterschiedliche libcmt-,21 libvcruntime- und99
+libucrt-Objektmitglieder. Das belegt diese Runtime-Beiträge für die konkrete DLL.
+Die Karte zerlegt das aggregierte Rust-Objekt nicht vollständig nach ursprünglichen
+In-tree-Quellen; ein fehlender Einzelname beweist keine Abwesenheit eines Anteils.
+Auch ein eigener Herkunftspfad-/Dateihashnachweis der SDK-Bibliotheken für diesen
+Cargo-Linkvorgang fehlt noch. Der vorhandene App-/CLI-Bericht wird dafür nicht
+als DLL-Bericht ausgegeben. Originalbytes und Abgleich:
+`build/accesskit-map-native/`, `debug-review.json` und `release-review.json`.
