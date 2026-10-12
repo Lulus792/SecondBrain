@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 static unsigned checks;
 #define CHECK(x) do{++checks;if(!(x)){fprintf(stderr,"EXIT PREFS %d: %s\n",__LINE__,#x);return 1;}}while(0)
 #define OK(x) CHECK((x).code==SB_OK)
@@ -39,6 +40,16 @@ int main(int argc,char **argv){
     d.form=SB_FORM_NOTE;strcpy(d.name,"Begonnene Notiz");frame(&d);strcpy(d.focus,"form-name");frame(&d);
     OK(sb_app_request(&d.model,SB_ACT_QUIT,NULL));CHECK(!sb_desktop_finish_quit(&d));frame(&d);key(&d,SDLK_ESCAPE);frame(&d);
     CHECK(d.form==SB_FORM_NOTE && !strcmp(d.name,"Begonnene Notiz") && !strcmp(d.focus,"form-name"));
+    key(&d,SDLK_F1);CHECK(d.form==SB_FORM_HELP && d.help_return);
+    OK(sb_app_request(&d.model,SB_ACT_QUIT,NULL));CHECK(!sb_desktop_finish_quit(&d));frame(&d);
+    CHECK(d.form==SB_FORM_EXIT_ERROR && d.help_return);
+    key(&d,SDLK_ESCAPE);frame(&d);CHECK(d.form==SB_FORM_HELP && d.help_return);
+    key(&d,SDLK_ESCAPE);frame(&d);CHECK(d.form==SB_FORM_NOTE && !strcmp(d.name,"Begonnene Notiz"));
+    d.form=SB_FORM_SETTINGS;frame(&d);frame(&d);CHECK(d.scrolling[3].maximum>50);
+    d.focus_scroll_frames=0;d.scrolling[3].position=d.scrolling[3].destination=d.scrolling[3].maximum/2;d.scrolling[3].active=true;frame(&d);
+    float scroll=d.scrolling[3].position;
+    OK(sb_app_request(&d.model,SB_ACT_QUIT,NULL));CHECK(!sb_desktop_finish_quit(&d));frame(&d);key(&d,SDLK_ESCAPE);frame(&d);frame(&d);
+    CHECK(d.form==SB_FORM_SETTINGS && fabsf(d.scrolling[3].position-scroll)<1 && !d.scrolling[3].dragging);
     d.form=SB_FORM_NONE;frame(&d);OK(sb_app_request(&d.model,SB_ACT_QUIT,NULL));CHECK(!sb_desktop_finish_quit(&d));frame(&d);
     strcpy(d.settings_path,good);key(&d,SDLK_RETURN);CHECK(d.model.quit);
     OK(sb_fs_read(good,&old,&length));hash=sb_hash(old,length);free(old);

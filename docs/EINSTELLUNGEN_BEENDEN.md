@@ -36,3 +36,15 @@ Modalfokus bestehen in 55,29 s. Originale: `build/exit-preferences-verification/
 Neue native Windows/Linux-Abnahme, vollständiger aktueller Lauf, Sanitizer und
 neues Paket stehen noch aus. Keine menschliche Desktop-/Screenreaderabnahme.
 Installiert bleibt zunächst 0.9.71; 1.0 bleibt ohne Nutzerfreigabe offen.
+
+
+Die abschließende Erweiterung prüft auch eine bereits geöffnete Hilfe und eine
+wirklich gescrollte Einstellungsansicht. Rückkehr bewahrt die Position; gehaltene
+Scrollbar-Eingaben werden nicht wieder aktiviert, automatische Fokusoffenlegung
+setzt die Position nicht zurück. Beide betroffenen Gruppen bestehen (16,04 s).
+93 neue Fehler-/Rückkehrbedingungen und 94 Hilfe-/Auswahlbedingungen bestehen
+unter ASan/UBSan mit 61 aktuellen Quell-/Includehashes. Eigene C-Teile sind
+instrumentiert, externe UI nicht; Leaks aus, kein TSan. Originale:
+`asan-final-exit.log`, `asan-final-help.log`, `scroll-regression.log`
+und `build/exit-preferences-sanitizers/sources.json`. Iconexport reproduzierbar.
+Neue Gesamt-/native-/Paketabnahme folgt weiterhin; installiert bleibt 0.9.71.

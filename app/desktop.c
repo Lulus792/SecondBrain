@@ -2674,7 +2674,9 @@ void sb_desktop_frame(SBDesktop *d) {
     }
     if(d->quit_return_pending){
         for(size_t i=0;i<d->target_count;++i)if(!strcmp(d->targets[i].id,d->quit_return_focus)){focus_set(d,d->quit_return_focus);break;}
-        memcpy(d->scrolling,d->quit_return_scroll,sizeof(d->scrolling));d->quit_return_pending=false;
+        memcpy(d->scrolling,d->quit_return_scroll,sizeof(d->scrolling));
+        for(unsigned i=0;i<4;++i){d->scrolling[i].dragging=false;d->scrolling[i].pending=0;}
+        d->focus_scroll_frames=0;d->quit_return_pending=false;
     }
     if(d->reader_pending_focus[0]){
         if(d->reader_pending_context!=accessible_context(d) || d->editing || modal || strcmp(d->focus,"reader"))d->reader_pending_focus[0]=0;
