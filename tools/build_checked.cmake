@@ -4,6 +4,7 @@ if(NOT SB_BUILD_DIR)
 endif()
 execute_process(COMMAND "${CMAKE_COMMAND}" --build "${SB_BUILD_DIR}" --config "${SB_BUILD_CONFIG}" --parallel 4
     RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE errors)
+file(WRITE "${SB_BUILD_DIR}/checked-build.log" "${output}${errors}")
 message("${output}${errors}")
 if(NOT result EQUAL 0)
     # GitHub truncates individual annotation messages; retain each stream's tail.

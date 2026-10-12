@@ -46,6 +46,9 @@ jobs:
       - name: Record installed Linux startup sources
         if: runner.os == 'Linux'
         run: python tools/record_linux_startup.py --build-dir build/ui --config ${{ matrix.config }} --output build/ui/linux-startup-provenance.json
+      - name: Record loaded Windows runtime libraries
+        if: runner.os == 'Windows'
+        run: python tools/record_windows_runtime.py --build-dir build/ui --config ${{ matrix.config }} --log build/ui/checked-build.log --output build/ui/windows-runtime-provenance.json
       - name: Verify UI on Linux
         if: runner.os == 'Linux'
         run: sh tools/run_linux_ui_tests.sh cmake -DSB_TEST_DIR=build/ui -DSB_TEST_CONFIG=${{ matrix.config }} -P tools/test_checked.cmake
@@ -84,6 +87,8 @@ jobs:
             build/ui/test-entry.log
             build/ui/ui-rust-compiler.json
             build/ui/linux-startup-provenance.json
+            build/ui/windows-runtime-provenance.json
+            build/ui/checked-build.log
             build/ui/link-maps/**/*.map
             build/ui/link-maps/**/*.map.identity
             build/ui/package-check/runtime-dependencies.json

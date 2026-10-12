@@ -137,3 +137,55 @@ erkennt derselbe Parser in den tatsächlich heruntergeladenen Linux-Karten je
 fünf Startobjekte. Das ist ein Parsernachweis auf dem Mac, keine dort ausgeführte
 Debian-Paketabfrage. Die neue tatsächliche Linux-CI-Abnahme folgt.
 Originale: `build/startup-inventory-check/`. Die installierte App bleibt unverändert.
+
+### Abgeschlossene native Linux-Inventur
+
+[CI38201394939](https://github.com/Lulus792/SecondBrain/actions/runs/38201394939)
+zu40d9271 besteht unter Windows/Linux in Debug/Release mit jeweils91 Tests und
+beiden Release-Paketen. Die neue Paketabfrage wurde unter Linux tatsächlich in
+Debug und Release ausgeführt: fünf Objektdateien und zwei Copyrighttexte.
+
+Der Linux-Release-Nachweis11725208690 und das Paket11726146509 wurden gegen die
+GitHub-SHA256-Digests geprüft. Der Bericht ist mit den zwei tatsächlichen
+Paketprogrammen hashgleich verknüpft; die enthaltenen Original-Copyrighttexte
+stimmen mit ihren aufgezeichneten Dateihashes überein. Originale:
+`build/startup-native/`, insbesondere `linux-startup-provenance.json`,
+`crosscheck.json` und `native-ci.json`.
+
+| Startobjekte | Installiertes Binärpaket | Quellpaket / genaue Version |
+| --- | --- | --- |
+| Scrt1.o, crti.o, crtn.o | libc6-dev:amd64 | glibc / 2.39-0ubuntu8.9 |
+| crtbeginS.o, crtendS.o | libgcc-13-dev:amd64 | gcc-13 / 13.3.0-6ubuntu2~24.04.1 |
+
+Der tatsächlich installierte GCC-Copyrighttext benennt libgcc/crtstuff unter
+GPLv3 oder später mit GCC Runtime Library Exception3.1 und enthält die
+Ausnahme. Der glibc-Pakettext und die Source-Paketpatches bleiben mit den zuvor
+gelesenen speziellen Startdatei-Regeln abzugleichen. Die erfassten Dateihashes
+bezeichnen den nach dem Linken geprüften installierten Bestand; die Inventur
+beweist keine unveränderliche Historie jeder SDK-Datei seit deren Installation.
+
+## Geladene Windows-Runtime-Dateien
+
+Der optionale Karten-Buildweg aktiviert unter MSVC zusätzlich `/VERBOSE:LIB`.
+Der vorhandene Build-Wrapper bewahrt vollständige Ausgaben in
+`checked-build.log`. Grundlage, am 12. Oktober gelesen:
+[Microsoft /VERBOSE](https://learn.microsoft.com/en-us/cpp/build/reference/verbose-print-progress-messages?view=msvc-170),
+insbesondere Bibliotheks-/Objektpfade und aufgelöste Symbole.
+
+`tools/record_windows_runtime.py` bindet die benannten CRT-/uuid-Mitglieder der
+Karten an tatsächlich als geladen gemeldete Bibliotheken. Eine Suchzeile allein
+ist kein Ladungsnachweis. Relative Namen benötigen genau einen vollständigen
+Suchpfad; mehrdeutige gleichnamige Dateien werden abgewiesen. Jedes benannte
+Objektmitglied muss im abgeschlossenen gemeinsamen Build-Log enthalten sein.
+App/CLI bleiben durch ihre Kartenidentitäten gebunden, SDK-Dateihashes werden
+nach dem Build erfasst und erneut geprüft. Die Bibliotheken werden weder in den
+Bericht kopiert noch durch den Prüfer ausgeführt. Innere AccessKit-DLL-Beiträge
+sind durch diesen begrenzten App-/CLI-Prüfweg noch nicht zugeordnet.
+
+Vier neue lokale Verträge bestehen: Such-/Ladungsunterschied, eindeutige
+vollständige Pfade, mehrdeutige SDKs und richtige Kartenmitglied-Auswahl.
+Der Parser liest beide tatsächlich heruntergeladenen MSVC-Karten mit den oben
+genannten Mitgliederzahlen. Zwei CTest-Gruppen und die Python-Gesamtprüfung mit
+72 Tests (eine plattformspezifisch übersprungen) bestehen. Neue native Windows-
+Ausführung des erweiterten Build-/Logwegs folgt. Originale:
+`build/windows-runtime-inventory-check/`. Kein neuer Installationsstand.

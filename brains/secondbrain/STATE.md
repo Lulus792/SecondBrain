@@ -40,7 +40,12 @@ Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
   Entwicklerprüfer für Paket-/Quellversionen und originale Copyrightdateien,
   an die Programm-/Kartenhashes gebunden. Vier lokale Verträge, 68 Python-Tests
   (eine übersprungen) und je fünf Beiträge in tatsächlichen Karten geprüft.
-  Native Paketabfrage noch ausstehend; kein neuer Programm-/Installationsstand.
+  Native Paketabfrage in Linux Debug/Release abgeschlossen: fünf Dateien, zwei
+  Original-Copyrighttexte; Berichts-/Paketprogrammhashes geprüft. CI38201394939
+  Windows/Linux jeweils91 Tests und beide Release-Pakete erfolgreich.
+- Windows-Runtime-Dateien: geladene CRT-/uuid-Dateien über MSVC-Log und
+  Kartenmitglieder erfassen. Vier neue Verträge, zwei CTest-Gruppen und72 Python-
+  Tests (eine übersprungen) lokal geprüft; neue native Ausführung noch offen.
 - [Startdiagnose](../../docs/LAUFZEIT_START.md): tatsächliche normale Rendererwahl,
   vier Frames, sichtbares Fenster und beobachtete Module. Dadurch echter Windows-
   Startfehler gefunden: Accessibility muss vor dem ersten sichtbaren Fenster
@@ -87,7 +92,8 @@ Endprodukttexte erst beim vollständigen Produkt abschließend bereinigen.
 
 ## Nächster Schritt
 
-Quellen der konkret eingebundenen Runtime-/SDK-/Startobjekte abgleichen.
+Windows-Dateinachweis nativ prüfen; konkrete Source-Paket-/SDK-Regeln sowie
+innere AccessKit-Runtime-Beiträge abgleichen.
 Sicherheitskanal nach GitHub-Anmeldung aktivieren.
 Geräte/Konten und menschliche Bediennachweise werden durch weitere kleine
 Codeänderungen oder Statusnotizen nicht ersetzt.
