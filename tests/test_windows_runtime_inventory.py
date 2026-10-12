@@ -36,6 +36,28 @@ class WindowsRuntimeInventoryTests(unittest.TestCase):
             self.assertEqual(record['sdk_libraries'][0]['named_object_members'], ['gs_cookie.obj'])
             self.assertEqual(record['sdk_libraries'][0]['byte_identical_sdk_file'], next(iter(args[3])))
 
+    def test_release_dll_uses_release_bytes_beside_debug_sdk_archive(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            args = self.repro_fixture(Path(temporary))
+            original = Path(next(iter(args[3])))
+            debug = original.with_name('libcmtd.lib')
+            debug.write_bytes(b'debug SDK archive bytes')
+            records = {str(debug): {'library': 'libcmtd', 'sha256': runtime.digest(debug)}}
+            record = runtime.dll_repro(*args[:3], records)
+            self.assertEqual(record['sdk_libraries'][0]['byte_identical_sdk_file'], str(original.resolve()))
+            self.assertNotEqual(record['sdk_libraries'][0]['sha256'], runtime.digest(debug))
+
+    def test_debug_archive_is_not_a_fallback_for_missing_release_sdk(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            args = self.repro_fixture(Path(temporary))
+            original = Path(next(iter(args[3])))
+            debug = original.with_name('libcmtd.lib')
+            debug.write_bytes(original.read_bytes())
+            original.unlink()
+            records = {str(debug): {'library': 'libcmtd', 'sha256': runtime.digest(debug)}}
+            with self.assertRaisesRegex(ValueError, 'matching SDK inventory'):
+                runtime.dll_repro(*args[:3], records)
+
     def test_dll_repro_rejects_missing_capture(self):
         with tempfile.TemporaryDirectory() as temporary:
             args = self.repro_fixture(Path(temporary))

@@ -71,6 +71,11 @@ Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
   DLL-Kartenbibliothek und Übereinstimmung mit der SDK-Inventur verlangt.
   78 Python-Tests (eine übersprungen) und CTest-Inventurvertrag bestehen;
   tatsächliche neue Windows-Ausführung noch offen. SDK-Kopien werden nicht verteilt.
+  Erste Windows-Debug-Ausführung scheitert: App/CLI laden Debug-CRT, Cargo-DLL
+  Release-CRT. Vergleich auf tatsächlich gelesene Release-/Debug-Gegenstücke
+  im beobachteten SDK-Verzeichnis erweitert; keine Ersetzung durch Debug-Bytes.
+  80 Python-Tests (eine übersprungen) und CTest-Inventurvertrag bestehen.
+  Neue native Nachprüfung erforderlich; Windows Release besteht den SDK-Vergleich.
 - [Startdiagnose](../../docs/LAUFZEIT_START.md): tatsächliche normale Rendererwahl,
   vier Frames, sichtbares Fenster und beobachtete Module. Dadurch echter Windows-
   Startfehler gefunden: Accessibility muss vor dem ersten sichtbaren Fenster

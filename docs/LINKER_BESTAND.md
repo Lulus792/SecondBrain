@@ -398,3 +398,28 @@ geänderte DLL-Identität. 78 Python-Tests bestehen mit einer plattformspezifisc
 Überspringung; der vorhandene CTest-Inventurvertrag besteht in0,82s.
 Log: `build/accesskit-map-native/repro-python-tests.log`.
 Die neue tatsächliche Windows-Repro-Ausgabe und der Paketvergleich folgen.
+
+### Debug-Nachprüfung des SDK-Vergleichs
+
+Im Lauf38206412970 zu17e7a93 scheitert Windows Debug vor den UI-Tests beim
+SDK-Bytevergleich. Der SHA256-geprüfte Nachweis11727567247 bestätigt die
+Ursache: App/CLI verwenden libcmtd, libvcruntimed und libucrtd; die stets in
+Release gebaute Cargo-DLL benennt libcmt, libvcruntime und libucrt. Der Prüfer
+hatte nur Dateien berücksichtigt, die App/CLI selbst laden. Damit fehlte die
+passende Release-SDK-Datei in seiner Vergleichsmenge, obwohl die DLL-Kopie
+vorhanden war. Windows Release durchläuft diesen Vergleich bereits und lief
+beim Abgleich noch in den UI-Tests.
+
+Der Prüfer berücksichtigt jetzt die ausdrücklich benannten Release-/Debug-
+Gegenstücke innerhalb derselben beobachteten SDK-Verzeichnisse. Er liest und
+hasht dafür die tatsächlich angeforderte Bibliotheksdatei; eine Debug-Datei
+wird niemals als Ersatz für eine fehlende Release-Datei akzeptiert, selbst
+wenn beide in einer Prüffassung gleiche Bytes hätten. Der DLL-Kopienhash muss
+weiterhin exakt passen. Die ursprüngliche App-/CLI-Ladungsinventur bleibt
+getrennt von diesem zusätzlichen Vergleich.
+
+Zwei neue lokale Verträge bestätigen unterschiedliche Debug-/Release-Bytes
+und die Abweisung bei fehlendem Release-Gegenstück. 80 Python-Tests bestehen
+mit einer Überspringung; CTest-Inventurvertrag besteht in0,13s. Originale:
+`build/accesskit-map-native/repro-debug-failure.zip` und
+`repro-debug-fix-tests.log`. Die neue native Debug-Nachprüfung steht noch aus.

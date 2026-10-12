@@ -11,6 +11,8 @@ from record_linux_startup import checked_map, digest
 
 SDK_LIBRARIES = {'libcmt', 'libcmtd', 'libucrt', 'libucrtd',
                  'libvcruntime', 'libvcruntimed', 'uuid'}
+SDK_VARIANTS = ({'libcmt', 'libcmtd'}, {'libucrt', 'libucrtd'},
+                {'libvcruntime', 'libvcruntimed'}, {'uuid'})
 
 
 def loaded_libraries(text):
@@ -67,11 +69,21 @@ def dll_repro(program, map_path, directory, libraries):
         if not copy.is_relative_to(directory):
             raise ValueError('Captured SDK library escapes the link repro')
         captured_hash = digest(copy)
-        originals = [(path, record) for path, record in libraries.items()
-                     if record['library'] == name and record['sha256'] == captured_hash]
+        candidates = {path: record['sha256'] for path, record in libraries.items()
+                      if record['library'] == name}
+        family = next(group for group in SDK_VARIANTS if name in group)
+        for path, record in libraries.items():
+            if record['library'] in family and record['library'] != name:
+                # Cargo builds its DLL in Release even in the Debug UI job.
+                # Compare the requested counterpart's actual bytes in the
+                # observed SDK directory; never substitute the debug archive.
+                counterpart = Path(path).with_name(name + '.lib')
+                if counterpart.is_file():
+                    candidates[str(counterpart.resolve())] = digest(counterpart)
+        originals = [path for path, value in candidates.items() if value == captured_hash]
         if len(originals) != 1:
             raise ValueError('Captured DLL SDK bytes lack one matching SDK inventory file: ' + name)
-        original, record = originals[0]
+        original = originals[0]
         if digest(Path(original)) != captured_hash or digest(copy) != captured_hash:
             raise ValueError('SDK file or captured copy changed during DLL inventory')
         references.append({'library': name, 'captured_file': str(copy),
