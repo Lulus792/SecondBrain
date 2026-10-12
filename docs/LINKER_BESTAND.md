@@ -369,3 +369,32 @@ noch nicht bewiesen. Ebenso sind nachträgliche SDK-Dateihashes keine unverände
 Aufzeichnung aller Dateiinhalte zum Linkzeitpunkt. Originale und Zuordnung:
 `build/accesskit-map-native/inputs-release-review.json`, beide ZIPs,
 `accesskit-inputs.rsp`, dessen Identität und `inputs-release-accesskit.map`.
+
+### Gesicherte SDK-Eingabebytes im Nachweis-Build
+
+Der optionale MSVC-Cargo-Linkvorgang verwendet ergänzend `/LINKREPRO` mit
+einem eigenen bereits angelegten Ordner im Buildverzeichnis. Grundlage, gelesen
+am12.Oktober: [Microsoft /LINKREPRO](https://learn.microsoft.com/en-us/cpp/build/reference/linkrepro?view=msvc-170)
+und [Link-Repros](https://learn.microsoft.com/en-us/cpp/overview/how-to-report-a-problem-with-the-visual-cpp-toolset?view=msvc-170#link-repros).
+Der Linker sichert dabei Eingabedateien für eine spätere Reproduktion. Der
+gewöhnliche Build ohne Kartenoption verwendet diesen Weg weiterhin nicht.
+
+`record_windows_runtime.py --accesskit-repro` bindet die DLL an ihre Karte,
+fordert für jede benannte SDK-Bibliothek genau eine gesicherte Kopie und
+vergleicht deren Bytes mit genau einer Datei der SDK-Inventur desselben Builds.
+Fehlende oder mehrdeutige Kopien, andere Bytes sowie geänderte DLL-/Karten-/SDK-
+Dateien werden abgewiesen. Der Bericht enthält nur Pfade, Hashes und benannte
+Objektmitglieder. Die Repro-Bibliotheken sind weder Installationsbestandteil
+noch Teil der ausgewählten CI-Uploads. Der Prüfer führt sie nicht aus und
+sendet keinen Fehlerbericht an Microsoft.
+
+Ein Bytevergleich belegt die SDK-Inhalte, nicht unabhängig den vom DLL-Linker
+gewählten ursprünglichen physischen Pfad. Auch ersetzt er weder vollständige
+Rust-Quellzerlegung noch den Abgleich der Verteilungsbedingungen.
+
+Sechs neue lokale Verträge prüfen den erfolgreichen Bytevergleich sowie
+fehlende, abweichende und mehrdeutige Kopien, geänderte SDK-Originale und
+geänderte DLL-Identität. 78 Python-Tests bestehen mit einer plattformspezifischen
+Überspringung; der vorhandene CTest-Inventurvertrag besteht in0,82s.
+Log: `build/accesskit-map-native/repro-python-tests.log`.
+Die neue tatsächliche Windows-Repro-Ausgabe und der Paketvergleich folgen.

@@ -53,6 +53,41 @@ def map_members(text):
     return result
 
 
+def dll_repro(program, map_path, directory, libraries):
+    identity = checked_map(program, map_path)
+    members = map_members(map_path.read_text())
+    directory = directory.resolve(strict=True)
+    references = []
+    for name, objects in members.items():
+        copies = [p for p in directory.rglob('*')
+                  if p.is_file() and p.suffix.lower() == '.lib' and p.stem.lower() == name]
+        if len(copies) != 1:
+            raise ValueError('Expected one captured DLL SDK library: ' + name)
+        copy = copies[0].resolve(strict=True)
+        if not copy.is_relative_to(directory):
+            raise ValueError('Captured SDK library escapes the link repro')
+        captured_hash = digest(copy)
+        originals = [(path, record) for path, record in libraries.items()
+                     if record['library'] == name and record['sha256'] == captured_hash]
+        if len(originals) != 1:
+            raise ValueError('Captured DLL SDK bytes lack one matching SDK inventory file: ' + name)
+        original, record = originals[0]
+        if digest(Path(original)) != captured_hash or digest(copy) != captured_hash:
+            raise ValueError('SDK file or captured copy changed during DLL inventory')
+        references.append({'library': name, 'captured_file': str(copy),
+                           'sha256': captured_hash, 'byte_identical_sdk_file': original,
+                           'named_object_members': sorted(objects)})
+    if checked_map(program, map_path) != identity:
+        raise ValueError('DLL/map changed during inventory')
+    for record in references:
+        if (digest(Path(record['captured_file'])) != record['sha256'] or
+                digest(Path(record['byte_identical_sdk_file'])) != record['sha256']):
+            raise ValueError('SDK library or captured copy changed during inventory')
+    return {'scope': 'dll-map-named-members-and-link-repro-library-bytes-matched-to-sdk-inventory',
+            'identity': identity, 'sdk_libraries': references,
+            'limitation': 'Byte equality identifies SDK contents; it does not independently prove the original path selected by the DLL linker'}
+
+
 def collect(build, config, log):
     log_bytes = log.read_bytes()
     loaded = loaded_libraries(log_bytes.decode('utf-8'))
@@ -104,6 +139,7 @@ def main():
     parser.add_argument('--config', required=True)
     parser.add_argument('--log', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--accesskit-repro', type=Path)
     args = parser.parse_args()
     if sys.platform != 'win32':
         parser.error('SDK file inventory must run on Windows')
@@ -111,7 +147,13 @@ def main():
         parser.error('Invalid configuration name')
     if args.output.exists():
         parser.error('Existing output is protected; choose a new report path')
-    report = collect(args.build_dir.resolve(), args.config, args.log)
+    build = args.build_dir.resolve()
+    report = collect(build, args.config, args.log)
+    if args.accesskit_repro:
+        target = build / 'accesskit-windows-build'
+        program = target / 'x86_64-pc-windows-msvc/release/accesskit.dll'
+        report['accesskit_dll_repro'] = dll_repro(program, target/'accesskit.map',
+                                               args.accesskit_repro, report['libraries'])
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open('x', encoding='utf-8') as stream:
         json.dump(report, stream, ensure_ascii=False, indent=2)

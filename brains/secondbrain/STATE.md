@@ -67,6 +67,10 @@ Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
   Pakete erfolgreich; neue Windows-DLL-/Karten-/Listenhashes passen zum Paket.
   Direkter libcmt-Pfad passt zum SDK-Dateihash desselben Builds. Beobachtete
   Liste enthält keine direkten libvcruntime-/libucrt-Pfade; diese bleiben offen.
+  Ergänzender Link-Repro-Bytevergleich vorbereitet: genau eine SDK-Kopie je
+  DLL-Kartenbibliothek und Übereinstimmung mit der SDK-Inventur verlangt.
+  78 Python-Tests (eine übersprungen) und CTest-Inventurvertrag bestehen;
+  tatsächliche neue Windows-Ausführung noch offen. SDK-Kopien werden nicht verteilt.
 - [Startdiagnose](../../docs/LAUFZEIT_START.md): tatsächliche normale Rendererwahl,
   vier Frames, sichtbares Fenster und beobachtete Module. Dadurch echter Windows-
   Startfehler gefunden: Accessibility muss vor dem ersten sichtbaren Fenster
