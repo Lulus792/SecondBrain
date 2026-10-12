@@ -22,6 +22,10 @@ Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
 
 ## Neueste geprüfte Änderungen
 
+- [Sternbeschriftungen](../../docs/STERNBESCHRIFTUNGEN.md): symmetrischer Abstand
+  außerhalb des Fokusrings und tatsächliche Schriftzeilenmitte. 108 neue
+  Bedingungen, negative Regression, acht gezielte CTest-Gruppen und betrachtete
+  Raster bestehen lokal. Neuer Paket-/Installationsstand und Plattformlauf folgen.
 - [Startdiagnose](../../docs/LAUFZEIT_START.md): tatsächliche normale Rendererwahl,
   vier Frames, sichtbares Fenster und beobachtete Module. Dadurch echter Windows-
   Startfehler gefunden: Accessibility muss vor dem ersten sichtbaren Fenster
@@ -68,9 +72,8 @@ Endprodukttexte erst beim vollständigen Produkt abschließend bereinigen.
 
 ## Nächster Schritt
 
-Weitere tatsächliche UI-/Release-Abnahmen fortführen. In der installierten
-Sternkarte berührt die Beschriftung des ausgewählten Projektauftrags den
-Auswahlring; Abstand und Priorität der Sternbeschriftungen gezielt nachprüfen.
+Weitere tatsächliche UI-/Release-Abnahmen fortführen; die lokal geprüfte
+Abstandskorrektur der Sternbeschriftungen als Paket bereitstellen und nachprüfen.
 Geräte/Konten und menschliche Bediennachweise werden durch weitere kleine
 Codeänderungen oder Statusnotizen nicht ersetzt.
 
@@ -78,5 +81,5 @@ Codeänderungen oder Statusnotizen nicht ersetzt.
 
 [Abnahmeübersicht](../../docs/RELEASE_ABNAHME.md),
 [Umsetzungsstand](../../docs/STATUS.md), [Release-Liste](../../docs/RELEASE.md),
-[Journal](journal/2026-10-11.md), [Quellen](SOURCES.md) und
+[Journal](journal/2026-10-12.md), [Quellen](SOURCES.md) und
 [archivierter Stand](archive/state-2026-10-12.md).

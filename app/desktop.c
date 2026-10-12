@@ -2428,9 +2428,14 @@ static void galaxy_annotations(SBDesktop *d,struct nk_command_buffer *canvas,str
         if (p.focused) nk_stroke_circle(canvas, nk_rect(p.x-13,p.y-13,26,26), 2.5f, d->ui.contrast ? ctx->style.text.color : nk_rgb(190,223,255));
         char title[SB_NAME_CAP]; compact_label(d, d->graph_notes.items[i].title, title, sizeof(title), 200);
         float tw = d->ui.normal->handle.width(d->ui.normal->handle.userdata, d->ui.normal->handle.height, title, (int)strlen(title));
-        struct nk_rect r = nk_rect(p.x+12,p.y-8,tw+5,24*d->ui.scale);
+        /* Leave room outside the focus ring on either side; center the full
+           text line rather than keeping a fixed offset as fonts grow. */
+        float gap=20*d->ui.scale,height=d->ui.normal->handle.height,ascent=0,descent=0;
+        if(sb_ui_text_metrics(&d->ui.normal->handle,title,strlen(title),&ascent,&descent))
+            height=fmaxf(height,ascent+descent);
+        struct nk_rect r = nk_rect(p.x+gap,p.y-height/2,tw+5*d->ui.scale,height);
         if (d->card && r.x < card.x+card.w && r.x+r.w > card.x && r.y < card.y+card.h && r.y+r.h > card.y)
-            r.x = p.x-tw-12;
+            r.x = p.x-r.w-gap;
         if (d->browser && r.x < list.x+list.w && r.x+r.w > list.x && r.y < list.y+list.h && r.y+r.h > list.y) continue;
         bool collision = false;
         for (unsigned j = 0; j < label_count; ++j) if (r.x < labels[j].x+labels[j].w && r.x+r.w > labels[j].x && r.y < labels[j].y+labels[j].h && r.y+r.h > labels[j].y) collision = true;
