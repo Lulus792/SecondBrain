@@ -14,13 +14,13 @@ typedef struct SBHelpReturn SBHelpReturn;
 typedef struct {SBNativeText text;char *source;size_t anchor,caret;} SBFieldText;
 typedef struct {char *source;size_t anchor,caret;uint64_t context;bool pending;} SBFieldSelection;
 
-typedef enum { SB_FORM_NONE, SB_FORM_PROJECT, SB_FORM_NOTE, SB_FORM_WORKSPACE, SB_FORM_SETTINGS, SB_FORM_CONTEXT, SB_FORM_HELP, SB_FORM_ACTIONS, SB_FORM_PROJECTS, SB_FORM_FILTER,SB_FORM_BACKUP,SB_FORM_RESTORE,SB_FORM_ABOUT,SB_FORM_NOTICE_LIST,SB_FORM_NOTICE_TEXT } SBForm;
+typedef enum { SB_FORM_NONE, SB_FORM_PROJECT, SB_FORM_NOTE, SB_FORM_WORKSPACE, SB_FORM_SETTINGS, SB_FORM_CONTEXT, SB_FORM_HELP, SB_FORM_ACTIONS, SB_FORM_PROJECTS, SB_FORM_FILTER,SB_FORM_BACKUP,SB_FORM_RESTORE,SB_FORM_ABOUT,SB_FORM_NOTICE_LIST,SB_FORM_NOTICE_TEXT,SB_FORM_EXIT_ERROR } SBForm;
 typedef enum {
     SB_CMD_NONE, SB_CMD_SAVE, SB_CMD_COPY, SB_CMD_NEW_PROJECT, SB_CMD_NEW_NOTE,
     SB_CMD_WORKSPACE, SB_CMD_SUBMIT, SB_CMD_CANCEL, SB_CMD_CONTEXT,
     SB_CMD_GUARD_SAVE, SB_CMD_GUARD_DISCARD, SB_CMD_GUARD_CANCEL,
     SB_CMD_ARCHIVE, SB_CMD_RELOAD, SB_CMD_THEME, SB_CMD_SCALE, SB_CMD_SOURCE,
-    SB_CMD_BACKUP,SB_CMD_RESTORE,SB_CMD_INSPECT
+    SB_CMD_BACKUP,SB_CMD_RESTORE,SB_CMD_INSPECT,SB_CMD_EXIT_RETRY,SB_CMD_EXIT_SKIP
 } SBCommand;
 typedef enum { SB_FOCUS_BUTTON, SB_FOCUS_TEXT, SB_FOCUS_MAP, SB_FOCUS_READER } SBFocusKind;
 typedef struct { char id[100], label[SB_NAME_CAP]; struct nk_rect bounds; SBFocusKind kind; int group; unsigned order; char parent[100]; } SBTarget;
@@ -39,6 +39,11 @@ typedef struct {
     char settings_path[SB_PATH_CAP];
     SBRevision settings_revision;
     bool settings_enabled;
+    bool preferences_skip,quit_return_pending;
+    SBForm quit_return_form;
+    char quit_return_focus[100];
+    SBScroll quit_return_scroll[4];
+    SBStatus quit_return_message;
     SBNativeDialogs *dialogs;
     SBAccessibility *accessibility;
     SBStyleMonitor *style_monitor;
@@ -138,6 +143,7 @@ SBStatus sb_desktop_init(SBDesktop *desktop, const char *workspace, const char *
 void sb_desktop_free(SBDesktop *desktop);
 SBStatus sb_desktop_preferences(SBDesktop *desktop, const char *path, bool explicit_workspace);
 SBStatus sb_desktop_store_preferences(SBDesktop *desktop);
+bool sb_desktop_finish_quit(SBDesktop *desktop);
 void sb_desktop_event(SBDesktop *desktop, const SDL_Event *event);
 void sb_desktop_focus_start(SBDesktop *desktop);
 void sb_desktop_frame(SBDesktop *desktop);

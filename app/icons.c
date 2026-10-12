@@ -86,8 +86,8 @@ SBIcon sb_icon_for(const char *id) {
     if (!strcmp(id,"new-note")) return SB_ICON_NEW_NOTE;
     if (!strcmp(id,"new-project") || !strcmp(id,"new-project-settings") || !strcmp(id,"new-project-detail")) return SB_ICON_NEW_PROJECT;
     if (!strcmp(id,"zoom-out")) return SB_ICON_MINUS;
-    if (!strcmp(id,"rotate-left") || !strcmp(id,"source-back") || !strcmp(id,"page-prev") || !strcmp(id,"project-prev")) return SB_ICON_LEFT;
-    if (!strcmp(id,"rotate-right") || !strcmp(id,"page-next") || !strcmp(id,"project-next")) return SB_ICON_RIGHT;
+    if (!strcmp(id,"rotate-left") || !strcmp(id,"source-back") || !strcmp(id,"page-prev") || !strcmp(id,"project-prev") || !strcmp(id,"exit-back")) return SB_ICON_LEFT;
+    if (!strcmp(id,"rotate-right") || !strcmp(id,"page-next") || !strcmp(id,"project-next") || !strcmp(id,"exit-skip")) return SB_ICON_RIGHT;
     if (!strcmp(id,"camera-home")) return SB_ICON_HOME;
     if (!strcmp(id,"expand")) return SB_ICON_EXPAND;
     if (!strcmp(id,"list")) return SB_ICON_LIST;
@@ -97,7 +97,7 @@ SBIcon sb_icon_for(const char *id) {
     if (!strcmp(id,"archive")) return SB_ICON_ARCHIVE;
     if (!strcmp(id,"save-copy") || !strcmp(id,"copy-context") || !strcmp(id,"guard-copy")) return SB_ICON_COPY;
     if (!strcmp(id,"filter") || !strcmp(id,"list-filter")) return SB_ICON_FILTER;
-    if (!strcmp(id,"reload") || !strcmp(id,"restore-project") || !strcmp(id,"refresh-projects")) return SB_ICON_RELOAD;
+    if (!strcmp(id,"reload") || !strcmp(id,"restore-project") || !strcmp(id,"refresh-projects") || !strcmp(id,"exit-retry")) return SB_ICON_RELOAD;
     if (!strcmp(id,"read")) return SB_ICON_EYE;
     if (!strcmp(id,"actions")) return SB_ICON_ACTIONS;
     if (!strcmp(id,"settings") || !strcmp(id,"settings-actions")) return SB_ICON_SETTINGS;

@@ -111,15 +111,17 @@ int main(int argc, char **argv) {
         }
         SDL_RenderPresent(desktop.ui.renderer);
         sb_desktop_apply(&desktop);
+        if(!snapshot)sb_desktop_finish_quit(&desktop);
         if (desktop.model.has_project) {
             char title[SB_NAME_CAP + 32];
             snprintf(title, sizeof(title), "%s — SecondBrain", desktop.model.project.name);
             SDL_SetWindowTitle(desktop.ui.window, title);
         }
     }
-    preferences=sb_desktop_store_preferences(&desktop);
+    preferences=snapshot ? sb_desktop_store_preferences(&desktop) : sb_ok();
     if (preferences.code!=SB_OK) fprintf(stderr,"%s\n",preferences.message);
     sb_desktop_free(&desktop);
+    if(preferences.code!=SB_OK)return 1;
     if (status.code != SB_OK) { fprintf(stderr, "%s\n", status.message); return 1; }
     return 0;
 }

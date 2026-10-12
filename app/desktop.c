@@ -620,6 +620,20 @@ SBStatus sb_desktop_store_preferences(SBDesktop *d) {
     if (status.code!=SB_OK) d->message=status;
     return status;
 }
+bool sb_desktop_finish_quit(SBDesktop *d) {
+    if(!d->model.quit)return false;
+    if(d->preferences_skip)return true;
+    SBStatus old_message=d->message;
+    SBStatus status=sb_desktop_store_preferences(d);
+    if(status.code==SB_OK)return true;
+    if(d->form!=SB_FORM_EXIT_ERROR){
+        d->quit_return_form=d->form;d->quit_return_message=old_message;
+        snprintf(d->quit_return_focus,sizeof(d->quit_return_focus),"%s",d->focus);
+        memcpy(d->quit_return_scroll,d->scrolling,sizeof(d->scrolling));
+    }
+    d->model.quit=false;d->form=SB_FORM_EXIT_ERROR;d->message=status;
+    memset(&d->navigation,0,sizeof(d->navigation));return false;
+}
 void sb_desktop_free(SBDesktop *d) {
     help_return_free(d);
     reader_preparation_free(d);
@@ -701,6 +715,13 @@ void sb_desktop_apply(SBDesktop *d) {
     SBCommand cmd = d->command;
     SBStatus status = sb_ok();
     d->command = SB_CMD_NONE;
+    if(d->form==SB_FORM_EXIT_ERROR){
+        memset(&d->navigation,0,sizeof(d->navigation));
+        if(cmd==SB_CMD_EXIT_RETRY)d->model.quit=true;
+        else if(cmd==SB_CMD_EXIT_SKIP){d->preferences_skip=true;d->model.quit=true;}
+        else if(cmd==SB_CMD_CANCEL){d->form=d->quit_return_form;d->message=d->quit_return_message;d->model.quit=false;d->preferences_skip=false;d->quit_return_pending=true;}
+        return;
+    }
     if (d->backup) { if (cmd==SB_CMD_CANCEL) sb_backup_job_cancel(d->backup); return; }
     if (cmd==SB_CMD_BACKUP || cmd==SB_CMD_RESTORE) {
         d->backup_error_copied=d->backup_clipboard_failed=false;
@@ -1023,6 +1044,7 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
         SDL_free(reply); return;
     }
     if (event->type == SDL_EVENT_QUIT || event->type == SDL_EVENT_WINDOW_CLOSE_REQUESTED) {
+        if(d->form==SB_FORM_EXIT_ERROR)return;
         if (d->backup) { sb_backup_job_cancel(d->backup); d->quit_after_backup=true; return; }
         request(d, SB_ACT_QUIT, NULL); return;
     }
@@ -1114,6 +1136,12 @@ void sb_desktop_event(SBDesktop *d, const SDL_Event *event) {
         bool modifier = (event->key.mod & SDL_KMOD_CTRL) != 0;
 #endif
         bool shift = (event->key.mod & SDL_KMOD_SHIFT) != 0;
+        if(d->form==SB_FORM_EXIT_ERROR){
+            if(key==SDLK_ESCAPE || (modifier && key==SDLK_PERIOD))command(d,SB_CMD_CANCEL);
+            else if(key==SDLK_TAB || key==SDLK_UP || key==SDLK_DOWN)focus_step(d,key==SDLK_UP || (key==SDLK_TAB && shift) ? -1 : 1);
+            else if(key==SDLK_RETURN || key==SDLK_SPACE)snprintf(d->activate,sizeof(d->activate),"%s",d->focus);
+            return;
+        }
         if (d->backup && ((modifier && key==SDLK_Q) || key==SDLK_ESCAPE)) {
             sb_backup_job_cancel(d->backup); if (modifier && key==SDLK_Q) d->quit_after_backup=true; return;
         }
@@ -2016,11 +2044,13 @@ static void popup(SBDesktop *d, int width, int height) {
     ctx->style.window.group_padding=nk_vec2(8*d->ui.scale,6*d->ui.scale);
     ctx->style.window.spacing=nk_vec2(8*d->ui.scale,4*d->ui.scale);
     float s = d->ui.scale, w = fminf(width - 40.0f, 580 * s), h = fminf(height - 40.0f, 680 * s);
-    if(d->model.guard){
-        const char *guard_text="Dieses Dokument enthält ungespeicherte Änderungen. Speichere sie vor dem Wechsel oder behalte die Bearbeitung bei.";
+    if(d->model.guard || d->form==SB_FORM_EXIT_ERROR){
+        bool exit_error=d->form==SB_FORM_EXIT_ERROR;
+        const char *heading=exit_error ? "Einstellungen nicht gespeichert" : "Änderungen erhalten";
+        const char *guard_text=exit_error ? "Der letzte Arbeitsbereich und die Darstellung konnten nicht gespeichert werden." : "Dieses Dokument enthält ungespeicherte Änderungen. Speichere sie vor dem Wechsel oder behalte die Bearbeitung bei.";
         const struct nk_user_font *font=&d->ui.normal->handle;float gap=ctx->style.window.spacing.y;
         float row=fmaxf(36,font->height+12*s),header=32*s;
-        unsigned actions=d->message.code==SB_CONFLICT ? 4 : 3;
+        unsigned actions=!exit_error && d->message.code==SB_CONFLICT ? 4 : 3;
         float footer=actions*row+(actions-1)*gap;
         float shell=2*ctx->style.window.padding.y+header+footer+3*gap;
         float text_width=fmaxf(1,w-2*ctx->style.window.padding.x-2*ctx->style.window.group_padding.x-(10+6*s));
@@ -2029,12 +2059,12 @@ static void popup(SBDesktop *d, int width, int height) {
         float content=info+(error ? gap+error : 0)+4*ctx->style.window.group_padding.y;
         h=fminf(height-40.0f,shell+content);d->modal_bounds=nk_rect((width-w)/2,(height-h)/2,w,h);
         glass(d,d->modal_bounds,16);
-        if(nk_begin(ctx,"Änderungen erhalten",d->modal_bounds,NK_WINDOW_NO_SCROLLBAR)){
+        if(nk_begin(ctx,heading,d->modal_bounds,NK_WINDOW_NO_SCROLLBAR)){
             sb_ui_material_panel(&d->ui,d->modal_bounds,16);
             float available=ctx->current->layout->bounds.w;
             nk_layout_row_begin(ctx,NK_STATIC,header,2);
-            nk_layout_row_push(ctx,available-32*s-ctx->style.window.spacing.x);native_heading(d,"modal-title","Änderungen erhalten");
-            nk_layout_row_push(ctx,32*s);if(button(d,"cancel","Schließen"))command(d,SB_CMD_GUARD_CANCEL);nk_layout_row_end(ctx);
+            nk_layout_row_push(ctx,available-32*s-ctx->style.window.spacing.x);native_heading(d,"modal-title",heading);
+            nk_layout_row_push(ctx,32*s);if(button(d,"cancel","Schließen"))command(d,exit_error ? SB_CMD_CANCEL : SB_CMD_GUARD_CANCEL);nk_layout_row_end(ctx);
             nk_layout_row_dynamic(ctx,fmaxf(1,h-shell),1);
             if(!d->scrolling[3].measured)nk_group_set_scroll(ctx,"Guard contents",0,0);
             if(nk_group_begin(ctx,"Guard contents",NK_WINDOW_NO_SCROLLBAR)){
@@ -2044,10 +2074,10 @@ static void popup(SBDesktop *d, int width, int height) {
                 if(error){nk_layout_row_dynamic(ctx,sb_ui_wrap_height(ctx,font,d->message.message,strlen(d->message.message),inner),1);native_wrap(d,d->message.message);}
                 scroll_measure(d,3);nk_group_end(ctx);
             }
-            nk_layout_row_dynamic(ctx,row,1);if(button(d,"guard-save","Speichern und weiter"))command(d,SB_CMD_GUARD_SAVE);
-            nk_layout_row_dynamic(ctx,row,1);if(button(d,"guard-discard","Änderungen verwerfen"))command(d,SB_CMD_GUARD_DISCARD);
+            nk_layout_row_dynamic(ctx,row,1);if(button(d,exit_error ? "exit-retry" : "guard-save",exit_error ? "Erneut versuchen" : "Speichern und weiter"))command(d,exit_error ? SB_CMD_EXIT_RETRY : SB_CMD_GUARD_SAVE);
+            nk_layout_row_dynamic(ctx,row,1);if(button(d,exit_error ? "exit-skip" : "guard-discard",exit_error ? "Ohne Einstellungen beenden" : "Änderungen verwerfen"))command(d,exit_error ? SB_CMD_EXIT_SKIP : SB_CMD_GUARD_DISCARD);
             if(actions==4){nk_layout_row_dynamic(ctx,row,1);if(button(d,"guard-copy","Eigene Fassung als neue Notiz sichern"))command(d,SB_CMD_COPY);}
-            nk_layout_row_dynamic(ctx,row,1);if(button(d,"guard-cancel","Weiter bearbeiten"))command(d,SB_CMD_GUARD_CANCEL);
+            nk_layout_row_dynamic(ctx,row,1);if(button(d,exit_error ? "exit-back" : "guard-cancel",exit_error ? "Abbrechen" : "Weiter bearbeiten"))command(d,exit_error ? SB_CMD_CANCEL : SB_CMD_GUARD_CANCEL);
         }
         nk_end(ctx);ctx->style.window=original_window;return;
     }
@@ -2550,7 +2580,7 @@ static void welcome(SBDesktop *d,int width,int height,nk_flags flags) {
     nk_end(ctx);
 }
 void sb_desktop_frame(SBDesktop *d) {
-    if(d->help_return && d->form!=SB_FORM_HELP)help_return_free(d);
+    if(d->help_return && d->form!=SB_FORM_HELP && d->form!=SB_FORM_EXIT_ERROR)help_return_free(d);
     d->reader_preparation_used=false;d->reader_source_used=false;
     sb_native_text_free(&d->native_editor);
     sb_native_text_free(&d->reader_title_native);d->reader_title_display[0]=0;d->reader_title_claimed=false;
@@ -2581,6 +2611,7 @@ void sb_desktop_frame(SBDesktop *d) {
         memset(&d->scrolling[3],0,sizeof(d->scrolling[3]));
         if(modal_reader(d) && d->form!=d->focus_form)memset(&d->scrolling[2],0,sizeof(d->scrolling[2]));
     }
+    if(d->quit_return_pending){memcpy(d->scrolling,d->quit_return_scroll,sizeof(d->scrolling));d->help_restore_scroll=d->form!=SB_FORM_NONE;}
     if (modal && !before) snprintf(d->saved_focus,sizeof(d->saved_focus),"%s",d->focus);
     if (!modal && before) {
         /* A cancelled map navigation can leave the old editor card open.
@@ -2640,6 +2671,10 @@ void sb_desktop_frame(SBDesktop *d) {
             snprintf(d->focus,sizeof(d->focus),"%s",d->targets[first].id);
             d->keyboard = true; d->focus_changed = true; d->focus_scroll_frames = 3;
         } else focus_set(d,d->targets[first].id);
+    }
+    if(d->quit_return_pending){
+        for(size_t i=0;i<d->target_count;++i)if(!strcmp(d->targets[i].id,d->quit_return_focus)){focus_set(d,d->quit_return_focus);break;}
+        memcpy(d->scrolling,d->quit_return_scroll,sizeof(d->scrolling));d->quit_return_pending=false;
     }
     if(d->reader_pending_focus[0]){
         if(d->reader_pending_context!=accessible_context(d) || d->editing || modal || strcmp(d->focus,"reader"))d->reader_pending_focus[0]=0;
