@@ -17,6 +17,7 @@ weder Version 1.0 noch einen Release-Tag. Der Nutzer entscheidet über die Freig
 | Suche mit eigenem Löschen-Icon, Suchende, Textcursor, Hinweise und Formulare | [Navigationspolitur](NAVIGATION_POLITUR.md), [Interaktion](INTERAKTION.md), [Wortnavigation](WORTNAVIGATION.md), [Hilfe](HILFE_RUECKKEHR.md) |
 | Scrollposition und frühe Eingaben erhalten; Übergänge ohne alten Resize-Zuschnitt | [Scrollen beim Laden](SCROLLEN_BEIM_LADEN.md), [Übergangsbild](UEBERGANG_BILD.md) |
 | Sichtbare Einstellungsfehler beim Beenden, Wiederholung und Rückkehr | [Fehlerkarte](EINSTELLUNGEN_BEENDEN.md); lokale, Sanitizer- und native Windows-/Linux-Prüfungen |
+| Normaler sichtbarer Start und Accessibility vor dem ersten Anzeigen | [Startdiagnose](LAUFZEIT_START.md); Windows-/Linux-Release-Pakete und Intel-Mac geprüft |
 | Lesbare Oberfläche bei Materialfehlern | [Materialrückfall](MATERIAL_RUECKFALL.md), Software-/Metal- und gezielte Speicherfehlerprüfungen |
 
 „Implementiert“ bedeutet hier Code mit den genannten begrenzten Prüfungen.
@@ -26,26 +27,35 @@ Schemaänderungen sind kein bereits vorhandener Migrationsmechanismus.
 
 ## Aktueller ausgeführter Stand
 
-Installiert: **0.9.72 / c40c9fd47ce1**, sauberer Intel/macOS-Release auf
+Installiert: **0.9.73 / 15e63b4f7960**, sauberer Intel/macOS-Release auf
 macOS 14.6.1 / 23G93. 98 Dateien paketgleich. App-SHA256:
-`3406d07cc09f239b5208ebaf50be6b76f7f692540b15826cc7c411acbe45c8a8`.
-Alle **88 lokalen Release-Tests** bestehen (471,00 s); alle 209 gehashten
-Produktinputs und die ausführbare Datei bleiben über den Lauf unverändert.
+`72fb1cd672adc6b5bc8b8cc6601de1bb8d35e6e5aefeb01964cc4034a17d76b6`.
+Die korrigierte Startreihenfolge besteht lokal **89/89 Tests zu e66e023**
+(517,45 s), Binärhash und 211 Produktinputs unverändert. Danach ändern sich nur
+Prüfer, CI-Nachweissicherung und Dokumentation: 211 Produktinputs bleiben gleich.
+Die saubere 15e63b4-Fassung bestätigt beide Versionswege und normalen Start in
+1,22 s. Ihre Buildkennung unterscheidet die Binärdateien; der vollständige Lauf
+gehört ausdrücklich zu e66e023, Paket und Installation zu 15e63b4.
+
 Das entpackte Paket besteht 126 Desktop-, 167 Tastatur- und 75 Sicherungsbedingungen,
 Einstellungen in zwei Prozessen, CLI, Lizenzen, Versions- und Laufzeitprüfung.
-Der echte **71→72→71-Wechsel** erhält 20 Testdateien und Einstellungen;
-Sicherung/Wiederherstellung bestehen. Drei Updateaufnahmen und die installierte
-Ansicht wurden betrachtet. Beim Öffnen bleiben 21 Gedächtnisdateien unverändert.
-Deployment-Ziel der App: minos 14.0, SDK 15.2; kein Nachweis auf macOS 14.0/ARM64.
-[Fehlerkarte und genaue Abdeckung](EINSTELLUNGEN_BEENDEN.md).
-Originale unter `build/exit-preferences-verification/` und
-`build/exit-preferences-update/`.
+Normaler Paketstart: Metal/Cocoa, sichtbares Fenster, vier Frames, 394 Module,
+13 isolierte Projektdateien erhalten. Echter **72→73→72-Wechsel** erhält 20
+Testdateien und Einstellungen; Sicherung/Wiederherstellung bestehen.
+Drei Updateaufnahmen und die installierte Ansicht betrachtet. Beim Software-
+Snapshot und dem zusätzlich geprüften normalen installierten Start bleiben alle
+21 Gedächtnisdateien unverändert. App: minos 14.0, SDK 15.2; kein Nachweis auf
+macOS 14.0/ARM64. [Startfehler und genaue Abdeckung](LAUFZEIT_START.md).
 
-[CI38191364672](https://github.com/Lulus792/SecondBrain/actions/runs/38191364672)
-zu c40c9fd: Windows und Linux jeweils **88/88 Tests in Debug und Release**;
-beide Release-Pakete erfolgreich entpackt und geprüft. macOS-Jobs warten auf
-Runner. Windows Server 2025 und Ubuntu/Xvfb ersetzen keine Windows-11-/Wayland-
-oder menschliche Screenreaderabnahme.
+[CI38195529730](https://github.com/Lulus792/SecondBrain/actions/runs/38195529730)
+zu 15e63b4: Windows/Linux Debug/Release vollständig erfolgreich, einschließlich
+beider Release-Pakete. SHA256-verifizierte native Paketberichte bestätigen
+Direct3D11/Windows mit 52 Modulen beziehungsweise OpenGL/X11 mit 65 Modulen;
+jeweils sichtbares Fenster, vier Frames und unveränderte Testdaten.
+Mac-CI wartet auf Runner. Server 2025/Xvfb ersetzen keine Windows-11-/Wayland-
+oder menschliche Screenreaderabnahme. Originale unter
+`build/runtime73-fixed-verification/`, `build/runtime73-verification/`
+und `build/runtime73-update/`.
 
 ## Projektgedächtnis nach der Prüfung
 

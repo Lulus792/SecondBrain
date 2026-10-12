@@ -146,3 +146,40 @@ steht noch aus. Die tatsächlichen Programmdateien und Projektinhalte werden
 für diesen Abgleich nicht normalisiert oder verändert.
 Originale: `build/runtime73-fixed-verification/`, `full-ctest.log`,
 `linux-native-runtime.json`, `probe-contract-final.log`, `probe-final-text-check.log`.
+
+## Abschließende native, Paket- und Installationsabnahme
+
+Installiert: **0.9.73 / 15e63b4f7960**, sauberer Intel/macOS-Release auf
+macOS 14.6.1 / 23G93. 98 Dateien paketgleich. App-SHA256:
+`72fb1cd672adc6b5bc8b8cc6601de1bb8d35e6e5aefeb01964cc4034a17d76b6`.
+Die korrigierte Startreihenfolge besteht lokal **89/89 Tests zu e66e023**
+(517,45 s), Binärhash und 211 Produktinputs unverändert. Danach ändern sich nur
+Prüfer, CI-Nachweissicherung und Dokumentation: 211 Produktinputs bleiben gleich.
+Die saubere 15e63b4-Fassung bestätigt beide Versionswege und normalen Start in
+1,22 s. Ihre Buildkennung unterscheidet die Binärdateien; der vollständige Lauf
+gehört ausdrücklich zu e66e023, Paket und Installation zu 15e63b4.
+
+Das entpackte Paket besteht 126 Desktop-, 167 Tastatur- und 75 Sicherungsbedingungen,
+Einstellungen in zwei Prozessen, CLI, Lizenzen, Versions- und Laufzeitprüfung.
+Normaler Paketstart: Metal/Cocoa, sichtbares Fenster, vier Frames, 394 Module,
+13 isolierte Projektdateien erhalten. Echter **72→73→72-Wechsel** erhält 20
+Testdateien und Einstellungen; Sicherung/Wiederherstellung bestehen.
+Drei Updateaufnahmen und die installierte Ansicht betrachtet. Beim Software-
+Snapshot und dem zusätzlich geprüften normalen installierten Start bleiben alle
+21 Gedächtnisdateien unverändert. App: minos 14.0, SDK 15.2; kein Nachweis auf
+macOS 14.0/ARM64. [Startfehler und genaue Abdeckung](LAUFZEIT_START.md).
+
+[CI38195529730](https://github.com/Lulus792/SecondBrain/actions/runs/38195529730)
+zu 15e63b4: Windows/Linux Debug/Release vollständig erfolgreich, einschließlich
+beider Release-Pakete. SHA256-verifizierte native Paketberichte bestätigen
+Direct3D11/Windows mit 52 Modulen beziehungsweise OpenGL/X11 mit 65 Modulen;
+jeweils sichtbares Fenster, vier Frames und unveränderte Testdaten.
+Mac-CI wartet auf Runner. Server 2025/Xvfb ersetzen keine Windows-11-/Wayland-
+oder menschliche Screenreaderabnahme. Originale unter
+`build/runtime73-fixed-verification/`, `build/runtime73-verification/`
+und `build/runtime73-update/`.
+
+Die vorige App liegt als Rückfallkopie unter
+`/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.72-20261012-043357`. Diese Abnahme schließt die bekannte Startreihenfolge
+und den Textvergleich im dokumentierten Umfang ab; übrige Release-Anforderungen
+bleiben offen. 1.0 ist nicht freigegeben.

@@ -2,14 +2,15 @@
 
 Stand: 12. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.72/c40c9fd47ce1. Die Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.73/15e63b4f7960. Die Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
-0.9.72 besteht lokal 88/88 Tests; Windows/Linux bestehen ebenfalls je 88/88
-in Debug und Release einschließlich der Release-Pakete. Einstellungsfehler beim
-Beenden bleiben jetzt sichtbar und können wiederholt oder abgebrochen werden.
-[Aktuelle Paket-/Updateabnahme](RELEASE_ABNAHME.md).
+0.9.73 korrigiert den normalen Windows-Start: Accessibility wird vor dem ersten
+sichtbaren Fenster eingerichtet. Der neue Paketprüfer nutzt zusätzlich die normale
+Rendererwahl und protokolliert Sichtbarkeit und geladene Module. Lokal 89/89 zur
+korrigierten Startreihenfolge; aktuelle Windows-/Linux-Jobs und Release-Pakete
+bestehen. [Genaue Commit-/Paket-/Updateabnahme](RELEASE_ABNAHME.md).
 
 ## Abgeschlossene Grundlagen
 

@@ -52,7 +52,7 @@ Anforderungen und Abgrenzung: [Projektauftrag](PROJECT.md).
 
 ## Vertrauliche Sicherheitsmeldungen
 
-Am 7. Oktober angefragt: GitHub Private Vulnerability Reporting oder eigene
-Kontaktadresse. Die öffentlichen Fehlerformulare sind ein anderer Weg.
-Aktivierung/Erreichbarkeit und tatsächliche Nutzung des gewählten Kanals bleiben
-bis zur Entscheidung und Prüfung offen. Keine vertraulichen Inhalte in Issues.
+Am 12. Oktober entschieden: **GitHub Private Vulnerability Reporting**.
+Die Aktivierung im Repository und die tatsächliche Erreichbarkeit werden geprüft.
+Öffentliche Fehlerformulare bleiben ein anderer Weg. Vertrauliche Inhalte werden
+nicht in Issues veröffentlicht.
