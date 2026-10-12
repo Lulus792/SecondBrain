@@ -4498,3 +4498,15 @@ Drei Aufnahmen angesehen. 98 Dateien paketgleich installiert, 21 Gedächtnisdate
 beim Öffnen unverändert; installierte Aufnahme angesehen. CI38187181878 bestätigt
 Windows und Linux Release einschließlich entpackter Pakete; beide Debugjobs in
 Arbeit, Mac queued. [Originale und Grenzen](SCHRIFT_LEBENSDAUER.md).
+
+
+## Reale volle Sicherungsvolumes auf drei Systemen
+
+12. Oktober: gemeinsamer C-Kern-Prüfablauf auf lokalem HFS+ und nativen
+ext4-/NTFS-Volumes bestanden. CI38188559402 zu 30f867a bestätigt Windows/Linux
+Debug/Release mit je 35 Kernprüfungen. Release-Artefakte per SHA256 verifiziert:
+beide Operationen erreichen 70.436 Bytes vor ENOSPC, erhalten Originale und
+bestehende Ziele, gelingen nach Freigabe des Platzes und trennen das eigene Image.
+Windows-Skriptaufbau nach beobachtetem UTF-16-Fehler auf ASCII ohne BOM korrigiert;
+Datenpfade weiterhin Unicode. Weitere Notiz-/Einstellungs-/Persistenzabnahmen
+bleiben offen. App unverändert installiert 0.9.71; [Nachweis](VOLLER_SPEICHER.md).

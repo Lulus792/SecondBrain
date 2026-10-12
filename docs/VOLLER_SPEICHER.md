@@ -87,3 +87,30 @@ im gemeinsamen C-Ablauf enthalten weiterhin Unicode; die Backing-Pfadgrenze
 betrifft nur diesen Entwicklerprüfer. Sieben Guard-Prüfungen und der HFS+-Versuch
 mit zusätzlichen Unicode-Pfaden bestehen lokal. Neue Windows-Abnahme folgt;
 kein NTFS-Erfolg wird aus dem bisher fehlgeschlagenen Aufbau abgeleitet.
+
+
+## Native ext4-/NTFS-Abnahme nach der Kodierungskorrektur
+
+[CI38188559402](https://github.com/Lulus792/SecondBrain/actions/runs/38188559402)
+zu 30f867ac0bac bestätigt alle vier Windows-/Linux-Kernjobs mit jeweils 35 Tests.
+Windows Release 114616125745, Debug 114616125770; Linux Release 114616125595,
+Debug 114616125740. Die neue Volume-Prüfung ist in allen vier Konfigurationen
+enthalten. Mac-CI weiterhin queued; der lokale HFS+-Nachweis bleibt getrennt.
+
+Die zwei Release-Artefakte wurden heruntergeladen und gegen die GitHub-Digests
+geprüft. JSON-Berichte bestätigen für beide Vorgänge auf beiden Dateisystemen:
+ENOSPC, 70.436 Bytes Teilfortschritt, unveränderte Originale, erfolgreichen erneuten
+Versuch und `detached=true`. Unicode-Projekt-, Archiv- und Wiederherstellungspfade
+sind Teil des gemeinsamen neuen Ablaufs.
+
+| Nachweis | NTFS / Windows | ext4 / Linux |
+| --- | --- | --- |
+| Tatsächliche Dateisystemkapazität | 65.990.656 Bytes | 27.234.304 Bytes |
+| Artefakt | 11720625762 | 11719984807 |
+| ZIP-SHA256 | ce3a9496db359ec4bae43e3f62d61abcc0ca968e982f83f3a11b6b573bf9900e | 949ed860c66d377ee789e71cfd1ac7686843e877f93508c88e5091a68c049222 |
+
+Originale: `build/native-volume-verification/native-summary.json`,
+`windows-release-30f867a.zip/json`, `linux-release-30f867a.zip/json`.
+Die frühere Formulierung „erste native Läufe stehen aus“ beschreibt den damaligen
+Zwischenstand. Dieser Abschluss betrifft Sicherung/Wiederherstellung, nicht die
+oben benannten weiteren Schreib-/Persistenzabnahmen. Kein 1.0-Abschluss.

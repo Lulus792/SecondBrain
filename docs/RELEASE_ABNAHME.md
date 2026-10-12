@@ -48,7 +48,7 @@ beide Lebensdauertests bestehen, nur die Patchdatei-Byteprüfung scheitert.
 LF-Dateiregel korrigiert, echter Git-autocrlf-Checkout vor/nach geprüft.
 [Neue CI38187181878](https://github.com/Lulus792/SecondBrain/actions/runs/38187181878)
 zu 9867139: Windows und Linux Release einschließlich beider entpackter Pakete
-erfolgreich; beide Debugjobs noch in Arbeit. Mac-Jobs warten auf Runner. Windows Server 2025 und Ubuntu/Xvfb
+erfolgreich; auch beide Debugjobs sind inzwischen bestätigt. Mac-Jobs warten auf Runner. Windows Server 2025 und Ubuntu/Xvfb
 ersetzen keine Windows-11-/Wayland-/menschliche Screenreaderabnahme.
 
 ## Projektgedächtnis nach der Prüfung
@@ -70,7 +70,7 @@ automatische Änderung anderer Second Brains. Dieser historische Pflegeabschnitt
 | Frische Nutzerrechner | Entpacktes aktuelles Paket starten und gesamten Projekt-/Notiz-/Sicherungs-/Updateablauf bedienen; CI-Konfiguration genügt nicht |
 | Menschliche Bedienung/Barrierefreiheit | VoiceOver, NVDA, Orca, native IME und Dialoge; Kontraste/Custom-Paletten, große Schrift, reale Systemvorgaben und RTL/Textauswahl |
 | Alltag und Leistung | Reale größere Wissensbasen, schwächere Geräte, Trackpads, lange Sitzungen, verschiedene GPU-Treiber, Monitore und tatsächliche Pixeldichtewechsel |
-| Dateien und Persistenz | Volle Windows-/Linux-Zielvolumes, weitere Dateisysteme und physische Persistenz; vorhandene Crash-/ENOSPC-Prüfungen sind begrenzt |
+| Dateien und Persistenz | Weitere Dateisysteme und physische Persistenz; [native volle Backup-Volumes](VOLLER_SPEICHER.md) sind bestätigt; Notiz-/Einstellungs-Speichern bei vollem Volume und physische Persistenz bleiben offen |
 | Vollständige mitgelieferte Laufzeit-/Lizenzzuordnung | Tatsächliche Binär-/Toolchainanteile und dynamische/transitive Komponenten final abgleichen; [Inventur](LIZENZ_INVENTUR.md), [Rust](RUST_RUNTIME_NACHWEIS.md), [Laufzeit](PAKET_LAUFZEIT.md) |
 | Vertraulicher Sicherheitskanal | Nutzerentscheidung und tatsächliche Erreichbarkeit; öffentliche Issues sind kein vertraulicher Kanal |
 | Signierung und Distribution | Apple-Developer-Konto/Windows-Zertifikat fehlen; tatsächliche Signierung/Notarisierung und dauerhafte aktuelle Pakete vor Freigabe prüfen |

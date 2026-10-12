@@ -46,7 +46,7 @@ Windows-11-/Wayland-/Screenreaderabnahmen.
 
 Mindest-OS/frische Nutzerrechner und aktuelles ARM64; menschliche VoiceOver/NVDA/
 Orca-/IME-/Dialogbedienung; echte Monitore/Dichtewechsel, Trackpads, schwächere
-Geräte und Langzeit; volle Windows-/Linux-Volumes und physische Persistenz;
+Geräte und Langzeit; Notiz-/Einstellungs-Speichern bei vollem Volume und physische Persistenz;
 vollständiger Runtime-/Lizenzabgleich, vertraulicher Sicherheitskanal, Signierung
 und dauerhafte aktuelle Pakete. [Abnahmekriterien](../../docs/RELEASE_ABNAHME.md).
 
@@ -59,7 +59,8 @@ Endprodukttexte erst abschließend beim vollständigen Produkt bereinigen.
 
 CI38187181878 nach LF-Dateiregel: alle vier Windows-/Linux-Desktopjobs samt
 Release-Paketen bestehen; Mac queued. Neuer gemeinsamer Volume-Prüfweg lokal mit
-35 Kernprüfungen und echtem HFS+-Test bestätigt; erste ext4-/NTFS-CI folgt. Die native Windows-Allokatorprüfung
+35 Kernprüfungen und echtem HFS+-Test bestätigt; ext4-/NTFS-CI besteht ebenfalls
+in Debug/Release. Verifizierte Release-Berichte bestätigen Bestandsschutz und Trennen. Die native Windows-Allokatorprüfung
 besteht bereits im vorherigen Lauf. Neues Mac-Paket, tatsächlicher Updatewechsel
 und Installation sind abgeschlossen. [Schriftlebensdauer](../../docs/SCHRIFT_LEBENSDAUER.md),
 [Kontrastfarben](../../docs/SYSTEM_KONTRASTFARBEN.md).
