@@ -79,6 +79,16 @@ Developer-ID-Anforderung nicht. Normaler Start: Metal/Cocoa, vier Frames,
 394 Module und13 erhaltene isolierte Projektdateien. Originale unter
 `build/signing-preparation/`. Die installierte App wurde nicht ersetzt.
 
+[CI38213765328](https://github.com/Lulus792/SecondBrain/actions/runs/38213765328)
+zu ebc1ab6 besteht unter Windows/Linux in Debug und Release einschließlich
+beider Release-Pakete. Die Windows-Python-Verträge bestätigen88 Tests mit einer
+Überspringung. Der heruntergeladene Windows-Release-Nachweis11731305343 ist
+gegen seinen GitHub-SHA256 geprüft; die rohe CTest-Datei bestätigt92 Prüfblöcke
+und92 Pass-Marker. Linux-Wayland-Starts bestehen ebenfalls. Originale:
+`build/signing-preparation/native-ci.json` und ZIP. Dies prüft die unverändert
+unsignierten Entwicklungspakete und Werkzeugverträge, keine Windows-
+Herausgebersignatur oder Apple-Serviceannahme. Mac-CI wartet weiterhin auf Runner.
+
 Grundlagen, am12.Oktober gelesen:
 [Apple-Notarisierung](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution),
 [manueller Apple-Ablauf](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow),
