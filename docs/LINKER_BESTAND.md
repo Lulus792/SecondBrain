@@ -51,8 +51,61 @@ sowie normaler Metal-Start (drei CTest-Gruppen, 1,22 s). Ein tatsächliches
 Diagnosepaket enthält keine Karten und seine zwei Programme stimmen mit den
 Build-Identitäten überein. Originale: `build/label74-toolchain-map/`.
 
-Die neue native Windows-/Linux-Ausführung dieses optionalen Buildwegs folgt.
-Sie ist getrennt von der abgeschlossenen 0.9.74-Produktprüfung zu eabf5b3.
-Systemruntimes, SDK-/Toolchainbedingungen und innere Rust-Anteile sind weiterhin
-gezielt abzugleichen; dies ist keine vollständige Lizenzfreigabe. Die installierte
-App bleibt die bereits geprüfte saubere 0.9.74/eabf5b3ff114.
+## Native Karten und tatsächliche Pakete
+
+[CI38199346371](https://github.com/Lulus792/SecondBrain/actions/runs/38199346371)
+zu `325f86d31e27cc79624a26c2b6d6c05c9f0af382` besteht unter Windows/Linux in
+Debug und Release mit jeweils 90 Tests und beiden Release-Paketen. Mac-Jobs
+warten auf Runner. Tatsächliche C-/C++-Compiler: MSVC 19.51.36260.0 beziehungsweise
+GNU 13.3.0. Diese Abnahme gehört zum optionalen Karten-Buildweg und ist getrennt
+vom zuvor installierten Produktbuild eabf5b3.
+
+Alle vier heruntergeladenen Paket-/Nachweis-ZIPs stimmen mit den GitHub-Digests
+überein. Beide Karten pro Plattform stimmen mit ihren `.identity`-Hashes überein;
+App und CLI im tatsächlichen Paket stimmen mit den jeweiligen Programm-Hashes
+überein. Karten/Identitäten sind in den Entwicklungsnachweisen und fehlen in den
+Anwendungspaketen. Die fremden Programme wurden auf dem Mac gelesen, nicht ausgeführt.
+
+| Plattform | Paket-Artefakt | Nachweis-Artefakt |
+| --- | --- | --- |
+| Linux | 11724029521 | 11724388310 |
+| Windows | 11724953387 | 11724569670 |
+
+Originale und SHA256: `build/link-map-native/`, insbesondere `native-ci.json`,
+`linux-map-crosscheck.json`, `windows-map-crosscheck.json` und die unveränderten
+ZIPs/Karten. Die Windows-Karte benennt in ihren Symbolursprüngen folgende
+eindeutige Objektmitglieder; das ist keine vollständige private Symbolinventur:
+
+| Beitrag | App | CLI |
+| --- | --- | --- |
+| LIBCMT | 42 | 37 |
+| libucrt | 243 | 154 |
+| libvcruntime | 30 | 25 |
+| uuid | 2 | 0 |
+
+Unter Linux sind `Scrt1.o`, `crti.o`, `crtn.o`, `crtbeginS.o` und `crtendS.o`
+benannt, einschließlich nichtleerer Beiträge zur ausgegebenen Datei. `libgcc.a`
+steht in LOAD-Zeilen, aber es sind keine eindeutig extrahierten Mitglieder
+`libgcc.a(...)` benannt. LOAD allein wird deshalb nicht als Nachweis einer
+eingebetteten statischen libgcc behandelt.
+
+## Noch erforderlicher Quellenabgleich
+
+Die erkannten Beiträge bestimmen die nächsten Originalquellen: unter Windows
+das [Lizenzverzeichnis](https://visualstudio.microsoft.com/license-terms/),
+die [Verteilungsliste für Visual Studio 2026](https://learn.microsoft.com/en-us/visualstudio/releases/2026/redistribution)
+und die tatsächlich verwendeten SDK-Dateien; unter Linux die konkreten
+Distributionspakete der Startobjekte. Microsofts
+[Compilerzuordnung](https://learn.microsoft.com/en-us/cpp/overview/compiler-versions?view=msvc-170)
+ordnet 1951/14.51 den neueren Toolsets zu. Eine pauschale Zuordnung zu Visual
+Studio 2022 wäre für diesen beobachteten Compiler ungeeignet.
+
+Die offiziellen 2026-Enterprise-/Runtime-Dokumente, die Verteilungsliste und
+die Compilerzuordnung wurden am 12. Oktober im betreffenden Umfang gelesen.
+GCCs Original `libgcc/crtstuff.c` zu 13.3.0 nennt GPLv3 mit Runtime Library
+Exception 3.1; `COPYING.RUNTIME` wurde ebenfalls gelesen. Das ist ein
+Upstream-Quellenkandidat, noch kein Hash-/Lizenzabgleich mit den konkreten
+Ubuntu-Paketdateien. Rohquellen/Hashes: `build/link-map-runtime-review/`.
+Systemruntimes, konkrete SDK-/Toolchainbedingungen und innere Rust-Anteile
+bleiben gezielt abzugleichen; dies ist keine vollständige Lizenzfreigabe.
+Die installierte App bleibt die bereits geprüfte saubere 0.9.74/eabf5b3ff114.

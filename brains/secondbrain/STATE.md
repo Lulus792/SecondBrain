@@ -32,8 +32,10 @@ Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
   erfolgreich; SHA-geprüfte native Paketberichte/Archive stimmen überein.
 - [Linkerbestand](../../docs/LINKER_BESTAND.md): bytegleiche Diagnosekarte zur
   installierten Mac-App; optionaler Buildweg erzeugt App-/CLI-Karten mit Hash-
-  Identitäten außerhalb der Pakete. Lokal tatsächlich geprüft, neue native
-  Windows-/Linux-Ausführung des Buildwegs folgt. Lizenzabgleich weiterhin offen.
+  Identitäten außerhalb der Pakete. Neue CI38199346371 Windows/Linux vollständig
+  erfolgreich: jeweils90 Tests, beide Release-Pakete; Karten und tatsächliche
+  Paketprogramme stimmen über Hashes überein. Konkrete SDK-/Startobjektquellen
+  und innere Rust-Anteile sind der weitere Lizenzabgleich; Mac-CI queued.
 - [Startdiagnose](../../docs/LAUFZEIT_START.md): tatsächliche normale Rendererwahl,
   vier Frames, sichtbares Fenster und beobachtete Module. Dadurch echter Windows-
   Startfehler gefunden: Accessibility muss vor dem ersten sichtbaren Fenster
@@ -80,8 +82,8 @@ Endprodukttexte erst beim vollständigen Produkt abschließend bereinigen.
 
 ## Nächster Schritt
 
-Native Nachprüfung der neuen Linkerkarten und weiterer Runtime-/SDK-Anteile
-fortführen. Sicherheitskanal nach GitHub-Anmeldung aktivieren.
+Quellen der konkret eingebundenen Runtime-/SDK-/Startobjekte abgleichen.
+Sicherheitskanal nach GitHub-Anmeldung aktivieren.
 Geräte/Konten und menschliche Bediennachweise werden durch weitere kleine
 Codeänderungen oder Statusnotizen nicht ersetzt.
 

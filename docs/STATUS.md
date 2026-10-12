@@ -13,8 +13,9 @@ Intel/macOS-Paket bestehen; 73→74→73 erhält Projekte und Einstellungen.
 Windows/Linux Debug/Release bestehen jeweils90 Tests und beide Release-Pakete;
 native Berichte und Paketbytes sind SHA-geprüft. Mac-CI wartet. Keine neue
 menschliche Gesamt-Abnahme. [Linkerkarten](LINKER_BESTAND.md) ergänzen jetzt die
-Entwicklungsnachweise für den weiteren Runtime-/SDK-Abgleich; ihre neue native
-Windows-/Linux-Ausführung folgt getrennt.
+Entwicklungsnachweise für den weiteren Runtime-/SDK-Abgleich. Ihr eigener Lauf
+CI38199346371 besteht unter Windows/Linux in Debug/Release und beiden Paketen;
+Kartenidentitäten stimmen mit den tatsächlichen Paketprogrammen überein.
 
 0.9.73 korrigiert den normalen Windows-Start: Accessibility wird vor dem ersten
 sichtbaren Fenster eingerichtet. Der neue Paketprüfer nutzt zusätzlich die normale
