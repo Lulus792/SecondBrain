@@ -27,7 +27,15 @@ Schemaänderungen sind kein bereits vorhandener Migrationsmechanismus.
 
 ## Aktueller ausgeführter Stand
 
-Installiert: **0.9.73 / 15e63b4f7960**, sauberer Intel/macOS-Release auf
+Installiert: **0.9.74 / eabf5b3ff114**, Intel/macOS 14.6.1; 98 Dateien paketgleich.
+App-SHA256: `d0b039034dce04ca8a5cf712bdc7858810040008aeb1715acb2dfc710fc65ff7`.
+Die [Sternbeschriftungen](STERNBESCHRIFTUNGEN.md) sind im Acht-Test-Lauf gezielt
+geprüft. Saubere Versions-/Startprüfung, entpacktes Paket und 73→74→73-Wechsel
+bestehen; 22 Gedächtnisdateien beim installierten Snapshot und normalen Metal-
+Start unverändert. Neue CI38197916019 läuft unter Windows/Linux; Mac queued.
+Der folgende vollständige 89er-/native Plattformstand gehört zur Vorversion.
+
+Vorige installierte Fassung: **0.9.73 / 15e63b4f7960**, sauberer Intel/macOS-Release auf
 macOS 14.6.1 / 23G93. 98 Dateien paketgleich. App-SHA256:
 `72fb1cd672adc6b5bc8b8cc6601de1bb8d35e6e5aefeb01964cc4034a17d76b6`.
 Die korrigierte Startreihenfolge besteht lokal **89/89 Tests zu e66e023**

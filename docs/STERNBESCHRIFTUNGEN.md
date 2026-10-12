@@ -33,6 +33,36 @@ vor und nach dem abschließenden Lauf waren identisch. Originalnachweise:
 `build/label-review/`; Review SBUI-087 unter
 `/Users/lulus/Projects/UI_reviewer/reviews/secondbrain/2026-10-12_04-50-23/UI_REVIEW.md`.
 
-Die installierte App bleibt zunächst 0.9.73/15e63b4f7960. Ein neuer Paketstand,
-Windows-/Linux-Ausführung, weitere Graphdichten, Geräte und menschliche assistive
-Bedienung sind durch diesen Durchlauf nicht abgenommen. Keine 1.0-Freigabe.
+Beim ersten lokalen Durchlauf war noch 0.9.73/15e63b4f7960 installiert.
+
+## Paket und Installation: 0.9.74
+
+Der saubere Intel/macOS-Build **0.9.74 / eabf5b3ff114** ist installiert.
+Nach der Versionsanhebung bestehen beide Versionsprüfungen und der normale
+Rendererstart in 1,62 Sekunden. Die eigentliche Layoutkorrektur gehört zum
+oben beschriebenen Acht-Test-Lauf; kein neuer vollständiger 90er-Lauf wird behauptet.
+
+Das tatsächlich entpackte Paket besteht 126 Desktop-, 167 Tastatur- und 75
+Sicherungsbedingungen, Einstellungen in zwei Prozessen, CLI, Ressourcen,
+Lizenzen und Laufzeitprüfung. Normale Rendererwahl: Metal/Cocoa, sichtbares
+Fenster, vier Frames und 394 beobachtete Module; 13 Testdateien unverändert.
+170 Produktinputs und Programmidentitäten bleiben nach der Paketprüfung gleich.
+Der echte **73→74→73-Wechsel** erhält 20 Testdateien und Einstellungen;
+Sicherung und Wiederherstellung bestehen. Alle drei Updatebilder betrachtet.
+
+98 installierte Dateien sind paketgleich. Installierte App-SHA256:
+`d0b039034dce04ca8a5cf712bdc7858810040008aeb1715acb2dfc710fc65ff7`.
+Archiv-SHA256:
+`76b01067b3d3e28bdd64d3ec12c1d68bc3d9f490290c41d084da6d038fc6f4fb`.
+Die installierte Ansicht wurde betrachtet. Beim Software-Snapshot und beim
+zusätzlichen normalen Metal-Start bleiben alle 22 eigenen Gedächtnisdateien
+unverändert. App-Metadaten: minos 14.0, SDK 15.2; tatsächlich ausgeführt auf
+macOS 14.6.1, kein Nachweis auf macOS 14.0 oder ARM64.
+
+Originale: `build/label74-verification/`, `build/label74-package-check/`,
+`build/label74-update/`. Rückfallkopie:
+`/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.73-20261012-050232`.
+[CI38197916019](https://github.com/Lulus792/SecondBrain/actions/runs/38197916019)
+zum Paketquellstand läuft unter Windows/Linux; Mac-Jobs warten auf Runner.
+Weitere Graphdichten, Geräte, neue Plattformläufe und menschliche assistive
+Bedienung bleiben offen. Keine 1.0-Freigabe.

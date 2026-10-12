@@ -1,7 +1,8 @@
 # SecondBrain: aktueller Stand
 
-Stand: 12. Oktober 2026. Installiert ist **0.9.73 / 15e63b4f7960** auf
-Intel/macOS 14.6.1. Windows/Linux Debug/Release und beide Release-Pakete bestehen.
+Stand: 12. Oktober 2026. Installiert ist **0.9.74 / eabf5b3ff114** auf
+Intel/macOS 14.6.1. Neue Windows-/Linux-CI läuft, Mac-CI wartet; die vorige
+0.9.73 besteht dort in Debug/Release und beiden Release-Paketen.
 1.0 ist nicht freigegeben. Originale und Historie stehen am Ende dieser Notiz.
 
 ## Produkt und installierte Fassung
@@ -15,8 +16,8 @@ Ungespeicherte Entwürfe und erkannte externe Konflikte bleiben geschützt.
 Externe Bibliotheken nur für UI; eigener Code MIT.
 
 98 installierte Dateien paketgleich. Paket: Desktop 126/Tastatur 167/Sicherung 75,
-Einstellungen, CLI, Lizenzen, Laufzeit und Version. Echter 72→73→72-Wechsel erhält
-20 Dateien und Einstellungen; Sicherung/Wiederherstellung bestehen. 21 eigene
+Einstellungen, CLI, Lizenzen, Laufzeit und Version. Echter 73→74→73-Wechsel erhält
+20 Dateien und Einstellungen; Sicherung/Wiederherstellung bestehen. 22 eigene
 Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
 [Abnahme](../../docs/RELEASE_ABNAHME.md).
 
@@ -25,7 +26,9 @@ Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
 - [Sternbeschriftungen](../../docs/STERNBESCHRIFTUNGEN.md): symmetrischer Abstand
   außerhalb des Fokusrings und tatsächliche Schriftzeilenmitte. 108 neue
   Bedingungen, negative Regression, acht gezielte CTest-Gruppen und betrachtete
-  Raster bestehen lokal. Neuer Paket-/Installationsstand und Plattformlauf folgen.
+  Raster bestehen lokal. Saubere 0.9.74: Versionen/normaler Start in 1,62 s,
+  entpacktes Intel-Paket und Installation geprüft. 170 Produktinputs/Identitäten
+  während der Paketprüfung unverändert; neue CI38197916019 läuft.
 - [Startdiagnose](../../docs/LAUFZEIT_START.md): tatsächliche normale Rendererwahl,
   vier Frames, sichtbares Fenster und beobachtete Module. Dadurch echter Windows-
   Startfehler gefunden: Accessibility muss vor dem ersten sichtbaren Fenster
@@ -72,8 +75,8 @@ Endprodukttexte erst beim vollständigen Produkt abschließend bereinigen.
 
 ## Nächster Schritt
 
-Weitere tatsächliche UI-/Release-Abnahmen fortführen; die lokal geprüfte
-Abstandskorrektur der Sternbeschriftungen als Paket bereitstellen und nachprüfen.
+Neue native Plattformnachprüfung der Sternbeschriftungen und weitere tatsächliche
+Release-Abnahmen fortführen. Sicherheitskanal nach GitHub-Anmeldung aktivieren.
 Geräte/Konten und menschliche Bediennachweise werden durch weitere kleine
 Codeänderungen oder Statusnotizen nicht ersetzt.
 
