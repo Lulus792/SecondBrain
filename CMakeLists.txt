@@ -653,6 +653,8 @@ if(BUILD_TESTING)
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_volume_guards.py")
     add_test(NAME ui-license-inventory COMMAND "${Python3_EXECUTABLE}"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_ui_license_inventory.py")
+    add_test(NAME startup-inventory-contract COMMAND "${Python3_EXECUTABLE}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_startup_inventory.py")
     add_test(NAME rust-runtime-inventory COMMAND "${Python3_EXECUTABLE}"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_rust_runtime_inventory.py")
     add_test(NAME ci-test-entry COMMAND "${Python3_EXECUTABLE}"

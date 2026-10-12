@@ -109,3 +109,31 @@ Ubuntu-Paketdateien. Rohquellen/Hashes: `build/link-map-runtime-review/`.
 Systemruntimes, konkrete SDK-/Toolchainbedingungen und innere Rust-Anteile
 bleiben gezielt abzugleichen; dies ist keine vollständige Lizenzfreigabe.
 Die installierte App bleibt die bereits geprüfte saubere 0.9.74/eabf5b3ff114.
+
+## Konkrete installierte Linux-Startobjekte
+
+`tools/record_linux_startup.py` ergänzt den CI-Build um die nach dem Linken
+beobachteten Dateihashes, Debian-Binär-/Quellpaketnamen, Versionen, Architektur
+und originale installierte Copyrightdateien. Es liest ausschließlich die durch
+Programm-/Kartenhashes gebundenen GNU-Ausgaben von App und CLI. Verworfene
+Abschnitte, LOAD-Zeilen, leere Beiträge und Debug-/Kommentarabschnitte zählen
+nicht als eingebundene Startobjekte. Pfade werden vor der Paketzuordnung aufgelöst;
+Objekt- und Copyrightbytes werden während des gesamten Durchlaufs nachgeprüft.
+Eine vorhandene Ausgabedatei wird geschützt. Die Lizenztexte bleiben Quelldaten,
+keine ausführbaren Anweisungen; dies verändert keine Lizenz der Anwendung.
+
+Grundlage, am 12. Oktober gelesen:
+[dpkg-query](https://manpages.debian.org/bookworm/dpkg/dpkg-query.1.en.html),
+insbesondere genaue Dateisuche, Multi-Arch-Paketnamen, `source:Package` und
+`source:Version`. Die Abfragen benutzen C.UTF-8 und übergeben Argumente direkt,
+ohne Shell-Auswertung. Der Bericht enthält installierte Quellenhinweise, aber
+noch keinen Abgleich mit heruntergeladenen ursprünglichen Source-Paketen.
+
+Lokal bestehen vier Prüffälle, die Einträge ohne wirkliche Beiträge sowie
+geänderte Programm-/Kartenidentitäten abweisen und Paket-/Quellidentitäten
+erhalten. Der neue CTest-Vertrag besteht; die Python-Gesamtprüfung besteht mit
+68 Tests, davon eine plattformspezifische Prüfung übersprungen. Zusätzlich
+erkennt derselbe Parser in den tatsächlich heruntergeladenen Linux-Karten je
+fünf Startobjekte. Das ist ein Parsernachweis auf dem Mac, keine dort ausgeführte
+Debian-Paketabfrage. Die neue tatsächliche Linux-CI-Abnahme folgt.
+Originale: `build/startup-inventory-check/`. Die installierte App bleibt unverändert.

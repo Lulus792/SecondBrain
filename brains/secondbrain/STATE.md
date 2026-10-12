@@ -36,6 +36,11 @@ Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
   erfolgreich: jeweils90 Tests, beide Release-Pakete; Karten und tatsächliche
   Paketprogramme stimmen über Hashes überein. Konkrete SDK-/Startobjektquellen
   und innere Rust-Anteile sind der weitere Lizenzabgleich; Mac-CI queued.
+- Installierter [Linux-Startobjektbestand](../../docs/LINKER_BESTAND.md): neuer
+  Entwicklerprüfer für Paket-/Quellversionen und originale Copyrightdateien,
+  an die Programm-/Kartenhashes gebunden. Vier lokale Verträge, 68 Python-Tests
+  (eine übersprungen) und je fünf Beiträge in tatsächlichen Karten geprüft.
+  Native Paketabfrage noch ausstehend; kein neuer Programm-/Installationsstand.
 - [Startdiagnose](../../docs/LAUFZEIT_START.md): tatsächliche normale Rendererwahl,
   vier Frames, sichtbares Fenster und beobachtete Module. Dadurch echter Windows-
   Startfehler gefunden: Accessibility muss vor dem ersten sichtbaren Fenster
