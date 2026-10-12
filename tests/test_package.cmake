@@ -138,6 +138,19 @@ if(NOT SB_PROBE_RESULT EQUAL 0)
     message(FATAL_ERROR "Normal-renderer package probe failed: ${SB_PROBE_ERROR}")
 endif()
 
+if(SB_TEST_WAYLAND AND UNIX AND NOT APPLE)
+    find_program(SB_DBUS_RUN_SESSION dbus-run-session REQUIRED)
+    execute_process(COMMAND "${SB_DBUS_RUN_SESSION}" -- "${Python3_EXECUTABLE}"
+        "${CMAKE_CURRENT_LIST_DIR}/../tools/run_wayland_runtime.py"
+        --app "${SB_EXECUTABLE}" --cli "${SB_PROBE_CLI}" --output "${SB_TEST_ROOT}/wayland-runtime"
+        RESULT_VARIABLE SB_WAYLAND_RESULT OUTPUT_VARIABLE SB_WAYLAND_OUTPUT
+        ERROR_VARIABLE SB_WAYLAND_ERROR TIMEOUT 180)
+    message(STATUS "${SB_WAYLAND_OUTPUT}")
+    if(NOT SB_WAYLAND_RESULT EQUAL 0)
+        message(FATAL_ERROR "Wayland package probe failed: ${SB_WAYLAND_ERROR}")
+    endif()
+endif()
+
 execute_process(COMMAND "${SB_EXECUTABLE}" --keyboard-test "${SB_TEST_ROOT}/Tastaturprüfung ü"
     WORKING_DIRECTORY "${SB_UNPACK}" RESULT_VARIABLE SB_KEYBOARD_RESULT
     OUTPUT_VARIABLE SB_KEYBOARD_OUTPUT ERROR_VARIABLE SB_KEYBOARD_ERROR TIMEOUT 300)

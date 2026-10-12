@@ -28,6 +28,18 @@ class ProbeContractTests(unittest.TestCase):
         self.assertEqual(set(probe.report_errors(self.report, self.version.encode())),
                          {'window_visible', 'loaded_modules', 'rendered_frames'})
 
+    def test_requested_backend_must_be_the_reported_backend(self):
+        self.report['video_driver'] = 'wayland'
+        self.assertEqual(probe.report_errors(self.report, self.version.encode(), 'wayland'), [])
+        self.report['video_driver'] = 'x11'
+        self.assertEqual(probe.report_errors(self.report, self.version.encode(), 'wayland'),
+                         ['expected_video_driver'])
+
+    def test_backend_assertion_does_not_hide_other_missing_facts(self):
+        self.report.update(video_driver='wayland', window_visible=False, rendered_frames=0)
+        self.assertEqual(set(probe.report_errors(self.report, self.version.encode(), 'wayland')),
+                         {'window_visible', 'rendered_frames'})
+
 
 if __name__ == '__main__':
     unittest.main()

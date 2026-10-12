@@ -75,7 +75,13 @@ Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
   Release-CRT. Vergleich auf tatsächlich gelesene Release-/Debug-Gegenstücke
   im beobachteten SDK-Verzeichnis erweitert; keine Ersetzung durch Debug-Bytes.
   80 Python-Tests (eine übersprungen) und CTest-Inventurvertrag bestehen.
-  Neue native Nachprüfung erforderlich; Windows Release besteht den SDK-Vergleich.
+  CI38206935201 Windows/Linux Debug/Release und Pakete erfolgreich. Geprüfter
+  Debug-Nachweis bestätigt92 Tests und getrennte Debug-App-/Release-DLL-SDKs.
+  Release zu17e7a93 inzwischen vollständig bestätigt:92 Tests, Paket-DLL-
+  Hash und alle drei SDK-Bytevergleiche passen; keine SDK-Kopien in Downloads.
+- [Wayland-Startprüfung](../../docs/WAYLAND_START.md) für gebaute App und Paket
+  vorbereitet.82 Python-Tests (eine übersprungen), vier lokale Prozess-/Socket-
+  Fälle und vorhandener Metal/Cocoa-Start bestehen. Native Wayland-Ausführung offen.
 - [Startdiagnose](../../docs/LAUFZEIT_START.md): tatsächliche normale Rendererwahl,
   vier Frames, sichtbares Fenster und beobachtete Module. Dadurch echter Windows-
   Startfehler gefunden: Accessibility muss vor dem ersten sichtbaren Fenster

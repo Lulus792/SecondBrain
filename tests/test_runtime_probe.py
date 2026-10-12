@@ -12,7 +12,7 @@ def hashes(root):
             for p in root.rglob('*') if p.is_file()}
 
 
-def report_errors(data, version_output):
+def report_errors(data, version_output, expected_video_driver=None):
     # MSVC stdout is a text stream (CRLF); JSON uses the literal LF build text.
     version = version_output.decode('utf-8').replace('\r\n', '\n')
     required = {'format': 1, 'build': version, 'rendered_frames': 4,
@@ -21,30 +21,32 @@ def report_errors(data, version_output):
     if data.get('window_visible') is not True: errors.append('window_visible')
     for key in ('renderer', 'video_driver'):
         if not isinstance(data.get(key), str) or not data[key]: errors.append(key)
+    if expected_video_driver and data.get('video_driver') != expected_video_driver:
+        errors.append('expected_video_driver')
     modules = data.get('loaded_modules')
     if not isinstance(modules, list) or not modules or any(not isinstance(x, str) or not x for x in modules):
         errors.append('loaded_modules')
     return errors
 
 
-def verify(app, cli, output):
+def verify(app, cli, output, expected_video_driver=None, environment=None):
     output.mkdir(parents=True, exist_ok=True)
     root = Path(tempfile.mkdtemp(prefix='Normaler Start ü ', dir=output.resolve()))
     workspace = root / 'Wissen ü'
     subprocess.run([str(cli), 'new', str(workspace), 'probe', 'Laufzeitprüfung'],
-                   capture_output=True, check=True, timeout=30)
+                   capture_output=True, check=True, timeout=30, env=environment)
     note = workspace / 'probe/knowledge/Eigene Notiz.md'
     note.write_bytes('# Unverändert\r\n\r\nΩ, e\u0301 und 🧭.\r\n'.encode('utf-8'))
     before = hashes(workspace)
     report = root / 'Laufzeit ü.json'
     def invoke(*args):
-        return subprocess.run([str(app), *map(str, args)], capture_output=True, timeout=60)
+        return subprocess.run([str(app), *map(str, args)], capture_output=True, timeout=60, env=environment)
     result = invoke('--workspace', workspace, '--runtime-probe', report)
     if result.returncode != 0:
         raise RuntimeError('Normal-renderer probe failed: ' + result.stderr.decode('utf-8', errors='replace'))
     data = json.loads(report.read_bytes())
     version = invoke('--version')
-    errors = report_errors(data, version.stdout)
+    errors = report_errors(data, version.stdout, expected_video_driver)
     if errors:
         detail = ', '.join(errors)
         if 'build' in errors: detail += '; report=' + repr(data.get('build')) + '; stdout=' + repr(version.stdout)
@@ -75,5 +77,6 @@ if __name__ == '__main__':
     parser.add_argument('--app', required=True, type=Path)
     parser.add_argument('--cli', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--expected-video-driver')
     args = parser.parse_args()
-    verify(args.app.resolve(), args.cli.resolve(), args.output)
+    verify(args.app.resolve(), args.cli.resolve(), args.output, args.expected_video_driver)

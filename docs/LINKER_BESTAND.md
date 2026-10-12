@@ -423,3 +423,32 @@ und die Abweisung bei fehlendem Release-Gegenstück. 80 Python-Tests bestehen
 mit einer Überspringung; CTest-Inventurvertrag besteht in0,13s. Originale:
 `build/accesskit-map-native/repro-debug-failure.zip` und
 `repro-debug-fix-tests.log`. Die neue native Debug-Nachprüfung steht noch aus.
+
+### Bestätigter Release-Bytevergleich
+
+Windows Release zu17e7a93 im Lauf38206412970 ist vollständig erfolgreich,
+einschließlich92 Tests und entpacktem Paket. Nachweis11727976618 und Paket
+11727463741 sind gegen ihre GitHub-SHA256-Digests geprüft. Der native Repro-
+Bericht passt zur tatsächlichen Paket-DLL, SHA256
+`af6e133f2a7f4cb9bc4709b6da174cda7fa69cefe943a1619d8792d1d0aa9945`,
+und zur enthaltenen Kartenidentität. Die drei gesicherten Bibliotheken stimmen
+bytegenau mit den SDK-Dateien überein: libcmt29, libvcruntime21 und libucrt99
+benannte Objektmitglieder. Ihre Dateihashes sind die bereits oben dokumentierten
+Hashes aus MSVC14.51.36231 beziehungsweise Windows SDK10.0.26100.0.
+
+Die rohe CTest-Datei bestätigt92 Prüfblöcke und92 Pass-Marker. Weder das Paket
+noch das heruntergeladene Nachweisarchiv enthält .lib/.rlib/.obj/.o-Dateien;
+die SDK-Kopien bleiben im temporären Build. Originale:
+`build/accesskit-map-native/repro-release-review.json`, beide ZIPs und
+`repro-release-runtime-provenance.json`.
+
+Die anschließende Nachprüfung zu24497c5 im Lauf38206935201 besteht unter
+Windows/Linux in Debug/Release einschließlich beider Release-Pakete. Der
+heruntergeladene Debug-Nachweis11727718400 stimmt mit seinem GitHub-SHA256
+überein.92 rohe CTest-Prüfblöcke und92 Pass-Marker bestätigen den Lauf. Der
+Bericht hält App-/CLI-Debug-Dateien und die drei tatsächlichen Release-SDK-
+Bytevergleiche der DLL getrennt; DLL-/Kartenidentität passen zusammen. Die
+Release-SDK-Dateihashes stimmen mit den oben dokumentierten drei Werten überein.
+Original: `build/accesskit-map-native/repro-fixed-debug-review.json` und ZIP.
+Die physische Ursprungspfadgrenze und der separate Lizenzbedingungen-Abgleich
+bleiben bestehen; Mac-Jobs warten weiterhin auf Runner.
