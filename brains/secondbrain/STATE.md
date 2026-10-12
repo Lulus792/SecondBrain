@@ -60,6 +60,9 @@ Mindestversionsvorschlag: macOS 14, Windows 11 25H2, Ubuntu 24.04 LTS;
 noch keine endgültige Zusage. Apple-Developer-Konto/Windows-Zertifikat fehlen.
 Sicherheitskanal gewählt: GitHub Private Vulnerability Reporting; Aktivierung
 und Erreichbarkeit werden noch geprüft.
+Sicherheitsrichtlinie und Verweis aus den Fehlerformularen vorbereitet. Der
+verfügbare Browser ist nicht angemeldet; der Connector bietet die Aktivierung
+nicht an. GitHub-Anmeldung im Browser für den nächsten Schritt erforderlich.
 Endprodukttexte erst beim vollständigen Produkt abschließend bereinigen.
 **1.0 nur nach ausdrücklicher Nutzerfreigabe.**
 

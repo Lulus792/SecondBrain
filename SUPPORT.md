@@ -18,7 +18,9 @@ GitHub Issues sind öffentlich. Verwende zum Wiederholen möglichst ein kleines
 Testprojekt mit erfundenen Inhalten. Teile keine Zugangsdaten, privaten Notizen
 oder vollständigen Sicherungen; entferne persönliche Angaben aus Bildern und Logs.
 Eine vermutete Sicherheitslücke gehört nicht in einen öffentlichen Fehlerbericht.
-Der vertrauliche Meldeweg wird vor der stabilen Veröffentlichung festgelegt.
+Für vertrauliche Meldungen ist GitHub Private Vulnerability Reporting gewählt;
+die Aktivierung wird noch geprüft. Der tatsächliche Stand und die benötigten
+Angaben stehen in [SECURITY.md](SECURITY.md).
 
 Bei ungespeicherten Änderungen erhält die App den Entwurf. Eine Fehlermeldung
 kannst du über **Meldung kopieren** übernehmen, wenn diese Aktion angeboten wird.
