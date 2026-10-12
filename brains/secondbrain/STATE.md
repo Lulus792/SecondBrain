@@ -45,7 +45,9 @@ Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
   Windows/Linux jeweils91 Tests und beide Release-Pakete erfolgreich.
 - Windows-Runtime-Dateien: geladene CRT-/uuid-Dateien über MSVC-Log und
   Kartenmitglieder erfassen. Vier neue Verträge, zwei CTest-Gruppen und72 Python-
-  Tests (eine übersprungen) lokal geprüft; neue native Ausführung noch offen.
+  Tests (eine übersprungen) lokal geprüft. Erste native Ausführung verweigert
+  korrekt einen Nachweis aus bloßen Suchzeilen; vollständige Linker-/normale
+  MSBuild-Ausgabe für die neue Nachprüfung vorbereitet. Kein Produktfehler belegt.
 - [Startdiagnose](../../docs/LAUFZEIT_START.md): tatsächliche normale Rendererwahl,
   vier Frames, sichtbares Fenster und beobachtete Module. Dadurch echter Windows-
   Startfehler gefunden: Accessibility muss vor dem ersten sichtbaren Fenster

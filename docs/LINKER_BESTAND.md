@@ -166,7 +166,7 @@ beweist keine unveränderliche Historie jeder SDK-Datei seit deren Installation.
 
 ## Geladene Windows-Runtime-Dateien
 
-Der optionale Karten-Buildweg aktiviert unter MSVC zusätzlich `/VERBOSE:LIB`.
+Der optionale Karten-Buildweg aktiviert unter MSVC zusätzlich `/VERBOSE`.
 Der vorhandene Build-Wrapper bewahrt vollständige Ausgaben in
 `checked-build.log`. Grundlage, am 12. Oktober gelesen:
 [Microsoft /VERBOSE](https://learn.microsoft.com/en-us/cpp/build/reference/verbose-print-progress-messages?view=msvc-170),
@@ -189,3 +189,17 @@ genannten Mitgliederzahlen. Zwei CTest-Gruppen und die Python-Gesamtprüfung mit
 72 Tests (eine plattformspezifisch übersprungen) bestehen. Neue native Windows-
 Ausführung des erweiterten Build-/Logwegs folgt. Originale:
 `build/windows-runtime-inventory-check/`. Kein neuer Installationsstand.
+
+Die erste native Ausführung zu439cecb scheitert in beiden Windows-Konfigurationen
+im neuen Inventurprüfer, noch vor der UI-Gesamtprüfung. Das gesicherte Debug-
+Artefakt11725203477 stimmt mit seinem GitHub-SHA256-Digest überein und enthält
+nur Bibliothekssuchzeilen, keine Loaded-/Found-/Referenced-Zeilen. Der Prüfer
+verweigert deshalb einen Ladungsnachweis; vorhandene Karten/Paketabnahmen der
+Vorversion werden dadurch nicht rückwirkend ungültig. Quelle:
+`build/windows-runtime-native/checked-build-debug.log`.
+
+Für die Nachprüfung wird der Linker auf vollständiges `/VERBOSE` umgestellt;
+bei Visual-Studio-Generatoren erhält MSBuild normale Ausführlichkeit, damit
+gewöhnliche Werkzeugausgaben im Log bleiben. Der Prüfer akzeptiert weiterhin
+keine Suchzeilen als Ladungsnachweis. Die lokale Python-Gesamtprüfung bleibt
+mit72 Tests (eine übersprungen) erfolgreich. Neue native Nachprüfung folgt.

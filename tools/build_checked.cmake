@@ -2,7 +2,18 @@ cmake_minimum_required(VERSION 3.20)
 if(NOT SB_BUILD_DIR)
     message(FATAL_ERROR "SB_BUILD_DIR is required")
 endif()
+set(SB_NATIVE_BUILD_ARGUMENTS)
+if(WIN32 AND EXISTS "${SB_BUILD_DIR}/CMakeCache.txt")
+    file(STRINGS "${SB_BUILD_DIR}/CMakeCache.txt" SB_NATIVE_GENERATOR
+        REGEX "^CMAKE_GENERATOR:INTERNAL=Visual Studio")
+    if(SB_NATIVE_GENERATOR)
+        # Keep native linker progress in the completed build log. This level
+        # prints ordinary tool output without diagnostic environment dumps.
+        set(SB_NATIVE_BUILD_ARGUMENTS -- /verbosity:normal)
+    endif()
+endif()
 execute_process(COMMAND "${CMAKE_COMMAND}" --build "${SB_BUILD_DIR}" --config "${SB_BUILD_CONFIG}" --parallel 4
+    ${SB_NATIVE_BUILD_ARGUMENTS}
     RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE errors)
 file(WRITE "${SB_BUILD_DIR}/checked-build.log" "${output}${errors}")
 message("${output}${errors}")
