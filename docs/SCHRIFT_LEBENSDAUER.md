@@ -69,3 +69,29 @@ Die neue Linux-Debug-Nachprüfung und Windows-/Linux-/Mac-Pakete stehen noch aus
 Die Korrektur allein schließt den früheren Linux-CI-Absturz nicht als verifiziert
 behoben. Allgemeine Geräte-, Langzeit-, Screenreader- und Releaseabnahmen bleiben
 offen; 1.0 wird nicht automatisch gesetzt. Installiert bleibt vorerst 0.9.69.
+
+## Gesamtlauf und Windows-Checkout
+
+Der saubere Intel/macOS-Release zu **b6d3a799434d** besteht mit allen **86 Tests**
+in 723,70 s. Binärhash vor/nach dem Lauf identisch:
+`7381f3894e2e246e71908259b77a0c27011525b2404a0748f054b38982c4efaf`.
+209 Produktquellen und Ressourcen sind zusätzlich gehasht. Originale unter
+`build/contrast-lifetime-verification/`: `full-ctest.log`, `full-binary-*.sha256`
+und `full-product-inputs.json`. Schutzkarte bei großer Schrift und
+Materialtestfläche angesehen; dies ist keine menschliche Bedienabnahme.
+
+[CI38186316198](https://github.com/Lulus792/SecondBrain/actions/runs/38186316198)
+bestätigt Linux Debug/Release einschließlich Release-Paket. Windows Debug/Release
+bestehen je 85 von 86 Tests, darunter beide neuen Lebensdauerprüfungen und die
+Textvorbereitung. Nur der Quellprüfer scheitert: Git wandelt die neue `.inc`-Datei
+in CRLF um, CMake bereitet LF vor; der bytegenaue Python-Vergleich lehnt sie ab.
+Die Prüfung bleibt strikt. `.gitattributes` schreibt nun für diese hashgebundene
+Datei LF vor, wie schon für den früheren Bitmap-Patch.
+
+Ein tatsächlicher Git-Checkout mit `core.autocrlf=true` reproduziert lokal die
+abweichenden Bytes vor der Regel und liefert danach die identischen LF-Bytes.
+Sechs Quellvorbereitungsfälle bestehen weiterhin, alle 209 Produktinputs bleiben
+identisch. Das ist ein Git-Nachweis auf dem Mac; die neue Windows-CI muss den
+kompletten Abschluss bestätigen. Originale: `checkout-before.json`,
+`checkout-after.json`; native Jobs 114609289714/114609289722 (Windows),
+114609289737/114609289757 (Linux). Mac-Jobs warten weiterhin auf Runner.

@@ -1,7 +1,7 @@
 # SecondBrain: aktueller Stand
 
-Stand: 12. Oktober 2026. Installiert ist 0.9.69. Der letzte vollständige lokale
-Release-Lauf und die bestätigte Windows-/Linux-CI gehören zur vorherigen 0.9.68.
+Stand: 12. Oktober 2026. Installiert ist 0.9.69. Der neue vollständige lokale
+Release-Lauf gehört zu 0.9.71; Windows-Abschluss nach Checkoutkorrektur noch offen.
 1.0 ist noch nicht freigegeben. Die maßgeblichen Quellen und die Historie
 stehen am Ende dieser Notiz.
 
@@ -34,10 +34,12 @@ Einstellungen; Sicherung/Wiederherstellung bestehen. [Nachweis](../../docs/SYSTE
   Kamerafahrt und neue passende Ladeaufnahme erhalten. ASan/UBSan im dokumentierten
   Umfang; externe UI nicht instrumentiert, Leaks aus, kein TSan.
 
-Für 0.9.68 bestehen 84/84 lokale Release-Tests (707,14 s); die damalige
-Build- und installierte Binärdatei waren bytegleich. Alle vier Windows-/Linux-Desktopjobs zu
-0b0fdac/CI38181757771 einschließlich beider Release-Pakete bestehen. Mac-CI queued;
-lokale Intel-Abnahme separat. Server 2025/Xvfb sind keine menschlichen
+Für 0.9.71/b6d3a799434d bestehen 86/86 lokale Release-Tests (723,70 s);
+Binärhash vor/nach dem Lauf gleich. Linux Debug/Release samt Release-Paket bestehen
+in CI38186316198. Windows: 85/86 je Konfiguration, nur Patchdatei-Byteprüfung
+scheitert; neue Lebensdauerprüfungen bestehen. Git-LF-Regel korrigiert und lokal
+mit echtem autocrlf-Checkout geprüft; 209 Produktinputs unverändert. Mac-CI queued.
+Server 2025/Xvfb sind keine menschlichen
 Windows-11-/Wayland-/Screenreaderabnahmen.
 
 ## Vor 1.0 noch offen
@@ -57,14 +59,14 @@ Endprodukttexte erst abschließend beim vollständigen Produkt bereinigen.
 
 0.9.69-CI38184984352: Windows Debug/Release und Linux Release samt Release-Paketen
 bestehen. Linux Debug scheitert bei der Textvorbereitung; Palette besteht, Mac queued.
-0.9.70 gibt Windows-Schemanamen frei; neue native Allokatorprüfung noch offen.
+0.9.70 gibt Windows-Schemanamen frei; native Allokatorprüfung besteht Debug/Release.
 0.9.71 korrigiert einen lokal reproduzierten FreeType-Listenfehler beim parallelen
 Schließen privater Fonts. Alter Test hängt, alte ASan-Vergleichsfassung zeigt
 Use-after-free; korrigierter 1024er-Test und acht lokale Tests bestehen.
 [Schriftlebensdauer](../../docs/SCHRIFT_LEBENSDAUER.md),
 [Kontrastfarben](../../docs/SYSTEM_KONTRASTFARBEN.md). Installiert bleibt 0.9.69.
-Nächster Schritt: vollständiger aktueller lokaler Lauf, native CI und neue Pakete;
-der frühere Linux-Absturz ist damit noch nicht als nativ behoben abgenommen.
+Nächster Schritt: sauberes neues Mac-Paket/Update/Installation, neue Windows-CI
+nach LF-Regel prüfen. Der zuvor fehlschlagende Linux-Debug-Prüfweg besteht jetzt.
 Weitere technische Abnahmen und benötigte reale Umgebungen anhand der
 Abnahmeübersicht klären.
 

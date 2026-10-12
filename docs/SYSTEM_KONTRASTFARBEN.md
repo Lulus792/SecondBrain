@@ -103,7 +103,10 @@ Eine konkrete Produktions-Leakrate wurde nicht gemessen.
 Die neue Windows-Prüfung kompiliert den tatsächlichen Adapter und beantwortet
 die drei Systemabfragen kontrolliert. 1024 Schemanamen werden mit echten Win32-
 Allokatoren angelegt und auf ihre Freigabe geprüft; Systemeinstellungen werden
-nicht geändert. Dieser Test ist Windows-only, seine native Ausführung steht noch aus.
+nicht geändert. Dieser Windows-only-Test besteht inzwischen nativ in Debug
+und Release zu b6d3a799434d (CI38186316198). Die vollständigen Windows-Jobs
+scheitern dort ausschließlich an der getrennten Patchdatei-Byteprüfung;
+[Befund und Dateiregelkorrektur](SCHRIFT_LEBENSDAUER.md#gesamtlauf-und-windows-checkout).
 Lokal auf Intel/macOS bestehen vier Paletten-/Darstellungs-/Versionsprüfungen
 (18,71 s) und zwei Textvorbereitungsprüfungen (8,17 s). Das belegt weder die neue
 Windows-Allokatorprüfung noch die Behebung des Linux-Debug-Absturzes.
