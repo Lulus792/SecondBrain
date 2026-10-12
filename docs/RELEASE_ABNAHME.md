@@ -70,10 +70,11 @@ automatische Änderung anderer Second Brains. Dieser historische Pflegeabschnitt
 | Frische Nutzerrechner | Entpacktes aktuelles Paket starten und gesamten Projekt-/Notiz-/Sicherungs-/Updateablauf bedienen; CI-Konfiguration genügt nicht |
 | Menschliche Bedienung/Barrierefreiheit | VoiceOver, NVDA, Orca, native IME und Dialoge; Kontraste/Custom-Paletten, große Schrift, reale Systemvorgaben und RTL/Textauswahl |
 | Alltag und Leistung | Reale größere Wissensbasen, schwächere Geräte, Trackpads, lange Sitzungen, verschiedene GPU-Treiber, Monitore und tatsächliche Pixeldichtewechsel |
-| Dateien und Persistenz | Weitere Dateisysteme und physische Persistenz; [native volle Backup-Volumes](VOLLER_SPEICHER.md) sind bestätigt; Notiz-/Einstellungs-Speichern bei vollem Volume und physische Persistenz bleiben offen |
+| Dateien und Persistenz | Weitere Dateisysteme und physische Persistenz; [native volle Backup-Volumes](VOLLER_SPEICHER.md) sind bestätigt; fünf [Schreib-/Modellfälle](VOLLER_SPEICHER.md) sind auf HFS+/NTFS/ext4 bestätigt; weitere Dateisysteme und physische Persistenz bleiben offen |
 | Vollständige mitgelieferte Laufzeit-/Lizenzzuordnung | Tatsächliche Binär-/Toolchainanteile und dynamische/transitive Komponenten final abgleichen; [Inventur](LIZENZ_INVENTUR.md), [Rust](RUST_RUNTIME_NACHWEIS.md), [Laufzeit](PAKET_LAUFZEIT.md) |
 | Vertraulicher Sicherheitskanal | Nutzerentscheidung und tatsächliche Erreichbarkeit; öffentliche Issues sind kein vertraulicher Kanal |
 | Signierung und Distribution | Apple-Developer-Konto/Windows-Zertifikat fehlen; tatsächliche Signierung/Notarisierung und dauerhafte aktuelle Pakete vor Freigabe prüfen |
+| Fehler beim Einstellungs-Speichern sichtbar machen | Beim Beenden schreibt `app/main.c:120–124` den Fehler nur nach stderr und schließt trotzdem; eigene UI-Rückmeldung mit Wiederholung/Rückkehr und Tastaturbedienung implementieren und prüfen |
 | Fertige Texte und 1.0 | Redaktionelle Schlussprüfung erst beim vollständigen Produkt, danach ausdrückliche Nutzerfreigabe; keine automatische 1.0-Setzung |
 
 ## Nächster Schritt

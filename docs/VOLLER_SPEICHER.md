@@ -168,3 +168,31 @@ die Karte und verändert den Modellpuffer nicht; die Revision wird in
 `sb_app_save` erst nach erfolgreicher Dateispeicherung übernommen. Das ist kein
 interaktiver Desktop-/Screenreader-Nachweis. Original:
 `build/volume-write-verification/model-targeted.log`.
+
+
+## Abschluss der nativen Schreib-/Modellprüfung
+
+[CI38189642966](https://github.com/Lulus792/SecondBrain/actions/runs/38189642966)
+zu 6e46e29f0fd5 bestätigt alle vier Windows-/Linux-Kernjobs mit jeweils 35 Tests.
+Windows Release 114619426860, Debug 114619426881; Linux Release 114619426807,
+Debug 114619426858. Neue und bestehende Notizen/Einstellungen sowie die
+Speicherentscheidung im echten Anwendungsmodell sind enthalten. Mac-CI queued;
+HFS+ lokal getrennt geprüft.
+
+Die beiden heruntergeladenen Release-Berichte wurden gegen ihre GitHub-Digests
+geprüft. Sie enthalten alle fünf Schreibfälle, erhaltene Original-/Entwurfsdaten,
+erfolgreiche Wiederholungen und `detached=true`. Der Modellworker prüft bei SB_IO
+die erhaltene Schutzentscheidung und verhindert ein Beenden. Eine interaktive
+UI-Sitzung wird damit nicht als bereits bedient ausgegeben.
+
+| Bericht | Artefakt | ZIP-SHA256 |
+| --- | --- | --- |
+| NTFS / Windows | 11720569925 | ccab892906164d43b3e76e3873765720b91df5bc7c076c8d0e368e8d8ddeb763 |
+| ext4 / Linux | 11720661818 | a207db8e117b3c903b1b2babe75ad4bbf0c0a7ba0cf90d38ccca0690f9a2f965 |
+
+Originale: `build/volume-write-verification/native-model-summary.json`,
+`windows-6e46e29.zip/json`, `linux-6e46e29.zip/json`. Der frühere Stand „native
+Nachweise stehen aus“ ist damit für diese Fälle überholt. Weitere Dateisysteme,
+physische Persistenz und reale assistive Bedienung bleiben offen. Die UI-
+Rückmeldung bei fehlgeschlagenem Einstellungs-Speichern beim Beenden benötigt
+noch Korrektur: [aktueller Abnahmestand](RELEASE_ABNAHME.md).

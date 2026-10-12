@@ -4510,3 +4510,14 @@ bestehende Ziele, gelingen nach Freigabe des Platzes und trennen das eigene Imag
 Windows-Skriptaufbau nach beobachtetem UTF-16-Fehler auf ASCII ohne BOM korrigiert;
 Datenpfade weiterhin Unicode. Weitere Notiz-/Einstellungs-/Persistenzabnahmen
 bleiben offen. App unverändert installiert 0.9.71; [Nachweis](VOLLER_SPEICHER.md).
+
+
+## Schreiben bei vollem Volume und erhaltene Schutzentscheidung
+
+12. Oktober: HFS+ lokal sowie NTFS/ext4 in Windows/Linux Debug/Release bestätigt.
+Fünf Fälle schützen neue/bestehende Notizen/Einstellungen und den echten Modell-
+Entwurf beim Speichern aus dem Beendenschutz. Beide nativen Release-Berichte
+per SHA256 verifiziert; eigene Volumes getrennt. Produktcode unverändert,
+installiert 0.9.71. Noch offene konkrete UI-Lücke: Einstellungs-Speicherfehler
+werden beim Beenden nur auf stderr ausgegeben; sichtbare Rückmeldung fehlt.
+[Schreibnachweise](VOLLER_SPEICHER.md), [offene Abnahme](RELEASE_ABNAHME.md).

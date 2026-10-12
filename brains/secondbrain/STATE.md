@@ -46,7 +46,7 @@ Windows-11-/Wayland-/Screenreaderabnahmen.
 
 Mindest-OS/frische Nutzerrechner und aktuelles ARM64; menschliche VoiceOver/NVDA/
 Orca-/IME-/Dialogbedienung; echte Monitore/Dichtewechsel, Trackpads, schwächere
-Geräte und Langzeit; Notiz-/Einstellungs-Speichern bei vollem Volume und physische Persistenz;
+Geräte und Langzeit; sichtbare Einstellungsfehler beim Beenden und physische Persistenz;
 vollständiger Runtime-/Lizenzabgleich, vertraulicher Sicherheitskanal, Signierung
 und dauerhafte aktuelle Pakete. [Abnahmekriterien](../../docs/RELEASE_ABNAHME.md).
 
@@ -61,11 +61,14 @@ CI38187181878 nach LF-Dateiregel: alle vier Windows-/Linux-Desktopjobs samt
 Release-Paketen bestehen; Mac queued. Neuer gemeinsamer Volume-Prüfweg lokal mit
 Backup-Volumeprüfung auf HFS+/ext4/NTFS bestätigt. Neu: vier echte HFS+-Fälle
 für bestehende/neue Notizen und Einstellungen samt Bestandsschutz und Wiederholung
-bestehen; native Windows-/Linux-Nachprüfung dafür folgt. Die native Windows-Allokatorprüfung
+bestehen; neue native Windows-/Linux-Schreib- und Modellprüfung ebenfalls
+Debug/Release erfolgreich, beide Release-Berichte per SHA256 verifiziert. Die native Windows-Allokatorprüfung
 besteht bereits im vorherigen Lauf. Neues Mac-Paket, tatsächlicher Updatewechsel
 und Installation sind abgeschlossen. [Schriftlebensdauer](../../docs/SCHRIFT_LEBENSDAUER.md),
 [Kontrastfarben](../../docs/SYSTEM_KONTRASTFARBEN.md).
 [Volume-Vertrag](../../docs/VOLLER_SPEICHER.md).
+Nächste konkrete UI-Korrektur: Einstellungs-Speicherfehler beim Beenden sichtbar
+behandeln; bisher nur stderr und trotzdem Schließen (`app/main.c:120–124`).
 Weitere technische Abnahmen und nötige reale Umgebungen anhand der
 Abnahmeübersicht klären; alle offenen Release-Anforderungen bleiben Arbeitsumfang.
 
