@@ -278,5 +278,8 @@ dass derselbe Cargo--lib-Vertrag die beiden Ausgaben, die zusätzliche Linkerkar
 und die DLL-/Kartenhashbindung erzeugt, einschließlich Pfad mit Leerzeichen/Umlaut.
 Das ist eine Cargo-Orchestrierungsprüfung auf Intel/macOS, keine Windows-
 AccessKit-Ausführung. Originale: `build/accesskit-map-check/`.
+Auch die tatsächliche lokale CMake-ExternalProject-Kette mit Cargo und
+anschließendem Identitätsprüfer besteht, einschließlich Leerzeichen/Umlaut
+in allen beteiligten Pfaden. Quelle: `build/accesskit-map-check/Orchestrierung ü/`.
 Die neue native Windows-DLL-Prüfung folgt; die inneren Beiträge werden erst
 nach ihrer tatsächlichen Karte und dem Paketvergleich als zugeordnet behandelt.
