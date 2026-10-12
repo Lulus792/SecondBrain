@@ -32,7 +32,9 @@ App-SHA256: `d0b039034dce04ca8a5cf712bdc7858810040008aeb1715acb2dfc710fc65ff7`.
 Die [Sternbeschriftungen](STERNBESCHRIFTUNGEN.md) sind im Acht-Test-Lauf gezielt
 geprüft. Saubere Versions-/Startprüfung, entpacktes Paket und 73→74→73-Wechsel
 bestehen; 22 Gedächtnisdateien beim installierten Snapshot und normalen Metal-
-Start unverändert. Neue CI38197916019 läuft unter Windows/Linux; Mac queued.
+Start unverändert. CI38197916019 besteht unter Windows/Linux in Debug/Release
+mit jeweils90 Tests und beiden Release-Paketen; Mac queued. Heruntergeladene
+Pakete/Nachweise SHA-geprüft, App-Hashes stimmen mit den nativen Berichten überein.
 Der folgende vollständige 89er-/native Plattformstand gehört zur Vorversion.
 
 Vorige installierte Fassung: **0.9.73 / 15e63b4f7960**, sauberer Intel/macOS-Release auf
@@ -85,7 +87,7 @@ automatische Änderung anderer Second Brains. Dieser historische Pflegeabschnitt
 | Menschliche Bedienung/Barrierefreiheit | VoiceOver, NVDA, Orca, native IME und Dialoge; Kontraste/Custom-Paletten, große Schrift, reale Systemvorgaben und RTL/Textauswahl |
 | Alltag und Leistung | Reale größere Wissensbasen, schwächere Geräte, Trackpads, lange Sitzungen, verschiedene GPU-Treiber, Monitore und tatsächliche Pixeldichtewechsel |
 | Dateien und Persistenz | Weitere Dateisysteme und physische Persistenz; [native volle Backup-Volumes](VOLLER_SPEICHER.md) sind bestätigt; fünf [Schreib-/Modellfälle](VOLLER_SPEICHER.md) sind auf HFS+/NTFS/ext4 bestätigt; weitere Dateisysteme und physische Persistenz bleiben offen |
-| Vollständige mitgelieferte Laufzeit-/Lizenzzuordnung | Tatsächliche Binär-/Toolchainanteile und dynamische/transitive Komponenten final abgleichen; [Inventur](LIZENZ_INVENTUR.md), [Rust](RUST_RUNTIME_NACHWEIS.md), [Laufzeit](PAKET_LAUFZEIT.md) |
+| Vollständige mitgelieferte Laufzeit-/Lizenzzuordnung | Tatsächliche Binär-/Toolchainanteile und dynamische/transitive Komponenten final abgleichen; [Inventur](LIZENZ_INVENTUR.md), [Rust](RUST_RUNTIME_NACHWEIS.md), [Laufzeit](PAKET_LAUFZEIT.md), [Linkerbestand](LINKER_BESTAND.md) |
 | Vertraulicher Sicherheitskanal | Nutzerentscheidung und tatsächliche Erreichbarkeit; öffentliche Issues sind kein vertraulicher Kanal |
 | Signierung und Distribution | Apple-Developer-Konto/Windows-Zertifikat fehlen; tatsächliche Signierung/Notarisierung und dauerhafte aktuelle Pakete vor Freigabe prüfen |
 | Fertige Texte und 1.0 | Redaktionelle Schlussprüfung erst beim vollständigen Produkt, danach ausdrückliche Nutzerfreigabe; keine automatische 1.0-Setzung |

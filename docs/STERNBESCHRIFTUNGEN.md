@@ -63,6 +63,11 @@ Originale: `build/label74-verification/`, `build/label74-package-check/`,
 `build/label74-update/`. Rückfallkopie:
 `/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.73-20261012-050232`.
 [CI38197916019](https://github.com/Lulus792/SecondBrain/actions/runs/38197916019)
-zum Paketquellstand läuft unter Windows/Linux; Mac-Jobs warten auf Runner.
+zum Paketquellstand besteht unter Windows/Linux in Debug und Release mit jeweils
+90 Tests und beiden Release-Paketen. Die Paket- und Nachweis-ZIPs stimmen mit
+ihren GitHub-SHA256-Digests überein. App-Hashes stimmen mit den nativen Berichten
+überein: Direct3D11/Windows, 52 Module; OpenGL/X11, 65 Module. Jeweils sichtbares
+Fenster, vier Frames und 13 erhaltene Testdateien. Originale unter
+`build/label74-native-evidence/`. Mac-Jobs warten auf Runner.
 Weitere Graphdichten, Geräte, neue Plattformläufe und menschliche assistive
 Bedienung bleiben offen. Keine 1.0-Freigabe.

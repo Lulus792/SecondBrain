@@ -80,6 +80,8 @@ jobs:
             build/ui/checked-ctest.log
             build/ui/test-entry.log
             build/ui/ui-rust-compiler.json
+            build/ui/link-maps/**/*.map
+            build/ui/link-maps/**/*.map.identity
             build/ui/package-check/runtime-dependencies.json
             build/ui/package-check/native-runtime/**/verification.json
             build/ui/package-check/native-runtime/**/Laufzeit*.json

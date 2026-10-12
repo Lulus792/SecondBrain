@@ -1,8 +1,8 @@
 # SecondBrain: aktueller Stand
 
 Stand: 12. Oktober 2026. Installiert ist **0.9.74 / eabf5b3ff114** auf
-Intel/macOS 14.6.1. Neue Windows-/Linux-CI läuft, Mac-CI wartet; die vorige
-0.9.73 besteht dort in Debug/Release und beiden Release-Paketen.
+Intel/macOS 14.6.1. 0.9.74 besteht unter Windows/Linux in Debug/Release mit
+jeweils 90 Tests und beiden Release-Paketen; Mac-CI wartet auf Runner.
 1.0 ist nicht freigegeben. Originale und Historie stehen am Ende dieser Notiz.
 
 ## Produkt und installierte Fassung
@@ -28,7 +28,12 @@ Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
   Bedingungen, negative Regression, acht gezielte CTest-Gruppen und betrachtete
   Raster bestehen lokal. Saubere 0.9.74: Versionen/normaler Start in 1,62 s,
   entpacktes Intel-Paket und Installation geprüft. 170 Produktinputs/Identitäten
-  während der Paketprüfung unverändert; neue CI38197916019 läuft.
+  während der Paketprüfung unverändert. CI38197916019 Windows/Linux vollständig
+  erfolgreich; SHA-geprüfte native Paketberichte/Archive stimmen überein.
+- [Linkerbestand](../../docs/LINKER_BESTAND.md): bytegleiche Diagnosekarte zur
+  installierten Mac-App; optionaler Buildweg erzeugt App-/CLI-Karten mit Hash-
+  Identitäten außerhalb der Pakete. Lokal tatsächlich geprüft, neue native
+  Windows-/Linux-Ausführung des Buildwegs folgt. Lizenzabgleich weiterhin offen.
 - [Startdiagnose](../../docs/LAUFZEIT_START.md): tatsächliche normale Rendererwahl,
   vier Frames, sichtbares Fenster und beobachtete Module. Dadurch echter Windows-
   Startfehler gefunden: Accessibility muss vor dem ersten sichtbaren Fenster
@@ -75,8 +80,8 @@ Endprodukttexte erst beim vollständigen Produkt abschließend bereinigen.
 
 ## Nächster Schritt
 
-Neue native Plattformnachprüfung der Sternbeschriftungen und weitere tatsächliche
-Release-Abnahmen fortführen. Sicherheitskanal nach GitHub-Anmeldung aktivieren.
+Native Nachprüfung der neuen Linkerkarten und weiterer Runtime-/SDK-Anteile
+fortführen. Sicherheitskanal nach GitHub-Anmeldung aktivieren.
 Geräte/Konten und menschliche Bediennachweise werden durch weitere kleine
 Codeänderungen oder Statusnotizen nicht ersetzt.
 

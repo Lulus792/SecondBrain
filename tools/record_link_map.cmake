@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.20)
+if(NOT SB_PROGRAM OR NOT SB_MAP OR NOT EXISTS "${SB_PROGRAM}" OR NOT EXISTS "${SB_MAP}")
+    message(FATAL_ERROR "Program and its completed link map are required")
+endif()
+file(SIZE "${SB_MAP}" SB_MAP_SIZE)
+if(SB_MAP_SIZE EQUAL 0)
+    message(FATAL_ERROR "Link map is empty")
+endif()
+file(SHA256 "${SB_PROGRAM}" SB_PROGRAM_HASH)
+file(SHA256 "${SB_MAP}" SB_MAP_HASH)
+file(WRITE "${SB_MAP}.identity"
+    "SecondBrain link map 1\nprogram_sha256=${SB_PROGRAM_HASH}\nmap_sha256=${SB_MAP_HASH}\n")

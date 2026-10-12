@@ -9,8 +9,12 @@ Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 0.9.74 verfeinert [Sternbeschriftungen](STERNBESCHRIFTUNGEN.md): Abstand außerhalb
 des Fokusrings, symmetrischer Seitenwechsel und Schriftzeilenmitte. Acht gezielte
 Layout-/Navigationsprüfungen, saubere Versions-/Startprüfung und das entpackte
-Intel/macOS-Paket bestehen; 73→74→73 erhält Projekte und Einstellungen. Neue
-Windows-/Linux-CI läuft, Mac-CI wartet. Keine neue menschliche Gesamt-Abnahme.
+Intel/macOS-Paket bestehen; 73→74→73 erhält Projekte und Einstellungen.
+Windows/Linux Debug/Release bestehen jeweils90 Tests und beide Release-Pakete;
+native Berichte und Paketbytes sind SHA-geprüft. Mac-CI wartet. Keine neue
+menschliche Gesamt-Abnahme. [Linkerkarten](LINKER_BESTAND.md) ergänzen jetzt die
+Entwicklungsnachweise für den weiteren Runtime-/SDK-Abgleich; ihre neue native
+Windows-/Linux-Ausführung folgt getrennt.
 
 0.9.73 korrigiert den normalen Windows-Start: Accessibility wird vor dem ersten
 sichtbaren Fenster eingerichtet. Der neue Paketprüfer nutzt zusätzlich die normale
