@@ -28,6 +28,17 @@ Schemaänderungen sind kein bereits vorhandener Migrationsmechanismus.
 
 ## Aktueller ausgeführter Stand
 
+Vollständig geprüfter **Entwicklungsbuild 0.9.74 / 95341ae310a0** auf
+Intel/macOS14.6.1 / 23G93: **92/92 Tests**,717,26s. Alle501 erfassten Repository-
+Dateien bleiben über Konfiguration, Build und Testlauf unverändert; beide
+Programmhashes bleiben während der Tests gleich. Darunter sind Sternbeschriftungen,
+Navigation, Tastatur, Editor, native Provider-/Geometrie-, Lizenz- und Neustart-
+prüfungen. Die echte HFS+-Volumenprüfung bestätigt zwei Backup- und fünf
+Schreib-/Modellfälle auf einem wegwerfbaren32MiB-Image; dieses wurde entfernt.
+[Dauerhafter Ergebnisbeleg](evidence/mac-95341ae-tests.json), Originale unter
+`build/mac-current-verification/`. Kein neuer ARM64-/menschlicher Nachweis und
+keine neue Paketinstallation; installierter Stand folgt separat.
+
 Installiert: **0.9.74 / eabf5b3ff114**, Intel/macOS 14.6.1; 98 Dateien paketgleich.
 App-SHA256: `d0b039034dce04ca8a5cf712bdc7858810040008aeb1715acb2dfc710fc65ff7`.
 Die [Sternbeschriftungen](STERNBESCHRIFTUNGEN.md) sind im Acht-Test-Lauf gezielt

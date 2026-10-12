@@ -1,0 +1,36 @@
+{
+  "source_commit": "95341ae310a005e7fe2d85b2674801305ee62deb",
+  "tests_passed": 92,
+  "elapsed_seconds": 717.26,
+  "tracked_files_preserved": 501,
+  "program_hashes": {
+    "build/current-ui/secondbrain.app/Contents/MacOS/secondbrain": "480511cc25b0755732ce5d03c63ef50d5d5b9bbdf2129ba508460696edc0ada5",
+    "build/current-ui/secondbrain-cli": "c525c0a0bf0d15a8a5216bc1f1bc4ec13c2c52aec6ca7f2bbb3868aab22437d3"
+  },
+  "version": "SecondBrain 0.9.74\nBuild: 95341ae310a0\nSystem: Darwin / x86_64\nConfiguration: Release\n",
+  "ctest_log_sha256": "c94d8e5cc2a397a0114863ad2c99c0bb0e4c026fa2f8b99231ddd145d3365e8a",
+  "last_test_log_sha256": "8f7b2080cffc94e0a4368c40ad4c14a4cf3baf4cfdad27baf554302671281c8f",
+  "scope": "Intel/macOS local Release; automated tests, not human or ARM64 acceptance",
+  "system": "macOS 14.6.1 / 23G93, Intel x86_64",
+  "real_volume_scope": {
+    "filesystem": "HFS+",
+    "disposable_image_mib": 32,
+    "confirmed_cases": [
+      "create-fill",
+      "restore-fill",
+      "note-replace",
+      "note-new",
+      "model-guard-save",
+      "settings-replace",
+      "settings-new"
+    ],
+    "image_detached": true
+  },
+  "not_covered": [
+    "ARM64",
+    "macOS 14.0 minimum-version acceptance",
+    "human VoiceOver, IME and native dialog acceptance",
+    "physical power-loss persistence",
+    "new package or installation"
+  ]
+}

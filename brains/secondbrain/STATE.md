@@ -1,8 +1,9 @@
 # SecondBrain: aktueller Stand
 
 Stand: 12. Oktober 2026. Installiert ist **0.9.74 / eabf5b3ff114** auf
-Intel/macOS 14.6.1. 0.9.74 besteht unter Windows/Linux in Debug/Release mit
-jeweils 90 Tests und beiden Release-Paketen; Mac-CI wartet auf Runner.
+Intel/macOS 14.6.1. Entwicklungsbuild zu95341ae besteht lokal mit92 Tests;
+Windows/Linux zu dc3ee0e bestehen in Debug/Release mit jeweils92 Tests und
+beiden Release-Paketen, einschließlich Linux-Wayland. Mac-CI wartet auf Runner.
 1.0 ist nicht freigegeben. Originale und Historie stehen am Ende dieser Notiz.
 
 ## Produkt und installierte Fassung
@@ -23,6 +24,10 @@ Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
 
 ## Neueste geprüfte Änderungen
 
+- Vollständiger Intel/macOS-Lauf zu95341ae:92/92 Tests in717,26s;501 Repository-
+  Dateien und beide Programme unverändert. Echte HFS+-Backup-/Schreibfälle auf
+  entferntem32MiB-Testimage bestehen. [Ergebnis und Scope](../../docs/evidence/mac-95341ae-tests.json).
+  Entwicklungsbuild, keine neue Installation oder menschliche/ARM64-Abnahme.
 - [Sternbeschriftungen](../../docs/STERNBESCHRIFTUNGEN.md): symmetrischer Abstand
   außerhalb des Fokusrings und tatsächliche Schriftzeilenmitte. 108 neue
   Bedingungen, negative Regression, acht gezielte CTest-Gruppen und betrachtete

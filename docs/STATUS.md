@@ -6,6 +6,14 @@ Die installierte Intel/macOS-App ist 0.9.74/eabf5b3ff114. Die vorige Windows-Lau
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
+Aktueller vollständiger Intel/macOS-Entwicklungsbuild zu95341ae:92/92 Tests in
+717,26s,501 Repository-Dateien und beide Programme während des geprüften
+Abschnitts unverändert. Echte HFS+-Fehler-/Wiederholungsfälle bestehen ebenfalls.
+[Umfang, Hashes und Grenzen](RELEASE_ABNAHME.md). Die installierte App bleibt
+auf dem oben genannten Paketstand. Neuere Windows-/Linux-Nachweise zu dc3ee0e
+bestehen mit jeweils92 Tests und beiden Paketen, einschließlich der zusätzlichen
+[Wayland-Startprüfung](WAYLAND_START.md). Mac-CI und menschliche Abnahmen bleiben offen.
+
 0.9.74 verfeinert [Sternbeschriftungen](STERNBESCHRIFTUNGEN.md): Abstand außerhalb
 des Fokusrings, symmetrischer Seitenwechsel und Schriftzeilenmitte. Acht gezielte
 Layout-/Navigationsprüfungen, saubere Versions-/Startprüfung und das entpackte
