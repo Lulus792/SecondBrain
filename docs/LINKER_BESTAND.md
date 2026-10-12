@@ -308,3 +308,27 @@ Auch ein eigener Herkunftspfad-/Dateihashnachweis der SDK-Bibliotheken für dies
 Cargo-Linkvorgang fehlt noch. Der vorhandene App-/CLI-Bericht wird dafür nicht
 als DLL-Bericht ausgegeben. Originalbytes und Abgleich:
 `build/accesskit-map-native/`, `debug-review.json` und `release-review.json`.
+
+### Direkte Eingabepfade für den Cargo-Linkvorgang
+
+Der optionale Windows-Nachweis-Build fordert zusätzlich eine
+`accesskit-inputs.rsp` über `/LINKREPROFULLPATHRSP` an. Laut der am12.Oktober
+gelesenen [Microsoft-Dokumentation](https://learn.microsoft.com/en-us/cpp/build/reference/link-repro-full-path-rsp?view=msvc-170)
+enthält diese Ausgabe die vollständigen Pfade der Linkereingaben, ohne die
+Bibliotheksdateien wie `/LINKREPRO` zu kopieren. Die Option benötigt Visual Studio
+17.11 beziehungsweise MSVC19.41 oder neuer; der Nachweis-Build weist ältere
+Versionen ausdrücklich ab. Der gewöhnliche Build ohne Kartenoption bleibt
+davon unberührt. Die dokumentierte MAX_PATH-Grenze gilt auch für die Ausgabedatei.
+
+Der abschließende CMake-Prüfer verlangt eine vorhandene, nicht leere Pfadliste
+und schreibt eine eigene Identität mit Programm- und Pfadlistenhash. Die
+bisherige dreizeilige Kartenidentität bleibt kompatibel. CI bewahrt Liste und
+Identität neben der Karte auf. Die Dateipfade sind zunächst Rohbelege; sie sind
+noch keine vollständige Zuordnung aller Runtime-Anteile oder Lizenzfreigabe.
+
+Sechs lokale CMake-Bedingungen bestehen, darunter fehlende/leere Listen,
+Unicode-/Leerzeichenpfade, beide Hashes und unveränderter Kartenvertrag.
+72 Python-Tests bestehen mit einer plattformspezifischen Überspringung.
+Originale: `build/accesskit-map-native/Input ü check/` und
+`input-path-python-tests.log`. Die tatsächliche neue Windows-Linkerausgabe und
+der SDK-Dateiabgleich müssen anschließend nativ geprüft werden.

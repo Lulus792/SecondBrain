@@ -90,6 +90,8 @@ jobs:
             build/ui/windows-runtime-provenance.json
             build/ui/accesskit-windows-build/accesskit.map
             build/ui/accesskit-windows-build/accesskit.map.identity
+            build/ui/accesskit-windows-build/accesskit-inputs.rsp
+            build/ui/accesskit-windows-build/accesskit-inputs.rsp.identity
             build/ui/checked-build.log
             build/ui/link-maps/**/*.map
             build/ui/link-maps/**/*.map.identity

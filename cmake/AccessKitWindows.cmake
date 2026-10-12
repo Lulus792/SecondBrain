@@ -34,13 +34,20 @@ set(SB_ACCESSKIT_CARGO_FINAL_ARGS)
 set(SB_ACCESSKIT_MAP_COMMAND)
 set(SB_ACCESSKIT_MAP_BYPRODUCTS)
 if(SB_RECORD_LINK_MAPS AND NOT MINGW)
+    if(MSVC_VERSION LESS 1941)
+        message(FATAL_ERROR "AccessKit input-path recording requires MSVC 19.41 or newer")
+    endif()
     set(SB_ACCESSKIT_DLL_MAP "${SB_ACCESSKIT_CARGO_TARGET}/accesskit.map")
+    set(SB_ACCESSKIT_DLL_INPUTS "${SB_ACCESSKIT_CARGO_TARGET}/accesskit-inputs.rsp")
     set(SB_ACCESSKIT_CARGO_SUBCOMMAND rustc)
-    set(SB_ACCESSKIT_CARGO_FINAL_ARGS --lib -- -C "link-arg=/MAP:${SB_ACCESSKIT_DLL_MAP}")
+    set(SB_ACCESSKIT_CARGO_FINAL_ARGS --lib -- -C "link-arg=/MAP:${SB_ACCESSKIT_DLL_MAP}"
+        -C "link-arg=/LINKREPROFULLPATHRSP:${SB_ACCESSKIT_DLL_INPUTS}")
     set(SB_ACCESSKIT_MAP_COMMAND COMMAND "${CMAKE_COMMAND}"
         "-DSB_PROGRAM=${SB_ACCESSKIT_OUTPUT}/accesskit.dll" "-DSB_MAP=${SB_ACCESSKIT_DLL_MAP}"
+        "-DSB_LINK_INPUTS=${SB_ACCESSKIT_DLL_INPUTS}"
         -P "${CMAKE_CURRENT_LIST_DIR}/../tools/record_link_map.cmake")
-    set(SB_ACCESSKIT_MAP_BYPRODUCTS "${SB_ACCESSKIT_DLL_MAP}" "${SB_ACCESSKIT_DLL_MAP}.identity")
+    set(SB_ACCESSKIT_MAP_BYPRODUCTS "${SB_ACCESSKIT_DLL_MAP}" "${SB_ACCESSKIT_DLL_MAP}.identity"
+        "${SB_ACCESSKIT_DLL_INPUTS}" "${SB_ACCESSKIT_DLL_INPUTS}.identity")
 endif()
 ExternalProject_Add(sb_accesskit_windows_build
     SOURCE_DIR "${SB_C_SOURCE}"
