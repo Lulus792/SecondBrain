@@ -1,5 +1,6 @@
 #include "backup.h"
 #include "platform.h"
+#include "settings.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,7 +27,34 @@ static int run(int argc,char **argv) {
     if (argc!=7) return 2;
     Stop stop={(SBBackupPhase)strtoul(argv[5],NULL,10),argv[6],!strstr(argv[1],"-fill"),false};
     SBStatus status;
-    if (!strcmp(argv[1],"create") || !strcmp(argv[1],"create-fill")) {
+    if (!strcmp(argv[1],"note-save")) {
+        SBProject project={0};char *text=NULL,*old=NULL;size_t length=0;uint64_t draft_hash=0;SBRevision expected={0},saved={0};
+        if (strlen(argv[2])>=sizeof(project.root) || strlen(argv[5])>=sizeof(project.id)) return 2;
+        strcpy(project.root,argv[2]);strcpy(project.id,argv[5]);
+        status=sb_fs_read(argv[3],&text,&length);
+        if (status.code==SB_OK) draft_hash=sb_hash(text,length);
+        if (status.code==SB_OK && strlen(text)!=length) status=sb_error(SB_INVALID,"Text enthält NUL.");
+        if (status.code==SB_OK) {
+            status=sb_note_load(&project,argv[4],&old,&expected);free(old);
+            if (status.code==SB_NOT_FOUND) status=sb_ok();
+        }
+        if (status.code==SB_OK) status=sb_note_save(&project,argv[4],text,expected,&saved);
+        if (status.code==SB_OK && (!saved.exists || saved.length!=length || saved.hash!=sb_hash(text,length)))
+            status=sb_error(SB_INVALID,"Gespeicherte Textrevision stimmt nicht.");
+        if (text && sb_hash(text,length)!=draft_hash) status=sb_error(SB_INVALID,"Übergebener Entwurf wurde verändert.");
+        free(text);
+    } else if (!strcmp(argv[1],"settings-init") || !strcmp(argv[1],"settings-update")) {
+        SBSettings settings;SBRevision expected={0};status=sb_settings_load(argv[2],&settings,&expected);
+        if (status.code==SB_OK && !strcmp(argv[1],"settings-init")) {
+            if (expected.exists) status=sb_error(SB_EXISTS,"Einstellungen bestehen bereits.");
+            else if (strlen(argv[3])>=sizeof(settings.workspace) || strlen(argv[4])>=sizeof(settings.project) || strlen(argv[5])>=sizeof(settings.note)) return 2;
+            else {strcpy(settings.workspace,argv[3]);strcpy(settings.project,argv[4]);strcpy(settings.note,argv[5]);}
+        } else if (status.code==SB_OK) {
+            if (!expected.exists) status=sb_error(SB_NOT_FOUND,"Einstellungen fehlen.");
+            else {settings.dark=!settings.dark;settings.font_percent=settings.font_percent==100 ? 150 : 100;}
+        }
+        if (status.code==SB_OK) status=sb_settings_save(argv[2],&settings,expected,NULL);
+    } else if (!strcmp(argv[1],"create") || !strcmp(argv[1],"create-fill")) {
         SBProject project={0};
         if (strlen(argv[2])>=sizeof(project.root) || strlen(argv[4])>=sizeof(project.id)) return 2;
         strcpy(project.root,argv[2]); strcpy(project.id,argv[4]);

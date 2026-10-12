@@ -59,8 +59,9 @@ Endprodukttexte erst abschließend beim vollständigen Produkt bereinigen.
 
 CI38187181878 nach LF-Dateiregel: alle vier Windows-/Linux-Desktopjobs samt
 Release-Paketen bestehen; Mac queued. Neuer gemeinsamer Volume-Prüfweg lokal mit
-35 Kernprüfungen und echtem HFS+-Test bestätigt; ext4-/NTFS-CI besteht ebenfalls
-in Debug/Release. Verifizierte Release-Berichte bestätigen Bestandsschutz und Trennen. Die native Windows-Allokatorprüfung
+Backup-Volumeprüfung auf HFS+/ext4/NTFS bestätigt. Neu: vier echte HFS+-Fälle
+für bestehende/neue Notizen und Einstellungen samt Bestandsschutz und Wiederholung
+bestehen; native Windows-/Linux-Nachprüfung dafür folgt. Die native Windows-Allokatorprüfung
 besteht bereits im vorherigen Lauf. Neues Mac-Paket, tatsächlicher Updatewechsel
 und Installation sind abgeschlossen. [Schriftlebensdauer](../../docs/SCHRIFT_LEBENSDAUER.md),
 [Kontrastfarben](../../docs/SYSTEM_KONTRASTFARBEN.md).

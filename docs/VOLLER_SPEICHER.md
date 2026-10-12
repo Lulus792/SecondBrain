@@ -114,3 +114,36 @@ Originale: `build/native-volume-verification/native-summary.json`,
 Die frühere Formulierung „erste native Läufe stehen aus“ beschreibt den damaligen
 Zwischenstand. Dieser Abschluss betrifft Sicherung/Wiederherstellung, nicht die
 oben benannten weiteren Schreib-/Persistenzabnahmen. Kein 1.0-Abschluss.
+
+
+## Notizen und Einstellungen: neuer Prüfstand
+
+Der vorhandene C-Testworker ruft jetzt zusätzlich die unveränderten Produktions-
+APIs `sb_note_save` und `sb_settings_save` auf. Bestehende und neue Notizen sowie
+bestehende und neue Einstellungsdateien erhalten jeweils einen echten
+Speicherplatzfehler. Alte Datei und Projektdateien müssen bytegleich bleiben;
+neue Teilziele und temporäre Schreibdateien dürfen nicht zurückbleiben.
+Der im C-Aufrufer geladene Entwurf wird zusätzlich vor/nach per Hash verglichen.
+Nach Entfernen des Füllers gelingen dieselben Schreibaufrufe mit passenden Inhalten.
+
+Große Füllschreibvorgänge können trotz ENOSPC noch Platz für kleine Dateien
+übrig lassen. Der Füller arbeitet deshalb anschließend mit 4-KiB-, 512-Byte-
+und 1-Byte-Schreibvorgängen bis zum Fehler. Erst danach wird der gewünschte
+Restplatz freigegeben: 128 KiB für Notizen, kein zusätzlicher Platz für Einstellungen.
+Ein gültiger langer Unicode-Pfadwert erzeugt eine Einstellungsdatei größer als
+4 KiB. Die Datei muss damit Datenblöcke benötigen; ein kleiner Inhalt könnte
+gegebenenfalls in Metadaten eines Dateisystems passen. Der Pfadwert muss zur
+Dateiformatgrenze passen, benötigt für die Speicherformatprüfung keinen
+existierenden Arbeitsordner. Normale kurze Konfigurationen werden dadurch
+nicht als grundsätzlich unspeicherbar auf einem vollen Dateisystem dargestellt.
+
+Lokal auf dem echten HFS+-Image bestehen alle vier neuen Fälle, beide bisherigen
+Backupfälle, Bestandsschutz, Wiederholung und Trennen. 35 lokale Release-Kern-
+prüfungen bestehen (13,82 s); nach Ergänzung des C-Entwurfsvergleichs bestehen
+fünf abschließende betroffene Prüfungen (3,20 s). Originale:
+`build/volume-write-verification/core-final.log`, `targeted-final.log`
+und `macos-final-report.json`. Der erste Versuch zeigte den unzureichenden großen
+Füllschreibvorgang und wurde gezielt korrigiert; kein Produktfehler beobachtet.
+Neue native Windows-/Linux-Nachweise für diese vier Fälle stehen noch aus.
+App-Code und installierte 0.9.71 bleiben unverändert; physische Persistenz und
+andere Dateisysteme bleiben getrennte Abnahmen.
