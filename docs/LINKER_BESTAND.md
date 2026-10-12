@@ -332,3 +332,40 @@ Unicode-/Leerzeichenpfade, beide Hashes und unveränderter Kartenvertrag.
 Originale: `build/accesskit-map-native/Input ü check/` und
 `input-path-python-tests.log`. Die tatsächliche neue Windows-Linkerausgabe und
 der SDK-Dateiabgleich müssen anschließend nativ geprüft werden.
+
+### Ausgeführter Eingabepfad-Nachweis
+
+[CI38205225168](https://github.com/Lulus792/SecondBrain/actions/runs/38205225168)
+zufeb45e8: Windows/Linux Release einschließlich entpackter Pakete erfolgreich.
+Windows bestätigt92 Prüfblöcke und92 Pass-Marker in der rohen CTest-Datei;
+Linux-Release-Log bestätigt92 Tests und22 aufgelöste Laufzeitdateien ohne
+unaufgelöste/externe/konfligierende Einträge. Debug-Jobs liefen bei diesem
+Abgleich noch, Mac-Jobs warteten auf Runner.
+
+Windows-Nachweis11727029025 und Paket11727625582 sind gegen ihre GitHub-
+SHA256-Digests geprüft. Die tatsächliche DLL im Paket hat den Hash
+`ca06d2354abaa25ee0ca84f3981ee38dda1e72baf0f6f368ea148ca3b65e571e`.
+Karten- und Eingabepfadidentität nennen genau diesen DLL-Hash; auch ihre
+jeweiligen Dateihashes stimmen. Die Pfadliste ist tatsächlich UTF-16 LE mit
+BOM und wurde entsprechend gelesen, nicht verlusthaft als UTF-8 interpretiert.
+
+Sie nennt den vollständigen libcmt.lib-Pfad aus MSVC14.51.36231. Dieser passt
+zum SDK-Dateibericht desselben abgeschlossenen Builds, SHA256
+`d4cc4c224455825dec1669f9ad6a9872a4f5b37ed1daae1fd0b9044d7650d908`.
+Die DLL-Karte benennt29 Mitglieder dieser Bibliothek. Damit sind für diesen
+Teil DLL, benannte Mitglieder, direkter Herkunftspfad und nachträglicher
+SDK-Dateihash verbunden.
+
+Die tatsächliche Liste benennt sechs Rust-Archivinputs, darunter libstd und
+libcompiler_builtins. Als Input übergebene Archive beweisen nicht, dass alle
+ihre Mitglieder eingebaut sind. Der konservative Rust-Quellenabgleich bleibt
+deshalb getrennt vom Nachweis einzelner gelinkter Beiträge.
+
+Wichtige Grenze der beobachteten Ausgabe: Die über weitere eingebettete
+Default-Library-Direktiven erreichten libvcruntime-/libucrt-Dateien fehlen in
+dieser direkten Eingabepfadliste. Ihre benannten DLL-Beiträge sind durch die
+Karte belegt, ihre eigenen DLL-Herkunftspfade werden durch diesen Schritt
+noch nicht bewiesen. Ebenso sind nachträgliche SDK-Dateihashes keine unveränderliche
+Aufzeichnung aller Dateiinhalte zum Linkzeitpunkt. Originale und Zuordnung:
+`build/accesskit-map-native/inputs-release-review.json`, beide ZIPs,
+`accesskit-inputs.rsp`, dessen Identität und `inputs-release-accesskit.map`.

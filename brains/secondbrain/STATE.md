@@ -63,7 +63,10 @@ Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
   Mitglieder. Eigene DLL-SDK-Pfade und vollständige Rust-Quellzerlegung offen.
   Direkte Linkereingabepfade im optionalen MSVC-Nachweis-Build ergänzt, mit
   eigener DLL-/Listenhashbindung; sechs lokale CMake-Bedingungen und72 Python-
-  Tests (eine übersprungen) bestehen. Neue native Ausgabe noch zu prüfen.
+  Tests (eine übersprungen) bestehen. CI38205225168 Windows/Linux Release und
+  Pakete erfolgreich; neue Windows-DLL-/Karten-/Listenhashes passen zum Paket.
+  Direkter libcmt-Pfad passt zum SDK-Dateihash desselben Builds. Beobachtete
+  Liste enthält keine direkten libvcruntime-/libucrt-Pfade; diese bleiben offen.
 - [Startdiagnose](../../docs/LAUFZEIT_START.md): tatsächliche normale Rendererwahl,
   vier Frames, sichtbares Fenster und beobachtete Module. Dadurch echter Windows-
   Startfehler gefunden: Accessibility muss vor dem ersten sichtbaren Fenster
