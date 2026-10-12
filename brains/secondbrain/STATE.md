@@ -128,16 +128,15 @@ Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
 Mindest-OS/frische Nutzerrechner und aktuelles ARM64; menschliche VoiceOver/NVDA/
 Orca-/IME-/Dialogbedienung; echte Monitore/Dichtewechsel, Trackpads, schwächere
 Geräte und Langzeit; weitere Dateisysteme/physische Persistenz; vollständiger
-Runtime-/SDK-/Lizenzabgleich, vertraulicher Sicherheitskanal, Signierung und
+Runtime-/SDK-/Lizenzabgleich, Signierung und
 dauerhafte aktuelle Pakete. [Kriterien](../../docs/RELEASE_ABNAHME.md).
 
 Mindestversionsvorschlag: macOS 14, Windows 11 25H2, Ubuntu 24.04 LTS;
 noch keine endgültige Zusage. Apple-Developer-Konto/Windows-Zertifikat fehlen.
-Sicherheitskanal gewählt: GitHub Private Vulnerability Reporting; Aktivierung
-und Erreichbarkeit werden noch geprüft.
-Sicherheitsrichtlinie und Verweis aus den Fehlerformularen vorbereitet. Der
-verfügbare Browser ist nicht angemeldet; der Connector bietet die Aktivierung
-nicht an. GitHub-Anmeldung im Browser für den nächsten Schritt erforderlich.
+Sicherheitskanal am 12. Oktober aktiviert: GitHub Private Vulnerability Reporting.
+GitHub bestätigt die Einstellung; die öffentlich abgerufene Advisories-Seite
+bietet **Report a vulnerability** an. Keine Testmeldung abgeschickt.
+[Sicherheitsrichtlinie](../../SECURITY.md) und Supporthinweise aktualisiert.
 Endprodukttexte erst beim vollständigen Produkt abschließend bereinigen.
 **1.0 nur nach ausdrücklicher Nutzerfreigabe.**
 
@@ -147,7 +146,6 @@ Die [konsolidierte Lizenzinventur](../../docs/LIZENZ_INVENTUR.md) trennt nun
 technische Quellen-/Bytebelege und noch offene konkrete Verteilungsbedingungen.
 Geräteliste für reale Abnahmen abwarten; macOS-Runner/ARM64, menschliche Bedienung
 und Signierung benötigen externe Voraussetzungen. Keine1.0-Freigabe daraus ableiten.
-Sicherheitskanal nach GitHub-Anmeldung aktivieren.
 Geräte/Konten und menschliche Bediennachweise werden durch weitere kleine
 Codeänderungen oder Statusnotizen nicht ersetzt.
 

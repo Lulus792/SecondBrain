@@ -92,6 +92,11 @@ automatische Änderung anderer Second Brains. Dieser historische Pflegeabschnitt
 
 ## Noch nötige Abnahmen und Entscheidungen
 
+Der vertrauliche Sicherheitskanal ist am 12. Oktober 2026 aktiviert und geprüft:
+GitHub bestätigt die Einstellung; die öffentlich abgerufene Advisories-Seite
+bietet **Report a vulnerability** an. Keine Testmeldung abgeschickt.
+[Sicherheitsrichtlinie](../SECURITY.md).
+
 | Offener Punkt | Benötigter Abschluss |
 | --- | --- |
 | Betriebssystemzusagen | [Vorschlag](PLATTFORM_VORSCHLAG.md) bestätigen und tatsächlich abnehmen: macOS 14 Intel/ARM64, Windows 11 25H2 x64, Ubuntu 24.04 LTS x64; zusätzlich aktuelle Systeme |
@@ -100,7 +105,6 @@ automatische Änderung anderer Second Brains. Dieser historische Pflegeabschnitt
 | Alltag und Leistung | Reale größere Wissensbasen, schwächere Geräte, Trackpads, lange Sitzungen, verschiedene GPU-Treiber, Monitore und tatsächliche Pixeldichtewechsel |
 | Dateien und Persistenz | Weitere Dateisysteme und physische Persistenz; [native volle Backup-Volumes](VOLLER_SPEICHER.md) sind bestätigt; fünf [Schreib-/Modellfälle](VOLLER_SPEICHER.md) sind auf HFS+/NTFS/ext4 bestätigt; weitere Dateisysteme und physische Persistenz bleiben offen |
 | Vollständige mitgelieferte Laufzeit-/Lizenzzuordnung | Tatsächliche Binär-/Toolchainanteile und dynamische/transitive Komponenten final abgleichen; [Inventur](LIZENZ_INVENTUR.md), [Rust](RUST_RUNTIME_NACHWEIS.md), [Laufzeit](PAKET_LAUFZEIT.md), [Linkerbestand](LINKER_BESTAND.md) |
-| Vertraulicher Sicherheitskanal | GitHub Private Vulnerability Reporting gewählt; Aktivierung nach GitHub-Anmeldung und tatsächliche Erreichbarkeit noch offen; [Sicherheitsrichtlinie](../SECURITY.md) |
 | Signierung und Distribution | Apple-Developer-Konto/Windows-Zertifikat fehlen; tatsächliche Signierung/Notarisierung und dauerhafte aktuelle Pakete vor Freigabe prüfen |
 | Fertige Texte und 1.0 | Redaktionelle Schlussprüfung erst beim vollständigen Produkt, danach ausdrückliche Nutzerfreigabe; keine automatische 1.0-Setzung |
 

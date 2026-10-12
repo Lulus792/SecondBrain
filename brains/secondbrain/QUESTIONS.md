@@ -53,6 +53,8 @@ Anforderungen und Abgrenzung: [Projektauftrag](PROJECT.md).
 ## Vertrauliche Sicherheitsmeldungen
 
 Am 12. Oktober entschieden: **GitHub Private Vulnerability Reporting**.
-Die Aktivierung im Repository und die tatsächliche Erreichbarkeit werden geprüft.
+Am selben Tag aktiviert und geprüft: GitHub bestätigt die Einstellung; die
+öffentliche Advisories-Seite bietet **Report a vulnerability** an. Keine
+Testmeldung abgeschickt. Dieser Punkt ist abgeschlossen; [Richtlinie](../../SECURITY.md).
 Öffentliche Fehlerformulare bleiben ein anderer Weg. Vertrauliche Inhalte werden
 nicht in Issues veröffentlicht.

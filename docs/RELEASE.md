@@ -110,7 +110,9 @@ der späteren Nachprüfungen zu lesen.
   Fehler-/Vorschlagsformulare, [Supporthinweise](../SUPPORT.md),
   [Beitragsregeln](../CONTRIBUTING.md) und ein
   [Ablauf für Abhängigkeitsupdates](ABHAENGIGKEITEN_WARTUNG.md) sind vorbereitet.
-  Vertraulicher Sicherheitskanal und vollständige transitive Lizenzprüfung bleiben offen.
+  GitHub Private Vulnerability Reporting ist am 12. Oktober aktiviert und der
+  öffentliche Meldeweg geprüft; [Sicherheitsrichtlinie](../SECURITY.md).
+  Vollständige transitive Lizenzprüfung und Wartungsverantwortlichkeit bleiben offen.
   Ab 0.9.20 sind 113 Cargo-Komponenten und zusätzliche SDL-/HarfBuzz-Hinweise
   [inventarisiert](LIZENZ_INVENTUR.md) und mitgeliefert. Der Rust-/Systemruntime-
   Abgleich bleibt offen; dieser Teilschritt schließt die Release-Aufgabe nicht.

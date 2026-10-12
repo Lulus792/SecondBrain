@@ -1,12 +1,12 @@
 # Sicherheitsmeldungen
 
 Stand: 12. Oktober 2026. Für vertrauliche Meldungen wurde **GitHub Private
-Vulnerability Reporting** gewählt. Die Aktivierung im Repository und die
-Erreichbarkeitsprüfung stehen noch aus. Ein nutzbarer privater Meldekanal wird
-erst nach dieser Prüfung hier bestätigt.
+Vulnerability Reporting** aktiviert. GitHub hat die Änderung bestätigt; die
+öffentliche Advisories-Seite bietet **Report a vulnerability** an. Beide Wege
+wurden am 12. Oktober 2026 geprüft. Es wurde keine Testmeldung abgeschickt.
 
 Veröffentliche vermutete Sicherheitslücken, Zugangsdaten oder private
-Projektinhalte nicht in GitHub Issues. Nach der Aktivierung findest du unter
+Projektinhalte nicht in GitHub Issues. Du findest unter
 [Security → Advisories](https://github.com/Lulus792/SecondBrain/security/advisories)
 die Schaltfläche **Report a vulnerability** für eine private Meldung.
 
