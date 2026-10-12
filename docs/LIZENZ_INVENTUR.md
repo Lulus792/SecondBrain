@@ -82,3 +82,47 @@ unterscheiden. GLib/GIO/D-Bus werden im Linux-Paket nicht mitkopiert. Ihre
 Versionen, Systemhinweise und die übrigen Toolchain-Anteile bleiben Gegenstand
 des abschließenden Abgleichs. Für den bisherigen Schritt wird keine vollständige
 Lizenzfreigabe aller möglichen Builds behauptet.
+
+## Konsolidierter Abgleich vom 12. Oktober
+
+Die früheren offenen Punkte oben sind anhand der späteren Originalnachweise
+einzuordnen. Für die tatsächlich geprüften Entwicklungsstände gilt:
+
+| Bestandteil | Belegter Umfang |
+| --- | --- |
+| Eigener C-Code | MIT auf Nutzerentscheidung; [LICENSE](../LICENSE) |
+| UI-Bibliotheken und Schriften | Festgelegte Quellen,113 Cargo-Komponenten und Originaltexte im vorhandenen Inventurumfang |
+| Rust-Standardbibliothek/Compilerlaufzeit | Konservative Quellenabdeckung der beobachteten Compilercommits und Ziele; native Compiler-/Lock-/Lizenzabgleiche in [RUST_RUNTIME_NACHWEIS.md](RUST_RUNTIME_NACHWEIS.md) |
+| Linux-Startobjekte | Tatsächliche glibc-/GCC-Paketzuordnung, Copyrighttexte und besonderer Quellregelabgleich in [LINKER_BESTAND.md](LINKER_BESTAND.md) |
+| Windows-CRT in App/CLI und AccessKit-DLL | Native Karten und SDK-Dateihashes; DLL-Kopien bytegenau den Release-SDK-Dateien zugeordnet, Debug und Release getrennt |
+| Dynamische Systemkomponenten | [Paket- und Laufzeitnachweise](PAKET_LAUFZEIT.md), einschließlich beobachteter normaler Starts; Systemdateien sind von mitgelieferten Kopien zu unterscheiden |
+
+Der Nachweis bestimmt konkrete Inhalte und Quellen. Er ordnet nicht jede
+optimierte Rust-In-tree-Funktion unabhängig ihrem ursprünglichen Quellabschnitt
+zu und ersetzt keine abschließende Verteilungsbedingungenprüfung.
+
+### Microsoft-Verteilungsbedingungen
+
+Am12.Oktober wurden die offiziellen [Visual-Studio-2026-Bedingungen](https://visualstudio.microsoft.com/license-terms/vs2026-ga-pro-enterprise/)
+und die [2026-Verteilungsliste](https://learn.microsoft.com/en-us/visualstudio/releases/2026/redistribution)
+erneut geprüft. Die Liste setzt eine gültige Lizenz der betreffenden Software
+und deren Bedingungen voraus. Der Abschnitt „Distributable Code“ im Original
+bindet die Verteilung unter anderem an eigene wesentliche Funktionalität und
+schützende Bedingungen für Distributoren und Endnutzer; er enthält außerdem
+Haftungs-/Freistellungsbedingungen und Beschränkungen für unveröffentlichte
+Komponenten. Das sind Microsoft-Bedingungen, keine neue Lizenz des eigenen C-Codes.
+
+Die [allgemeinen Visual-C++-Verteilungshinweise](https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files?view=msvc-170)
+verweisen ebenfalls auf passende Softwarebedingungen. Die tatsächlichen
+SecondBrain-Pakete enthalten statisch eingebaute CRT-Anteile und keinen separat
+gebündelten vc_redist-Installer. Eine Liste für separat verteilte Dateien wird
+deshalb nicht pauschal als vollständige Freigabe dieser Einbettung ausgegeben.
+SDK-Dateihashes und ein vorinstallierter CI-Compiler belegen für sich allein
+keinen individuellen Lizenzvertrag des späteren Herausgebers.
+
+Die konkrete rechtliche Zuordnung der eingebetteten SDK-Anteile und die
+endgültigen Veröffentlichungsbedingungen bleiben vor1.0 offen. Es wurde weder
+ein Vertrag für den Nutzer angenommen noch eine neue Endnutzervereinbarung
+eingeführt. Geprüfte Originaldokumente und Hashes stehen unter
+`build/link-map-runtime-review/`; technische Originale unter
+`build/accesskit-map-native/`. Die [Release-Abnahme](RELEASE_ABNAHME.md) bleibt maßgeblich.

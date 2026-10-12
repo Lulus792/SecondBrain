@@ -136,8 +136,10 @@ Endprodukttexte erst beim vollständigen Produkt abschließend bereinigen.
 
 ## Nächster Schritt
 
-Konkrete SDK-Verteilungsbedingungen und innere AccessKit-Runtime-Beiträge
-abgleichen; weitere menschliche/gerätebezogene Release-Abnahmen bleiben offen.
+Die [konsolidierte Lizenzinventur](../../docs/LIZENZ_INVENTUR.md) trennt nun
+technische Quellen-/Bytebelege und noch offene konkrete Verteilungsbedingungen.
+Geräteliste für reale Abnahmen abwarten; macOS-Runner/ARM64, menschliche Bedienung
+und Signierung benötigen externe Voraussetzungen. Keine1.0-Freigabe daraus ableiten.
 Sicherheitskanal nach GitHub-Anmeldung aktivieren.
 Geräte/Konten und menschliche Bediennachweise werden durch weitere kleine
 Codeänderungen oder Statusnotizen nicht ersetzt.
