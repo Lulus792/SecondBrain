@@ -24,6 +24,11 @@ Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
 
 ## Neueste geprüfte Änderungen
 
+- [Signierungsvorbereitung](../../docs/SIGNIERUNG.md): neue Paketkopie,
+  native Signatur-/Paketdatenprüfung und getrennte Freigabe.88 Python-Tests
+  (eine übersprungen) und echter Mac-Ad-hoc-/Hardened-Runtime-Test bestehen,
+  einschließlich Ressourcenänderungsabweisung und Metal/Cocoa-Start.
+  Zertifikate, Windows-Signierung und tatsächliche Notarisierung bleiben offen.
 - Vollständiger Intel/macOS-Lauf zu95341ae:92/92 Tests in717,26s;501 Repository-
   Dateien und beide Programme unverändert. Echte HFS+-Backup-/Schreibfälle auf
   entferntem32MiB-Testimage bestehen. [Ergebnis und Scope](../../docs/evidence/mac-95341ae-tests.json).

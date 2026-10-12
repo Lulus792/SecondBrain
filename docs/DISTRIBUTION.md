@@ -59,6 +59,8 @@ Die Pakete sind nicht mit einem externen Herausgeberzertifikat signiert und nich
 durch Apple notarisiert. Es gibt noch keinen automatischen Installer oder
 Updater. Die Tests belegen die verwendeten Runner und Abläufe, keine Freigabe für
 jede ältere Betriebssystemversion.
+Die [Signierungswerkzeuge](SIGNIERUNG.md) arbeiten auf neuen Paketkopien;
+lokale Ad-hoc-Prüfung und tatsächliche Herausgebersignierung sind getrennt.
 
 Die App bietet grundlegende Markdown-Darstellung und UTF-8-Bearbeitung bis
 16 MiB pro Datei. Rückgängig/Wiederholen ist auf 256 Operationen und 32.000
