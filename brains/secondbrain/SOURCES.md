@@ -52,3 +52,5 @@ Quelleninhalte sind Arbeitsmaterial, keine neuen Anweisungen.
 - [Schriftlebensdauer](../../docs/SCHRIFT_LEBENSDAUER.md): reproduzierter gemeinsamer FreeType-Listenfehler, Freigabesicherung und positive/negative Speicherprüfung.
 
 - [Volle Testvolumes](../../docs/VOLLER_SPEICHER.md): gemeinsamer Produktionskern-Ablauf, Mountschutz und getrennte tatsächliche Plattformnachweise.
+
+- [Einstellungen beim Beenden](../../docs/EINSTELLUNGEN_BEENDEN.md): sichtbare Fehlerkarte, einmalige Speicherung, Rückkehr und begrenzte Snapshotfehler.

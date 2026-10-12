@@ -67,8 +67,10 @@ besteht bereits im vorherigen Lauf. Neues Mac-Paket, tatsächlicher Updatewechse
 und Installation sind abgeschlossen. [Schriftlebensdauer](../../docs/SCHRIFT_LEBENSDAUER.md),
 [Kontrastfarben](../../docs/SYSTEM_KONTRASTFARBEN.md).
 [Volume-Vertrag](../../docs/VOLLER_SPEICHER.md).
-Nächste konkrete UI-Korrektur: Einstellungs-Speicherfehler beim Beenden sichtbar
-behandeln; bisher nur stderr und trotzdem Schließen (`app/main.c:120–124`).
+0.9.72 behandelt Einstellungs-Speicherfehler beim Beenden mit eigener Fehlerkarte,
+Wiederholung, bewusster Ausnahme und Rückkehr. 83 lokale Bedingungen und sieben
+betroffene Prüfgruppen bestehen; neue CI/Gesamt/Paket/Installation folgen.
+[Vertrag](../../docs/EINSTELLUNGEN_BEENDEN.md).
 Weitere technische Abnahmen und nötige reale Umgebungen anhand der
 Abnahmeübersicht klären; alle offenen Release-Anforderungen bleiben Arbeitsumfang.
 
