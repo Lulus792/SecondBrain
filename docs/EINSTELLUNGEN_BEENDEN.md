@@ -33,9 +33,8 @@ Testaufbau; das wurde korrigiert. Vier bestehende Guard-/Help-/Preferences-Prüf
 bestehen, sieben abschließende Gruppen einschließlich nativer Mac-Anbindung und
 Modalfokus bestehen in 55,29 s. Originale: `build/exit-preferences-verification/`.
 
-Neue native Windows/Linux-Abnahme, vollständiger aktueller Lauf, Sanitizer und
-neues Paket stehen noch aus. Keine menschliche Desktop-/Screenreaderabnahme.
-Installiert bleibt zunächst 0.9.71; 1.0 bleibt ohne Nutzerfreigabe offen.
+Diese ersten gezielten Prüfungen wurden durch die abschließenden Nachweise
+unten ergänzt. Keine menschliche Desktop-/Screenreaderabnahme.
 
 
 Die abschließende Erweiterung prüft auch eine bereits geöffnete Hilfe und eine
@@ -47,4 +46,31 @@ unter ASan/UBSan mit 61 aktuellen Quell-/Includehashes. Eigene C-Teile sind
 instrumentiert, externe UI nicht; Leaks aus, kein TSan. Originale:
 `asan-final-exit.log`, `asan-final-help.log`, `scroll-regression.log`
 und `build/exit-preferences-sanitizers/sources.json`. Iconexport reproduzierbar.
-Neue Gesamt-/native-/Paketabnahme folgt weiterhin; installiert bleibt 0.9.71.
+
+
+## Abschließende Gesamt-, Paket- und Installationsprüfung
+
+Installiert: **0.9.72 / c40c9fd47ce1**, sauberer Intel/macOS-Release auf
+macOS 14.6.1 / 23G93. 98 Dateien paketgleich. App-SHA256:
+`3406d07cc09f239b5208ebaf50be6b76f7f692540b15826cc7c411acbe45c8a8`.
+Alle **88 lokalen Release-Tests** bestehen (471,00 s); alle 209 gehashten
+Produktinputs und die ausführbare Datei bleiben über den Lauf unverändert.
+Das entpackte Paket besteht 126 Desktop-, 167 Tastatur- und 75 Sicherungsbedingungen,
+Einstellungen in zwei Prozessen, CLI, Lizenzen, Versions- und Laufzeitprüfung.
+Der echte **71→72→71-Wechsel** erhält 20 Testdateien und Einstellungen;
+Sicherung/Wiederherstellung bestehen. Drei Updateaufnahmen und die installierte
+Ansicht wurden betrachtet. Beim Öffnen bleiben 21 Gedächtnisdateien unverändert.
+Deployment-Ziel der App: minos 14.0, SDK 15.2; kein Nachweis auf macOS 14.0/ARM64.
+[Fehlerkarte und genaue Abdeckung](EINSTELLUNGEN_BEENDEN.md).
+Originale unter `build/exit-preferences-verification/` und
+`build/exit-preferences-update/`.
+
+[CI38191364672](https://github.com/Lulus792/SecondBrain/actions/runs/38191364672)
+zu c40c9fd: Windows und Linux jeweils **88/88 Tests in Debug und Release**;
+beide Release-Pakete erfolgreich entpackt und geprüft. macOS-Jobs warten auf
+Runner. Windows Server 2025 und Ubuntu/Xvfb ersetzen keine Windows-11-/Wayland-
+oder menschliche Screenreaderabnahme.
+
+Die bisherige Installation liegt als Rückfallkopie unter
+`/Users/lulus/Projects/SecondBrain/build/previous-dist-0.9.71-20261012-033219`. ASan/UBSan und automatisierte SDL-Eingaben
+ersetzen keine menschliche Bedienabnahme. 1.0 bleibt ohne Nutzerfreigabe offen.

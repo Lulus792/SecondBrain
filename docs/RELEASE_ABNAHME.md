@@ -16,6 +16,7 @@ weder Version 1.0 noch einen Release-Tag. Der Nutzer entscheidet über die Freig
 | Sofortige Pfeilwahl, Startfokus, Kamerafahrt, groß lesen | [Tastaturvertrag](UI_TASTATUR.md), [Interaktion](INTERAKTION.md); Schutz ungespeicherter Änderungen bleibt |
 | Suche mit eigenem Löschen-Icon, Suchende, Textcursor, Hinweise und Formulare | [Navigationspolitur](NAVIGATION_POLITUR.md), [Interaktion](INTERAKTION.md), [Wortnavigation](WORTNAVIGATION.md), [Hilfe](HILFE_RUECKKEHR.md) |
 | Scrollposition und frühe Eingaben erhalten; Übergänge ohne alten Resize-Zuschnitt | [Scrollen beim Laden](SCROLLEN_BEIM_LADEN.md), [Übergangsbild](UEBERGANG_BILD.md) |
+| Sichtbare Einstellungsfehler beim Beenden, Wiederholung und Rückkehr | [Fehlerkarte](EINSTELLUNGEN_BEENDEN.md); lokale, Sanitizer- und native Windows-/Linux-Prüfungen |
 | Lesbare Oberfläche bei Materialfehlern | [Materialrückfall](MATERIAL_RUECKFALL.md), Software-/Metal- und gezielte Speicherfehlerprüfungen |
 
 „Implementiert“ bedeutet hier Code mit den genannten begrenzten Prüfungen.
@@ -25,31 +26,26 @@ Schemaänderungen sind kein bereits vorhandener Migrationsmechanismus.
 
 ## Aktueller ausgeführter Stand
 
-Installiert: **0.9.71 / 9867139fb2ac**, sauberer Intel/macOS-Release auf
+Installiert: **0.9.72 / c40c9fd47ce1**, sauberer Intel/macOS-Release auf
 macOS 14.6.1 / 23G93. 98 Dateien paketgleich. App-SHA256:
-`2a13aae08009f2e4b0ff931d307577da90bdc972eca101c5c280c86a73a6e41c`.
-Entpacktes Paket: 126 Desktop-, 167 Tastatur- und 75 Sicherungsbedingungen,
-Einstellungen in zwei Prozessen, CLI, Lizenzen, Version und verlinkte Laufzeit.
-Der echte 69→71→69-Wechsel erhält 20 Testdateien und Einstellungen; Sicherung und
-Wiederherstellung bestehen, drei Aufnahmen angesehen. 21 Gedächtnisdateien beim
-Öffnen unverändert; installierte Aufnahme angesehen. [Nachweis](SCHRIFT_LEBENSDAUER.md).
+`3406d07cc09f239b5208ebaf50be6b76f7f692540b15826cc7c411acbe45c8a8`.
+Alle **88 lokalen Release-Tests** bestehen (471,00 s); alle 209 gehashten
+Produktinputs und die ausführbare Datei bleiben über den Lauf unverändert.
+Das entpackte Paket besteht 126 Desktop-, 167 Tastatur- und 75 Sicherungsbedingungen,
+Einstellungen in zwei Prozessen, CLI, Lizenzen, Versions- und Laufzeitprüfung.
+Der echte **71→72→71-Wechsel** erhält 20 Testdateien und Einstellungen;
+Sicherung/Wiederherstellung bestehen. Drei Updateaufnahmen und die installierte
+Ansicht wurden betrachtet. Beim Öffnen bleiben 21 Gedächtnisdateien unverändert.
+Deployment-Ziel der App: minos 14.0, SDK 15.2; kein Nachweis auf macOS 14.0/ARM64.
+[Fehlerkarte und genaue Abdeckung](EINSTELLUNGEN_BEENDEN.md).
+Originale unter `build/exit-preferences-verification/` und
+`build/exit-preferences-update/`.
 
-Alle 86 lokalen Release-Tests bestehen zu 0.9.71/b6d3a799434d (723,70 s).
-Binärhash vor/nach dem Lauf identisch. Nach der Git-LF-Dateiregelkorrektur bleiben
-alle 209 gehashten Produktinputs unverändert; die saubere neu gebaute Fassung
-9867139 bestätigt Quellvorbereitung und beide Versionswege (1,13 s). Die Build-
-Commitkennung unterscheidet die Binärdateien; der vollständige Lauf gehört
-ausdrücklich zu b6d3a799434d. Der entpackte Paket-/Updateweg prüft die installierte
-9867139-Fassung. Originale unter `build/contrast-lifetime-verification/`.
-
-[CI38186316198](https://github.com/Lulus792/SecondBrain/actions/runs/38186316198):
-Linux Debug/Release samt Release-Paket erfolgreich. Windows je 85/86 Tests;
-beide Lebensdauertests bestehen, nur die Patchdatei-Byteprüfung scheitert.
-LF-Dateiregel korrigiert, echter Git-autocrlf-Checkout vor/nach geprüft.
-[Neue CI38187181878](https://github.com/Lulus792/SecondBrain/actions/runs/38187181878)
-zu 9867139: Windows und Linux Release einschließlich beider entpackter Pakete
-erfolgreich; auch beide Debugjobs sind inzwischen bestätigt. Mac-Jobs warten auf Runner. Windows Server 2025 und Ubuntu/Xvfb
-ersetzen keine Windows-11-/Wayland-/menschliche Screenreaderabnahme.
+[CI38191364672](https://github.com/Lulus792/SecondBrain/actions/runs/38191364672)
+zu c40c9fd: Windows und Linux jeweils **88/88 Tests in Debug und Release**;
+beide Release-Pakete erfolgreich entpackt und geprüft. macOS-Jobs warten auf
+Runner. Windows Server 2025 und Ubuntu/Xvfb ersetzen keine Windows-11-/Wayland-
+oder menschliche Screenreaderabnahme.
 
 ## Projektgedächtnis nach der Prüfung
 
@@ -74,7 +70,6 @@ automatische Änderung anderer Second Brains. Dieser historische Pflegeabschnitt
 | Vollständige mitgelieferte Laufzeit-/Lizenzzuordnung | Tatsächliche Binär-/Toolchainanteile und dynamische/transitive Komponenten final abgleichen; [Inventur](LIZENZ_INVENTUR.md), [Rust](RUST_RUNTIME_NACHWEIS.md), [Laufzeit](PAKET_LAUFZEIT.md) |
 | Vertraulicher Sicherheitskanal | Nutzerentscheidung und tatsächliche Erreichbarkeit; öffentliche Issues sind kein vertraulicher Kanal |
 | Signierung und Distribution | Apple-Developer-Konto/Windows-Zertifikat fehlen; tatsächliche Signierung/Notarisierung und dauerhafte aktuelle Pakete vor Freigabe prüfen |
-| Fehler beim Einstellungs-Speichern sichtbar machen | Beim Beenden schreibt `app/main.c:120–124` den Fehler nur nach stderr und schließt trotzdem; eigene UI-Rückmeldung mit Wiederholung/Rückkehr und Tastaturbedienung implementieren und prüfen |
 | Fertige Texte und 1.0 | Redaktionelle Schlussprüfung erst beim vollständigen Produkt, danach ausdrückliche Nutzerfreigabe; keine automatische 1.0-Setzung |
 
 ## Nächster Schritt
@@ -101,5 +96,5 @@ und menschliche Prüfung offen. Kein neuer lokaler 85er-Gesamtlauf zu 0.9.69.
 
 0.9.70 korrigiert die Schemanamenfreigabe, 0.9.71 einen reproduzierten
 [FreeType-Listenfehler](SCHRIFT_LEBENSDAUER.md). Acht lokale gezielte Tests sowie
-positive/negative ASan-/UBSan-Vergleiche sind dokumentiert. Der neue Gesamt-, native CI-, Paket- und Installationsstand steht oben; installiert
-ist 0.9.71. Weitere dort benannte Abnahmen bleiben offen.
+positive/negative ASan-/UBSan-Vergleiche sind dokumentiert. Der neue Gesamt-, native CI-, Paket- und Installationsstand steht oben; die damalige Installation
+war 0.9.71. Weitere dort benannte Abnahmen bleiben offen.

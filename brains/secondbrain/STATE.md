@@ -1,7 +1,7 @@
 # SecondBrain: aktueller Stand
 
-Stand: 12. Oktober 2026. Installiert ist 0.9.71. Der neue vollständige lokale
-Release-Lauf gehört zu 0.9.71; vier Windows-/Linux-Desktopjobs sind bestätigt.
+Stand: 12. Oktober 2026. Installiert ist 0.9.72/c40c9fd47ce1. Lokal und in den
+vier Windows-/Linux-Desktopjobs bestehen jeweils 88 Tests.
 1.0 ist noch nicht freigegeben. Die maßgeblichen Quellen und die Historie
 stehen am Ende dieser Notiz.
 
@@ -15,11 +15,12 @@ Vorlagen und Updates überschreiben vorhandenes Wissen nicht automatisch.
 Ungespeicherte Entwürfe und erkannte externe Konflikte bleiben geschützt.
 Externe Bibliotheken nur für UI; eigener Code MIT.
 
-Installiert **0.9.71 / 9867139fb2ac**, sauberer Intel/macOS-Release auf
-macOS 14.6.1/23G93. 98 Dateien paketgleich. Paketprüfungen: 126 Desktop-,
-167 Tastatur-, 75 Sicherungsbedingungen sowie Einstellungen, CLI, Lizenzen,
-Laufzeit und Versionsidentität. Echter 69→71→69-Wechsel erhält 20 Testdateien und
-Einstellungen; Sicherung/Wiederherstellung bestehen. [Nachweis](../../docs/SCHRIFT_LEBENSDAUER.md).
+Installiert **0.9.72 / c40c9fd47ce1**, Intel/macOS 14.6.1/23G93;
+98 Dateien paketgleich. Paket: 126 Desktop-, 167 Tastatur- und 75
+Sicherungsbedingungen sowie Einstellungen, CLI, Lizenzen, Laufzeit und Version.
+Echter 71→72→71-Wechsel erhält 20 Testdateien und Einstellungen;
+Sicherung/Wiederherstellung bestehen. 21 Gedächtnisdateien beim Öffnen unverändert.
+[Nachweis](../../docs/EINSTELLUNGEN_BEENDEN.md).
 
 ## Neueste geprüfte Änderungen
 
@@ -34,19 +35,16 @@ Einstellungen; Sicherung/Wiederherstellung bestehen. [Nachweis](../../docs/SCHRI
   Kamerafahrt und neue passende Ladeaufnahme erhalten. ASan/UBSan im dokumentierten
   Umfang; externe UI nicht instrumentiert, Leaks aus, kein TSan.
 
-Für 0.9.71/b6d3a799434d bestehen 86/86 lokale Release-Tests (723,70 s);
-Binärhash vor/nach dem Lauf gleich. Linux Debug/Release samt Release-Paket bestehen
-in CI38186316198. Windows: 85/86 je Konfiguration, nur Patchdatei-Byteprüfung
-scheitert; neue Lebensdauerprüfungen bestehen. Git-LF-Regel korrigiert und lokal
-mit echtem autocrlf-Checkout geprüft; 209 Produktinputs unverändert. Mac-CI queued.
-Server 2025/Xvfb sind keine menschlichen
-Windows-11-/Wayland-/Screenreaderabnahmen.
+Für c40c9fd bestehen lokal 88/88 Tests (471,00 s), Binärhash und 209
+Produktinputs unverändert. CI38191364672: Windows/Linux Debug/Release je 88/88,
+beide Release-Pakete erfolgreich. Mac-CI queued. Server 2025/Xvfb ersetzen keine
+menschlichen Windows-11-/Wayland-/Screenreaderabnahmen.
 
 ## Vor 1.0 noch offen
 
 Mindest-OS/frische Nutzerrechner und aktuelles ARM64; menschliche VoiceOver/NVDA/
 Orca-/IME-/Dialogbedienung; echte Monitore/Dichtewechsel, Trackpads, schwächere
-Geräte und Langzeit; sichtbare Einstellungsfehler beim Beenden und physische Persistenz;
+Geräte und Langzeit; weitere Dateisysteme und physische Persistenz;
 vollständiger Runtime-/Lizenzabgleich, vertraulicher Sicherheitskanal, Signierung
 und dauerhafte aktuelle Pakete. [Abnahmekriterien](../../docs/RELEASE_ABNAHME.md).
 
@@ -68,9 +66,10 @@ und Installation sind abgeschlossen. [Schriftlebensdauer](../../docs/SCHRIFT_LEB
 [Kontrastfarben](../../docs/SYSTEM_KONTRASTFARBEN.md).
 [Volume-Vertrag](../../docs/VOLLER_SPEICHER.md).
 0.9.72 behandelt Einstellungs-Speicherfehler beim Beenden mit eigener Fehlerkarte,
-Wiederholung, bewusster Ausnahme und Rückkehr. 83 lokale Bedingungen und sieben
-betroffene Prüfgruppen bestehen; neue CI/Gesamt/Paket/Installation folgen.
-[Vertrag](../../docs/EINSTELLUNGEN_BEENDEN.md).
+Wiederholung, bewusster Ausnahme und Rückkehr. 93 Fehler-/Rückkehrbedingungen
+und 94 Hilfe-/Auswahlbedingungen bestehen unter ASan/UBSan. Gesamt-, native
+Windows/Linux-, Paket-, Update- und Installationsprüfung abgeschlossen;
+menschliche Bedienprüfung bleibt offen. [Vertrag](../../docs/EINSTELLUNGEN_BEENDEN.md).
 Weitere technische Abnahmen und nötige reale Umgebungen anhand der
 Abnahmeübersicht klären; alle offenen Release-Anforderungen bleiben Arbeitsumfang.
 
