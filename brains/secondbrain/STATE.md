@@ -54,6 +54,10 @@ Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
   SHA256 geprüft; besondere Linkerlaubnis in allen drei x86-64-Dateien vorhanden,
   kein erwähnender Patch in116 Quilt-Einträgen. Keine reproduzierte Übersetzung
   und keine geprüfte PGP-Signatur; Originale unter build/glibc-source-review/.
+- Innere Windows-AccessKit-DLL: optionaler abschließender Cargo-Linkeraufruf
+  erzeugt jetzt ebenfalls eine Karte mit DLL-/Kartenhashes. Cargo--lib-Vertrag
+  lokal mit cdylib/staticlib, Pfad mit Leerzeichen/Umlaut und Hashbindung geprüft;
+ 72 Python-Tests (eine übersprungen) bestehen. Native Windows-Karte noch offen.
 - [Startdiagnose](../../docs/LAUFZEIT_START.md): tatsächliche normale Rendererwahl,
   vier Frames, sichtbares Fenster und beobachtete Module. Dadurch echter Windows-
   Startfehler gefunden: Accessibility muss vor dem ersten sichtbaren Fenster

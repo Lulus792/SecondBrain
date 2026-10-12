@@ -255,3 +255,28 @@ Zuordnung benennt App-/CLI-Runtime-Dateien, nicht automatisch alle internen
 Beiträge der AccessKit-DLL. Versionsbezogene SDK-Verteilungsbedingungen und
 deren Endproduktdarstellung bleiben mit den Originalquellen abzugleichen.
 Die installierte App bleibt0.9.74/eabf5b3ff114; kein neuer menschlicher Nachweis.
+
+## Innere Windows-AccessKit-DLL
+
+Der optionale Karten-Buildweg fordert nun auch eine MSVC-Karte für die tatsächlich
+erzeugte AccessKit-DLL an. Dafür wird `cargo rustc --lib` mit einem zusätzlichen
+abschließenden `-C link-arg=/MAP:...` verwendet. Die vorhandene Lockdatei,
+Release-Konfiguration, explizite MSVC-Zielauswahl und crt-static-Policy bleiben
+Teil desselben Buildbefehls. Die Karte wird wie bei App/CLI über eine Identität
+mit DLL- und Karten-SHA256 verbunden und als Entwicklungsnachweis aufbewahrt.
+Im normalen Build ohne Kartenoption bleibt der vorhandene Cargo-build-Aufruf.
+
+Grundlage, am 12. Oktober gelesen:
+[Cargo rustc](https://doc.rust-lang.org/cargo/commands/cargo-rustc.html),
+insbesondere Argumente ausschließlich für den abschließenden gewählten Target
+und die erforderliche einzelne Target-Auswahl. Die Argumente werden nicht als
+globale Flags an Abhängigkeiten oder Host-Buildskripte weitergereicht.
+
+Lokal besteht die Python-Gesamtprüfung mit72 Tests (eine übersprungen). Eine
+tatsächlich kompilierte kleine macOS-Prüfbibliothek mit cdylib/staticlib zeigt,
+dass derselbe Cargo--lib-Vertrag die beiden Ausgaben, die zusätzliche Linkerkarte
+und die DLL-/Kartenhashbindung erzeugt, einschließlich Pfad mit Leerzeichen/Umlaut.
+Das ist eine Cargo-Orchestrierungsprüfung auf Intel/macOS, keine Windows-
+AccessKit-Ausführung. Originale: `build/accesskit-map-check/`.
+Die neue native Windows-DLL-Prüfung folgt; die inneren Beiträge werden erst
+nach ihrer tatsächlichen Karte und dem Paketvergleich als zugeordnet behandelt.
