@@ -1,7 +1,7 @@
 # SecondBrain: aktueller Stand
 
 Stand: 12. Oktober 2026. Installiert ist 0.9.71. Der neue vollständige lokale
-Release-Lauf gehört zu 0.9.71; Windows-Abschluss nach Checkoutkorrektur noch offen.
+Release-Lauf gehört zu 0.9.71; vier Windows-/Linux-Desktopjobs sind bestätigt.
 1.0 ist noch nicht freigegeben. Die maßgeblichen Quellen und die Historie
 stehen am Ende dieser Notiz.
 
@@ -57,11 +57,13 @@ Endprodukttexte erst abschließend beim vollständigen Produkt bereinigen.
 
 ## Nächster Schritt
 
-Neue CI38187181878 nach LF-Dateiregel: Windows und Linux Release samt Paketen
-bestehen; beide Debugjobs in Arbeit, Mac queued. Deren Abschluss prüfen. Die native Windows-Allokatorprüfung
+CI38187181878 nach LF-Dateiregel: alle vier Windows-/Linux-Desktopjobs samt
+Release-Paketen bestehen; Mac queued. Neuer gemeinsamer Volume-Prüfweg lokal mit
+35 Kernprüfungen und echtem HFS+-Test bestätigt; erste ext4-/NTFS-CI folgt. Die native Windows-Allokatorprüfung
 besteht bereits im vorherigen Lauf. Neues Mac-Paket, tatsächlicher Updatewechsel
 und Installation sind abgeschlossen. [Schriftlebensdauer](../../docs/SCHRIFT_LEBENSDAUER.md),
 [Kontrastfarben](../../docs/SYSTEM_KONTRASTFARBEN.md).
+[Volume-Vertrag](../../docs/VOLLER_SPEICHER.md).
 Weitere technische Abnahmen und nötige reale Umgebungen anhand der
 Abnahmeübersicht klären; alle offenen Release-Anforderungen bleiben Arbeitsumfang.
 

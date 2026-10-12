@@ -195,3 +195,13 @@ Werkzeug hdiutil; sie ist kein Bestandteil der normalen App. Windows-/Linux-
 Prozessabnahme sowie weitere echte Dateisysteme werden erst nach ausgeführten
 Prüfungen genannt. Ein beendeter Prozess ist kein Stromausfall: Persistenz
 bei Hardware-, Kernel- oder Geräteausfall bleibt gesondert abzunehmen.
+
+
+## Gemeinsame Volume-Abnahme vom 12. Oktober
+
+Der HFS+-Prüfablauf ist mit neuen begrenzten ext4-/NTFS-Testvolumes geteilt.
+Identität, Kapazität, Bestandsschutz, Teilfortschritt, Wiederholung und Trennen
+werden geprüft. Windows/Linux sind ausdrücklich eingeschaltete Entwicklerprüfungen;
+ihre erste native Ausführung steht noch aus. 35 lokale Kernprüfungen samt echtem
+HFS+-Test und sieben kontrollierten Mount-Negativfällen bestehen.
+[Umfang, Originalquellen und Grenzen](VOLLER_SPEICHER.md).

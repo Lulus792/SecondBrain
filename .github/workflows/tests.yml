@@ -110,7 +110,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Configure native core
-        run: cmake -S . -B build/native -DSB_BUILD_UI=OFF -DCMAKE_BUILD_TYPE=${{ matrix.config }}
+        run: cmake -S . -B build/native -DSB_BUILD_UI=OFF -DSB_TEST_REAL_VOLUMES=ON -DCMAKE_BUILD_TYPE=${{ matrix.config }}
       - name: Build native core and tools
         run: cmake --build build/native --config ${{ matrix.config }} --parallel
       - name: Verify native project workflow
@@ -122,13 +122,15 @@ jobs:
         if: failure()
         run: cmake -DSB_TEST_LOG=build/native/Testing/Temporary/LastTest.log -P tools/ci_diagnostics.cmake
       - uses: actions/upload-artifact@v7
-        if: failure()
+        if: always()
         with:
           name: Core-evidence-${{ runner.os }}-${{ matrix.config }}
           path: |
             build/native/Testing/Temporary/LastTest.log
             build/native/checked-ctest.log
             build/native/test-entry.log
+            build/native/volume-test-data/**/report.json
+            build/native/volume-test-data/**/*.txt
           retention-days: 30
   tests:
     name: ${{ matrix.os }} / Python ${{ matrix.python }}

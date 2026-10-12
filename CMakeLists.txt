@@ -592,6 +592,9 @@ elseif(MINGW)
 endif()
 
 if(BUILD_TESTING)
+    option(SB_TEST_REAL_VOLUMES "Enable elevated bounded-volume integration tests on Windows/Linux" OFF)
+    add_test(NAME volume-fixture-guards COMMAND "${Python3_EXECUTABLE}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_volume_guards.py")
     add_test(NAME ui-license-inventory COMMAND "${Python3_EXECUTABLE}"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_ui_license_inventory.py")
     add_test(NAME rust-runtime-inventory COMMAND "${Python3_EXECUTABLE}"
@@ -616,6 +619,12 @@ if(BUILD_TESTING)
             "$<TARGET_FILE:secondbrain-backup-crash-worker>" "$<TARGET_FILE:secondbrain-cli>"
             "${CMAKE_CURRENT_BINARY_DIR}/volume-test-data")
         set_tests_properties(backup-real-volume PROPERTIES TIMEOUT 180 RESOURCE_LOCK secondbrain_clipboard)
+    elseif(SB_TEST_REAL_VOLUMES AND (WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux"))
+        add_test(NAME backup-real-volume COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_backup_volume_native.py"
+            "$<TARGET_FILE:secondbrain-backup-crash-worker>" "$<TARGET_FILE:secondbrain-cli>"
+            "${CMAKE_CURRENT_BINARY_DIR}/volume-test-data")
+        set_tests_properties(backup-real-volume PROPERTIES TIMEOUT 180 RUN_SERIAL TRUE)
     endif()
     add_executable(secondbrain-backup-tests tests/test_backup.c)
     target_link_libraries(secondbrain-backup-tests PRIVATE sb_core)
