@@ -18,6 +18,7 @@ weder Version 1.0 noch einen Release-Tag. Der Nutzer entscheidet über die Freig
 | Scrollposition und frühe Eingaben erhalten; Übergänge ohne alten Resize-Zuschnitt | [Scrollen beim Laden](SCROLLEN_BEIM_LADEN.md), [Übergangsbild](UEBERGANG_BILD.md) |
 | Sichtbare Einstellungsfehler beim Beenden, Wiederholung und Rückkehr | [Fehlerkarte](EINSTELLUNGEN_BEENDEN.md); lokale, Sanitizer- und native Windows-/Linux-Prüfungen |
 | Normaler sichtbarer Start und Accessibility vor dem ersten Anzeigen | [Startdiagnose](LAUFZEIT_START.md); Windows-/Linux-Release-Pakete und Intel-Mac geprüft |
+| Nativer Linux-Start unter Wayland | [Wayland-Prüfung](WAYLAND_START.md); Headless-Weston, Debug/Release und entpacktes Paket, separat von menschlicher Desktopbedienung |
 | Lesbare Oberfläche bei Materialfehlern | [Materialrückfall](MATERIAL_RUECKFALL.md), Software-/Metal- und gezielte Speicherfehlerprüfungen |
 
 „Implementiert“ bedeutet hier Code mit den genannten begrenzten Prüfungen.

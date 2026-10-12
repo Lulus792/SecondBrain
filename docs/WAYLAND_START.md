@@ -1,7 +1,8 @@
 # Startprüfung unter Wayland
 
-Stand: 12. Oktober 2026. Der zusätzliche Prüfweg ist vorbereitet; seine native
-Linux-Ausführung steht noch aus. Bisherige Linux-Abnahmen laufen unter X11.
+Stand: 12. Oktober 2026. Der zusätzliche Prüfweg besteht nativ unter Linux in
+Debug und Release sowie im entpackten Release-Paket. Er ergänzt die vorhandenen
+X11-Abnahmen; die menschliche Geräte-/Desktopabnahme bleibt gesondert offen.
 
 ## Prüfweg
 
@@ -53,6 +54,24 @@ Mac-Prüfweg, keinen Linux-Backend. Originale:
 `build/accesskit-map-native/wayland-contract-tests.log`,
 `wayland-process-checks.json` und `cocoa-probe-contract/`.
 
-Auch eine erfolgreiche native Headless-Prüfung würde keine reale GPU,
+Die native Headless-Prüfung nimmt keine reale GPU,
 Monitor-/Pixeldichtewechsel, Eingabegeräte, native Dialoge oder menschliche
-Orca-Bedienung abnehmen. Diese Aufgaben bleiben in der [Release-Abnahme](RELEASE_ABNAHME.md).
+Orca-Bedienung ab. Diese Aufgaben bleiben in der [Release-Abnahme](RELEASE_ABNAHME.md).
+
+## Native Ausführung
+
+[CI38207821830](https://github.com/Lulus792/SecondBrain/actions/runs/38207821830)
+zudc3ee0e: Linux Debug und Release einschließlich Release-Paket erfolgreich.
+Beide rohen CTest-Dateien enthalten92 Prüfblöcke und92 Pass-Marker. Weston13.0.0
+läuft mit Headless-Backend, Pixman und Kiosk-Shell. Alle drei Wayland-Berichte
+bestätigen OpenGL/wayland, vier Frames, ein sichtbares Fenster,62 beobachtete
+Module und13 erhaltene isolierte Projektdateien. Bereits vorhandene Berichte
+und die Ablehnung mehrdeutiger Argumente sind ebenfalls bestätigt.
+
+Debug-Nachweis11728028767, Release-Nachweis11728760219 und Paket11727759607
+wurden gegen ihre GitHub-SHA256-Digests geprüft. Der App-Hash im tatsächlichen
+tar.gz-Paket stimmt exakt mit beiden Release-Wayland-Berichten überein:
+`3bec18a80e01d56905a1e1b503606ad387edc72222d93d9bc90d35b79fd60a1d`.
+Die Archive wurden gelesen, fremde Programme auf dem Mac nicht ausgeführt.
+Originale: `build/accesskit-map-native/wayland-native-review.json` und die drei ZIPs.
+Der Nachweis gilt für diese Headless-Umgebung und den dokumentierten Startumfang.

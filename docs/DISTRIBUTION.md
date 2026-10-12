@@ -15,10 +15,11 @@ cpack --config build/app/CPackConfig.cmake -C Release -B build/app/packages
 cmake -DSB_ARCHIVE_ROOT=build/app/packages -DSB_TEST_ROOT=build/app/package-check -P tests/test_package.cmake
 ```
 
-Unter Linux benötigen die UI-Prüfungen eine Desktop-Sitzung oder X11 unter Xvfb.
-Die CI installiert die zugehörigen Entwicklungsdateien und führt die beiden
-Prüfbefehle mit `xvfb-run -a` aus. Linux zur Laufzeit benötigt weiterhin die
-Systembibliotheken und eine Sitzung seines Fenstersystems.
+Unter Linux laufen die bisherigen UI-Prüfungen mit X11 unter Xvfb. Zusätzlich
+prüft die CI den normalen App-Start unter Wayland mit einer isolierten Weston-
+Sitzung und `-DSB_TEST_WAYLAND=ON` im Pakettest. Weston dient dabei als
+Entwicklungs-Testumgebung; die normale Linux-Desktop-Sitzung stellt das
+Fenstersystem bereit. [Ausgeführter Umfang und Grenzen](WAYLAND_START.md).
 
 Der Pakettest entpackt das tatsächliche ZIP beziehungsweise tar.gz in einen
 neuen Ordner mit Leerzeichen und Umlauten. Er prüft Schriften, Lizenzen und
@@ -62,9 +63,12 @@ jede ältere Betriebssystemversion.
 Die App bietet grundlegende Markdown-Darstellung und UTF-8-Bearbeitung bis
 16 MiB pro Datei. Rückgängig/Wiederholen ist auf 256 Operationen und 32.000
 gespeicherte Unicode-Zeichen begrenzt. Die Suchnormalisierung deckt ASCII und
-häufige lateinische Zeichen ab. Die mitgelieferten Schriften decken Deutsch,
-Latein, Griechisch, Kyrillisch und grundlegende mathematische Symbole ab;
-für weitere Schriftsysteme besteht noch kein vollständiger Schrift-Fallback.
+häufige lateinische Zeichen ab. Die mitgelieferten Schriften und die eigene
+Auswahl ganzer Grapheme unterstützen die in [Textdarstellung](TEXTDARSTELLUNG.md)
+und [Emoji](EMOJI.md) dokumentierten Schriftläufe, einschließlich der vorhandenen
+CJK-, arabischen, hebräischen, Devanagari-, Mathematik- und Emoji-Schriften.
+Die Prüfungen dieser konkreten Fälle sind keine Zusage für jede Sprache,
+Glyphenfolge oder Eingabemethode.
 AccessKit ergänzt die native Zugänglichkeit. Vollständige Dokumentsemantik
 und menschliche Screenreader-Abnahme bleiben offen.
 
@@ -75,8 +79,9 @@ integrierte Verbindung zu einem KI-Anbieter sind spätere Erweiterungen.
 
 Die Sternkarte ist auf 4096 Dokumente und 65536 interne Verweise je Projekt begrenzt.
 Bei Überschreitung bleibt die Dokumentliste verfügbar. Die Graphauswertung
-unterstützt einfache Markdown-Inline-Links; Referenzdefinitionen und Wiki-Links
-werden noch nicht ausgewertet. Die Glasdarstellung ist ein eigener C-Effekt und
+verwendet die gemeinsamen [Inline-Linkregeln](INLINE_LINKS.md), einschließlich
+[Referenzdefinitionen](REFERENZLINKS.md). Wiki-Links gehören nicht zum
+dokumentierten Umfang. Die Glasdarstellung ist ein eigener C-Effekt und
 verwendet keine native macOS-26-Materialkomponente. Reduzierte Transparenz lässt
 sich in der App aktivieren. Kamera und Scrollen verwenden kurze Übergänge;
 „Bewegung reduzieren“ schaltet sie ab. Es gibt keine automatische Rotation.

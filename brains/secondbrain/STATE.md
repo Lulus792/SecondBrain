@@ -80,8 +80,11 @@ Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
   Release zu17e7a93 inzwischen vollständig bestätigt:92 Tests, Paket-DLL-
   Hash und alle drei SDK-Bytevergleiche passen; keine SDK-Kopien in Downloads.
 - [Wayland-Startprüfung](../../docs/WAYLAND_START.md) für gebaute App und Paket
-  vorbereitet.82 Python-Tests (eine übersprungen), vier lokale Prozess-/Socket-
-  Fälle und vorhandener Metal/Cocoa-Start bestehen. Native Wayland-Ausführung offen.
+  besteht zu dc3ee0e nativ unter Linux Debug/Release und im Release-Paket:
+  Weston13/Pixman, OpenGL/wayland, vier Frames,62 Module,13 erhaltene Dateien;
+  Paket-App-Hash stimmt mit beiden Release-Berichten überein. Drei ZIPs SHA-
+  geprüft; je92 Tests.82 Python-Tests (eine übersprungen), vier lokale Prozess-/
+  Socket-Fälle und vorhandener Metal/Cocoa-Start bestehen. Menschliche Abnahme offen.
 - [Startdiagnose](../../docs/LAUFZEIT_START.md): tatsächliche normale Rendererwahl,
   vier Frames, sichtbares Fenster und beobachtete Module. Dadurch echter Windows-
   Startfehler gefunden: Accessibility muss vor dem ersten sichtbaren Fenster
