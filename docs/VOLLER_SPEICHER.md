@@ -147,3 +147,24 @@ Füllschreibvorgang und wurde gezielt korrigiert; kein Produktfehler beobachtet.
 Neue native Windows-/Linux-Nachweise für diese vier Fälle stehen noch aus.
 App-Code und installierte 0.9.71 bleiben unverändert; physische Persistenz und
 andere Dateisysteme bleiben getrennte Abnahmen.
+
+
+## Anwendungsmodell beim Speichern aus dem Schutzdialog
+
+Ein zusätzlicher Workeraufruf benutzt das unveränderte `SBApp`-Modell: Notiz
+laden, tatsächlichen Editorpuffer ändern, Beenden anfordern und „Änderungen
+speichern“ entscheiden. Bei SB_IO müssen Editorinhalt, alte Revision,
+Änderungszustand, Schutzdialog und ausstehender Beenden-Befehl erhalten bleiben;
+`quit` darf nicht gesetzt sein. Bei erfolgreichem Aufruf mit freiem Platz muss
+der Entwurf gespeichert und der geschützte Wechsel abgeschlossen werden.
+Der Vergleich nach Platzfreigabe startet einen neuen Testprozess; er behauptet
+keine bereits gemessene Wiederholung in derselben laufenden UI-Sitzung.
+
+Die neue fünfte Schreibprüfung besteht lokal auf HFS+, zusammen mit fünf
+betroffenen CTest-Gruppen (4,10 s). Der Testworker verlinkt dafür das eigene
+C-Anwendungsmodell; Produktionscode und Runtimebibliotheken sind unverändert.
+Die UI-Codeanalyse zeigt außerdem: `result` speichert die Fehlermeldung, öffnet
+die Karte und verändert den Modellpuffer nicht; die Revision wird in
+`sb_app_save` erst nach erfolgreicher Dateispeicherung übernommen. Das ist kein
+interaktiver Desktop-/Screenreader-Nachweis. Original:
+`build/volume-write-verification/model-targeted.log`.

@@ -1,6 +1,7 @@
 #include "backup.h"
 #include "platform.h"
 #include "settings.h"
+#include "model.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,7 +28,27 @@ static int run(int argc,char **argv) {
     if (argc!=7) return 2;
     Stop stop={(SBBackupPhase)strtoul(argv[5],NULL,10),argv[6],!strstr(argv[1],"-fill"),false};
     SBStatus status;
-    if (!strcmp(argv[1],"note-save")) {
+    if (!strcmp(argv[1],"model-save")) {
+        SBApp app={0};char *text=NULL;size_t length=0;
+        status=sb_fs_read(argv[3],&text,&length);
+        if (status.code==SB_OK) status=sb_app_init(&app,argv[2]);
+        if (status.code==SB_OK) status=sb_app_request(&app,SB_ACT_PROJECT,argv[5]);
+        if (status.code==SB_OK) status=sb_app_request(&app,SB_ACT_NOTE,argv[4]);
+        if (status.code==SB_OK && app.editor && length<=SB_TEXT_LIMIT) {
+            memcpy(app.editor,text,length+1);SBRevision before=app.revision;
+            status=sb_app_request(&app,SB_ACT_QUIT,NULL);
+            if (status.code==SB_OK && (!app.guard || !sb_app_dirty(&app))) status=sb_error(SB_INVALID,"Entwurf löst keinen Schutzdialog aus.");
+            if (status.code==SB_OK) {
+                status=sb_app_decide(&app,SB_SAVE_CHANGES);
+                bool kept=app.editor && !strcmp(app.editor,text);
+                if (status.code==SB_IO && (!kept || !sb_app_dirty(&app) || !app.guard || app.quit || app.pending.kind!=SB_ACT_QUIT || app.revision.hash!=before.hash || app.revision.length!=before.length))
+                    status=sb_error(SB_INVALID,"Speicherfehler verliert Entwurf oder Schutzentscheidung.");
+                if (status.code==SB_OK && (!kept || sb_app_dirty(&app) || app.guard || !app.quit))
+                    status=sb_error(SB_INVALID,"Erneutes Speichern beendet den geschützten Wechsel nicht.");
+            }
+        } else if (status.code==SB_OK) status=sb_error(SB_INVALID,"Editor fehlt.");
+        free(text);sb_app_free(&app);
+    } else if (!strcmp(argv[1],"note-save")) {
         SBProject project={0};char *text=NULL,*old=NULL;size_t length=0;uint64_t draft_hash=0;SBRevision expected={0},saved={0};
         if (strlen(argv[2])>=sizeof(project.root) || strlen(argv[5])>=sizeof(project.id)) return 2;
         strcpy(project.root,argv[2]);strcpy(project.id,argv[5]);

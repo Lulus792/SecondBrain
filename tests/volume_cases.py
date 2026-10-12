@@ -105,6 +105,8 @@ def exercise(worker, cli, root, volume, capacity, filesystem):
     relative = 'knowledge/Erhalten ü.md'
     note = notes_project / relative
     note.write_bytes('# Bisherige Fassung ü\n\nMuss erhalten bleiben.\n'.encode())
+    model_note = notes_project / 'knowledge/Modell ü.md'
+    model_note.write_bytes('# Modell vor Speicherfehler\n'.encode())
     body = root / 'Entwurf ü.txt'
     desired = ('# Neue Fassung ü\n\n' + 'Längerer Text Ω und é.\n' * 65536).encode()
     body.write_bytes(desired)
@@ -118,13 +120,16 @@ def exercise(worker, cli, root, volume, capacity, filesystem):
     writes = []
     for mode, target, remaining in [('note-replace', note, 128 * 1024),
                                     ('note-new', notes_project / 'knowledge/Neu ü.md', 128 * 1024),
+                                    ('model-guard-save', model_note, 128 * 1024),
                                     ('settings-replace', settings, 0),
                                     ('settings-new', volume / 'Neue Einstellungen ü.conf', 0)]:
         before = snapshot(notes_project)
         old_settings = settings.read_bytes()
         exists = target.exists()
         old_target = target.read_bytes() if exists else None
-        if mode.startswith('note'):
+        if mode == 'model-guard-save':
+            args = [worker, 'model-save', notes_workspace, body, target.relative_to(notes_project).as_posix(), 'notes', '-']
+        elif mode.startswith('note'):
             args = [worker, 'note-save', notes_project, body, target.relative_to(notes_project).as_posix(), 'notes', '-']
         else:
             args = [worker, 'settings-update' if exists else 'settings-init', target, remembered_workspace, 'notes', relative, '-']
@@ -139,7 +144,7 @@ def exercise(worker, cli, root, volume, capacity, filesystem):
         finally:
             filler.unlink()
         successful(args)
-        if mode.startswith('note'):
+        if mode.startswith('note') or mode == 'model-guard-save':
             assert target.read_bytes() == desired
         else:
             after = target.read_bytes()

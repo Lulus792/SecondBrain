@@ -602,7 +602,7 @@ if(BUILD_TESTING)
     add_test(NAME ci-test-entry COMMAND "${Python3_EXECUTABLE}"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_ci_entry.py")
     add_executable(secondbrain-backup-crash-worker tests/backup_crash_worker.c)
-    target_link_libraries(secondbrain-backup-crash-worker PRIVATE sb_core)
+    target_link_libraries(secondbrain-backup-crash-worker PRIVATE sb_app_model)
     if(MSVC)
         target_compile_options(secondbrain-backup-crash-worker PRIVATE /utf-8)
     elseif(MINGW)
