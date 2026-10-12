@@ -80,6 +80,8 @@ typedef struct {
 } SBUi;
 
 SBStatus sb_ui_init(SBUi *ui, const char *font_path, int width, int height, bool testing);
+/* Desktop attaches native accessibility before the first visible window. */
+SBStatus sb_ui_init_hidden(SBUi *ui, const char *font_path, int width, int height, bool testing);
 SBStatus sb_ui_fonts(SBUi *ui, float scale);
 void sb_ui_set_palette(SBUi *ui,SBPalette palette);
 struct nk_color sb_ui_palette_color(const SBUi *ui,unsigned role);

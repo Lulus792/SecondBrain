@@ -68,6 +68,7 @@ SBStatus sb_runtime_probe(const SBUi *ui,const char *path) {
     Probe p={0};append(&p,"{\"format\":1,\"build\":");quoted(&p,sb_build_info());
     append(&p,",\"renderer\":");quoted(&p,SDL_GetRendererName(ui->renderer));
     append(&p,",\"video_driver\":");quoted(&p,SDL_GetCurrentVideoDriver());
+    append(&p,",\"window_visible\":");append(&p,(SDL_GetWindowFlags(ui->window)&SDL_WINDOW_HIDDEN) ? "false" : "true");
     append(&p,",\"rendered_frames\":4,\"loaded_modules\":[");
 #ifdef _WIN32
     HANDLE snapshot=INVALID_HANDLE_VALUE;

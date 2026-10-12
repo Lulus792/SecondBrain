@@ -10,7 +10,7 @@ Die festen Imports allein beschreiben deshalb nicht diesen gesamten Startweg.
 `--runtime-probe NEUE_DATEI.json --workspace TESTORDNER` startet dieselbe App mit
 normaler Rendererwahl, zeichnet und präsentiert vier Frames, schreibt einen
 JSON-Bericht und beendet sich. Der Bericht nennt Buildkennung, tatsächlich
-gewählten Renderer, Fenstersystem und beobachtete geladene Module.
+gewählten Renderer, Fenstersystem, Sichtbarkeit und beobachtete geladene Module.
 Er benötigt einen expliziten Arbeitsordner. Einstellungen werden weder geladen
 noch gespeichert; Kombinationen mit Projektwahl, Einstellungen, Snapshot oder
 anderen Testmodi werden vor dem Start abgewiesen. Bestehende Berichte werden
@@ -67,3 +67,51 @@ Sitzungen sind dadurch nicht abgenommen. Beobachtete Systemmodule werden nicht
 mitgeliefert und sind keine Zuordnung aller eingebetteten statischen Bestandteile.
 Eine vollständige Lizenz-/SDK- oder Mindest-OS-Freigabe folgt daraus nicht.
 Sie ergänzt [Paketimporte](PAKET_LAUFZEIT.md) und [Lizenzinventur](LIZENZ_INVENTUR.md).
+
+## Gefundener Windows-Startfehler und Korrektur
+
+Der neue normale Startweg scheitert in Windows Release zu 51b6963
+([CI38193619573](https://github.com/Lulus792/SecondBrain/actions/runs/38193619573)):
+88/89 Tests bestehen, nur die Startdiagnose bricht ab. AccessKit Windows 0.35.1
+verlangt seinen Subclassing-Adapter vor dem ersten sichtbaren Fenster. Die App
+zeigte bislang das Fenster bereits in `sb_ui_init`; erst danach wurde der Adapter
+in `sb_desktop_init` angelegt. Versteckte Software-Testfenster verdeckten diesen
+Fehler des normalen Starts. Der native Linux-Release samt Paket besteht dagegen.
+
+Das offizielle Crate-Archiv wurde gegen den bereits festgelegten SHA256
+`ce63f35d6bdcf59f26b76b3379063f738e6412cef46999cc772d46aa3de35adb`
+geprüft und `src/subclass.rs` gelesen. Sein Sichtbarkeitscheck bestätigt die
+Ursache. Original: [AccessKit Windows 0.35.1](https://static.crates.io/crates/accesskit_windows/accesskit_windows-0.35.1.crate).
+Die docs.rs-Seite war nicht erreichbar; die Aussage stammt aus dem geprüften
+Originalarchiv und dem tatsächlichen Jobfehler.
+
+Der Desktop erstellt nun anfangs ein verborgenes Fenster bei unveränderter
+normaler Rendererwahl, richtet Dialoge, Accessibility, Systemstil und Modell ein
+und zeigt es anschließend an. Fehler beim Anzeigen führen zu geordnetem Abbau
+und einer Fehlermeldung. Die eigenständige `sb_ui_init`-Anbindung behält ihr
+bisheriges Verhalten. Die Diagnose verlangt jetzt ausdrücklich
+`window_visible: true`; dauerhaft versteckte Fenster erfüllen die Prüfung nicht.
+
+Vor der Korrektur bestehen lokal 89/89 Tests zu 51b6963 in 461,19 s; 211
+Produktinputs und Binärhash unverändert. Dieser Lauf belegt nicht die neue
+Reihenfolge. Nach der Korrektur bestehen fünf betroffene Gruppen einschließlich
+normalem Start, nativer Mac-Anbindung, Erststart und Einstellungsfehlern in
+25,05 s. Die neue Windows-Abnahme und der neue vollständige Lauf folgen.
+
+Der SHA256-verifizierte ursprüngliche Linux-Release-Nachweis (Artefakt
+11722576971, ZIP `45afbc65eeefbd0742b5fcfce8e852166a61e8e59a7ada4f2e3b83d9ad1a0d3c`)
+bestätigt OpenGL/X11, vier Frames, 65 Module und 13 erhaltene Projektdateien im
+entpackten Paket. Programmhash stimmt mit dem Importbericht überein. Alle
+beobachteten Dateipfade liegen im Systembereich, hinzu kommt `linux-vdso.so.1`.
+Keine reale GPU-/Wayland-/menschliche Bedienabnahme. Originale:
+`build/runtime73-verification/`, insbesondere `linux-native-runtime.json`,
+`window-order-tests.log` und `accesskit-subclass-original.rs`. Installiert bleibt
+0.9.72; 0.9.73 wird erst nach der korrigierten Paketabnahme installiert.
+
+Die korrigierte sichtbare Metal-Reihenfolge besteht außerdem drei Starts und
+den bestehenden-Bericht-Fall unter ASan/UBSan; 65 aktuelle Quell-/Include-/Header-
+Records abgeglichen, Headeroriginale vor dem nächsten sauberen Build gesichert.
+Eigene C-Teile instrumentiert, externe UI nicht; Leaks aus, kein TSan. Originale:
+`build/runtime73-verification/window-order-asan/` und
+`build/runtime-probe-sanitizers/sources.json`. Das ersetzt keine positive
+Windows-Ausführung der Korrektur.

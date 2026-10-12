@@ -89,6 +89,15 @@ Modulbeobachtung und geschütztem neuen Bericht. Lokal Metal/Cocoa, 394 Module,
 bestanden. Neue vollständige/native/Paket-/Installationsprüfung folgt;
 installiert bleibt 0.9.72. [Startdiagnose](../../docs/LAUFZEIT_START.md).
 
+Der vollständige lokale 89er-Lauf zu 51b6963 besteht (461,19 s), 211 Inputs und
+Binärhash unverändert. Neue native Startprüfung zeigt jedoch einen echten
+Windows-Fehler: AccessKit wird nach dem ersten sichtbaren Fenster angelegt.
+Windows Release 88/89; Linux Release samt Paket erfolgreich, SHA-geprüfter
+Startbericht OpenGL/X11/65 Module. Reihenfolge korrigiert: zunächst verborgen,
+Adapter einrichten, dann zeigen; Diagnose verlangt sichtbares Fenster. Fünf
+lokale Gruppen (25,05 s) und drei ASan/UBSan-Starts bestehen. Korrigierte native
+Windows-, vollständige lokale und Paket-/Installationsabnahme folgen.
+
 ## Quellen und Historie
 
 [Abnahmeübersicht](../../docs/RELEASE_ABNAHME.md),

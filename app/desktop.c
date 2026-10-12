@@ -555,7 +555,7 @@ SBStatus sb_desktop_init(SBDesktop *d, const char *workspace, const char *font, 
     d->flight=1;
     d->sidebar = true; d->test = testing; d->card = true; d->zoom = d->view_zoom = 1; d->seconds = 1.0f/60; d->graph_dirty = true;
     strcpy(d->focus, "project-picker"); strcpy(d->section, "all");
-    status = sb_ui_init(&d->ui, font, 1336, 840, testing);
+    status = sb_ui_init_hidden(&d->ui, font, 1336, 840, testing);
     if (status.code != SB_OK) return status;
     d->dialogs=sb_dialogs_new();
     d->accessibility=sb_accessibility_new(d->ui.window);
@@ -568,6 +568,10 @@ SBStatus sb_desktop_init(SBDesktop *d, const char *workspace, const char *font, 
     }
     d->generation = d->model.generation;
     sb_desktop_focus_start(d);
+    if(!testing && !SDL_ShowWindow(d->ui.window)) {
+        status=sb_error(SB_IO,"Fenster konnte nicht angezeigt werden: %s",SDL_GetError());
+        sb_desktop_free(d);return status;
+    }
     return sb_ok();
 }
 SBStatus sb_desktop_preferences(SBDesktop *d, const char *path, bool explicit_workspace) {

@@ -30,7 +30,7 @@ def verify(app, cli, output):
     data = json.loads(report.read_bytes())
     version = invoke('--version')
     if (data['format'] != 1 or data['build'] != version.stdout.decode('utf-8')
-            or data['rendered_frames'] != 4 or not data['renderer'] or not data['video_driver']
+            or data['rendered_frames'] != 4 or data['window_visible'] is not True or not data['renderer'] or not data['video_driver']
             or not data['loaded_modules'] or any(not isinstance(x, str) or not x for x in data['loaded_modules'])
             or data['scope'] != 'normal-renderer-start-after-four-frames'):
         raise RuntimeError('Incomplete runtime probe report')

@@ -399,7 +399,7 @@ void sb_ui_theme(SBUi *ui, bool dark) {
     ui->dark = dark;
 }
 
-SBStatus sb_ui_init(SBUi *ui, const char *font_path, int width, int height, bool testing) {
+static SBStatus ui_init(SBUi *ui, const char *font_path, int width, int height, bool testing, bool defer_show) {
     SBStatus result;
     memset(ui, 0, sizeof(*ui));
     if (strlen(font_path) >= sizeof(ui->font_path)) return sb_error(SB_LIMIT, "Schriftpfad zu lang.");
@@ -409,7 +409,7 @@ SBStatus sb_ui_init(SBUi *ui, const char *font_path, int width, int height, bool
     SDL_SetHint(SDL_HINT_IME_IMPLEMENTED_UI,"composition");
     if (!SDL_Init(SDL_INIT_VIDEO)) return sb_error(SB_IO, "Fenstersystem: %s", SDL_GetError());
     ui->window = SDL_CreateWindow("SecondBrain", width, height,
-        SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | (testing ? SDL_WINDOW_HIDDEN : 0));
+        SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | ((testing || defer_show) ? SDL_WINDOW_HIDDEN : 0));
     if (!ui->window) { SDL_Quit(); return sb_error(SB_IO, "Fenster: %s", SDL_GetError()); }
     SDL_SetWindowMinimumSize(ui->window, 780, 520);
     ui->renderer = SDL_CreateRenderer(ui->window, testing ? "software" : NULL);
@@ -422,6 +422,13 @@ SBStatus sb_ui_init(SBUi *ui, const char *font_path, int width, int height, bool
     if (result.code != SB_OK) { sb_ui_shutdown(ui); return result; }
     sb_ui_theme(ui, true);
     return sb_ok();
+}
+
+SBStatus sb_ui_init(SBUi *ui,const char *font_path,int width,int height,bool testing) {
+    return ui_init(ui,font_path,width,height,testing,false);
+}
+SBStatus sb_ui_init_hidden(SBUi *ui,const char *font_path,int width,int height,bool testing) {
+    return ui_init(ui,font_path,width,height,testing,true);
 }
 
 void sb_ui_event(SBUi *ui, const SDL_Event *event) {
