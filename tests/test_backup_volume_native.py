@@ -56,12 +56,13 @@ def windows_volume(root):
     image = root / 'limited.vhd'
     assert not image.exists()
     assert not any(c in str(image) for c in '"\r\n'), 'Invalid DiskPart path'
+    assert str(image).isascii(), 'DiskPart fixture backing path must be ASCII'
     # DiskPart focuses only this new file. Never select/clean a numbered disk.
     script = root / 'attach.txt'
     script.write_text(f'create vdisk file="{image}" maximum=64 type=fixed\n'
                       'attach vdisk\ncreate partition primary\n'
                       'format fs=ntfs label=SecondBrainVolumeTest quick\n'
-                      f'assign letter={letter}\nexit\n', encoding='utf-16')
+                      f'assign letter={letter}\nexit\n', encoding='ascii')
     started = False
     try:
         started = True
@@ -81,7 +82,7 @@ def windows_volume(root):
             # Microsoft requires a gap between consecutive DiskPart invocations.
             time.sleep(15)
             detach = root / 'detach.txt'
-            detach.write_text(f'select vdisk file="{image}"\ndetach vdisk\nexit\n', encoding='utf-16')
+            detach.write_text(f'select vdisk file="{image}"\ndetach vdisk\nexit\n', encoding='ascii')
             successful(['diskpart.exe', '/s', detach])
             assert not volume.exists(), 'Owned test image remained attached'
 

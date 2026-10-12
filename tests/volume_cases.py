@@ -26,12 +26,12 @@ def exercise(worker, cli, root, volume, capacity, filesystem):
     """Caller must prove the mount identity and capacity before this call."""
     assert 0 < capacity <= 80 * 1024 * 1024
     command = lambda *args: successful([cli, *args])
-    workspace = root / 'Original'
+    workspace = root / 'Original ü'
     command('new', workspace, 'project', 'Projekt ü')
     project = workspace / 'project'
     (project / 'attachment.bin').write_bytes(bytes(range(256)) * 4096)
     original = snapshot(project)
-    archive = root / 'valid.sbbackup'
+    archive = root / 'Sicherung ü.sbbackup'
     command('backup', workspace, 'project', archive)
     original_archive = hashlib.sha256(archive.read_bytes()).hexdigest()
     restore_root = volume / 'Wiederherstellung ü'
@@ -59,7 +59,7 @@ def exercise(worker, cli, root, volume, capacity, filesystem):
             os.fsync(stream.fileno())
         marker = root / (operation + '.txt')
         source = project if phase == 1 else archive
-        destination = volume / 'failed.sbbackup' if phase == 1 else restore_root
+        destination = volume / 'Fehlversuch ü.sbbackup' if phase == 1 else restore_root
         final = destination if phase == 1 else destination / 'recovered'
         result = execute([worker, operation, source, destination,
                           'project' if phase == 1 else 'recovered', phase, marker])

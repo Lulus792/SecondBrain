@@ -73,3 +73,17 @@ auf diesen begrenzten virtuellen Dateisystemen; Speichern von Notizen/Einstellun
 weitere Dateisysteme, Netzlaufwerke und physische Persistenz bleiben getrennte
 Abnahmen. Ein virtuelles Volume und ein Prozesskill sind kein Stromausfall.
 Die installierte App bleibt 0.9.71 / 9867139fb2ac; 1.0 bleibt ohne Nutzerfreigabe offen.
+
+
+## Erste native Linux-Abnahme und Windows-Aufbaukorrektur
+
+CI38188340574 zu 2380173 besteht auf Linux in Debug und Release mit jeweils
+35 Kernprüfungen, einschließlich echtem ext4-Volume. Linux-Releasejob
+114615455135 bestätigt backup-real-volume in 1,11 s. Der Windows-Aufbau scheitert
+vor Volume-Erzeugung an der gewählten UTF-16-Skriptkodierung: DiskPart zeigt seine
+Befehlsübersicht. Der Prüfer schreibt die Skripte jetzt ohne BOM als ASCII und
+verlangt dafür einen ASCII-Backing-Pfad. Die Projekt-/Archiv-/Wiederherstellungspfade
+im gemeinsamen C-Ablauf enthalten weiterhin Unicode; die Backing-Pfadgrenze
+betrifft nur diesen Entwicklerprüfer. Sieben Guard-Prüfungen und der HFS+-Versuch
+mit zusätzlichen Unicode-Pfaden bestehen lokal. Neue Windows-Abnahme folgt;
+kein NTFS-Erfolg wird aus dem bisher fehlgeschlagenen Aufbau abgeleitet.

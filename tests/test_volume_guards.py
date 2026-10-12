@@ -62,7 +62,7 @@ class VolumeGuards(unittest.TestCase):
             kernel = SimpleNamespace(GetLogicalDrives=lambda: 1)
             def command(args):
                 commands.append(list(map(str, args)))
-                script = Path(args[-1]).read_text(encoding='utf-16')
+                script = Path(args[-1]).read_text(encoding='ascii')
                 self.assertNotIn('select disk ', script.lower())
                 self.assertNotIn('\nclean', script.lower())
                 if 'create vdisk' in script:
