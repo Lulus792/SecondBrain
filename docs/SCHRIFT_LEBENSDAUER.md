@@ -65,10 +65,11 @@ Worker; der Prozess endet mit SIGABRT. Die produktive vorbereitete Quelle wurde
 für diesen Vergleich nicht geändert. Originale: `build/font-lifetime-sanitizers/`
 mit `sources.json`, `fixed.log`, `baseline/run.log` und `baseline/result.json`.
 
-Die neue Linux-Debug-Nachprüfung und Windows-/Linux-/Mac-Pakete stehen noch aus.
+Zum damaligen gezielten Prüfstand standen native Gesamtläufe und neue Pakete
+noch aus; der aktualisierte Stand folgt unten.
 Die Korrektur allein schließt den früheren Linux-CI-Absturz nicht als verifiziert
 behoben. Allgemeine Geräte-, Langzeit-, Screenreader- und Releaseabnahmen bleiben
-offen; 1.0 wird nicht automatisch gesetzt. Installiert bleibt vorerst 0.9.69.
+offen; 1.0 wird nicht automatisch gesetzt.
 
 ## Gesamtlauf und Windows-Checkout
 
@@ -95,3 +96,26 @@ identisch. Das ist ein Git-Nachweis auf dem Mac; die neue Windows-CI muss den
 kompletten Abschluss bestätigen. Originale: `checkout-before.json`,
 `checkout-after.json`; native Jobs 114609289714/114609289722 (Windows),
 114609289737/114609289757 (Linux). Mac-Jobs warten weiterhin auf Runner.
+
+## Sauberes Mac-Paket und Installation
+
+0.9.71 / 9867139fb2ac, Intel/macOS Release: drei Quell-/Versionsprüfungen bestehen
+(1,13 s), alle 209 Produktinputs des vollständigen b6d3a79-Laufs bleiben bytegleich.
+Die Git-Dateiregel und Buildkennung sind angepasst; der 86er-Gesamtlauf gehört
+zum oben genannten früheren Binärhash, kein behaupteter identischer neuer Hash.
+
+Entpacktes Paket: 126 Desktop-, 167 Tastatur- und 75 Sicherungsbedingungen,
+Einstellungen über zwei Prozesse, CLI, Lizenzen, Versionsidentität und verlinkte
+Laufzeit erfolgreich. Echter 69→71→69-Wechsel erhält alle 20 Testdateien und
+Einstellungen; Sicherung/Wiederherstellung bestehen. Drei Aufnahmen angesehen.
+98 Dateien paketgleich installiert; 21 eigene Gedächtnisdateien beim Öffnen
+unverändert, installierte Aufnahme angesehen. Binärminimum 14.0, SDK 15.2;
+ausgeführt auf Intel/macOS 14.6.1, keine 14.0-/ARM64-Abnahme.
+
+Archiv-SHA256: `c5762a4687d6eacfa702f604da32bda09ce56e2042d9c699c807334b040dadff`.
+Installierte App: `2a13aae08009f2e4b0ff931d307577da90bdc972eca101c5c280c86a73a6e41c`.
+Rückfallkopie: `build/previous-dist-0.9.69-20261012-021722`.
+Originale: `build/contrast-lifetime-package-check`, `build/contrast-lifetime-update`
+und `build/contrast-lifetime-verification/installed.json`, `installed-brain-check.json`.
+Neue CI38187181878 zu 9867139: Windows und Linux Release samt Paketen erfolgreich;
+beide Debugjobs noch in Arbeit, Mac-Jobs queued. Paketprüfschritte einzeln bestätigt.

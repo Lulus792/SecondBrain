@@ -25,29 +25,31 @@ Schemaänderungen sind kein bereits vorhandener Migrationsmechanismus.
 
 ## Aktueller ausgeführter Stand
 
-Installiert: **0.9.68 / 0b0fdacda4fa**, Intel/macOS 14.6.1/23G93, sauberer
-Release-Build. Build- und installierte App sind bytegleich; SHA256
-`ade288ab84195382a64f8c5b24fed8f1713b11aad0616c5a846b8ad958b8869e`.
-Das Paket hat 98 geprüfte Dateien. Desktop-, Tastatur-, Sicherungs-, Versions-,
-Laufzeit- und Updateprüfungen bestehen im dokumentierten Umfang. Der tatsächliche
-67→68→67-Wechsel erhält 20 Testdateien und Einstellungen; 18 eigene Gedächtnisdateien
-blieben beim damaligen Öffnen unverändert. [Nachweis](UEBERGANG_BILD.md).
+Installiert: **0.9.71 / 9867139fb2ac**, sauberer Intel/macOS-Release auf
+macOS 14.6.1 / 23G93. 98 Dateien paketgleich. App-SHA256:
+`2a13aae08009f2e4b0ff931d307577da90bdc972eca101c5c280c86a73a6e41c`.
+Entpacktes Paket: 126 Desktop-, 167 Tastatur- und 75 Sicherungsbedingungen,
+Einstellungen in zwei Prozessen, CLI, Lizenzen, Version und verlinkte Laufzeit.
+Der echte 69→71→69-Wechsel erhält 20 Testdateien und Einstellungen; Sicherung und
+Wiederherstellung bestehen, drei Aufnahmen angesehen. 21 Gedächtnisdateien beim
+Öffnen unverändert; installierte Aufnahme angesehen. [Nachweis](SCHRIFT_LEBENSDAUER.md).
 
-Alle 84 lokalen Release-CTest-Prüfungen bestehen (707,14 s). Der Prozess ist
-mit Exit 0 beendet; vor und nach dem Lauf bleiben Build-/installierte App
-bytegleich. Originale: `build/release-audit-verification/full-ctest.log` und
-`programs-before.json`. Das ist der aktuelle Gesamtnachweis, keine Übernahme einer
-älteren Teilsuite. Package-/Update- und gezielte native Metal-/Sanitizerabnahmen
-sind zusätzlich im oben verlinkten Übergangsvertrag dokumentiert.
+Alle 86 lokalen Release-Tests bestehen zu 0.9.71/b6d3a799434d (723,70 s).
+Binärhash vor/nach dem Lauf identisch. Nach der Git-LF-Dateiregelkorrektur bleiben
+alle 209 gehashten Produktinputs unverändert; die saubere neu gebaute Fassung
+9867139 bestätigt Quellvorbereitung und beide Versionswege (1,13 s). Die Build-
+Commitkennung unterscheidet die Binärdateien; der vollständige Lauf gehört
+ausdrücklich zu b6d3a799434d. Der entpackte Paket-/Updateweg prüft die installierte
+9867139-Fassung. Originale unter `build/contrast-lifetime-verification/`.
 
-Alle vier Windows-/Linux-Desktopjobs zu 0.9.68 / 0b0fdac bestehen tatsächlich,
-einschließlich beider entpackter Release-Pakete:
-[CI38181757771](https://github.com/Lulus792/SecondBrain/actions/runs/38181757771).
-Linux-Release 114595624348, Linux-Debug 114595624494, Windows-Release 114595624587,
-Windows-Debug 114595624614. Die Paketprüfschritte wurden einzeln auf `success`
-geprüft. Native Mac-CI weiterhin queued; lokale Intel-Abnahme getrennt.
-Windows Server 2025 und Ubuntu 24.04/Xvfb sind die CI-Umgebungen, keine tatsächliche
-Windows-11-/Wayland-/menschliche Screenreaderabnahme.
+[CI38186316198](https://github.com/Lulus792/SecondBrain/actions/runs/38186316198):
+Linux Debug/Release samt Release-Paket erfolgreich. Windows je 85/86 Tests;
+beide Lebensdauertests bestehen, nur die Patchdatei-Byteprüfung scheitert.
+LF-Dateiregel korrigiert, echter Git-autocrlf-Checkout vor/nach geprüft.
+[Neue CI38187181878](https://github.com/Lulus792/SecondBrain/actions/runs/38187181878)
+zu 9867139: Windows und Linux Release einschließlich beider entpackter Pakete
+erfolgreich; beide Debugjobs noch in Arbeit. Mac-Jobs warten auf Runner. Windows Server 2025 und Ubuntu/Xvfb
+ersetzen keine Windows-11-/Wayland-/menschliche Screenreaderabnahme.
 
 ## Projektgedächtnis nach der Prüfung
 
@@ -58,7 +60,7 @@ bleiben vorhanden. Der kopierbare Kontext sinkt von 46.118 auf 18.012 Bytes
 (rund 61 %). 523 lokale Verweise geprüft; elf ältere Journalverweise korrigiert.
 21 Gedächtnisdateien beim Öffnen in der installierten App unverändert,
 aktuelle Darstellung angesehen. Das ist Pflege der eigenen Instanz, keine
-automatische Änderung anderer Second Brains. App-Version bleibt 0.9.68.
+automatische Änderung anderer Second Brains. Dieser historische Pflegeabschnitt gehörte zur damaligen 0.9.68; aktuelle Installation oben.
 
 ## Noch nötige Abnahmen und Entscheidungen
 
@@ -78,16 +80,18 @@ automatische Änderung anderer Second Brains. App-Version bleibt 0.9.68.
 
 Die [Windows-Kontrastfarben](SYSTEM_KONTRASTFARBEN.md) sind ab 0.9.69 im Adapter
 und UI-Code implementiert und lokal mit synthetischen Paletten nachgeprüft.
-Jetzt die tatsächliche SDK-/Paketabnahme und benutzerdefinierte Systemthemen
-auf Windows abschließen; lokale Farben auf dem Mac ersetzen diese nicht.
+SDK-/Lebensdauer- und neue Windows-Release-Paketprüfung bestehen nativ.
+Benutzerdefinierte Systemthemen und menschliche Kontrastbedienung bleiben offen;
+synthetische Farben auf dem Mac ersetzen diese nicht. Weitere technische
+Release-Abnahmen anhand der Tabelle fortführen.
 Den erfolgreichen Gesamt-/CI-Stand im Projektgedächtnis kurz halten. Offene technische
 Abnahmen bleiben Arbeitsumfang; erforderliche Geräte/Konten und Nutzerentscheidungen
 werden nicht durch weitere kleine Codeänderungen oder Statusnotizen ersetzt.
 
-## Neuerer begrenzter Prüfstand: 0.9.69
+## Historischer begrenzter Prüfstand: 0.9.69
 
-Die oben genannten 84 lokalen Tests und bestätigten vier Plattformjobs gehören
-zur 0.9.68. Inzwischen ist [0.9.69 mit Kontrastfarben](SYSTEM_KONTRASTFARBEN.md)
+Der frühere 84er-Gesamtlauf und vier bestätigte Plattformjobs gehörten
+zur 0.9.68; aktuelle Ergebnisse stehen oben. Inzwischen ist [0.9.69 mit Kontrastfarben](SYSTEM_KONTRASTFARBEN.md)
 lokal gezielt geprüft und sauber installiert, einschließlich Paket und echtem
 68→69→68-Wechsel. Die Windows-Debug-/Release- und Linux-Releasejobs einschließlich
 Release-Paketen bestehen. Linux Debug scheitert in der Textvorbereitung; die
@@ -96,5 +100,5 @@ und menschliche Prüfung offen. Kein neuer lokaler 85er-Gesamtlauf zu 0.9.69.
 
 0.9.70 korrigiert die Schemanamenfreigabe, 0.9.71 einen reproduzierten
 [FreeType-Listenfehler](SCHRIFT_LEBENSDAUER.md). Acht lokale gezielte Tests sowie
-positive/negative ASan-/UBSan-Vergleiche sind dokumentiert. Neuer Gesamt-, nativer
-CI-, Paket- und Installationsstand folgt separat; installiert bleibt 0.9.69.
+positive/negative ASan-/UBSan-Vergleiche sind dokumentiert. Der neue Gesamt-, native CI-, Paket- und Installationsstand steht oben; installiert
+ist 0.9.71. Weitere dort benannte Abnahmen bleiben offen.

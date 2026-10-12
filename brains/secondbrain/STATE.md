@@ -1,6 +1,6 @@
 # SecondBrain: aktueller Stand
 
-Stand: 12. Oktober 2026. Installiert ist 0.9.69. Der neue vollständige lokale
+Stand: 12. Oktober 2026. Installiert ist 0.9.71. Der neue vollständige lokale
 Release-Lauf gehört zu 0.9.71; Windows-Abschluss nach Checkoutkorrektur noch offen.
 1.0 ist noch nicht freigegeben. Die maßgeblichen Quellen und die Historie
 stehen am Ende dieser Notiz.
@@ -15,11 +15,11 @@ Vorlagen und Updates überschreiben vorhandenes Wissen nicht automatisch.
 Ungespeicherte Entwürfe und erkannte externe Konflikte bleiben geschützt.
 Externe Bibliotheken nur für UI; eigener Code MIT.
 
-Installiert **0.9.69 / 8d74c8d72d6a**, sauberer Intel/macOS-Release auf
+Installiert **0.9.71 / 9867139fb2ac**, sauberer Intel/macOS-Release auf
 macOS 14.6.1/23G93. 98 Dateien paketgleich. Paketprüfungen: 126 Desktop-,
 167 Tastatur-, 75 Sicherungsbedingungen sowie Einstellungen, CLI, Lizenzen,
-Laufzeit und Versionsidentität. Echter 68→69→68-Wechsel erhält 20 Testdateien und
-Einstellungen; Sicherung/Wiederherstellung bestehen. [Nachweis](../../docs/SYSTEM_KONTRASTFARBEN.md).
+Laufzeit und Versionsidentität. Echter 69→71→69-Wechsel erhält 20 Testdateien und
+Einstellungen; Sicherung/Wiederherstellung bestehen. [Nachweis](../../docs/SCHRIFT_LEBENSDAUER.md).
 
 ## Neueste geprüfte Änderungen
 
@@ -57,18 +57,13 @@ Endprodukttexte erst abschließend beim vollständigen Produkt bereinigen.
 
 ## Nächster Schritt
 
-0.9.69-CI38184984352: Windows Debug/Release und Linux Release samt Release-Paketen
-bestehen. Linux Debug scheitert bei der Textvorbereitung; Palette besteht, Mac queued.
-0.9.70 gibt Windows-Schemanamen frei; native Allokatorprüfung besteht Debug/Release.
-0.9.71 korrigiert einen lokal reproduzierten FreeType-Listenfehler beim parallelen
-Schließen privater Fonts. Alter Test hängt, alte ASan-Vergleichsfassung zeigt
-Use-after-free; korrigierter 1024er-Test und acht lokale Tests bestehen.
-[Schriftlebensdauer](../../docs/SCHRIFT_LEBENSDAUER.md),
-[Kontrastfarben](../../docs/SYSTEM_KONTRASTFARBEN.md). Installiert bleibt 0.9.69.
-Nächster Schritt: sauberes neues Mac-Paket/Update/Installation, neue Windows-CI
-nach LF-Regel prüfen. Der zuvor fehlschlagende Linux-Debug-Prüfweg besteht jetzt.
-Weitere technische Abnahmen und benötigte reale Umgebungen anhand der
-Abnahmeübersicht klären.
+Neue CI38187181878 nach LF-Dateiregel: Windows und Linux Release samt Paketen
+bestehen; beide Debugjobs in Arbeit, Mac queued. Deren Abschluss prüfen. Die native Windows-Allokatorprüfung
+besteht bereits im vorherigen Lauf. Neues Mac-Paket, tatsächlicher Updatewechsel
+und Installation sind abgeschlossen. [Schriftlebensdauer](../../docs/SCHRIFT_LEBENSDAUER.md),
+[Kontrastfarben](../../docs/SYSTEM_KONTRASTFARBEN.md).
+Weitere technische Abnahmen und nötige reale Umgebungen anhand der
+Abnahmeübersicht klären; alle offenen Release-Anforderungen bleiben Arbeitsumfang.
 
 ## Quellen und Historie
 

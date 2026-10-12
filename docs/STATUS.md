@@ -2,7 +2,7 @@
 
 Stand: 12. Oktober 2026. Die Vorabversion 0.7.3 ist als dauerhafter GitHub Release
 veröffentlicht. 0.8.0 mit Versionsangaben ist auf allen vier Paketarchitekturen abgenommen.
-Die installierte Intel/macOS-App ist 0.9.69/8d74c8d72d6a. Die Windows-Laufzeitprüfung
+Die installierte Intel/macOS-App ist 0.9.71/9867139fb2ac. Die Windows-Laufzeitprüfung
 besteht; weitere Release-Aufgaben einschließlich Textdarstellung bleiben offen.
 Die Abschnitte nennen die tatsächlich ausgeführten Abnahmen und deren Grenzen.
 
@@ -4485,3 +4485,16 @@ mit 49 Einheiten aus Test, SDL_ttf und FreeType: korrigiert erfolgreich, ohne
 Sperre Use-after-free durch anderen Worker. SDL/HarfBuzz nicht instrumentiert,
 Leaks aus, kein TSan. [Vertrag](SCHRIFT_LEBENSDAUER.md). Native Nachprüfung,
 Gesamtlauf und neue Pakete folgen; installiert bleibt 0.9.69. Kein 1.0-Abschluss.
+
+
+## 0.9.71 installiert und Release-Pakete nachgeprüft
+
+Saubere 9867139-Fassung: drei Quell-/Versionsprüfungen bestehen, alle 209
+Produktinputs bleiben bytegleich zum vollständigen 86er-Lauf zu b6d3a79.
+Entpacktes Mac-Paket besteht mit 126 Desktop-, 167 Tastatur-, 75 Sicherungsbedingungen,
+Einstellungen in zwei Prozessen, CLI, Lizenzen, Runtime und Version. Echter
+69→71→69-Wechsel erhält 20 Dateien und Einstellungen; Sicherung wiederherstellbar.
+Drei Aufnahmen angesehen. 98 Dateien paketgleich installiert, 21 Gedächtnisdateien
+beim Öffnen unverändert; installierte Aufnahme angesehen. CI38187181878 bestätigt
+Windows und Linux Release einschließlich entpackter Pakete; beide Debugjobs in
+Arbeit, Mac queued. [Originale und Grenzen](SCHRIFT_LEBENSDAUER.md).
