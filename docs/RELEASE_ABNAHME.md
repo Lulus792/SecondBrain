@@ -97,6 +97,10 @@ GitHub bestätigt die Einstellung; die öffentlich abgerufene Advisories-Seite
 bietet **Report a vulnerability** an. Keine Testmeldung abgeschickt.
 [Sicherheitsrichtlinie](../SECURITY.md).
 
+Der [manuelle Abnahmeablauf](MANUELLE_ABNAHME.md) gibt konkrete Schritte und
+Erwartungen für die noch fehlenden Bediennachweise vor. Er ist vorbereitet,
+nicht als menschlicher Durchlauf ausgeführt.
+
 | Offener Punkt | Benötigter Abschluss |
 | --- | --- |
 | Betriebssystemzusagen | [Vorschlag](PLATTFORM_VORSCHLAG.md) bestätigen und tatsächlich abnehmen: macOS 14 Intel/ARM64, Windows 11 25H2 x64, Ubuntu 24.04 LTS x64; zusätzlich aktuelle Systeme |

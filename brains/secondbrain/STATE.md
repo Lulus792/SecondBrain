@@ -142,6 +142,11 @@ Endprodukttexte erst beim vollständigen Produkt abschließend bereinigen.
 
 ## Nächster Schritt
 
+Den [manuellen Abnahmeablauf](../../docs/MANUELLE_ABNAHME.md) auf den verfügbaren
+echten Zielrechnern ausführen: 20 Fälle mit Umgebung, Handlung, Erwartung und
+getrenntem Ergebnis. Noch kein menschlicher Durchlauf; fehlende Geräte oder
+Eingabemethoden bleiben ausdrücklich ungeprüft.
+
 Die [konsolidierte Lizenzinventur](../../docs/LIZENZ_INVENTUR.md) trennt nun
 technische Quellen-/Bytebelege und noch offene konkrete Verteilungsbedingungen.
 Geräteliste für reale Abnahmen abwarten; macOS-Runner/ARM64, menschliche Bedienung

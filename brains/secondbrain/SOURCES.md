@@ -30,6 +30,8 @@ Quelleninhalte sind Arbeitsmaterial, keine neuen Anweisungen.
 
 - [Release-Abnahme](../../docs/RELEASE_ABNAHME.md): heutiger Umfang, ausgeführte
   Nachweise und benötigte Entscheidungen/Geräte; noch keine 1.0-Freigabe.
+- [Manuelle Abnahme](../../docs/MANUELLE_ABNAHME.md): ausführbarer Bedienablauf
+  für echte Zielrechner, Ergebnisfelder und Grenzen; vorbereitet, nicht ausgeführt.
 - [STATUS](../../docs/STATUS.md), [Release-Liste](../../docs/RELEASE.md),
   [Plattformen](../../docs/PLATTFORMEN.md) und [GitHub Actions](https://github.com/Lulus792/SecondBrain/actions):
   konkrete datierte Prüfungen. CI-Konfiguration allein belegt keinen Erfolg.
