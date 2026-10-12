@@ -47,7 +47,13 @@ Gedächtnisdateien beim Snapshot und normalen installierten Start unverändert.
   Kartenmitglieder erfassen. Vier neue Verträge, zwei CTest-Gruppen und72 Python-
   Tests (eine übersprungen) lokal geprüft. Erste native Ausführung verweigert
   korrekt einen Nachweis aus bloßen Suchzeilen; vollständige Linker-/normale
-  MSBuild-Ausgabe für die neue Nachprüfung vorbereitet. Kein Produktfehler belegt.
+  MSBuild-Ausgabe korrigiert. CI38202931306 Windows/Linux jeweils92 Tests und
+  beide Pakete erfolgreich. Vier Windows-CRT-/uuid-Dateien mit tatsächlichen
+  Herkunftspfaden gehasht; Bericht und Log an Paketprogrammhashes nachgeprüft.
+- glibc-Startdateien: passende Ubuntu-Original-/Debian-Archive gegen publizierte
+  SHA256 geprüft; besondere Linkerlaubnis in allen drei x86-64-Dateien vorhanden,
+  kein erwähnender Patch in116 Quilt-Einträgen. Keine reproduzierte Übersetzung
+  und keine geprüfte PGP-Signatur; Originale unter build/glibc-source-review/.
 - [Startdiagnose](../../docs/LAUFZEIT_START.md): tatsächliche normale Rendererwahl,
   vier Frames, sichtbares Fenster und beobachtete Module. Dadurch echter Windows-
   Startfehler gefunden: Accessibility muss vor dem ersten sichtbaren Fenster
@@ -94,8 +100,8 @@ Endprodukttexte erst beim vollständigen Produkt abschließend bereinigen.
 
 ## Nächster Schritt
 
-Windows-Dateinachweis nativ prüfen; konkrete Source-Paket-/SDK-Regeln sowie
-innere AccessKit-Runtime-Beiträge abgleichen.
+Konkrete SDK-Verteilungsbedingungen und innere AccessKit-Runtime-Beiträge
+abgleichen; weitere menschliche/gerätebezogene Release-Abnahmen bleiben offen.
 Sicherheitskanal nach GitHub-Anmeldung aktivieren.
 Geräte/Konten und menschliche Bediennachweise werden durch weitere kleine
 Codeänderungen oder Statusnotizen nicht ersetzt.

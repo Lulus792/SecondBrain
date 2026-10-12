@@ -164,6 +164,26 @@ gelesenen speziellen Startdatei-Regeln abzugleichen. Die erfassten Dateihashes
 bezeichnen den nach dem Linken geprüften installierten Bestand; die Inventur
 beweist keine unveränderliche Historie jeder SDK-Datei seit deren Installation.
 
+### glibc-Quellpaket und besondere Startdatei-Regeln
+
+Die passende [Ubuntu-Quellenbeschreibung](https://archive.ubuntu.com/ubuntu/pool/main/g/glibc/glibc_2.39-0ubuntu8.9.dsc)
+nennt genau die beobachtete Version2.39-0ubuntu8.9. Original- und Debian-
+Quellarchive wurden von derselben offiziellen Quelle geladen und gegen deren
+veröffentlichte SHA256 geprüft. Die drei Originale `start.S`, `crti.S`, `crtn.S`
+unter sysdeps/x86_64 enthalten die besondere Erlaubnis, ihre kompilierten
+Fassungen mit anderen Programmen zu verbinden und diese ohne Beschränkung aus
+der Verwendung dieser Dateien zu verteilen. Die übrigen LGPL-Regeln bleiben
+laut Original für andere Verwendungsarten bestehen.
+
+Alle116 Einträge der im Debian-Archiv enthaltenen Quilt-Serie wurden gelesen;
+kein Patch erwähnt diese drei Pfade. Das stärkt den versionsbezogenen
+Quellenabgleich, ist aber keine reproduzierte Übersetzung der Objektdateien
+und keine vollständige Prüfung aller Debian-Buildskripte. Die PGP-Signatur der
+Quellenbeschreibung wurde nicht geprüft; nachgewiesen sind offizieller
+HTTPS-Abruf und Übereinstimmung der Archivbytes mit den publizierten Hashes.
+Originale und Dateihashes: `build/glibc-source-review/source-review.json`,
+Quellenbeschreibung, beide Archive und die drei gelesenen Quelldateien.
+
 ## Geladene Windows-Runtime-Dateien
 
 Der optionale Karten-Buildweg aktiviert unter MSVC zusätzlich `/VERBOSE`.
@@ -203,3 +223,35 @@ bei Visual-Studio-Generatoren erhält MSBuild normale Ausführlichkeit, damit
 gewöhnliche Werkzeugausgaben im Log bleiben. Der Prüfer akzeptiert weiterhin
 keine Suchzeilen als Ladungsnachweis. Die lokale Python-Gesamtprüfung bleibt
 mit72 Tests (eine übersprungen) erfolgreich. Neue native Nachprüfung folgt.
+
+### Abgeschlossene Windows-Nachprüfung
+
+[CI38202931306](https://github.com/Lulus792/SecondBrain/actions/runs/38202931306)
+zua490e5c besteht unter Windows/Linux in Debug/Release mit jeweils92 Tests und
+beiden Release-Paketen; Mac-Jobs warten auf Runner. Die Windows-Inventur wurde
+in beiden Konfigurationen erfolgreich ausgeführt. Der vollständige Release-
+Build-Log enthält1411 Loaded-Zeilen. Die erste Verweigerung ist damit im
+beschriebenen Umfang durch ausreichende native Linker-Ausgabe behoben.
+
+Der heruntergeladene Windows-Release-Nachweis11726008467 und das Paket11725569084
+stimmen mit ihren GitHub-SHA256-Digests überein. Der Bericht passt zu den beiden
+tatsächlichen Paketprogrammen; sein Loghash passt zum enthaltenen Build-Log.
+Die rohe CTest-Datei enthält92 Prüfblöcke und92 Pass-Marker, keinen Fail-Marker.
+Ihre gemischte Windows-Textkodierung wurde für diesen Nachweis nicht verlusthaft
+in UTF-8 umgedeutet. Originale: `build/windows-runtime-native/`, insbesondere
+`crosscheck.json`, `windows-runtime-provenance.json`, die beiden Logs und ZIPs.
+
+Der native Release-Bericht nennt vier tatsächlich geladene, nach dem Build
+gehashte Dateien:
+
+| Bibliothek | Tatsächlicher Herkunftspfad |
+| --- | --- |
+| libcmt.lib, libvcruntime.lib | Visual Studio18/Enterprise, MSVC14.51.36231/lib/x64 |
+| libucrt.lib | Windows Kits10/Lib/10.0.26100.0/ucrt/x64 |
+| Uuid.Lib | Windows Kits10/Lib/10.0.26100.0/um/x64 |
+
+Die vollständigen Pfade und individuellen SHA256 stehen im Bericht. Die
+Zuordnung benennt App-/CLI-Runtime-Dateien, nicht automatisch alle internen
+Beiträge der AccessKit-DLL. Versionsbezogene SDK-Verteilungsbedingungen und
+deren Endproduktdarstellung bleiben mit den Originalquellen abzugleichen.
+Die installierte App bleibt0.9.74/eabf5b3ff114; kein neuer menschlicher Nachweis.
