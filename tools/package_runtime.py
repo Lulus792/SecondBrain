@@ -120,6 +120,42 @@ def inspect_elf(path, tool):
     return metadata
 
 
+def elf_dependency_closures(program_metadata, program_scans, tool):
+    """Inspect the resolver's actual files; keep App and CLI requirements separate."""
+    libraries = {}
+    for scan in program_scans.values():
+        for filename in scan['resolved']:
+            if filename in libraries:
+                continue
+            path = Path(filename)
+            before = hashlib.sha256(path.read_bytes()).hexdigest()
+            metadata = inspect_elf(path, tool)
+            if hashlib.sha256(path.read_bytes()).hexdigest() != before:
+                raise ValueError('Dependency changed during inspection: ' + filename)
+            libraries[filename] = dict(metadata, sha256=before)
+    closures = {}
+    for program, metadata in program_metadata.items():
+        filenames = program_scans[program]['resolved']
+        highest = {}
+        versions = {}
+        providers = {}
+        for filename, record in [(program, metadata)] + [(p, libraries[p]) for p in filenames]:
+            for family, tag in record['highest_required_version_tags'].items():
+                # inspect_elf only returns numeric GLIBC/GLIBCXX/CXXABI/GCC tags.
+                version = tuple(map(int, tag.split('_', 1)[1].split('.')))
+                if family not in versions or version > versions[family]:
+                    versions[family] = version
+                    highest[family] = tag
+                    providers[family] = [filename]
+                elif version == versions[family]:
+                    providers[family].append(filename)
+        closures[program] = {'resolved_files': filenames,
+                             'highest_required_version_tags': highest,
+                             'highest_requirement_sources': providers}
+    return {'libraries': libraries, 'program_closures': closures,
+            'scope': 'linked-programs-and-resolved-files-on-this-host'}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--root', required=True)
@@ -153,7 +189,7 @@ def main():
                   program_scans=program_scans,
                   package_programs={}, declared_system_imports={}, binary_os_metadata={}, dependencies=[], limitations=[
                       'Linked imports only; optional libraries loaded dynamically need separate verification',
-                      'ELF version tags describe direct program requirements; transitive system library ABI requirements need separate verification',
+                      'ELF closure requirements describe files resolved on this host; other installations and dynamically loaded libraries need separate verification',
                       'System desktop availability and minimum OS versions need native clean-machine tests'])
     for path in programs:
         report['package_programs'][path.relative_to(root).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
@@ -172,6 +208,9 @@ def main():
             report['declared_system_imports'][path.relative_to(root).as_posix()] = metadata['needed_libraries']
     for value in raw['resolved']:
         report['dependencies'].append({'path': value, 'category': category(value, root, sys.platform)})
+    if sys.platform.startswith('linux'):
+        report['elf_dependency_closures'] = elf_dependency_closures(
+            report['binary_os_metadata'], program_scans, tool)
     problems = raw['unresolved'] + raw['conflicts'] + [d['path'] for d in report['dependencies'] if d['category'].startswith('external-')]
     report['problems'] = problems
     report['portable_linked_dependencies'] = not problems

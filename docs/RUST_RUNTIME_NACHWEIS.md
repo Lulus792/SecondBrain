@@ -143,3 +143,31 @@ Originale: `build/runtime-abi-verification/linux-evidence.zip` (SHA256
 keine vollständige Bestimmung jedes gelinkten In-tree-/SDK-/Systemanteils und
 keine allgemeine Lizenzfreigabe beliebiger Builds. Die vollständige Release-
 Aufgabe bleibt offen; die App-Version bleibt0.9.64.
+
+## Tatsächliche Windows-/Linux-Zuordnung vom 12. Oktober
+
+Die SHA256-geprüften Release-Berichte aus
+[CI38191364672](https://github.com/Lulus792/SecondBrain/actions/runs/38191364672),
+0.9.72/c40c9fd, bestätigen den inzwischen ausgeführten Compiler-/Lizenzabgleich:
+Windows MSVC x64 verwendet Rust 1.98.1/48a229c; Linux x64 Rust 1.99.0/b940084.
+Explizites Buildziel, Compilercommit, Release, Library-Lock und Lizenzsammlung
+stimmen mit der vorhandenen konservativen Inventur überein. Die sechs aktuellen
+Compiler-/Abdeckungsprüfungen bestehen lokal, ebenso sieben Rust-Inventurprüfungen.
+Die frühere Aussage, dass der neue CI-Abgleich noch einen eigenen Lauf benötigt,
+ist für diese beiden konkreten Release-Pakete damit erfüllt.
+
+Die Programmhashes der zusätzlich heruntergeladenen tatsächlichen Pakete stimmen
+mit den nativen Berichten überein. Alle 50 Lizenzdateien je Paket entsprechen den
+Repository-Texten; Linux bytegleich, Windows acht bytegleich und 42 nach alleiniger
+CRLF→LF-Normalisierung gleich. Tatsächliche Dateihashes bleiben im Nachweis
+erhalten; die Unterschiede werden nicht als Byteidentität ausgegeben.
+Sieben UI-Inventurprüfungen bestehen. Originale unter
+`build/runtime72-verification/package-notice-crosscheck.json` und den beiden
+`Desktop-evidence-*-Release-ui-rust-compiler.json`.
+
+Artefakte: Windows-Paket 11721871174, Linux-Paket 11721419707,
+Windows-Release-Nachweis 11721910856, Linux-Release-Nachweis 11721930496;
+alle vier äußeren ZIP-SHA256-Werte gegen den GitHub-Digest geprüft.
+Keine fremden Programme wurden auf dem Mac ausgeführt. Zusätzliche tatsächlich
+gelinkte Toolchain-/SDK-Anteile, dynamisch nachgeladene Komponenten und neue
+Toolchainstände bleiben eigene Prüfaufgaben; dies ist keine pauschale Lizenzfreigabe.

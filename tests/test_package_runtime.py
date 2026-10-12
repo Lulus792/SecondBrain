@@ -7,6 +7,7 @@ import sys
 import tempfile
 import unittest
 import importlib.util
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('package_inspector', ROOT / 'tools/package_runtime.py')
@@ -69,6 +70,49 @@ Version References:
             path.write_bytes(b'not an ELF')
             with self.assertRaises(ValueError):
                 inspector.inspect_elf(path, 'nonexistent-tool')
+
+    def test_transitive_requirements_do_not_leak_between_programs(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            library = Path(temporary) / 'libcustom.so'
+            library.write_bytes(b'fixture bytes')
+            name = str(library)
+            programs = {'app': {'highest_required_version_tags': {'GLIBC': 'GLIBC_2.9'}},
+                        'cli': {'highest_required_version_tags': {'GLIBC': 'GLIBC_2.9'}}}
+            scans = {'app': {'resolved': [name]}, 'cli': {'resolved': []}}
+            metadata = {'highest_required_version_tags': {'GLIBC': 'GLIBC_2.10', 'GCC': 'GCC_4.2.0'}}
+            with patch.object(inspector, 'inspect_elf', return_value=metadata) as inspect:
+                report = inspector.elf_dependency_closures(programs, scans, 'fixture-tool')
+            inspect.assert_called_once_with(library, 'fixture-tool')
+            self.assertEqual(report['program_closures']['app']['highest_required_version_tags'],
+                             metadata['highest_required_version_tags'])
+            self.assertEqual(report['program_closures']['cli']['highest_required_version_tags'],
+                             {'GLIBC': 'GLIBC_2.9'})
+            self.assertEqual(report['program_closures']['app']['highest_requirement_sources']['GLIBC'], [name])
+            self.assertEqual(report['libraries'][name]['sha256'], inspector.hashlib.sha256(b'fixture bytes').hexdigest())
+
+    def test_shared_dependency_is_inspected_once_and_keeps_equal_sources(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            library = Path(temporary) / 'shared.so'; library.write_bytes(b'shared')
+            name = str(library)
+            metadata = {'highest_required_version_tags': {'GLIBC': 'GLIBC_2.34'}}
+            programs = {'app': metadata, 'cli': metadata}
+            scans = {p: {'resolved': [name]} for p in programs}
+            with patch.object(inspector, 'inspect_elf', return_value=metadata) as inspect:
+                report = inspector.elf_dependency_closures(programs, scans, 'fixture-tool')
+            self.assertEqual(inspect.call_count, 1)
+            for program in programs:
+                self.assertEqual(report['program_closures'][program]['highest_requirement_sources']['GLIBC'],
+                                 [program, name])
+
+    def test_changed_dependency_cannot_produce_a_successful_inventory(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            library = Path(temporary) / 'changed.so'; library.write_bytes(b'before')
+            def change(path, tool):
+                path.write_bytes(b'after')
+                return {'highest_required_version_tags': {}}
+            with patch.object(inspector, 'inspect_elf', side_effect=change), self.assertRaisesRegex(ValueError, 'changed during inspection'):
+                inspector.elf_dependency_closures({'app': {'highest_required_version_tags': {}}},
+                                                {'app': {'resolved': [str(library)]}}, 'fixture-tool')
 
 
 @unittest.skipUnless(shutil.which('cmake'), 'CMake unavailable')
@@ -145,10 +189,16 @@ endif()
             data = json.loads(output.read_text(encoding='utf-8'))
             self.assertTrue(any(d['category'] == 'bundled' and 'sb_runtime_fixture' in d['path'] for d in data['dependencies']))
             if sys.platform.startswith('linux'):
+                closure = data['elf_dependency_closures']
+                self.assertEqual(set(closure['libraries']), set(data['resolved']))
                 for metadata in data['binary_os_metadata'].values():
                     self.assertIn('libsb_runtime_fixture.so', metadata['needed_libraries'])
                     self.assertTrue(metadata['version_requirements']['libc.so.6'])
                     self.assertIn('GLIBC', metadata['highest_required_version_tags'])
+                for program, scan in data['program_scans'].items():
+                    self.assertEqual(closure['program_closures'][program]['resolved_files'], scan['resolved'])
+                for path, record in closure['libraries'].items():
+                    self.assertEqual(record['sha256'], inspector.hashlib.sha256(Path(path).read_bytes()).hexdigest())
             for path in package.rglob(library.name): path.unlink()
             result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             self.assertNotEqual(result.returncode, 0)

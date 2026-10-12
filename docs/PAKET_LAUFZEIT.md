@@ -121,3 +121,44 @@ Mindestversionsbedienung bleiben offen. Die App-Version bleibt0.9.64;
 geändert sind Entwicklerprüfwerkzeuge, keine Anwendungsfunktionen.
 Originale: `build/runtime-abi-verification/linux-abi.json`,
 `linux-headers.txt`, `linux-symbols.txt` und `macos-runtime.json`.
+
+## Aktuelle Pakete und transitive ELF-Prüfung vom 12. Oktober
+
+Die Windows-/Linux-Pakete 0.9.72 zu c40c9fd wurden zusammen mit den nativen
+Release-Berichten aus [CI38191364672](https://github.com/Lulus792/SecondBrain/actions/runs/38191364672)
+heruntergeladen. Alle vier äußeren ZIP-Dateien stimmen mit dem jeweiligen
+GitHub-SHA256-Digest überein. App- und CLI-Hashes der enthaltenen Archive stimmen
+mit den nativen Importberichten überein. Auf dem Mac wurden die fremden Programme
+nur gelesen, nicht ausgeführt oder frei in das Dateisystem extrahiert.
+
+Windows liefert genau eine separate UI-DLL, `accesskit.dll`, mit; der native
+Bericht enthält keine ungelöste oder externe Laufzeitabhängigkeit. Linux liefert
+keine separate Shared Library mit und löst 22 Systembibliotheken auf. Die direkten
+Linux-Anforderungen bleiben GLIBC_2.39 für die App, GLIBC_2.34 für das CLI und
+GCC_4.2.0 für die App. LLVM objdump auf dem Mac bestätigt die native App-Metadaten-
+auswertung an derselben Binärdatei. Das ist keine Linux-Ausführung auf dem Mac.
+
+Der Scanner erfasst jetzt zusätzlich jede tatsächlich aufgelöste ELF-Bibliothek:
+Dateihash, Architektur, direkte Imports, vollständige Version References und
+numerisch höchste Versionstags. Pro Programm werden dessen eigene Anforderungen
+und die Anforderungen seiner aufgelösten Dateien zusammengeführt. Die CLI erbt
+dadurch keine nur zur App gehörenden Anforderungen. Gleich hohe Anforderungen
+behalten alle Ursprungsdateien. Änderungen einer Bibliothek während ihrer
+Prüfung werden abgewiesen. Die Herkunft bleibt auf den jeweiligen Prüfhost
+begrenzt; Systembibliotheken werden weder kopiert noch ausgeführt.
+
+Grundlagen: [GNU objdump](https://sourceware.org/binutils/docs/binutils/objdump.html)
+und [CMake Runtime Dependencies](https://cmake.org/cmake/help/latest/command/file.html#get-runtime-dependencies),
+am 12. Oktober gelesen. Der reale Shared-Library-Prüfaufbau verlangt auf Linux
+nun auch diese Inventur. Lokal bestehen zehn Python-Prüfungen, davon eine
+Windows-Prüfung übersprungen. Drei neue Fälle prüfen getrennte Programmumfänge,
+gemeinsame Dateien/gleich hohe Quellen und während der Prüfung geänderte Dateien.
+Die native Linux-Abnahme dieser Erweiterung steht noch aus; die alten Berichte
+enthalten ausdrücklich noch keine transitive ELF-Inventur.
+
+Originale: `build/runtime72-verification/`, insbesondere
+`package-notice-crosscheck.json`, beide nativen `runtime-dependencies.json`,
+`ui-rust-compiler.json` und `scanner-tests.log`. Dynamisch nachgeladene Komponenten,
+frische Nutzerrechner, andere Distributionen und die vollständige Zuordnung der
+Toolchain-/SDK-Anteile bleiben gesondert offen. Die App-Version bleibt 0.9.72;
+dieser Schritt verändert den Entwicklerprüfer.

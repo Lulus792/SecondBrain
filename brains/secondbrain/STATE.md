@@ -73,6 +73,14 @@ menschliche Bedienprüfung bleibt offen. [Vertrag](../../docs/EINSTELLUNGEN_BEEN
 Weitere technische Abnahmen und nötige reale Umgebungen anhand der
 Abnahmeübersicht klären; alle offenen Release-Anforderungen bleiben Arbeitsumfang.
 
+Aktuelle Windows-/Linux-Pakete und native Release-Berichte zu c40c9fd per
+GitHub-Digest geprüft; Programmhashes stimmen überein. Rust 1.98.1/1.99.0 ist
+im vorhandenen Quellenumfang abgedeckt, je 50 Lizenztexte abgeglichen (Windows-
+Zeilenenden getrennt dokumentiert). Der Entwicklerprüfer erfasst nun transitive
+ELF-Anforderungen je Programm; zehn lokale Prüfungen, eine Windows-Prüfung
+übersprungen. Neue native Linux-Abnahme offen. [Rust-Nachweis](../../docs/RUST_RUNTIME_NACHWEIS.md),
+[Laufzeitumfang](../../docs/PAKET_LAUFZEIT.md).
+
 ## Quellen und Historie
 
 [Abnahmeübersicht](../../docs/RELEASE_ABNAHME.md),
