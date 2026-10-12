@@ -98,6 +98,15 @@ Adapter einrichten, dann zeigen; Diagnose verlangt sichtbares Fenster. Fünf
 lokale Gruppen (25,05 s) und drei ASan/UBSan-Starts bestehen. Korrigierte native
 Windows-, vollständige lokale und Paket-/Installationsabnahme folgen.
 
+Zur korrigierten Fassung e66e023 bestehen inzwischen lokal 89/89 (517,45 s),
+211 Inputs und Binärhash unverändert. Neuer Linux-Release-Paketbericht bestätigt
+OpenGL/X11, sichtbares Fenster, 65 Module und erhaltene Dateien. Windows
+Debug/Release schreiben nun einen Bericht ohne AccessKit-Absturz, scheitern
+am Textvergleich (je 88/89). Prüfer korrigiert CRLF aus MSVC-stdout gegenüber
+LF im JSON, benennt fehlerhafte Felder und sichert Rohberichte. Drei lokale
+Vertragsfälle und erneuter Metal-Start bestehen; positiver Windows-Nachweis
+und aktuelle Paket-/Installationsabnahme folgen. Programmcode unverändert.
+
 ## Quellen und Historie
 
 [Abnahmeübersicht](../../docs/RELEASE_ABNAHME.md),

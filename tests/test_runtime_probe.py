@@ -12,6 +12,21 @@ def hashes(root):
             for p in root.rglob('*') if p.is_file()}
 
 
+def report_errors(data, version_output):
+    # MSVC stdout is a text stream (CRLF); JSON uses the literal LF build text.
+    version = version_output.decode('utf-8').replace('\r\n', '\n')
+    required = {'format': 1, 'build': version, 'rendered_frames': 4,
+                'scope': 'normal-renderer-start-after-four-frames'}
+    errors = [key for key, expected in required.items() if data.get(key) != expected]
+    if data.get('window_visible') is not True: errors.append('window_visible')
+    for key in ('renderer', 'video_driver'):
+        if not isinstance(data.get(key), str) or not data[key]: errors.append(key)
+    modules = data.get('loaded_modules')
+    if not isinstance(modules, list) or not modules or any(not isinstance(x, str) or not x for x in modules):
+        errors.append('loaded_modules')
+    return errors
+
+
 def verify(app, cli, output):
     output.mkdir(parents=True, exist_ok=True)
     root = Path(tempfile.mkdtemp(prefix='Normaler Start ü ', dir=output.resolve()))
@@ -29,11 +44,11 @@ def verify(app, cli, output):
         raise RuntimeError('Normal-renderer probe failed: ' + result.stderr.decode('utf-8', errors='replace'))
     data = json.loads(report.read_bytes())
     version = invoke('--version')
-    if (data['format'] != 1 or data['build'] != version.stdout.decode('utf-8')
-            or data['rendered_frames'] != 4 or data['window_visible'] is not True or not data['renderer'] or not data['video_driver']
-            or not data['loaded_modules'] or any(not isinstance(x, str) or not x for x in data['loaded_modules'])
-            or data['scope'] != 'normal-renderer-start-after-four-frames'):
-        raise RuntimeError('Incomplete runtime probe report')
+    errors = report_errors(data, version.stdout)
+    if errors:
+        detail = ', '.join(errors)
+        if 'build' in errors: detail += '; report=' + repr(data.get('build')) + '; stdout=' + repr(version.stdout)
+        raise RuntimeError('Incomplete runtime probe report: ' + detail)
     original = report.read_bytes()
     retry = invoke('--workspace', workspace, '--runtime-probe', report)
     if retry.returncode != 1 or report.read_bytes() != original:

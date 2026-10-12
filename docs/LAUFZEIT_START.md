@@ -115,3 +115,34 @@ Eigene C-Teile instrumentiert, externe UI nicht; Leaks aus, kein TSan. Originale
 `build/runtime73-verification/window-order-asan/` und
 `build/runtime-probe-sanitizers/sources.json`. Das ersetzt keine positive
 Windows-Ausführung der Korrektur.
+
+## Konsolenzeilenenden im Prüfer
+
+Lokal besteht die korrigierte Reihenfolge vollständig zu e66e023: 89/89 Tests
+in 517,45 s, alle 211 Produktinputs und der Binärhash bleiben über den Lauf gleich.
+Linux Release samt entpacktem Paket besteht erneut. Verifizierter Bericht:
+OpenGL/X11, `window_visible: true`, 65 Module, 13 Projektdateien erhalten.
+Artefakt 11722433364, ZIP-SHA256
+`e3ad850e966ccb5fd87b3b0e4f97b92fb3429fe69ef64d6d12af94fdc0d33248`;
+Programmhash stimmt mit dem Importbericht überein.
+
+Die Windows-Debug-/Releasejobs der
+[CI38194682964](https://github.com/Lulus792/SecondBrain/actions/runs/38194682964)
+erreichen jetzt einen geschriebenen Diagnosebericht ohne den AccessKit-Absturz,
+scheitern jedoch am bisherigen pauschalen Berichtvergleich (je 88/89).
+`sb_build_info` enthält LF; `--version` schreibt über `fputs` in den normalen
+MSVC-Textstream, der Bericht über `WriteFile` ohne Textübersetzung.
+[Microsoft Text/Binary I/O](https://learn.microsoft.com/en-us/cpp/c-runtime-library/text-and-binary-mode-file-i-o?view=msvc-170),
+am 12. Oktober gelesen, beschreibt den Standard-Textmodus von stdout.
+Der Prüfer verglich die beiden Transportdarstellungen zuvor bytegetreu als Text.
+
+Nur die Konsolen-Buildangabe wird nun CRLF→LF normalisiert. Andere Versionen,
+ein verborgenes Fenster, fehlende Module oder weniger als vier Frames bleiben
+Fehler. Die Validierung nennt einzelne fehlerhafte Felder; bei Buildabweichungen
+auch beide Repräsentationen. CI speichert den Rohbericht bereits bei fehlgeschlagener
+Validierung. Drei neue Vertragsprüfungen und ein erneuter tatsächlicher Metal-Start
+bestehen; 13 Dateien erhalten. Der positive Windows-Nachweis dieser Prüferkorrektur
+steht noch aus. Die tatsächlichen Programmdateien und Projektinhalte werden
+für diesen Abgleich nicht normalisiert oder verändert.
+Originale: `build/runtime73-fixed-verification/`, `full-ctest.log`,
+`linux-native-runtime.json`, `probe-contract-final.log`, `probe-final-text-check.log`.
