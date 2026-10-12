@@ -1,6 +1,7 @@
 #include "desktop.h"
 #include "version.h"
 #include "platform.h"
+#include "runtime_probe.h"
 #include <SDL3/SDL_main.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,6 +28,7 @@ int main(int argc, char **argv) {
     const char *workspace_arg = NULL, *project_arg = NULL, *assets = NULL, *test_root = NULL, *snapshot = NULL, *settings_arg = NULL;
     SBStatus status;
     bool keyboard_test = false,backup_test=false;
+    const char *runtime_probe=NULL;
     for (int i = 1; i < argc; ++i) {
         if (!strcmp(argv[i], "--workspace") && i + 1 < argc) workspace_arg = argv[++i];
         else if (!strcmp(argv[i], "--project") && i + 1 < argc) project_arg = argv[++i];
@@ -36,12 +38,17 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i],"--backup-test") && i+1<argc) { test_root=argv[++i]; backup_test=true; }
         else if (!strcmp(argv[i],"--settings") && i+1<argc) settings_arg=argv[++i];
         else if (!strcmp(argv[i], "--snapshot") && i + 1 < argc) snapshot = argv[++i];
+        else if (!strcmp(argv[i], "--runtime-probe") && i + 1 < argc) runtime_probe = argv[++i];
         else if (!strcmp(argv[i], "--help")) {
             printf("SecondBrain\n  --version\n  --workspace ORDNER\n  --project KENNUNG\n  --assets ASSETORDNER\n  --settings EINSTELLUNGSDATEI\n"
-                   "  --self-test TESTORDNER\n  --keyboard-test TESTORDNER\n  --backup-test TESTORDNER\n  --snapshot BILD.bmp\n");
+                   "  --self-test TESTORDNER\n  --keyboard-test TESTORDNER\n  --backup-test TESTORDNER\n  --snapshot BILD.bmp\n  --runtime-probe NEUE_DATEI.json --workspace TESTORDNER\n");
             return 0;
         } else { fprintf(stderr, "Unbekannte oder unvollständige Option: %s\n", argv[i]); return 2; }
     }
+    if(runtime_probe && (!workspace_arg || settings_arg || snapshot || test_root || project_arg)) {
+        fputs("Laufzeitdiagnose benötigt einen expliziten Arbeitsordner und keine weiteren Diagnose-/Einstellungsoptionen.\n",stderr);return 2;
+    }
+    bool diagnostic=snapshot || runtime_probe;
     if (test_root) {
         char suffix[100], directory[SB_PATH_CAP];
         snprintf(suffix, sizeof(suffix), "run-%lu-%lu", sb_process_id(), (unsigned long)time(NULL));
@@ -60,7 +67,7 @@ int main(int argc, char **argv) {
     char preference_path[SB_PATH_CAP]={0};
     SBStatus preferences=sb_ok();
     SBSettings startup_settings; SBRevision startup_revision;
-    if (settings_arg || !snapshot) {
+    if (settings_arg || !diagnostic) {
         char *directory=settings_arg ? NULL : SDL_GetPrefPath("Lulus792","SecondBrain");
         preferences=settings_arg ? sb_fs_absolute(settings_arg,preference_path,sizeof(preference_path)) :
             directory ? sb_path_join(preference_path,sizeof(preference_path),directory,"settings.conf") : sb_error(SB_IO,"Einstellungsordner ist nicht erreichbar.");
@@ -77,7 +84,7 @@ int main(int argc, char **argv) {
     if (status.code == SB_OK) status = font_path(assets, font);
     if (status.code == SB_OK) status = sb_desktop_init(&desktop, workspace, font, snapshot != NULL);
     if (status.code != SB_OK) { fprintf(stderr, "%s\n", status.message); return 1; }
-    if (settings_arg || !snapshot) {
+    if (settings_arg || !diagnostic) {
         if (preferences.code==SB_OK) preferences=sb_desktop_preferences(&desktop,preference_path,explicit_workspace);
         if (preferences.code!=SB_OK) { desktop.message=preferences; fprintf(stderr,"%s\n",preferences.message); }
     }
@@ -98,7 +105,7 @@ int main(int argc, char **argv) {
             double remaining=16.6667-(double)(SDL_GetTicksNS()-last_tick)/1e6;
             wait_ms=remaining>0 ? (int)remaining : 0;
         }
-        if (!snapshot && SDL_WaitEventTimeout(&event,wait_ms)) sb_desktop_event(&desktop, &event);
+        if (!diagnostic && SDL_WaitEventTimeout(&event,wait_ms)) sb_desktop_event(&desktop, &event);
         while (SDL_PollEvent(&event)) sb_desktop_event(&desktop, &event);
         Uint64 now=SDL_GetTicksNS();
         sb_desktop_tick(&desktop,(float)((double)(now-last_tick)/1e9)); last_tick=now;
@@ -109,9 +116,13 @@ int main(int argc, char **argv) {
             status = sb_ui_capture(&desktop.ui, snapshot);
             desktop.model.quit = true;
         }
-        SDL_RenderPresent(desktop.ui.renderer);
+        bool presented=SDL_RenderPresent(desktop.ui.renderer);
+        if(runtime_probe){
+            if(!presented){status=sb_error(SB_IO,"Darstellung der Laufzeitdiagnose: %s",SDL_GetError());desktop.model.quit=true;}
+            else if(++frames==4){status=sb_runtime_probe(&desktop.ui,runtime_probe);desktop.model.quit=true;}
+        }
         sb_desktop_apply(&desktop);
-        if(!snapshot)sb_desktop_finish_quit(&desktop);
+        if(!diagnostic)sb_desktop_finish_quit(&desktop);
         if (desktop.model.has_project) {
             char title[SB_NAME_CAP + 32];
             snprintf(title, sizeof(title), "%s — SecondBrain", desktop.model.project.name);

@@ -78,8 +78,16 @@ GitHub-Digest geprüft; Programmhashes stimmen überein. Rust 1.98.1/1.99.0 ist
 im vorhandenen Quellenumfang abgedeckt, je 50 Lizenztexte abgeglichen (Windows-
 Zeilenenden getrennt dokumentiert). Der Entwicklerprüfer erfasst nun transitive
 ELF-Anforderungen je Programm; zehn lokale Prüfungen, eine Windows-Prüfung
-übersprungen. Neue native Linux-Abnahme offen. [Rust-Nachweis](../../docs/RUST_RUNTIME_NACHWEIS.md),
+übersprungen. CI38192724967 Windows/Linux Debug/Release samt Release-Paketen
+erfolgreich. Verifizierter Linux-Bericht enthält 22 Bibliotheken, App/CLI getrennt.
+[Rust-Nachweis](../../docs/RUST_RUNTIME_NACHWEIS.md),
 [Laufzeitumfang](../../docs/PAKET_LAUFZEIT.md).
+
+0.9.73 ergänzt eine begrenzte Diagnose des normalen Renderers mit vier Frames,
+Modulbeobachtung und geschütztem neuen Bericht. Lokal Metal/Cocoa, 394 Module,
+13 Projektdateien unverändert; vier gezielte Gruppen und drei ASan/UBSan-Starts
+bestanden. Neue vollständige/native/Paket-/Installationsprüfung folgt;
+installiert bleibt 0.9.72. [Startdiagnose](../../docs/LAUFZEIT_START.md).
 
 ## Quellen und Historie
 

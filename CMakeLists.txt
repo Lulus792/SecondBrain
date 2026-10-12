@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-project(SecondBrain VERSION 0.9.72 LANGUAGES C)
+project(SecondBrain VERSION 0.9.73 LANGUAGES C)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
@@ -164,7 +164,7 @@ if(SB_BUILD_UI)
     elseif(UNIX)
         target_link_libraries(sb_ui PUBLIC m)
     endif()
-    add_library(sb_desktop STATIC app/desktop.c app/notices.c app/system_style.c app/accessibility.c app/dialog.c app/backup_job.c app/backup_test.c app/self_test.c app/keyboard_test.c)
+    add_library(sb_desktop STATIC app/desktop.c app/notices.c app/system_style.c app/accessibility.c app/dialog.c app/backup_job.c app/backup_test.c app/self_test.c app/keyboard_test.c app/runtime_probe.c)
     target_link_libraries(sb_desktop PUBLIC sb_ui sb_app_model ${SB_ACCESSKIT_TARGET})
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         find_package(PkgConfig REQUIRED)
@@ -547,6 +547,11 @@ if(SB_BUILD_UI)
             "-DSB_TEST_ROOT=${CMAKE_CURRENT_BINARY_DIR}/process-preferences"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_preferences_process.cmake")
         set_tests_properties(preferences-process-restart PROPERTIES TIMEOUT 90)
+        add_test(NAME normal-runtime-probe COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_runtime_probe.py"
+            --app "$<TARGET_FILE:secondbrain>" --cli "$<TARGET_FILE:secondbrain-cli>"
+            --output "${CMAKE_CURRENT_BINARY_DIR}/normal-runtime")
+        set_tests_properties(normal-runtime-probe PROPERTIES TIMEOUT 180 RESOURCE_LOCK secondbrain_clipboard)
         add_executable(secondbrain-text-tests tests/test_text.c)
         target_link_libraries(secondbrain-text-tests PRIVATE sb_ui)
         if(MSVC)

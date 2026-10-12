@@ -162,3 +162,16 @@ Originale: `build/runtime72-verification/`, insbesondere
 frische Nutzerrechner, andere Distributionen und die vollständige Zuordnung der
 Toolchain-/SDK-Anteile bleiben gesondert offen. Die App-Version bleibt 0.9.72;
 dieser Schritt verändert den Entwicklerprüfer.
+
+Die [native Nachprüfung zu 9b6555b](https://github.com/Lulus792/SecondBrain/actions/runs/38192724967)
+besteht inzwischen auf Windows/Linux jeweils in Debug und Release, einschließlich
+beider Release-Pakete. Der Linux-Release-Bericht (Artefakt 11722227301) wurde
+gegen seinen GitHub-Digest geprüft:
+`cc2506dc0ec7c88d67c5cb7d5950bf34af65f649a5fa77409a879564a3cb81a0`.
+Er enthält 22 aufgelöste Bibliotheken mit Hash und ELF-Metadaten. Die App löst
+22 Dateien auf, das CLI zwei. Die höchste GLIBC-Anforderung stammt jeweils aus
+dem Programm selbst: 2.39 für die App, 2.34 für das CLI. Die neue Inventur vermischt
+die Programmumfänge nicht. Original: `build/runtime72-verification/transitive-linux-runtime.json`.
+Mac-CI wartet weiter auf Runner. Die begrenzte [Startdiagnose](LAUFZEIT_START.md)
+ergänzt ab 0.9.73 den bisher durch Software-Renderer geprüften Paketweg;
+ihre neue vollständige native/Paketabnahme ist davon getrennt.

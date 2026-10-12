@@ -125,6 +125,19 @@ if(NOT SB_RESULT EQUAL 0)
 endif()
 message(STATUS "Extracted package passed the desktop workflow: ${SB_ARCHIVE}")
 
+if(WIN32)
+    set(SB_PROBE_CLI "${SB_ROOT}/secondbrain-cli.exe")
+else()
+    set(SB_PROBE_CLI "${SB_ROOT}/secondbrain-cli")
+endif()
+execute_process(COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_LIST_DIR}/test_runtime_probe.py"
+    --app "${SB_EXECUTABLE}" --cli "${SB_PROBE_CLI}" --output "${SB_TEST_ROOT}/native-runtime"
+    RESULT_VARIABLE SB_PROBE_RESULT OUTPUT_VARIABLE SB_PROBE_OUTPUT ERROR_VARIABLE SB_PROBE_ERROR TIMEOUT 180)
+message(STATUS "${SB_PROBE_OUTPUT}")
+if(NOT SB_PROBE_RESULT EQUAL 0)
+    message(FATAL_ERROR "Normal-renderer package probe failed: ${SB_PROBE_ERROR}")
+endif()
+
 execute_process(COMMAND "${SB_EXECUTABLE}" --keyboard-test "${SB_TEST_ROOT}/Tastaturprüfung ü"
     WORKING_DIRECTORY "${SB_UNPACK}" RESULT_VARIABLE SB_KEYBOARD_RESULT
     OUTPUT_VARIABLE SB_KEYBOARD_OUTPUT ERROR_VARIABLE SB_KEYBOARD_ERROR TIMEOUT 300)

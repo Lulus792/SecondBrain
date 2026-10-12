@@ -81,6 +81,8 @@ jobs:
             build/ui/test-entry.log
             build/ui/ui-rust-compiler.json
             build/ui/package-check/runtime-dependencies.json
+            build/ui/package-check/native-runtime/**/verification.json
+            build/ui/normal-runtime/**/verification.json
             build/ui/package-check/update-check/**/report.json
             build/ui/checked-configure.log
             build/ui/configure-entry.log
